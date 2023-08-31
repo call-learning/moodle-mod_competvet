@@ -17,10 +17,16 @@
 /**
  * Library of interface functions and constants.
  *
- * @package     mod_competvet
- * @copyright   2023 Your Name <you@example.com>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_competvet
+ * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use core_grades\component_gradeitem;
+use core_grades\component_gradeitems;
+use mod_competvet\competvet;
+use mod_competvet\local\persistent\situation;
+use mod_competvet\utils;
 
 /**
  * Return if the plugin supports $feature.
@@ -33,6 +39,8 @@ function competvet_supports($feature) {
         case FEATURE_GRADE_HAS_GRADE:
             return true;
         case FEATURE_MOD_INTRO:
+            return true;
+        case FEATURE_ADVANCED_GRADING:
             return true;
         default:
             return null;
@@ -55,8 +63,16 @@ function competvet_add_instance($moduleinstance, $mform = null) {
 
     $moduleinstance->timecreated = time();
 
-    $id = $DB->insert_record('competvet', $moduleinstance);
+    ['persistent' => $situationproperties, 'otherproperties' => $moduleproperties]
+        = utils::split_properties_from_persistent(situation::class, $moduleinstance);
+    $id = $DB->insert_record('competvet', $moduleproperties);
 
+    $situationproperties->competvetid = $id;
+    $situation = new situation(0, $situationproperties);
+    $situation->create();
+
+    $moduleinstance->id = $id;
+    competvet_grade_item_update($moduleinstance);
     return $id;
 }
 
@@ -75,8 +91,17 @@ function competvet_update_instance($moduleinstance, $mform = null) {
 
     $moduleinstance->timemodified = time();
     $moduleinstance->id = $moduleinstance->instance;
+    competvet_grade_item_update($moduleinstance);
 
-    return $DB->update_record('competvet', $moduleinstance);
+    ['persistent' => $situationproperties, 'otherproperties' => $moduleproperties]
+        = utils::split_properties_from_persistent(situation::class, $moduleinstance);
+    // Get the relevant situation.
+    $situationproperties->competvetid = $moduleinstance->instance;
+    $situation = situation::get_record(['competvetid' => $moduleinstance->instance], MUST_EXIST);
+    $situation->from_record($situationproperties);
+    $situation->update();
+
+    return $DB->update_record('competvet', $moduleproperties);
 }
 
 /**
@@ -88,13 +113,15 @@ function competvet_update_instance($moduleinstance, $mform = null) {
 function competvet_delete_instance($id) {
     global $DB;
 
-    $exists = $DB->get_record('competvet', array('id' => $id));
+    $exists = $DB->get_record('competvet', ['id' => $id]);
     if (!$exists) {
         return false;
     }
+    $situation = situation::get_record(['competvetid' => $id], MUST_EXIST);
+    $situation->delete();
 
-    $DB->delete_records('competvet', array('id' => $id));
-
+    $DB->delete_records('competvet', ['id' => $id]);
+    $DB->delete_records('competvet_planning', ['situationid' => $id]);
     return true;
 }
 
@@ -111,7 +138,7 @@ function competvet_delete_instance($id) {
 function competvet_scale_used($moduleinstanceid, $scaleid) {
     global $DB;
 
-    if ($scaleid && $DB->record_exists('competvet', array('id' => $moduleinstanceid, 'grade' => -$scaleid))) {
+    if ($scaleid && $DB->record_exists('competvet', ['id' => $moduleinstanceid, 'grade' => -$scaleid])) {
         return true;
     } else {
         return false;
@@ -129,10 +156,68 @@ function competvet_scale_used($moduleinstanceid, $scaleid) {
 function competvet_scale_used_anywhere($scaleid) {
     global $DB;
 
-    if ($scaleid && $DB->record_exists('competvet', array('grade' => -$scaleid))) {
+    if ($scaleid && $DB->record_exists('competvet', ['grade' => -$scaleid])) {
         return true;
     } else {
         return false;
+    }
+}
+
+/**
+ * Delete grade item for given mod_competvet instance.
+ *
+ * @param stdClass $moduleinstance Instance object.
+ * @return void
+ */
+function competvet_grade_item_delete($moduleinstance) {
+    global $CFG;
+    require_once($CFG->libdir . '/gradelib.php');
+    $itemnames = component_gradeitems::get_itemname_mapping_for_component(competvet::COMPONENT_NAME);
+    foreach ($itemnames as $itemnumber => $itemname) {
+        grade_update(
+            '/mod/competvet',
+            $moduleinstance->course,
+            'mod',
+            $moduleinstance->modulename,
+            $moduleinstance->id,
+            $itemnumber,
+            null,
+            ['deleted' => 1]
+        );
+    }
+}
+
+/**
+ * Update grades in central gradebook
+ *
+ * @param stdClass $moduleinstance Instance object with extra cmidnumber and modname property.
+ * @param int $userid specific user only, 0 mean all
+ * @param bool $nullifnone
+ */
+function competvet_update_grades($moduleinstance, $userid = 0, $nullifnone = true) {
+    $context = context_module::instance($moduleinstance->coursemodule);
+    $itemnames = component_gradeitems::get_itemname_mapping_for_component(competvet::COMPONENT_NAME);
+    foreach ($itemnames as $itemnumber => $itemname) {
+        $grades = [];
+        $item = component_gradeitem::instance(competvet::COMPONENT_NAME, $context, $itemname);
+        if ($userid) {
+            $grades[$userid] = $item->get_grade_for_user(core_user::get_user($userid));
+            $grades[$userid]->rawgrade = $grades[$userid]->grade ?? null;
+        } else {
+            // Here as grades in competvet_grade_item_update must be indexed by userid, we should only provide an array
+            // with one item type at a time.
+            $grades = $item->get_all_grades();
+            $grades = array_filter(
+                $grades,
+                function($grade) use ($itemnumber) {
+                    return $grade->itemnumber == $itemnumber;
+                }
+            );
+            foreach ($grades as $grade) {
+                $grade->rawgrade = $grade->grade ?? null;
+            }
+        }
+        competvet_grade_item_update($moduleinstance, !empty($grades) ? $grades : false);
     }
 }
 
@@ -142,63 +227,100 @@ function competvet_scale_used_anywhere($scaleid) {
  * Needed by {@see grade_update_mod_grades()}.
  *
  * @param stdClass $moduleinstance Instance object with extra cmidnumber and modname property.
- * @param bool $reset Reset grades in the gradebook.
+ * @param array|object $grades optional array/object of grade(s); 'reset' means reset grades in gradebook.
  * @return void.
  */
-function competvet_grade_item_update($moduleinstance, $reset=false) {
+function competvet_grade_item_update($moduleinstance, $grades = false) {
     global $CFG;
-    require_once($CFG->libdir.'/gradelib.php');
-
-    $item = array();
-    $item['itemname'] = clean_param($moduleinstance->name, PARAM_NOTAGS);
-    $item['gradetype'] = GRADE_TYPE_VALUE;
-
-    if ($moduleinstance->grade > 0) {
-        $item['gradetype'] = GRADE_TYPE_VALUE;
-        $item['grademax']  = $moduleinstance->grade;
-        $item['grademin']  = 0;
-    } else if ($moduleinstance->grade < 0) {
-        $item['gradetype'] = GRADE_TYPE_SCALE;
-        $item['scaleid']   = -$moduleinstance->grade;
-    } else {
-        $item['gradetype'] = GRADE_TYPE_NONE;
+    require_once($CFG->libdir . '/gradelib.php');
+    $itemnames = component_gradeitems::get_itemname_mapping_for_component(competvet::COMPONENT_NAME);
+    $categoryname = clean_param($moduleinstance->name, PARAM_NOTAGS);
+    $category = grade_category::fetch(['courseid' => $moduleinstance->course,
+        'fullname' => clean_param($moduleinstance->name, PARAM_NOTAGS),]);
+    if (!$category) {
+        $category = new grade_category(['courseid' => $moduleinstance->course, 'fullname' => $categoryname]);
+        $category->insert();
     }
-    if ($reset) {
-        $item['reset'] = true;
+    foreach ($itemnames as $itemnumber => $itemname) {
+        // Make sure we also update the category.
+        $item = grade_item::fetch([
+            'courseid' => $moduleinstance->course,
+            'itemnumber' => $itemnumber, 'itemtype' => 'mod',
+            'itemmodule' => competvet::MODULE_NAME,
+            'iteminstance' => $moduleinstance->id,
+        ]);
+        $gradecatfield =
+            component_gradeitems::get_field_name_for_itemnumber(competvet::COMPONENT_NAME, $itemnumber, 'gradecat');
+        if (empty($item)) {
+            $gradefield = component_gradeitems::get_field_name_for_itemnumber(competvet::COMPONENT_NAME, $itemnumber, 'grade');
+            $gradepassfield =
+                component_gradeitems::get_field_name_for_itemnumber(competvet::COMPONENT_NAME, $itemnumber, 'gradepass');
+            // Let's create it.
+            $item = [];
+            $item['itemname'] = $itemname;
+            // As $moduleinstance can either be a module record (who does not have any info about gradecat)
+            // or a mod_form we just submitted, if it is not there we do not try to set it.
+            $categoryid = $category->id;
+            $item['categoryid'] = $categoryid; // Set the category by default.
+            $gradepass = $moduleinstance->$gradepassfield ?? $moduleinstance->gradepass ?? false;
+            if ($gradepass) {
+                $item['gradepass'] = $gradepass;
+            }
+            // A quick comment on this because I was a bit surprised by it. The gradebook has a concept of a scale and points
+            // but this is not reflected in any field like "gradetype", this is processed by MoodleQuickForm_modgrade::process_value
+            // that will just convert the value to a negative number if it is a scale.
+            // So we need to set the gradetype to value and then set the scaleid to the negative of the scaleid.
+            // This is strange but this is the way it works.
+            $grade = $moduleinstance->$gradefield ?? $moduleinstance->grade;
+            if ($grade > 0) {
+                $item['gradetype'] = GRADE_TYPE_VALUE;
+                $item['grademax'] = $grade;
+                $item['grademin'] = 0;
+            } else if ($grade < 0) {
+                $item['gradetype'] = GRADE_TYPE_SCALE;
+                $item['scaleid'] = -$grade;
+            } else {
+                $item['gradetype'] = GRADE_TYPE_NONE;
+            }
+        } else {
+            // No need to change the item, so let's set it to null.
+            $item = null;
+        }
+        // Now the grades.
+        $filteredgrades = null;
+        if ($grades === 'reset') {
+            $item['reset'] = true;
+        } else {
+            $filteredgrades = empty($grades) ? null : array_filter(
+                $grades,
+                function($grade) use ($itemnumber) {
+                    return $grade->itemnumber == $itemnumber;
+                }
+            );
+        }
+        grade_update(
+            '/mod/competvet',
+            $moduleinstance->course,
+            'mod',
+            competvet::MODULE_NAME,
+            $moduleinstance->id,
+            $itemnumber,
+            // We filter again as grade might be a mix of itemnumbers.
+            $filteredgrades,
+            $item
+        );
+        // If ever we wanted to change the category, this is where it can happen.
+        $itemcategoryid = $moduleinstance->$gradecatfield ?? $moduleinstance->gradecat ?? $category->id;
+        $item = grade_item::fetch([
+            'courseid' => $moduleinstance->course,
+            'itemnumber' => $itemnumber, 'itemtype' => 'mod',
+            'itemmodule' => competvet::MODULE_NAME,
+            'iteminstance' => $moduleinstance->id,
+        ]);
+        if ($item->categoryid != $itemcategoryid) {
+            $item->set_parent($itemcategoryid);
+        }
     }
-
-    grade_update('/mod/competvet', $moduleinstance->course, 'mod', 'mod_competvet', $moduleinstance->id, 0, null, $item);
-}
-
-/**
- * Delete grade item for given mod_competvet instance.
- *
- * @param stdClass $moduleinstance Instance object.
- * @return grade_item.
- */
-function competvet_grade_item_delete($moduleinstance) {
-    global $CFG;
-    require_once($CFG->libdir.'/gradelib.php');
-
-    return grade_update('/mod/competvet', $moduleinstance->course, 'mod', 'competvet',
-                        $moduleinstance->id, 0, null, array('deleted' => 1));
-}
-
-/**
- * Update mod_competvet grades in the gradebook.
- *
- * Needed by {@see grade_update_mod_grades()}.
- *
- * @param stdClass $moduleinstance Instance object with extra cmidnumber and modname property.
- * @param int $userid Update grade of specific user only, 0 means all participants.
- */
-function competvet_update_grades($moduleinstance, $userid = 0) {
-    global $CFG, $DB;
-    require_once($CFG->libdir.'/gradelib.php');
-
-    // Populate array of grade objects indexed by userid.
-    $grades = array();
-    grade_update('/mod/competvet', $moduleinstance->course, 'mod', 'mod_competvet', $moduleinstance->id, 0, $grades);
 }
 
 /**

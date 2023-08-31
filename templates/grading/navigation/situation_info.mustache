@@ -1,0 +1,65 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_competvet/grading/navigation/situation_info
+
+    Shown when the real data for a user has been loaded. Display in the top left corner.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * data-region, data-assignmentid, data-groupid
+
+    Context variables required for this template:
+    * id, courseid, all fields from mod_assign_list_participants
+
+    Example context (json):
+    {
+        "id": "5",
+        "fullname": "Mr T",
+        "hasidentity": true,
+        "identity": "t@example.org, T",
+        "profileimageurl": "https://moodle.org/pix/u/f3.png"
+    }
+}}
+<div class="situation-info" id="situation-info-{{uniqid}}" data-cmid="{{cmid}}">
+    {{#user}}
+    <span data-region="user-info">
+       {{> mod_competvet/grading/navigation/user_info}}
+    </span>
+    {{/user}}
+    <span>
+    <a href="#previousplanning" data-action="previous-planning" aria-label="{{#str}} previousplanning, mod_competvet {{/str}}"
+       title="{{#str}} previousplanning, mod_competvet {{/str}}">
+        {{#pix}}t/left, core{{/pix}}
+    </a>
+    <span data-region="input-field">
+        <label for="change-planning-select" class="sr-only">{{#str}} changeplanning, mod_competvet {{/str}}</label>
+        <select id="change-planning-select" class="custom-select">
+        </select>
+    </span>
+    <a href="#nextplanning" data-action="next-planning" aria-label="{{#str}} nextplanning, mod_competvet {{/str}}" title="{{#str}} nextplanning, mod_competvet {{/str}}">
+        {{#pix}}t/right, core{{/pix}}
+    </a>
+    </span>
+</div>
+{{#js}}
+require(['mod_competvet/local/user_situation_component'], function(component) {
+    component.init(document.getElementById('situation-info-{{uniqid}}'));
+});
+{{/js}}

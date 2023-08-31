@@ -19,7 +19,7 @@
  *
  * @package     mod_competvet
  * @category    upgrade
- * @copyright   2023 Your Name <you@example.com>
+ * @copyright   2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

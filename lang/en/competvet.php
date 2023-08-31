@@ -19,7 +19,7 @@
  *
  * @package     mod_competvet
  * @category    string
- * @copyright   2023 Your Name <you@example.com>
+ * @copyright   2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -29,8 +29,76 @@ $string['pluginname'] = 'CompetVet';
 
 $string['modulename'] = 'CompetVet';
 $string['modulenameplural'] = 'CompetVet';
-$string['competvetname'] =  'CompetVet Activity Name';
-$string['competvetsettings'] =  'CompetVet Settings';
+$string['appraiser'] = 'Appraiser';
+$string['competvetname'] = 'CompetVet Activity Name';
+$string['competvetsettings'] = 'CompetVet Settings';
 $string['competvetplanning'] = 'Planning';
-$string['situation'] = 'Situation';
+$string['competvet:addinstance'] = 'Can add a new CompetVet activity';
+$string['competvet:canaskobservation'] = 'Can ask for an observation';
+$string['competvet:candoeverything'] = 'Can do everything';
+$string['competvet:cangrade'] = 'Can grade a student';
+$string['competvet:canobserve'] = 'Can observe a student';
+$string['competvet:editplanning'] = 'Can edit planning';
+$string['competvet:view'] = 'Can view an activity';
+// Additional capabilities to create.
+$string['competvet:managecompetencies'] = 'Manage CompetVet competencies';
+$string['competvet:managecompetencyframeworks'] = 'Manage CompetVet competency frameworks';
+$string['competvet:managesituationtemplates'] = 'Manage CompetVet situation templates';
+
+$string['editplanning'] = 'Edit planning';
 $string['pluginadministration']  = 'CompetVet Administration';
+$string['situationname'] = 'Name of the situation';
+$string['context'] = 'Context';
+$string['comment'] = 'Comment';
+$string['criterion'] = 'Criterion';
+$string['commentfor'] = 'Comment for {$a}';
+$string['layout:default'] = 'Click to expand review panel';
+$string['layout:collapsegradepanel'] = 'Collapse grade panel';
+$string['layout:collapsereviewpanel'] = 'Collapse review panel';
+$string['grade'] = 'Grade';
+$string['gradefor'] = 'Grade for {$a}';
+$string['gradeedit'] = 'Edit grades';
+$string['grade_eval_name'] = 'Eval. Observations';
+$string['grade_list_name'] = 'Eval. List';
+$string['grade_caselog_name'] = 'Eval. Case Log';
+$string['startdate'] = 'Start time';
+$string['student'] = 'Student';
+$string['enddate'] = 'End time';
+$string['group'] = 'Group';
+$string['evaluationgrid:default'] = 'Grille d\'évaluation par défaut';
+$string['view'] = 'View';
+$string['edit'] = 'Edit';
+$string['delete'] = 'Delete';
+$string['add'] = 'Add';
+$string['gradeitem:list'] = 'List Grade';
+$string['gradeitem:caselog'] = 'Case Log Grade';
+$string['gradeitem:eval'] = 'Eval Grade';
+$string['nofilters'] = 'No filters';
+$string['sendstudentnotifications'] = 'Send student notifications';
+$string['savingchanges'] = 'Saving changes';
+$string['situation:idnumber'] = 'Situation Unique ID';
+$string['loading'] = 'Loading';
+$string['back'] = 'Back';
+$string['invaliddatafor'] = 'Invalid data for {$a}';
+$string['invaliddata'] = 'Invalid data for {$a}';
+$string['observer:role'] = 'Observer';
+$string['observer:role:desc'] = 'Observer role: a user with this role can observe a student and create an observation';
+$string['assessor:role'] = 'Assessor';
+$string['assessor:role:desc'] = 'Assessor role: a user with this role can observer a student ';
+$string['evaluator:role'] = 'Evaluator';
+$string['evaluator:role:desc'] = 'Evaluator role: a user with this role can observer a student and create an observation';
+$string['responsibleucue:role'] = 'Responsible UC/UE';
+$string['responsibleucue:role:desc'] = 'Responsible UC/UE role: a user with this role can observer a student and create an observation
+ but can also create a new situation and plannings.';
+$string['situation:def'] = 'Situation definition';
+$string['situation:shortname'] = 'Situation short name';
+$string['situation:shortname_help'] = 'Situation short name';
+$string['situation:session'] = 'Situation session';
+$string['situation:session_help'] = 'Situation session';
+$string['situation:evalnum'] = 'Required evaluations number';
+$string['situation:evalnum_help'] = 'Required evaluations number';
+$string['situation:autoevalnum'] = 'Required autoevaluation number';
+$string['situation:autoevalnum_help'] = 'Required autoevaluation number';
+$string['admincompetvet:role'] = 'Admin CompetVet';
+$string['admincompetvet:role:desc'] = 'Admin CompetVet can do anything on any situation of the platform.';
+

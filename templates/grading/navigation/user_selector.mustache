@@ -1,0 +1,90 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_competvet/grading/navigation/user_selector
+
+    This template will show a user selection dropdown, and navigation buttons to move between users.
+    Additionally some filters will be added allowing to filter the users by group, role, etc.
+
+    Example context (json):
+    {
+        users: [
+            {
+                id: 1,
+                firstname: "Mr T",
+                lastname: true,
+                email: "test@example.com"
+                pictureurl: "http://moodle.com/image.png"
+            },
+        ]
+
+    }
+}}
+<div class="navigation-user-selector" id="user-selector-{{uniqid}}" data-cmid="{{cmid}}">
+    <a href="#previous" data-action="previous-user" aria-label="{{#str}} previoususer, mod_competvet {{/str}}" title="{{#str}} previoususer, mod_competvet {{/str}}">
+        {{#pix}}t/left, core{{/pix}}
+    </a>
+    <span data-region="input-field">
+        <label for="change-user-select" class="sr-only">{{#str}} changeuser, mod_competvet {{/str}}</label>
+        <select id="change-user-select" class="custom-select">
+            {{#users}}
+                <option value="{{id}}" data-user-id="{{id}}">
+                    <span> {{fullname}} </span>
+                </option>
+            {{/users}}
+        </select>
+    </span>
+    <a href="#next" data-action="next-user" aria-label="{{#str}} nextuser, mod_competvet {{/str}}" title="{{#str}} nextuser, mod_competvet {{/str}}">
+        {{#pix}}t/right, core{{/pix}}
+    </a>
+
+    <span data-region="user-count">
+        <small>
+            <span data-region="user-count-summary">{{#str}}xofy, mod_assign, { "x": "{{index}}", "y": "{{count}}" }{{/str}}</span>
+        </small>
+    </span>
+    <a href="#" data-region="user-filters" title="{{#str}}changefilters, mod_assign{{/str}}" aria-expanded="false" aria-controls="filter-configuration-{{uniqid}}">
+    <span class="accesshide">
+        {{#filters}}
+            {{filtername}}
+        {{/filters}}
+        {{^filters}}
+            {{#str}}nofilters, mod_competvet{{/str}}
+        {{/filters}}
+    </span>
+        {{#pix}}i/filter{{/pix}}
+    </a>
+    <div data-region="configure-filters" id="filter-configuration-{{uniqid}}" class="card card-large p-2 d-none">
+        <form>
+        <span class="row px-3 py-1">
+            <label class="text-right w-25 p-2 m-0" for="filter-general-{{uniqid}}">
+                {{#str}}filter, mod_assign{{/str}}
+            </label>
+            <select name="filter" class="custom-select w-50" id="filter-general-{{uniqid}}">
+                {{#filters}}
+                    <option value="{{key}}" {{#active}}selected="selected"{{/active}} > {{name}} </option>
+                {{/filters}}
+            </select>
+        </span>
+        </form>
+    </div>
+</div>
+{{#js}}
+require(['mod_competvet/local/user_selector_component'], function(component) {
+    component.init(document.getElementById('user-selector-{{uniqid}}'));
+});
+{{/js}}

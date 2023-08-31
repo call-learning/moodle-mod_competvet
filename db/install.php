@@ -19,7 +19,7 @@
  *
  * @package     mod_competvet
  * @category    upgrade
- * @copyright   2023 Your Name <you@example.com>
+ * @copyright   2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,6 +27,6 @@
  * Custom code to be run on installing the plugin.
  */
 function xmldb_competvet_install() {
-
+    \mod_competvet\setup::create_update_roles(\mod_competvet\competvet::COMPETVET_ROLES);
     return true;
 }

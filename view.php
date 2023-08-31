@@ -17,47 +17,54 @@
 /**
  * Prints an instance of mod_competvet.
  *
- * @package     mod_competvet
- * @copyright   2023 Your Name <you@example.com>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_competvet
+ * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require(__DIR__.'/../../config.php');
-require_once(__DIR__.'/lib.php');
+use mod_competvet\utils;
 
-// Course module id.
-$id = optional_param('id', 0, PARAM_INT);
+require(__DIR__ . '/../../config.php');
 
-// Activity instance id.
-$c = optional_param('c', 0, PARAM_INT);
+global $DB, $PAGE, $OUTPUT;
 
-if ($id) {
-    $cm = get_coursemodule_from_id('competvet', $id, 0, false, MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-    $moduleinstance = $DB->get_record('competvet', array('id' => $cm->instance), '*', MUST_EXIST);
-} else {
-    $moduleinstance = $DB->get_record('competvet', array('id' => $c), '*', MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $moduleinstance->course), '*', MUST_EXIST);
-    $cm = get_coursemodule_from_instance('competvet', $moduleinstance->id, $course->id, false, MUST_EXIST);
-}
-
-require_login($course, true, $cm);
+[$cm, $course, $moduleinstance, $tabs, $currenttype] = utils::page_requirements('view');
 
 $modulecontext = context_module::instance($cm->id);
 
-$event = \mod_competvet\event\course_module_viewed::create(array(
+$event = \mod_competvet\event\course_module_viewed::create([
     'objectid' => $moduleinstance->id,
-    'context' => $modulecontext
-));
+    'context' => $modulecontext,
+]);
 $event->add_record_snapshot('course', $course);
 $event->add_record_snapshot('competvet', $moduleinstance);
 $event->trigger();
 
-$PAGE->set_url('/mod/competvet/view.php', array('id' => $cm->id));
-$PAGE->set_title(format_string($moduleinstance->name));
-$PAGE->set_heading(format_string($course->fullname));
-$PAGE->set_context($modulecontext);
+$addbutton = new single_button(
+    new moodle_url(
+        '/mod/competvet/add.php',
+        ['id' => $cm->id, 'currenttype' => $currenttype]
+    ),
+    get_string('add')
+);
+$PAGE->set_button($OUTPUT->render($addbutton));
 
+// Add 3 pages tabs 'eval', 'planning' and 'view'.
 echo $OUTPUT->header();
+echo $OUTPUT->heading($moduleinstance->name);
 
+$gradebutton = new single_button(
+    new moodle_url(
+        '/mod/competvet/grading.php',
+        ['id' => $cm->id]
+    ),
+    get_string('gradeverb')
+);
+echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
+echo $OUTPUT->render($gradebutton);
+echo $OUTPUT->box_end('generalbox boxaligncenter', 'intro');
+
+echo $OUTPUT->tabtree($tabs, $currenttype);
+$eval = new \mod_competvet\output\eval_list($cm->id);
+echo $OUTPUT->render($eval);
 echo $OUTPUT->footer();

@@ -1,0 +1,55 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_competvet/grading/navigation/layout_control
+
+    Shown when the real data for a user has been loaded. Display in the top left corner.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * data-region, data-assignmentid, data-groupid
+
+    Context variables required for this template:
+    * id, courseid, all fields from mod_assign_list_participants
+
+    Example context (json):
+    {
+        "fullname": "Mr T",
+        "pictureurl": "https://moodle.org/pix/u/f3.png"
+    }
+}}
+
+<div class="btn-toolbar collapse-buttons" id="layout-control-{{uniqid}}" data-cmid="{{cmid}}">
+    <div class="btn-group">
+        <button type="button" class="btn btn-secondary collapse-review-panel" aria-label="{{#str}}layout:collapsereviewpanel, mod_competvet{{/str}}" title="{{#str}}layout:collapsereviewpanel, mod_competvet{{/str}}">
+            {{#pix }}layout-expand-right, mod_competvet {{/pix}}
+        </button>
+        <button type="button" class="btn btn-secondary collapse-none active" aria-label="{{#str}}layout:default, mod_competvet{{/str}}" title="{{#str}}layout:default, mod_competvet{{/str}}">
+            {{#pix }}layout-default, mod_competvet {{/pix}}
+        </button>
+        <button type="button" class="btn btn-secondary collapse-grade-panel" aria-label="{{#str}}layout:collapsereviewpanel, mod_competvet{{/str}}" title="{{#str}}layout:collapsereviewpanel, mod_competvet{{/str}}">
+            {{#pix }}layout-expand-left, mod_competvet {{/pix}}
+        </button>
+    </div>
+</div>
+{{#js}}
+require(['mod_competvet/local/layout_control_component'], function(component) {
+    component.init(document.getElementById('layout-control-{{uniqid}}'));
+});
+{{/js}}

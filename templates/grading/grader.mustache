@@ -1,0 +1,51 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_competvet/grading/grader
+
+    Shown when the real data for a user has been loaded. Display in the top left corner.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * data-region, data-assignmentid, data-groupid
+
+    Context variables required for this template:
+    * id, courseid, all fields from mod_assign_list_participants
+
+    Example context (json):
+    {
+        "cmid": "5",
+    }
+}}
+<div data-region="grader"
+     id="grader-{{itemname}}-{{uniqid}}"
+     data-cmid="{{cmid}}"
+     data-contextid="{{contextid}}"
+     data-grading-component="{{component}}"
+     data-grading-component-subtype="{{subcomponent}}"
+     data-item-name="{{itemname}}"
+     data-userid="{{userid}}">
+    <div data-region="grader-content"></div>
+    <button class="btn btn-primary" data-action="submit-grade" data-item-name="{{itemname}}">{{#str}}save{{/str}}</button>
+</div>
+{{#js}}
+    require(['mod_competvet/local/grader_component'], function(component) {
+    component.init(document.getElementById('grader-{{itemname}}-{{uniqid}}'));
+    });
+{{/js}}

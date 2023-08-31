@@ -17,10 +17,9 @@
 /**
  * Plugin administration pages are defined here.
  *
- * @package     mod_competvet
- * @category    admin
- * @copyright   2023 Your Name <you@example.com>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_competvet
+ * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();

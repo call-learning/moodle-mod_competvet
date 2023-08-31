@@ -17,14 +17,13 @@
 /**
  * Redirect the user to the appropiate submission related page.
  *
- * @package     mod_competvet
- * @category    grade
- * @copyright   2023 Your Name <you@example.com>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_competvet
+ * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require(__DIR__.'/../../config.php');
-
+global $DB;
 // Course module ID.
 $id = required_param('id', PARAM_INT);
 

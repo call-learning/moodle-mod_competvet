@@ -17,15 +17,15 @@
 /**
  * Plugin version and other meta-data are defined here.
  *
- * @package     mod_competvet
- * @copyright   2023 Your Name <you@example.com>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_competvet
+ * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_competvet';
-$plugin->release = '0.1.0';
-$plugin->version = 2023082200;
+$plugin->release = '0.1.1';
+$plugin->version = 2023082221;
 $plugin->requires = 2022112800;
 $plugin->maturity = MATURITY_ALPHA;
