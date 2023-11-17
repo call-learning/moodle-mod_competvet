@@ -1,0 +1,23 @@
+UC0514 Urgences *;URG
+UC0514 Anesthésie;ANE
+UC0514 Soins intensifs*;SI
+UC0514 Imagerie;IMA
+UC0513 Med zoologique*;ZOO
+UC0513 Med prév;PRE
+UC0513 Dermato;DER
+UC0513 Repro;REP
+UC0511 AUTOPS;AUT
+UC0512 Méd gén Hospit *;HME
+UC0512 Méd gén Hospit/ Neuro;HMN
+UC0512 Cardio/Ophtalmo;MSP
+UC0512 Méd gén consult;MGE
+UC0515 Chir Hospit/bloc*;CHO
+UC0515 Chir Repro  / Conv;CCV
+UC0515 Chir Conv / Rééduc;CRE
+UC0515 Chir Consult;CCO
+UC0521 Eq2 - Chir/Anesth *;EQC
+UC0521 Eq3 - Loco;EQL
+UC0521 Eq1 - Méd*;EQM
+UC0521 Eq4 - Urg Hospit;EQU
+UC0522 MIR HGA ;MIR
+UC0523 MCR Amb;AMB

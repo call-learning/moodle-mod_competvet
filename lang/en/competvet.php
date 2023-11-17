@@ -87,6 +87,9 @@ $string['assessor:role'] = 'Assessor';
 $string['assessor:role:desc'] = 'Assessor role: a user with this role can observer a student ';
 $string['evaluator:role'] = 'Evaluator';
 $string['evaluator:role:desc'] = 'Evaluator role: a user with this role can observer a student and create an observation';
+$string['progress_createcompetvet'] = 'Creating Situation ({$a})';
+$string['progress_createaccountswithroles'] = 'Creating user accounts with role {$a->rolename} ({$a->from} - {$a->to})';
+$string['progress_creategroups'] = 'Creating groups';
 $string['responsibleucue:role'] = 'Responsible UC/UE';
 $string['responsibleucue:role:desc'] = 'Responsible UC/UE role: a user with this role can observer a student and create an observation
  but can also create a new situation and plannings.';
