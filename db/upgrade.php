@@ -38,5 +38,10 @@ function xmldb_competvet_upgrade($oldversion) {
         // Competvet savepoint reached.
         upgrade_mod_savepoint(true, 2023082216, 'competvet');
     }
+    if ($oldversion < 2023082223) {
+        \mod_competvet\setup::setup_update_tags();
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2023082223, 'competvet');
+    }
     return true;
 }

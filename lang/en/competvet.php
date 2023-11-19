@@ -102,6 +102,12 @@ $string['situation:evalnum'] = 'Required evaluations number';
 $string['situation:evalnum_help'] = 'Required evaluations number';
 $string['situation:autoevalnum'] = 'Required autoevaluation number';
 $string['situation:autoevalnum_help'] = 'Required autoevaluation number';
+$string['situation:tags:firstyear'] = 'Première année';
+$string['situation:tags:secondyear'] = 'Deuxième année';
+$string['situation:tags:thirdyear'] = 'Troisième année';
 $string['admincompetvet:role'] = 'Admin CompetVet';
 $string['admincompetvet:role:desc'] = 'Admin CompetVet can do anything on any situation of the platform.';
+$string['tagarea_competvet_situation'] = 'Situations';
+$string['tagcollection_situations'] = 'Situations';
+$string['situation:tags'] = 'Tags for situation';
 

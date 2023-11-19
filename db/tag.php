@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,10 +12,10 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * CompetVet tags
  *
  * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
@@ -24,8 +24,15 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_competvet';
-$plugin->release = '0.1.1';
-$plugin->version = 2023082224;
-$plugin->requires = 2022112800;
-$plugin->maturity = MATURITY_ALPHA;
+$tagareas =  [
+    [
+        'itemtype' => 'competvet_situation',
+        'component' => 'mod_competvet',
+        'callback' => '\mod_competvet\tags::get_tagged_situations',
+        'callbackfile' => '/user/lib.php',
+        'collection' => 'situations',
+        'customurl' => '/mod/competvet/tag_search.php',
+        'searchable' => true,
+        'showstandard' => core_tag_tag::STANDARD_ONLY,
+    ]
+];

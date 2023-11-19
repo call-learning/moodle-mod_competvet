@@ -111,13 +111,26 @@ class mod_competvet_mod_form extends moodleform_mod {
             $competvetidel = $mform->getElement('competvetid');
             $competvetidel->setValue($this->get_current()->id);
         }
+        $mform->addElement(
+            'tags',
+            'situationtags',
+            get_string('situation:tags', 'competvet'),
+            [
+                'itemtype' => 'competvet_situation',
+                'component' => 'mod_competvet',
+            ]
+        );
+        if ($this->_cm) {
+            $tags = core_tag_tag::get_item_tags_array('mod_competvet', 'competvet_situation', $this->_cm->id);
+            $mform->setDefault('situationtags', $tags);
+        }
     }
 
     /**
      * Display planning.
      */
     private function display_planning() {
-        global $DB, $PAGE;
+        global $PAGE;
         $mform = $this->_form;
         // Get the current value of situationid.
         $cm = $this->get_coursemodule();
@@ -133,9 +146,9 @@ class mod_competvet_mod_form extends moodleform_mod {
             }, $groups);
             $indexedgroups = array_combine($groupsid, $groupsnames);
             $evalplans = \mod_competvet\local\persistent\planning::get_records(
-                    ['situationid' => $cm->instance],
-                    'groupid'
-                );
+                ['situationid' => $cm->instance],
+                'groupid'
+            );
             // Create an html table.
             $table = new html_table();
             $table->head = ['Group', 'Start time', 'End time'];
@@ -181,8 +194,13 @@ class mod_competvet_mod_form extends moodleform_mod {
             $competvetidel->setValue($this->get_current()->id);
             $situationfields = utils::get_persistent_fields_without_standards(situation::class);
             $situation = situation::get_record(['competvetid' => $this->get_current()->id]);
-            $situationrecord = array_intersect_key((array)$situation->to_record(), $situationfields);
+            $situationrecord = array_intersect_key((array) $situation->to_record(), $situationfields);
             $mform->setDefaults($situationrecord);
+        }
+        // Populate tags for situation.
+        if (core_tag_tag::is_enabled('mod_competvet', 'competvet_situation')) {
+            $tags = core_tag_tag::get_item_tags_array('mod_competvet', 'competvet_situation', $this->get_current()->id);
+            $mform->setDefault('situationtags', $tags);
         }
     }
 }

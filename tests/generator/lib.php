@@ -51,16 +51,73 @@ class mod_competvet_generator extends testing_module_generator {
                 $record->{$name} = $value;
             }
         }
+
+        if (empty($record->name)) {
+            $possiblesituationnames = self::get_situation_sample_names();
+            $random = rand(0, count($possiblesituationnames) - 1);
+            $record->name = $possiblesituationnames[$random][0] . ' ' . $this->instancecount;
+            $record->shortname = $possiblesituationnames[$random][1] . '-' . $this->instancecount;
+        }
         if (empty($record->idnumber)) {
             // Strip spaces in the name and convert to uppercase.
-            if (empty($record->name)) {
-                $name = get_string('pluginname', $this->get_modulename()).' '.$this->instancecount;
-            } else {
-                $name = $record->name;
-            }
-            $record->idnumber = strtoupper(preg_replace('/\s+/', '', $name));
+            $record->idnumber = strtoupper(preg_replace('/\s+/', '', $record->name));
+        }
+        if (empty($record->shortname)) {
+            // Strip spaces in the name and convert to uppercase.
+            $record->shortname = strtoupper(preg_replace('/\s+/', '', $record->name));
+        }
+
+        // Now take care of the tags.
+        if (empty($record->situationtags)) {
+            $possibletags = static::get_situation_sample_tags();
+            $tag = $possibletags[rand(0, count($possibletags) - 1)];
+            $record->situationtags = [$tag];
         }
         return parent::create_instance($record, (array) $options);
+    }
+
+    /**
+     * Get situation sample names
+     *
+     * @return array
+     */
+    private static function get_situation_sample_names() {
+        $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_competvet', 'situationsamples');
+        if ($cache->has('situationnames')) {
+            return $cache->get('situationnames');
+        }
+        $possiblesituationnames = [];
+        if (empty($possiblesituationnames)) {
+            global $CFG;
+            // Load possible situations names by loading data/samples/sample_situations_names.csv CSV file.
+            $situationnames = fopen($CFG->dirroot . '/mod/competvet/data/samples/sample_situations_names.csv', 'r');
+            while (($data = fgetcsv($situationnames, null, ';')) !== false) {
+                $data = array_map('trim', $data);
+                $possiblesituationnames[] = $data;
+            }
+            fclose($situationnames);
+        }
+        $cache->set('situationnames', $possiblesituationnames);
+        return $possiblesituationnames;
+    }
+
+    /**
+     * Get situation sample tags
+     *
+     * @return array
+     */
+    private static function get_situation_sample_tags() {
+        global $DB;
+        $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_competvet', 'situationsamples');
+        if ($cache->has('situationtags')) {
+            return $cache->get('situationtags');
+        }
+        $situationscollectionid = \core_tag_area::get_collection('mod_competvet', 'competvet_situation');
+        $collection = \core_tag_collection::get_by_id($situationscollectionid);
+        $possiblesituationtags =
+            $DB->get_fieldset_select('tag', 'name', 'tagcollid = :collectionid', ['collectionid' => $collection->id]);
+        $cache->set('situationtags', $possiblesituationtags);
+        return $possiblesituationtags;
     }
 
     /**

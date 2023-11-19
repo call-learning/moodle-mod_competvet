@@ -21,9 +21,9 @@
  * Note : in 4.2, thanks to this patch (https://tracker.moodle.org/browse/MDL-75334),
  * this might not be necessary anymore.
  *
- * @package tool_generator
- * @copyright 2013 The Open University
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_competvet
+ * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 define('CLI_SCRIPT', true);
@@ -209,29 +209,16 @@ class extended_tool_generator_course_backend extends tool_generator_course_backe
      * Creates a number of Situations activities.
      */
     private function create_situations() {
-        static $possiblesituationnames = [];
-        if (empty($possiblesituationnames)) {
-            global $CFG;
-            // Load possible situations names by loading data/samples/sample_situations_names.csv CSV file.
-            $situationnames = fopen($CFG->dirroot . '/mod/competvet/data/samples/sample_situations_names.csv', 'r');
-            while (($data = fgetcsv($situationnames, null, ';')) !== false) {
-                $data = array_map('trim', $data);
-                $possiblesituationnames[] = $data;
-            }
-            fclose($situationnames);
-        }
         $generatoreflection = new ReflectionClass('tool_generator_course_backend');
         $generatoreflection->getMethod('get_target_section')->setAccessible(true);
         // Set up generator.
         $competvetgenerator = $this->generator->get_plugin_generator('mod_competvet');
 
-        // Create pages.
+        // Create competvet.
         $number = self::$paramadmincompetvet[$this->size];
         $this->log('createcompetvet', ['number' => $number], true);
         for ($i = 0; $i < $number; $i++) {
-            $random = rand(0, count($possiblesituationnames) - 1);
-            $record = ['course' => $this->course, 'name' => $possiblesituationnames[$random][0],
-                'shortname' => $possiblesituationnames[$random][1], ];
+            $record = ['course' => $this->course];
             $options = ['section' => $generatoreflection->getMethod('get_target_section')->invoke($this)];
             $competvetgenerator->create_instance($record, $options);
             $this->dot($i, $number);
@@ -403,10 +390,10 @@ class extended_tool_generator_course_backend extends tool_generator_course_backe
                 'description' => 'Group ' . $number . ' description',
             ]);
         }
-        for ($usernumber = 1; $usernumber < $paramusers[$this->size]; $usernumber++) {
+        for ($usernumber = 1; $usernumber <= $paramusers[$this->size]; $usernumber++) {
             $this->generator->create_group_member([
                 'groupid' => $this->groups[$usernumber % $count]->id,
-                'userid' => $users[$usernumber + 1],
+                'userid' => $users[$usernumber],
             ]);
         }
     }

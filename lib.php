@@ -73,6 +73,14 @@ function competvet_add_instance($moduleinstance, $mform = null) {
 
     $moduleinstance->id = $id;
     competvet_grade_item_update($moduleinstance);
+    $contextmodule = context_module::instance($moduleinstance->coursemodule);
+    core_tag_tag::set_item_tags(
+        'mod_competvet',
+        'competvet_situation',
+        $id,
+        $contextmodule,
+        $moduleinstance->situationtags
+    );
     return $id;
 }
 
@@ -100,7 +108,13 @@ function competvet_update_instance($moduleinstance, $mform = null) {
     $situation = situation::get_record(['competvetid' => $moduleinstance->instance], MUST_EXIST);
     $situation->from_record($situationproperties);
     $situation->update();
-
+    core_tag_tag::set_item_tags(
+        'mod_competvet',
+        'competvet_situation',
+        $moduleinstance->instance,
+        context_module::instance($moduleinstance->coursemodule),
+        $moduleinstance->situationtags
+    );
     return $DB->update_record('competvet', $moduleproperties);
 }
 

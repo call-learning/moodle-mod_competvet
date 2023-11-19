@@ -16,6 +16,7 @@
 namespace mod_competvet;
 
 use context_module;
+use core_tag_collection;
 use moodle_url;
 use tabobject;
 

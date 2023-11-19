@@ -16,6 +16,7 @@
 namespace mod_competvet;
 
 use context_system;
+use core_tag_tag;
 
 /**
  * Setup routines
@@ -66,6 +67,31 @@ class setup {
                     // inherited by all the contexts where the role is assigned.
                     assign_capability($permissionname, $permissionvalue, $currentrole->id, context_system::instance()->id, true);
                 }
+            }
+        }
+    }
+
+    /**
+     * Language string for situation tags
+     */
+    const SITUATION_TAG_LS = [
+        'firstyear',
+        'secondyear',
+        'thirdyear',
+    ];
+    /**
+     * Add few standard tags for situation that can then be used to categorise and filter them.
+     * @return void
+     */
+    public static function setup_update_tags() {
+        if (core_tag_tag::is_enabled('mod_competvet', 'competvet_situation')) {
+            // Find the collection named situations.
+            $situationscollectionid = \core_tag_area::get_collection('mod_competvet', 'competvet_situation');
+            if ($situationscollectionid) {
+                $situationtags = array_map(function ($languagestring) {
+                    return get_string('situation:tags:' . $languagestring, competvet::COMPONENT_NAME);
+                }, self::SITUATION_TAG_LS);
+                core_tag_tag::create_if_missing($situationscollectionid, $situationtags, true);
             }
         }
     }
