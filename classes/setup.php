@@ -16,7 +16,12 @@
 namespace mod_competvet;
 
 use context_system;
+use core_reportbuilder\datasource;
+use core_reportbuilder\local\helpers\report as helper;
+use core_reportbuilder\local\models\report as report_model;
+use core_reportbuilder\manager;
 use core_tag_tag;
+use mod_competvet\reportbuilder\datasource\plannings;
 
 /**
  * Setup routines
@@ -27,13 +32,25 @@ use core_tag_tag;
  */
 class setup {
     /**
+     * Language string for situation tags
+     */
+    const SITUATION_TAG_LS = [
+        'firstyear',
+        'secondyear',
+        'thirdyear',
+    ];
+
+    /**
      * Create roles
      *
-     * @param array $roledefinitions an array of role definition
+     * @param array|null $roledefinitions an array of role definition
      * @return void
      */
-    public static function create_update_roles(array $roledefinitions): void {
+    public static function create_update_roles(?array $roledefinitions = null): void {
         global $DB;
+        if (empty($roledefinitions)) {
+            $roledefinitions = \mod_competvet\competvet::COMPETVET_ROLES;
+        }
         $existingroles = get_all_roles();
         $existingrolesshortnames = array_flip(array_map(function ($role) {
             return $role->shortname;
@@ -72,15 +89,8 @@ class setup {
     }
 
     /**
-     * Language string for situation tags
-     */
-    const SITUATION_TAG_LS = [
-        'firstyear',
-        'secondyear',
-        'thirdyear',
-    ];
-    /**
      * Add few standard tags for situation that can then be used to categorise and filter them.
+     *
      * @return void
      */
     public static function setup_update_tags() {
@@ -94,5 +104,40 @@ class setup {
                 core_tag_tag::create_if_missing($situationscollectionid, $situationtags, true);
             }
         }
+    }
+    /**
+     * Custom report infos.
+     */
+    const CUSTOM_REPORT_DATA = [
+        [
+            'label' => 'plannings', 'source' => plannings::class, 'default' => 0,
+        ],
+    ];
+
+    /**
+     * Create reports used in this module.
+     *
+     * @return void
+     */
+    public static function create_reports() {
+        foreach (self::CUSTOM_REPORT_DATA as $customreportdata) {
+            $customreportdata['name'] = get_string('report:' . $customreportdata['label'], competvet::COMPONENT_NAME);
+            unset($customreportdata['label']);
+            $customreportdata['component'] = competvet::COMPONENT_NAME;
+            $customreportdata['area'] = plannings::AREA;
+            $existingreport = report_model::get_record([
+                'type' => datasource::TYPE_CUSTOM_REPORT,
+                'source' => plannings::class,
+                'component' => competvet::COMPONENT_NAME,
+                'area' => plannings::AREA,
+            ]);
+            if ($existingreport) {
+                $customreportdata = array_merge((array) $existingreport->to_record(), $customreportdata);
+                helper::update_report((object) $customreportdata);
+            } else {
+                helper::create_report((object) $customreportdata);
+            }
+        }
+        manager::reset_caches();
     }
 }

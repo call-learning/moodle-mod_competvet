@@ -34,7 +34,7 @@ function xmldb_competvet_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
     if ($oldversion < 2023082216) {
-        \mod_competvet\setup::create_update_roles(\mod_competvet\competvet::COMPETVET_ROLES);
+        \mod_competvet\setup::create_update_roles();
         // Competvet savepoint reached.
         upgrade_mod_savepoint(true, 2023082216, 'competvet');
     }

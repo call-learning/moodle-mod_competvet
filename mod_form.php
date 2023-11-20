@@ -23,13 +23,19 @@
  */
 
 use core_grades\component_gradeitems;
+use core_reportbuilder\datasource;
+use core_reportbuilder\local\models\report as report_model;
+use core_reportbuilder\table\custom_report_table_view_filterset;
+use core_table\local\filter\integer_filter;
+use mod_competvet\competvet;
 use mod_competvet\local\persistent\situation;
+use mod_competvet\reportbuilder\datasource\plannings;
+use mod_competvet\table\custom_report_table_view_form_embed;
 use mod_competvet\utils;
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/course/moodleform_mod.php');
-
 /**
  * Module instance settings form.
  *
@@ -38,6 +44,9 @@ require_once($CFG->dirroot . '/course/moodleform_mod.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_competvet_mod_form extends moodleform_mod {
+    // The pagination size for the planning list.
+    const PLANNING_PAGINATION_SIZE = 10;
+
     /**
      * Defines forms elements
      */
@@ -61,7 +70,7 @@ class mod_competvet_mod_form extends moodleform_mod {
             $this->add_intro_editor();
         }
 
-        // Then the situation fields
+        // Then the situation fields.
         $this->add_situation_fields();
 
         // Adding the rest of mod_competvet settings, spreading all them into this fieldset.
@@ -94,8 +103,12 @@ class mod_competvet_mod_form extends moodleform_mod {
             if ($elementtype == 'hidden') {
                 $mform->addElement('hidden', $situationfield);
             } else {
-                $mform->addElement($elementtype, $situationfield, get_string('situation:' . $situationfield, 'competvet'),
-                    $elementoptions);
+                $mform->addElement(
+                    $elementtype,
+                    $situationfield,
+                    get_string('situation:' . $situationfield, 'competvet'),
+                    $elementoptions
+                );
                 if (situation::is_property_required($situationfield)) {
                     $mform->addRule($situationfield, null, 'required', null, 'client');
                 }
@@ -135,32 +148,25 @@ class mod_competvet_mod_form extends moodleform_mod {
         // Get the current value of situationid.
         $cm = $this->get_coursemodule();
         if (!empty($cm->id)) {
-            // Get current course group.
-            $groups = groups_get_all_groups($cm->course);
-            // Extract all group names.
-            $groupsnames = array_map(function($group) {
-                return $group->name;
-            }, $groups);
-            $groupsid = array_map(function($group) {
-                return $group->id;
-            }, $groups);
-            $indexedgroups = array_combine($groupsid, $groupsnames);
-            $evalplans = \mod_competvet\local\persistent\planning::get_records(
-                ['situationid' => $cm->instance],
-                'groupid'
-            );
-            // Create an html table.
-            $table = new html_table();
-            $table->head = ['Group', 'Start time', 'End time'];
-            $table->data = [];
-            foreach ($evalplans as $evalplan) {
-                $table->data[] = [
-                    $groups[$evalplan->get('groupid')]->name,
-                    userdate($evalplan->get('startdate')),
-                    userdate($evalplan->get('enddate')),
-                ];
-            }
-            $mform->addElement('html', html_writer::table($table));
+            $existingreport = report_model::get_record([
+                'type' => datasource::TYPE_CUSTOM_REPORT,
+                'source' => plannings::class,
+                'component' => competvet::COMPONENT_NAME,
+                'area' => plannings::AREA,
+            ]);
+            $renderer = $PAGE->get_renderer('core_reportbuilder');
+
+
+            $table = custom_report_table_view_form_embed::create($existingreport->get('id'));
+            $filterset = new custom_report_table_view_filterset();
+            $filterset->add_filter(new integer_filter('pagesize', null, [self::PLANNING_PAGINATION_SIZE]));
+            $table->define_baseurl($PAGE->url);
+            $table->set_filterset($filterset);
+            ob_start();
+            $table->out($table->get_default_per_page(), false);
+            $html = ob_get_contents();
+            ob_end_clean();
+            $mform->addElement('html', $html);
             $mform->addElement(
                 'button',
                 'editplanning',

@@ -27,7 +27,7 @@
  * Custom code to be run on installing the plugin.
  */
 function xmldb_competvet_install() {
-    \mod_competvet\setup::create_update_roles(\mod_competvet\competvet::COMPETVET_ROLES);
+    \mod_competvet\setup::create_update_roles();
     \mod_competvet\setup::setup_update_tags();
     return true;
 }

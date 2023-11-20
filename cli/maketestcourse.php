@@ -26,6 +26,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_competvet\local\persistent\situation;
+
 define('CLI_SCRIPT', true);
 define('NO_OUTPUT_BUFFERING', true);
 
@@ -107,6 +109,9 @@ if ($error = tool_generator_course_backend::check_shortname_available($shortname
 \core\session\manager::set_user(get_admin());
 
 class extended_tool_generator_course_backend extends tool_generator_course_backend {
+const PLANNING_WEEKS = 30;
+    const WEEK_SIZE = 7 * 24 * 3600;
+const RANDOM_MISSING_PLANNING = 6;
     private static $paramgroups = [1, 5, 10, 100, 300, 500];
     /**
      * @var array Number of assignments in course
@@ -145,7 +150,7 @@ class extended_tool_generator_course_backend extends tool_generator_course_backe
     /**
      * @var stdClass Course object
      */
-    private $course;
+    private $course; // 30 weeks.
 
     /**
      * Runs the entire 'make' process.
@@ -183,18 +188,19 @@ class extended_tool_generator_course_backend extends tool_generator_course_backe
         $this->course = $createcoursemethod->invoke($this);
         $courseprop->setValue($this, $this->course);
 
-        $this->create_situations($courseprop->getValue($this));
-        // Create users as late as possible to reduce regarding in the gradebook.
+        // Create users.
         $createusersmethod->invoke($this);
+        // Now create groups.
+        $this->log('creategroups', true);
+        $this->create_groups();
+
+        // Create situations.
+        $this->create_situations($courseprop->getValue($this));
 
         // Now to make it simple we will take the 3 roles and assign them to the
         foreach (array_keys(\mod_competvet\competvet::COMPETVET_ROLES) as $rolename) {
             $this->create_users_with_roles($rolename);
         }
-
-        // Now create groups.
-        $this->log('creategroups', true);
-        $this->create_groups();
         // Log total time.
         $this->log('coursecompleted', round(microtime(true) - $entirestart, 1));
 
@@ -220,12 +226,14 @@ class extended_tool_generator_course_backend extends tool_generator_course_backe
         for ($i = 0; $i < $number; $i++) {
             $record = ['course' => $this->course];
             $options = ['section' => $generatoreflection->getMethod('get_target_section')->invoke($this)];
-            $competvetgenerator->create_instance($record, $options);
+            $instance = $competvetgenerator->create_instance($record, $options);
+            // Now create random planning.
+            $this->create_plannings($instance);
             $this->dot($i, $number);
         }
 
         $this->end_log();
-    }
+    } // 6 weeks without planning.
 
     /**
      * Displays information as part of progress.
@@ -260,6 +268,34 @@ class extended_tool_generator_course_backend extends tool_generator_course_backe
             $this->lastdot = time();
             $this->lastpercentage = $this->lastdot;
             $this->starttime = microtime(true);
+        }
+    }
+
+    /**
+     * Creates a number of Planning for each situation
+     */
+    private function create_plannings(object $instance) {
+        $datenow = time();
+        // Get the closest monday at 00:00.
+        $monday = strtotime('last monday', $datenow);
+        $groups = array_values(groups_get_all_groups($this->course->id));
+        $competvetgenerator = $this->generator->get_plugin_generator('mod_competvet');
+        $situation = situation::get_from_module_instance_id($instance->id);
+        $skippedplanning = 0;
+        for ($week = 0; $week < self::PLANNING_WEEKS; $week++) {
+            if (random_int(1, 1000) > 500 && $skippedplanning < self::RANDOM_MISSING_PLANNING) {
+                $skippedplanning++;
+                continue;
+            }
+            $group = $groups[random_int(0, count($groups) - 1)];
+            $record = [
+                'situationid' => $situation->get('id'),
+                'startdate' => $monday,
+                'groupid' => $group->id,
+                'enddate' => $monday + self::WEEK_SIZE,
+            ];
+            $competvetgenerator->create_planning($record);
+            $monday += self::WEEK_SIZE;
         }
     }
 

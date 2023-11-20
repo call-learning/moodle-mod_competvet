@@ -37,7 +37,6 @@ class situations {
      * @return array[] array of situations
      */
     public static function get_all_situations_with_planning_for(int $userid): array {
-        global $DB;
         $situations = self::get_all_situations_for($userid);
         $situationswithplanning = [];
         foreach ($situations as $situation) {

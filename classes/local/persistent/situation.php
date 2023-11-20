@@ -32,6 +32,15 @@ class situation extends persistent {
     const TABLE = 'competvet_situation';
 
     /**
+     *
+     * @param $id
+     * @return situation
+     */
+    public static function get_from_module_instance_id($id): self {
+        return self::get_record(['competvetid' => $id]);
+    }
+
+    /**
      * Usual properties definition for a persistent
      *
      * @return array|array[]
