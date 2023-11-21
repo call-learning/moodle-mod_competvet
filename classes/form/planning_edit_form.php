@@ -18,6 +18,8 @@ namespace mod_competvet\form;
 
 use context;
 use core_form\dynamic_form;
+use mod_competvet\competvet;
+use mod_competvet\local\persistent\planning;
 use moodle_exception;
 use moodle_url;
 
@@ -39,34 +41,16 @@ class planning_edit_form extends dynamic_form {
         global $DB, $USER;
         $context = $this->get_context_for_dynamic_submission();
         $data = $this->get_data();
-
-        // Get data id from context_module
-        $modinfo = $this->get_modinfo();
-        $situationid = $modinfo->instance;
-        $planningentries = [];
-        for ($planningindex = 0; $planningindex < $data->planningcount; $planningindex++) {
-            $planningentry = [];
-            foreach (['groupid', 'startdate', 'enddate', 'planningid'] as $field) {
-                if ($data->$field[$planningindex]) {
-                    $planningentry[$field] = $data->$field[$planningindex];
-                }
-            }
-            if (count($planningentry) >= 3) {
-                $planningentries[] = (object) $planningentry;
-            }
-        }
-        foreach ($planningentries as $planningentry) {
-            $planningentry->usermodified = $USER->id;
-            $planningentry->timemodified = time();
-            $planningentry->timecreated = time();
-            $planningentry->situationid = $situationid;
-            if ($DB->record_exists('competvet_plan', ['id' => $planningentry->planningid])) {
-                $planningentry->id = $planningentry->planningid;
-                unset($planningentry->planningid);
-                $DB->update_record('competvet_plan', $planningentry);
-            } else {
-                $DB->insert_record('competvet_plan', $planningentry);
-            }
+        $situation = competvet::get_from_context($context)->get_situation();
+        $data->situationid = $situation->get('id');
+        unset($data->cmid);
+        if (!empty($data->planningid)) {
+            $planning = new planning($data->planningid);
+            $planning->from_record($data);
+            $planning->update();
+        } else {
+            $planning = new planning(0, $data);
+            $planning->create();
         }
         $returnurl = new moodle_url('/course/modedit.php', [
             'update' => $context->instanceid,
@@ -101,52 +85,6 @@ class planning_edit_form extends dynamic_form {
     }
 
     /**
-     * Set data
-     *
-     * @return void
-     */
-    public function set_data_for_dynamic_submission(): void {
-        global $DB;
-        $data = (object) [
-            'cmid' => $this->optional_param('cmid', 0, PARAM_INT),
-        ];
-        [
-            'groupid' => $data->groupid,
-            'startdate' => $data->startdate,
-            'enddate' => $data->enddate,
-            'planningid' => $data->planningid,
-            'planningcount' => $data->planningcount,
-        ] = $this->get_existing_data();
-        $this->set_data($data);
-    }
-
-    private function get_existing_data() {
-        global $DB;
-        // Check existing related planning.
-        $modinfo = $this->get_modinfo();
-        $situationid = $modinfo->instance;
-        $planningentries =
-            $DB->get_records('competvet_plan', ['situationid' => $situationid], 'groupid, startdate, enddate ASC');
-        $currentgroupsid = [];
-        $currentstartdates = [];
-        $currentendtdates = [];
-        $currentplanningids = [];
-        foreach ($planningentries as $planningentry) {
-            $currentgroupsid[] = $planningentry->groupid;
-            $currentstartdates[] = $planningentry->startdate;
-            $currentendtdates[] = $planningentry->enddate;
-            $currentplanningids[] = $planningentry->id;
-        }
-        return [
-            'groupid' => $currentgroupsid,
-            'startdate' => $currentstartdates,
-            'enddate' => $currentendtdates,
-            'planningid' => $currentplanningids,
-            'planningcount' => count($planningentries),
-        ];
-    }
-
-    /**
      * Has access ?
      *
      * @return void
@@ -177,42 +115,18 @@ class planning_edit_form extends dynamic_form {
         $mform = $this->_form;
         $mform->addElement('header', 'competvetplanning', get_string('competvetplanning', 'mod_competvet'));
         $mform->setExpanded('competvetplanning');
-        $this->get_existing_data();
-        [
-            'groupid' => $currentgroupsid,
-            'startdate' => $currentstartdates,
-            'enddate' => $currentenddatess,
-            'planningid' => $currentplanningids,
-            'planningcount' => $planningcount,
-        ] = $this->get_existing_data();
-        $this->_ajaxformdata['groupid'] = $this->_ajaxformdata['groupid'] ?? $currentgroupsid;
-        $this->_ajaxformdata['startdate'] = $this->_ajaxformdata['startdate'] ?? $currentstartdates;
-        $this->_ajaxformdata['enddate'] = $this->_ajaxformdata['enddate'] ?? $currentenddatess;
-        $this->_ajaxformdata['planningid'] = $this->_ajaxformdata['planningid'] ?? $currentplanningids;
-        $this->_ajaxformdata['planningcount'] = $this->_ajaxformdata['planningcount'] ?? $planningcount;
-        // Add repeat form elements with a groupid, a startdate and an enddate using moodleform::repeat_elements method.
-        $this->repeat_elements([
-            $mform->createElement('select', 'groupid', get_string('group', 'mod_competvet'), $this->get_groups()),
-            $mform->createElement('date_time_selector', 'startdate', get_string('startdate', 'mod_competvet')),
-            $mform->createElement('date_time_selector', 'enddate', get_string('enddate', 'mod_competvet')),
-            $mform->createElement('hidden', 'planningid'),
-            $mform->createElement('button', 'deleteplanning', get_string('delete')),
-        ], 1, [
-            'groupid' => ['type' => PARAM_INT],
-            'startdate' => ['type' => PARAM_INT],
-            'enddate' => ['type' => PARAM_INT],
-            'planningid' => ['type' => PARAM_INT],
-            'deleteplanning' => ['type' => PARAM_RAW],
-        ], 'planningcount',
-            'planningadd',
-            3,
-            get_string('addplanning', 'mod_competvet'),
-            false,
-            'deleteplanning');
-        foreach ($this->_ajaxformdata['planningid'] as $index => $planingid) {
-            $this->_form->setDefault("planningid[$index]", $planingid);
-        }
+
+        $mform->addElement('hidden', 'planningid', $this->optional_param('planningid', null, PARAM_INT));
+        $mform->setType('planningid', PARAM_INT);
         $mform->addElement('hidden', 'cmid', $this->optional_param('cmid', null, PARAM_INT));
+        $mform->setType('cmid', PARAM_INT);
+
+        $mform->addElement('select', 'groupid', get_string('group', 'mod_competvet'), $this->get_groups());
+        $mform->setType('groupid', PARAM_INT);
+        $mform->addElement('date_time_selector', 'startdate', get_string('startdate', 'mod_competvet'));
+        $mform->setType('startdate', PARAM_INT);
+        $mform->addElement('date_time_selector', 'enddate', get_string('enddate', 'mod_competvet'));
+        $mform->setType('enddate', PARAM_INT);
     }
 
     /**
@@ -231,5 +145,18 @@ class planning_edit_form extends dynamic_form {
         }, $groups);
         $indexedgroups = array_combine($groupsid, $groupsnames);
         return $indexedgroups;
+    }
+
+    public function set_data_for_dynamic_submission(): void {
+        $data = [
+            'cmid' => $this->optional_param('cmid', 0, PARAM_INT),
+            'planningid' => $this->optional_param('planningid', 0, PARAM_INT),
+        ];
+        if (!empty($data['planningid'])) {
+            $planning  = planning::get_record(['id' => $data['planningid']]);
+            $existingdata = $planning->to_record();
+            $data = array_merge($data, (array) $existingdata);
+        }
+        parent::set_data((object) $data);
     }
 }

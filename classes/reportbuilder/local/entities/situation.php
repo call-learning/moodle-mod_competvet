@@ -19,6 +19,7 @@ declare(strict_types=1);
 namespace mod_competvet\reportbuilder\local\entities;
 
 use core_reportbuilder\local\entities\base;
+use mod_competvet\reportbuilder\local\filters\situation_selector;
 use core_reportbuilder\local\filters\{number};
 use core_reportbuilder\local\report\{column, filter};
 use lang_string;
@@ -142,6 +143,15 @@ class situation extends base {
             $this->get_entity_name(),
             "{$situationalias}.autoevalnum"
         ))->add_joins($this->get_joins());
+
+        $filters[] = (new filter(
+            situation_selector::class,
+            'situationselect',
+            new lang_string('situation:selector', 'mod_competvet'),
+            $this->get_entity_name(),
+            "{$situationalias}.id"
+        ))->add_joins($this->get_joins());
+
         return $filters;
     }
 

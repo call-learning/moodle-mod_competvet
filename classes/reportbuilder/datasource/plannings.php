@@ -32,8 +32,6 @@ use mod_competvet\reportbuilder\local\entities\situation;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class plannings extends datasource {
-    const AREA = 'planning';
-
     /**
      * Return user friendly name of the report source
      *
@@ -75,10 +73,7 @@ class plannings extends datasource {
      * @return string[]
      */
     public function get_default_conditions(): array {
-        return [
-            'planning:startdate',
-            'planning:enddate',
-        ];
+        return [];
     }
 
     /**

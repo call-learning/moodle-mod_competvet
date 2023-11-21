@@ -39,6 +39,15 @@ class setup {
         'secondyear',
         'thirdyear',
     ];
+    /**
+     * Custom report infos.
+     */
+    const CUSTOM_REPORT_DATA = [
+        [
+            'label' => 'plannings', 'source' => plannings::class, 'area' => 'planning', 'component' => competvet::COMPONENT_NAME,
+            'default' => 0,
+        ],
+    ];
 
     /**
      * Create roles
@@ -52,7 +61,7 @@ class setup {
             $roledefinitions = \mod_competvet\competvet::COMPETVET_ROLES;
         }
         $existingroles = get_all_roles();
-        $existingrolesshortnames = array_flip(array_map(function ($role) {
+        $existingrolesshortnames = array_flip(array_map(function($role) {
             return $role->shortname;
         }, $existingroles)); // Shortname to ID.
         $roles = [];
@@ -98,21 +107,13 @@ class setup {
             // Find the collection named situations.
             $situationscollectionid = \core_tag_area::get_collection('mod_competvet', 'competvet_situation');
             if ($situationscollectionid) {
-                $situationtags = array_map(function ($languagestring) {
+                $situationtags = array_map(function($languagestring) {
                     return get_string('situation:tags:' . $languagestring, competvet::COMPONENT_NAME);
                 }, self::SITUATION_TAG_LS);
                 core_tag_tag::create_if_missing($situationscollectionid, $situationtags, true);
             }
         }
     }
-    /**
-     * Custom report infos.
-     */
-    const CUSTOM_REPORT_DATA = [
-        [
-            'label' => 'plannings', 'source' => plannings::class, 'default' => 0,
-        ],
-    ];
 
     /**
      * Create reports used in this module.
@@ -123,19 +124,29 @@ class setup {
         foreach (self::CUSTOM_REPORT_DATA as $customreportdata) {
             $customreportdata['name'] = get_string('report:' . $customreportdata['label'], competvet::COMPONENT_NAME);
             unset($customreportdata['label']);
-            $customreportdata['component'] = competvet::COMPONENT_NAME;
-            $customreportdata['area'] = plannings::AREA;
             $existingreport = report_model::get_record([
                 'type' => datasource::TYPE_CUSTOM_REPORT,
-                'source' => plannings::class,
-                'component' => competvet::COMPONENT_NAME,
-                'area' => plannings::AREA,
+                'source' => $customreportdata['source'],
+                'component' => $customreportdata['component'],
+                'area' => $customreportdata['area'],
             ]);
+            $defaults = $customreportdata['defaults'] ?? [];
+            unset($customreportdata['defaults']);
             if ($existingreport) {
-                $customreportdata = array_merge((array) $existingreport->to_record(), $customreportdata);
-                helper::update_report((object) $customreportdata);
-            } else {
-                helper::create_report((object) $customreportdata);
+                helper::delete_report($existingreport->get('id'));
+            }
+            $existingreport = helper::create_report((object) $customreportdata, empty($defaults));
+
+            if (!empty($defaults)) {
+                foreach ($defaults['columns'] ?? [] as $column) {
+                    helper::add_report_column($existingreport->get('id'), $column);
+                }
+                foreach ($defaults['filters'] ?? [] as $filter) {
+                    helper::add_report_filter($existingreport->get('id'), $filter);
+                }
+                foreach ($defaults['conditions'] ?? [] as $condition) {
+                    helper::add_report_condition($existingreport->get('id'), $condition);
+                }
             }
         }
         manager::reset_caches();

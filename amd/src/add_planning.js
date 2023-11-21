@@ -25,30 +25,34 @@ import Notification from 'core/notification';
 import {get_string as getString} from 'core/str';
 
 const selectors = {
-    editplanning: '[name="editplanning"]',
+    PLANNING_LIST_ID: 'id_competvetplanningcontainer',
+    EDIT_PLANNING_BUTTON_ACTION: '[data-action="editplanning"]',
+    ADD_PLANNING_BUTTON_ACTION: '[data-action="addplanning"]',
 };
 
 /**
  * Initialize module
  */
-export const init = () => {
+export const init = async () => {
     document.addEventListener('click', (event) => {
-        const editPlanningButton = event.target.closest(selectors.editplanning);
+        const editPlanningButton = event.target.closest(selectors.EDIT_PLANNING_BUTTON_ACTION);
+        const addPlanningButton = event.target.closest(selectors.ADD_PLANNING_BUTTON_ACTION);
 
-        if (!editPlanningButton) {
+        if (!editPlanningButton && !addPlanningButton) {
             return;
         }
-
+        const button = addPlanningButton || editPlanningButton;
         event.preventDefault();
         const modalForm = new ModalForm({
             modalConfig: {
-                title: getString('editplanning', 'mod_competvet'),
+                title: editPlanningButton ? getString('edit') : getString('add'),
             },
             formClass: 'mod_competvet\\form\\planning_edit_form',
             args: {
-                cmid: editPlanningButton.dataset.competvetCmid
+                cmid: button.dataset.cmid,
+                planningid: button.dataset?.planningId,
             },
-            saveButtonText: getString('save', 'moodle'),
+            saveButtonText: getString('save'),
         });
 
         modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, event => {

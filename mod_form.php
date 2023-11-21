@@ -26,10 +26,12 @@ use core_grades\component_gradeitems;
 use core_reportbuilder\datasource;
 use core_reportbuilder\local\models\report as report_model;
 use core_reportbuilder\table\custom_report_table_view_filterset;
+use core_reportbuilder\table\system_report_table;
 use core_table\local\filter\integer_filter;
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\reportbuilder\datasource\plannings;
+use mod_competvet\reportbuilder\local\systemreports\planning_per_situation;
 use mod_competvet\table\custom_report_table_view_form_embed;
 use mod_competvet\utils;
 
@@ -148,32 +150,19 @@ class mod_competvet_mod_form extends moodleform_mod {
         // Get the current value of situationid.
         $cm = $this->get_coursemodule();
         if (!empty($cm->id)) {
-            $existingreport = report_model::get_record([
-                'type' => datasource::TYPE_CUSTOM_REPORT,
-                'source' => plannings::class,
-                'component' => competvet::COMPONENT_NAME,
-                'area' => plannings::AREA,
-            ]);
-            $renderer = $PAGE->get_renderer('core_reportbuilder');
-
-
-            $table = custom_report_table_view_form_embed::create($existingreport->get('id'));
-            $filterset = new custom_report_table_view_filterset();
-            $filterset->add_filter(new integer_filter('pagesize', null, [self::PLANNING_PAGINATION_SIZE]));
-            $table->define_baseurl($PAGE->url);
-            $table->set_filterset($filterset);
-            ob_start();
-            $table->out($table->get_default_per_page(), false);
-            $html = ob_get_contents();
-            ob_end_clean();
+            $competvet = competvet::get_from_context($this->get_context());
+            $situation = $competvet->get_situation();
+            $existingreport = \core_reportbuilder\system_report_factory::create(planning_per_situation::class, $this->get_context(),
+            competvet::COMPONENT_NAME, 'form', 0, ['situationid' => $situation->get('id')]);
+            $html = $existingreport->output();
             $mform->addElement('html', $html);
             $mform->addElement(
                 'button',
-                'editplanning',
-                get_string('editplanning', 'mod_competvet'),
-                ['data-competvet-cmid' => $cm->id, 'class' => 'editplanning']
+                'addplanning',
+                get_string('add'),
+                ['data-cmid' => $cm->id, 'data-action' => 'addplanning']
             );
-            $PAGE->requires->js_call_amd('mod_competvet/edit_planning', 'init');
+            $PAGE->requires->js_call_amd('mod_competvet/add_planning', 'init');
         }
     }
 

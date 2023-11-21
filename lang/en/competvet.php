@@ -108,6 +108,7 @@ $string['situation:autoevalnum_help'] = 'Required autoevaluation number';
 $string['situation:tags:firstyear'] = 'Première année';
 $string['situation:tags:secondyear'] = 'Deuxième année';
 $string['situation:tags:thirdyear'] = 'Troisième année';
+$string['situation:selector'] = 'Situation selector';
 $string['admincompetvet:role'] = 'Admin CompetVet';
 $string['admincompetvet:role:desc'] = 'Admin CompetVet can do anything on any situation of the platform.';
 $string['tagarea_competvet_situation'] = 'Situations';
