@@ -18,27 +18,26 @@ declare(strict_types=1);
 
 namespace mod_competvet\reportbuilder\datasource;
 
-use core_group\reportbuilder\local\entities\group;
 use core_reportbuilder\datasource;
-use core_reportbuilder\local\entities\course;
-use mod_competvet\reportbuilder\local\entities\planning;
 use mod_competvet\reportbuilder\local\entities\situation;
 
 /**
- * Plannings datasource
+ * Situations datasource
  *
  * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class plannings extends datasource {
+class situations extends datasource
+{
     /**
      * Return user friendly name of the report source
      *
      * @return string
      */
-    public static function get_name(): string {
-        return get_string('report:plannings', 'mod_competvet');
+    public static function get_name(): string
+    {
+        return get_string('report:situations', 'mod_competvet');
     }
 
     /**
@@ -46,12 +45,12 @@ class plannings extends datasource {
      *
      * @return string[]
      */
-    public function get_default_columns(): array {
+    public function get_default_columns(): array
+    {
         return [
-            'planning:startdate',
-            'planning:enddate',
             'situation:shortname',
-            'group:name',
+            'situation:evalnum',
+            'situation:autoevalnum',
         ];
     }
 
@@ -60,10 +59,12 @@ class plannings extends datasource {
      *
      * @return string[]
      */
-    public function get_default_filters(): array {
+    public function get_default_filters(): array
+    {
         return [
-            'planning:startdate',
-            'planning:enddate',
+            'situation:shortname',
+            'situation:evalnum',
+            'situation:situationselect',
         ];
     }
 
@@ -72,37 +73,37 @@ class plannings extends datasource {
      *
      * @return string[]
      */
-    public function get_default_conditions(): array {
+    public function get_default_conditions(): array
+    {
         return [];
     }
 
     /**
      * Initialise report
      */
-    protected function initialise(): void {
-        $planningentity = new planning();
-
-        $planningalias = $planningentity->get_table_alias('competvet_planning');
-        $this->set_main_table('competvet_planning', $planningalias);
-        $this->add_entity($planningentity);
-
-        // Join planning entity to situation.
+    protected function initialise(): void
+    {
         $situationentity = new situation();
+
         $situationalias = $situationentity->get_table_alias('competvet_situation');
-        $this->add_entity($situationentity
-            ->add_join(
-                "LEFT JOIN {competvet_situation} {$situationalias} ON {$situationalias}.id = {$planningalias}.situationid"
-            ));
-        // Join planning to groups.
-        $groupentity = new group();
-        $groupsalias = $groupentity->get_table_alias('groups');
-        $groupscontextalias = $groupentity->get_table_alias('context');
-        $this->add_entity($groupentity
-            ->add_join("LEFT JOIN {groups} {$groupsalias} ON {$groupsalias}.id = {$planningalias}.groupid")
-            ->add_join("LEFT JOIN {context} {$groupscontextalias}
-            ON {$groupscontextalias}.contextlevel = " . CONTEXT_COURSE . "
-           AND {$groupscontextalias}.instanceid = {$groupsalias}.courseid")
+        $this->set_main_table('competvet_situation', $situationalias);
+
+        // Join situation entity to competvet.
+        $competvetalias = $situationentity->get_table_alias('competvet');
+        $modulealias = $situationentity->get_table_alias('modules');
+        $coursemodulealias = $situationentity->get_table_alias('course_modules');
+        $contextalias = $situationentity->get_table_alias('context');
+
+        $situationentity->add_join(
+            "LEFT JOIN {competvet} {$competvetalias} ON {$competvetalias}.id = {$situationalias}.competvetid"
+        )->add_join(
+            "LEFT JOIN {course_modules} {$coursemodulealias} ON {$competvetalias}.id = {$coursemodulealias}.instance"
+        )->add_join(
+            "LEFT JOIN {modules} {$modulealias} ON {$modulealias}.id = {$coursemodulealias}.module AND {$modulealias}.name = 'competvet'"
+        )->add_join(
+            "LEFT JOIN {context} {$contextalias} ON {$contextalias}.instanceid = {$coursemodulealias}.id AND contextlevel = " . CONTEXT_MODULE
         );
+        $this->add_entity($situationentity);
 
         $this->add_all_from_entities();
     }

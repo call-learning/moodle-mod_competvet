@@ -18,11 +18,14 @@ declare(strict_types=1);
 
 namespace mod_competvet\reportbuilder\local\entities;
 
+use context_course;
+use context_helper;
 use core_reportbuilder\local\entities\base;
-use mod_competvet\reportbuilder\local\filters\situation_selector;
 use core_reportbuilder\local\filters\{number};
 use core_reportbuilder\local\report\{column, filter};
 use lang_string;
+use mod_competvet\reportbuilder\local\filters\situation_selector;
+use stdClass;
 
 /**
  * Situation entity
@@ -31,13 +34,15 @@ use lang_string;
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class situation extends base {
+class situation extends base
+{
     /**
      * Initialise the entity
      *
      * @return base
      */
-    public function initialise(): base {
+    public function initialise(): base
+    {
         $columns = $this->get_all_columns();
         foreach ($columns as $column) {
             $this->add_column($column);
@@ -59,8 +64,12 @@ class situation extends base {
      *
      * @return column[]
      */
-    protected function get_all_columns(): array {
+    protected function get_all_columns(): array
+    {
         $situationalias = $this->get_table_alias('competvet_situation');
+        $competvetalias = $this->get_table_alias('competvet');
+        $contextalias = $this->get_table_alias('context');
+        $cmmodulealias = $this->get_table_alias('course_modules');
 
         $columns[] = (new column(
             'shortname',
@@ -91,6 +100,41 @@ class situation extends base {
             ->set_type(column::TYPE_INTEGER)
             ->add_fields("{$situationalias}.autoevalnum")
             ->set_is_sortable(true);
+
+        $columns[] = (new column(
+            'name',
+            new lang_string('situation:name', 'mod_competvet'),
+            $this->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->set_type(column::TYPE_TEXT)
+            ->add_fields("{$competvetalias}.name")
+            ->set_is_sortable(true);
+
+        $columns[] = (new column(
+            'intro',
+            new lang_string('situation:intro', 'mod_competvet'),
+            $this->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->set_type(column::TYPE_LONGTEXT)
+            ->add_field("{$competvetalias}.intro", 'intro')
+            ->add_fields("{$competvetalias}.introformat, {$competvetalias}.id as competvetid, {$cmmodulealias}.id AS cmmoduleid")
+            ->add_fields(context_helper::get_preload_record_columns_sql($contextalias))
+            ->set_is_sortable(false)
+            ->set_callback(static function(?string $intro, stdClass $row): string {
+                if ($intro === null) {
+                    return '';
+                }
+                context_helper::preload_from_record($row);
+                $context = \context_module::instance($row->cmmoduleid);
+
+                $intro = file_rewrite_pluginfile_urls($intro, 'pluginfile.php', $context->id, 'competvet',
+                    'intro', $row->competvetid);
+
+                return format_text($intro, $row->introformat, ['context' => $context]);
+            });
+
         return $columns;
     }
 
@@ -99,7 +143,8 @@ class situation extends base {
      *
      * @return filter[]
      */
-    protected function get_all_filters(): array {
+    protected function get_all_filters(): array
+    {
         $situationalias = $this->get_table_alias('competvet_situation');
 
         $filters[] = (new filter(
@@ -142,10 +187,14 @@ class situation extends base {
      *
      * @return array
      */
-    protected function get_default_table_aliases(): array {
+    protected function get_default_table_aliases(): array
+    {
         return [
-            'competvet_planning' => 'plan',
+            'competvet' => 'mcompetvet',
             'competvet_situation' => 'situation',
+            'modules' => 'modules',
+            'course_modules' => 'cmodules',
+            'context' => 'ctxmodule',
         ];
     }
 
@@ -154,7 +203,8 @@ class situation extends base {
      *
      * @return lang_string
      */
-    protected function get_default_entity_title(): lang_string {
+    protected function get_default_entity_title(): lang_string
+    {
         return new lang_string('entity:situation', 'mod_competvet');
     }
 }

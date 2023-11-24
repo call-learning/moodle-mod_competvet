@@ -107,9 +107,12 @@ $string['situation:tags:firstyear'] = 'Première année';
 $string['situation:tags:secondyear'] = 'Deuxième année';
 $string['situation:tags:thirdyear'] = 'Troisième année';
 $string['situation:selector'] = 'Situation selector';
+$string['situation:intro'] = 'Situation Intro';
+$string['situation:name'] = 'Situation Name (Full)';
+$string['situation:tags'] = 'Tags for situation';
 $string['sendstudentnotifications'] = 'Send student notifications';
 $string['savingchanges'] = 'Saving changes';
 $string['situation:idnumber'] = 'Situation Unique ID';
 $string['tagarea_competvet_situation'] = 'Situations';
 $string['tagcollection_situations'] = 'Situations';
-$string['situation:tags'] = 'Tags for situation';
+
