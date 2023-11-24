@@ -37,8 +37,6 @@
                        COMMENT="The id of the competvet module definition. Should be a 1 to 1 relationship."/>
                 <FIELD NAME="shortname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"
                        COMMENT="The unique shortname to for this situation. It is unique within a combination of shortname/session set."/>
-                <FIELD NAME="session" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"
-                       COMMENT="The session for the situation so it can be renewed every year or trimester. It is a freetext and is a unique id when combined with shortname."/>
                 <FIELD NAME="evalnum" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Required amount of evaluations."/>
                 <FIELD NAME="autoevalnum" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Required amount of auto evaluations."/>
                 <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -61,6 +59,8 @@
                 <FIELD NAME="groupid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="startdate" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="enddate" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="session" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"
+                       COMMENT="The session for the situation so it can be renewed every year or trimester. It is a freetext and is a unique id when combined with shortname."/>
                 <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>

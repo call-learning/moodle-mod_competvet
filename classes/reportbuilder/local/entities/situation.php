@@ -73,16 +73,6 @@ class situation extends base {
             ->set_is_sortable(true);
 
         $columns[] = (new column(
-            'session',
-            new lang_string('situation:session', 'mod_competvet'),
-            $this->get_entity_name()
-        ))
-            ->add_joins($this->get_joins())
-            ->set_type(column::TYPE_TEXT)
-            ->add_fields("{$situationalias}.session")
-            ->set_is_sortable(true);
-
-        $columns[] = (new column(
             'evalnum',
             new lang_string('situation:evalnum', 'mod_competvet'),
             $this->get_entity_name()
@@ -118,14 +108,6 @@ class situation extends base {
             new lang_string('situation:shortname', 'mod_competvet'),
             $this->get_entity_name(),
             "{$situationalias}.shortname"
-        ))->add_joins($this->get_joins());
-
-        $filters[] = (new filter(
-            number::class,
-            'session',
-            new lang_string('situation:session', 'mod_competvet'),
-            $this->get_entity_name(),
-            "{$situationalias}.session"
         ))->add_joins($this->get_joins());
 
         $filters[] = (new filter(

@@ -40,4 +40,12 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/competvet:view',
     ],
+    'mod_competvet_delete_planning' => [
+        'classname' => 'mod_competvet\\external\\delete_planning',
+        'methodname' => 'execute',
+        'description' => 'Delete a planning from its id',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:editplanning',
+    ],
 ];

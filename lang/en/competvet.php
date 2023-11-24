@@ -24,9 +24,9 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-
+$string['admincompetvet:role'] = 'Admin CompetVet';
+$string['admincompetvet:role:desc'] = 'Admin CompetVet can do anything on any situation of the platform.';
 $string['pluginname'] = 'CompetVet';
-
 $string['modulename'] = 'CompetVet';
 $string['modulenameplural'] = 'CompetVet';
 $string['appraiser'] = 'Appraiser';
@@ -44,7 +44,6 @@ $string['competvet:view'] = 'Can view an activity';
 $string['competvet:managecompetencies'] = 'Manage CompetVet competencies';
 $string['competvet:managecompetencyframeworks'] = 'Manage CompetVet competency frameworks';
 $string['competvet:managesituationtemplates'] = 'Manage CompetVet situation templates';
-
 $string['editplanning'] = 'Edit planning';
 $string['pluginadministration'] = 'CompetVet Administration';
 $string['situationname'] = 'Name of the situation';
@@ -74,9 +73,6 @@ $string['gradeitem:list'] = 'List Grade';
 $string['gradeitem:caselog'] = 'Case Log Grade';
 $string['gradeitem:eval'] = 'Eval Grade';
 $string['nofilters'] = 'No filters';
-$string['sendstudentnotifications'] = 'Send student notifications';
-$string['savingchanges'] = 'Saving changes';
-$string['situation:idnumber'] = 'Situation Unique ID';
 $string['loading'] = 'Loading';
 $string['back'] = 'Back';
 $string['invaliddatafor'] = 'Invalid data for {$a}';
@@ -91,16 +87,18 @@ $string['progress_createcompetvet'] = 'Creating Situation ({$a})';
 $string['progress_createaccountswithroles'] = 'Creating user accounts with role {$a->rolename} ({$a->from} - {$a->to})';
 $string['progress_creategroups'] = 'Creating groups';
 $string['responsibleucue:role'] = 'Responsible UC/UE';
+$string['planning:defaultsession'] = 'Default planning session';
+$string['planning:session'] = 'Planning session';
+$string['planning:session_help'] = 'Planning session';
 $string['responsibleucue:role:desc'] = 'Responsible UC/UE role: a user with this role can observer a student and create an observation
  but can also create a new situation and plannings.';
+$string['planning:confirmdelete'] = 'Are you sure you want to delete this planning?';
 $string['report:plannings'] = 'Plannings report';
 $string['entity:planning'] = 'Planning';
 $string['entity:situation'] = 'Situation';
 $string['situation:def'] = 'Situation definition';
 $string['situation:shortname'] = 'Situation short name';
 $string['situation:shortname_help'] = 'Situation short name';
-$string['situation:session'] = 'Situation session';
-$string['situation:session_help'] = 'Situation session';
 $string['situation:evalnum'] = 'Required evaluations number';
 $string['situation:evalnum_help'] = 'Required evaluations number';
 $string['situation:autoevalnum'] = 'Required autoevaluation number';
@@ -109,9 +107,9 @@ $string['situation:tags:firstyear'] = 'Première année';
 $string['situation:tags:secondyear'] = 'Deuxième année';
 $string['situation:tags:thirdyear'] = 'Troisième année';
 $string['situation:selector'] = 'Situation selector';
-$string['admincompetvet:role'] = 'Admin CompetVet';
-$string['admincompetvet:role:desc'] = 'Admin CompetVet can do anything on any situation of the platform.';
+$string['sendstudentnotifications'] = 'Send student notifications';
+$string['savingchanges'] = 'Saving changes';
+$string['situation:idnumber'] = 'Situation Unique ID';
 $string['tagarea_competvet_situation'] = 'Situations';
 $string['tagcollection_situations'] = 'Situations';
 $string['situation:tags'] = 'Tags for situation';
-

@@ -74,10 +74,12 @@ class planning_per_situation extends system_report {
         $this->add_filters();
         $this->add_actions();
 
-        // Here we do this intentionally as any button inserted in the page results in a javascript errror.
-        // This is due to the form lib interpreting each button as belonging to a form.
-        $this->set_downloadable(false);
-        $this->set_filter_form_default(false);
+        // Here we do this intentionally as any button inserted in the page results in a javascript error.
+        // This is due to fact that if we insert it in an existing form this will nest the form and this is not allowed.
+        $isdownloadable = $this->get_parameter('downloadable', false, PARAM_BOOL);
+        $hasfilters = $this->get_parameter('hasfilters', false, PARAM_BOOL);
+        $this->set_downloadable($isdownloadable);
+        $this->set_filter_form_default($hasfilters);
     }
 
     /**
@@ -90,6 +92,7 @@ class planning_per_situation extends system_report {
         $columns = [
             'planning:startdate',
             'planning:enddate',
+            'planning:session',
             'group:name',
         ];
 
@@ -126,10 +129,17 @@ class planning_per_situation extends system_report {
         // Action to view individual task log on a popup window.
         $this->add_action((new action(
             new moodle_url(''),
-            new pix_icon('e/edit', ''),
+            new pix_icon('t/edit', ''),
             ['data-action' => 'editplanning', 'data-planning-id' => ':id', 'data-cmid' => $competvet->get_course_module_id()],
             false,
             new lang_string('edit'),
+        )));
+        $this->add_action((new action(
+            new moodle_url(''),
+            new pix_icon('t/delete', ''),
+            ['data-action' => 'deleteplanning', 'data-planning-id' => ':id', 'data-cmid' => $competvet->get_course_module_id()],
+            false,
+            new lang_string('delete'),
         )));
     }
 

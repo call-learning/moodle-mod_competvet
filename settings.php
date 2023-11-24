@@ -29,6 +29,17 @@ if ($hassiteconfig) {
 
     // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedIf
     if ($ADMIN->fulltree) {
+        // Get current year.
+        $currentyear = date('Y');
+        $settings->add(
+            new admin_setting_configtext(
+                'mod_competvet/defaultsession',
+                get_string('planning:defaultsession', 'mod_competvet'),
+                get_string('planning:defaultsession', 'mod_competvet'),
+                $currentyear,
+                PARAM_INT,
+            )
+        );
         // TODO: Define actual plugin settings page and add it to the tree - {@link https://docs.moodle.org/dev/Admin_settings}.
     }
 }

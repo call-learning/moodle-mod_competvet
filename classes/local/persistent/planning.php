@@ -77,6 +77,12 @@ class planning extends persistent {
                 'type' => PARAM_INT,
                 'message' => new lang_string('invaliddata', 'competvet', 'enddate'),
             ],
+            'session' => [
+                'type' => PARAM_ALPHANUMEXT,
+                'default' => get_config('mod_competvet', 'defaultsession'),
+                'formtype' => 'text',
+                'formoptions' => ['size' => '64'],
+            ],
         ];
     }
 

@@ -59,12 +59,6 @@ class situation extends persistent {
                 'formtype' => 'text',
                 'formoptions' => ['size' => '64'],
             ],
-            'session' => [
-                'type' => PARAM_ALPHANUMEXT,
-                'default' => '',
-                'formtype' => 'text',
-                'formoptions' => ['size' => '64'],
-            ],
             'evalnum' => [
                 'type' => PARAM_INT,
                 'default' => 1,

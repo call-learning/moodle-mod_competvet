@@ -20,6 +20,7 @@ namespace mod_competvet\reportbuilder\local\entities;
 
 use core_reportbuilder\local\entities\base;
 use core_reportbuilder\local\filters\date;
+use core_reportbuilder\local\filters\number;
 use core_reportbuilder\local\helpers\format;
 use core_reportbuilder\local\report\{column, filter};
 use lang_string;
@@ -103,7 +104,15 @@ class planning extends base {
             ->add_fields("{$planningalias}.enddate")
             ->set_is_sortable(true)
             ->set_callback([format::class, 'userdate']);
-        ;
+        $columns[] = (new column(
+            'session',
+            new lang_string('planning:session', 'mod_competvet'),
+            $this->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->set_type(column::TYPE_TEXT)
+            ->add_fields("{$planningalias}.session")
+            ->set_is_sortable(true);
         return $columns;
     }
 
@@ -129,6 +138,15 @@ class planning extends base {
             $this->get_entity_name(),
             "{$planningalias}.enddate"
         ))->add_joins($this->get_joins());
+
+        $filters[] = (new filter(
+            number::class,
+            'session',
+            new lang_string('planning:session', 'mod_competvet'),
+            $this->get_entity_name(),
+            "{$planningalias}.session"
+        ))->add_joins($this->get_joins());
+
         return $filters;
     }
 }

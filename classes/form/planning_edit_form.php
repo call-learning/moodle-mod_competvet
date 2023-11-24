@@ -38,7 +38,6 @@ class planning_edit_form extends dynamic_form {
      * @throws moodle_exception
      */
     public function process_dynamic_submission(): array {
-        global $DB, $USER;
         $context = $this->get_context_for_dynamic_submission();
         $data = $this->get_data();
         $situation = competvet::get_from_context($context)->get_situation();
@@ -127,6 +126,8 @@ class planning_edit_form extends dynamic_form {
         $mform->setType('startdate', PARAM_INT);
         $mform->addElement('date_time_selector', 'enddate', get_string('enddate', 'mod_competvet'));
         $mform->setType('enddate', PARAM_INT);
+        $mform->addElement('text', 'session', get_string('planning:session', 'mod_competvet'));
+        $mform->setType('session', PARAM_TEXT);
     }
 
     /**

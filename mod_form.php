@@ -23,14 +23,8 @@
  */
 
 use core_grades\component_gradeitems;
-use core_reportbuilder\datasource;
-use core_reportbuilder\local\models\report as report_model;
-use core_reportbuilder\table\custom_report_table_view_filterset;
-use core_reportbuilder\table\system_report_table;
-use core_table\local\filter\integer_filter;
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\situation;
-use mod_competvet\reportbuilder\datasource\plannings;
 use mod_competvet\reportbuilder\local\systemreports\planning_per_situation;
 use mod_competvet\table\custom_report_table_view_form_embed;
 use mod_competvet\utils;
@@ -38,6 +32,7 @@ use mod_competvet\utils;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/course/moodleform_mod.php');
+
 /**
  * Module instance settings form.
  *
@@ -45,14 +40,16 @@ require_once($CFG->dirroot . '/course/moodleform_mod.php');
  * @copyright   2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_competvet_mod_form extends moodleform_mod {
+class mod_competvet_mod_form extends moodleform_mod
+{
     // The pagination size for the planning list.
     const PLANNING_PAGINATION_SIZE = 10;
 
     /**
      * Defines forms elements
      */
-    public function definition() {
+    public function definition()
+    {
         global $CFG, $DB;
 
         $mform = $this->_form;
@@ -93,7 +90,8 @@ class mod_competvet_mod_form extends moodleform_mod {
      *
      * @return void
      */
-    protected function add_situation_fields() {
+    protected function add_situation_fields()
+    {
         $mform = $this->_form;
         $mform->addElement('header', 'situationdef', get_string('situation:def', 'competvet'));
         $mform->setExpanded('situationdef');
@@ -144,7 +142,8 @@ class mod_competvet_mod_form extends moodleform_mod {
     /**
      * Display planning.
      */
-    private function display_planning() {
+    private function display_planning()
+    {
         global $PAGE;
         $mform = $this->_form;
         // Get the current value of situationid.
@@ -152,8 +151,14 @@ class mod_competvet_mod_form extends moodleform_mod {
         if (!empty($cm->id)) {
             $competvet = competvet::get_from_context($this->get_context());
             $situation = $competvet->get_situation();
-            $existingreport = \core_reportbuilder\system_report_factory::create(planning_per_situation::class, $this->get_context(),
-            competvet::COMPONENT_NAME, 'form', 0, ['situationid' => $situation->get('id')]);
+            $existingreport = \core_reportbuilder\system_report_factory::create(
+                planning_per_situation::class,
+                $this->get_context(),
+                competvet::COMPONENT_NAME,
+                'form',
+                0,
+                ['situationid' => $situation->get('id')]
+            );
             $html = $existingreport->output();
             $mform->addElement('html', $html);
             $mform->addElement(
@@ -162,11 +167,23 @@ class mod_competvet_mod_form extends moodleform_mod {
                 get_string('add'),
                 ['data-cmid' => $cm->id, 'data-action' => 'addplanning']
             );
-            $PAGE->requires->js_call_amd('mod_competvet/add_planning', 'init');
+            $PAGE->requires->js_call_amd(
+                'mod_competvet/planning_form_utils',
+                'init',
+                [$existingreport->get_report_persistent()->get('id')]
+            );
         }
     }
 
-    public function definition_after_data() {
+    /**
+     * Definition after data
+     *
+     * Adjust form definition after data is set.
+     *
+     * @return void
+     */
+    public function definition_after_data()
+    {
         parent::definition_after_data();
         $mform = $this->_form;
         $itemnumber = 0;
@@ -189,7 +206,7 @@ class mod_competvet_mod_form extends moodleform_mod {
             $competvetidel->setValue($this->get_current()->id);
             $situationfields = utils::get_persistent_fields_without_standards(situation::class);
             $situation = situation::get_record(['competvetid' => $this->get_current()->id]);
-            $situationrecord = array_intersect_key((array) $situation->to_record(), $situationfields);
+            $situationrecord = array_intersect_key((array)$situation->to_record(), $situationfields);
             $mform->setDefaults($situationrecord);
         }
         // Populate tags for situation.
