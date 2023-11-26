@@ -15,7 +15,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\local\api;
 
-use cache;
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
@@ -37,7 +36,7 @@ class situations {
      * @return array[] array of situations
      */
     public static function get_all_situations_with_planning_for(int $userid): array {
-        $situations = self::get_all_situations_for($userid);
+        $situations = situation::get_all_situations_for($userid);
         $situationswithplanning = [];
         foreach ($situations as $situation) {
             $situationrecord = $situation->to_record();
@@ -69,46 +68,6 @@ class situations {
             $situationswithplanning[] = $situationrecord;
         }
         return $situationswithplanning;
-    }
-
-    /**
-     * Get all situations for a given user
-     *
-     * @param int $userid
-     * @return array|situation[]
-     */
-    public static function get_all_situations_for(int $userid): array {
-        // If there is nothing cached for this user, then we build the situation list for this user.
-        $situationcache = cache::make('mod_competvet', 'usersituations');
-
-        if ($situationcache->has($userid)) {
-            global $DB;
-            [$where, $params] = $DB->get_in_or_equal($situationcache->get($userid), SQL_PARAMS_NAMED, 'situationsid', false);
-            $situations = situation::get_records_select('id ' . $where, $params);
-            return $situations;
-        }
-        // First get all course the user is enrolled in.
-        $courses = enrol_get_users_courses($userid);
-        // Get all situations for this user in this course.
-        $instancesid = [];
-        foreach ($courses as $course) {
-            $coursemodinfo = get_fast_modinfo($course->id, $userid);
-            foreach ($coursemodinfo->get_instances_of(competvet::MODULE_NAME) as $cm) {
-                if ($cm->get_user_visible()) {
-                    $instancesid[] = $cm->instance;
-                }
-            }
-        }
-        $situations = [];
-        foreach ($instancesid as $instanceid) {
-            $newsituations = situation::get_records(['competvetid' => $instanceid]);
-            $situations = array_merge($situations, $newsituations);
-        }
-        $situationsid = array_map(function ($situation) {
-            return $situation->get('id');
-        }, $situations);
-        $situationcache->set($userid, $situationsid);
-        return $situations;
     }
 
     /**

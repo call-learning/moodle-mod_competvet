@@ -50,7 +50,7 @@ class user_role {
      * @throws \moodle_exception if there are conflicts within roles for the app : like student and teacher
      */
     public static function get_top_for_all_situations(int $userid): string {
-        $allsituations = situations::get_all_situations_for($userid);
+        $allsituations = situation::get_all_situations_for($userid);
         $allroles = [];
         foreach ($allsituations as $situation) {
             $allroles = array_merge($allroles, self::get_all($userid, $situation->get('id')));

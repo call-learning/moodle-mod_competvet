@@ -18,13 +18,15 @@ declare(strict_types=1);
 
 namespace mod_competvet\reportbuilder\local\entities;
 
-use context_course;
 use context_helper;
 use core_reportbuilder\local\entities\base;
 use core_reportbuilder\local\filters\{number};
+use core_reportbuilder\local\helpers\database;
 use core_reportbuilder\local\report\{column, filter};
+use html_writer;
 use lang_string;
 use mod_competvet\reportbuilder\local\filters\situation_selector;
+use moodle_url;
 use stdClass;
 
 /**
@@ -34,15 +36,13 @@ use stdClass;
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class situation extends base
-{
+class situation extends base {
     /**
      * Initialise the entity
      *
      * @return base
      */
-    public function initialise(): base
-    {
+    public function initialise(): base {
         $columns = $this->get_all_columns();
         foreach ($columns as $column) {
             $this->add_column($column);
@@ -64,8 +64,8 @@ class situation extends base
      *
      * @return column[]
      */
-    protected function get_all_columns(): array
-    {
+    protected function get_all_columns(): array {
+        global $DB; // Used for aggregation.
         $situationalias = $this->get_table_alias('competvet_situation');
         $competvetalias = $this->get_table_alias('competvet');
         $contextalias = $this->get_table_alias('context');
@@ -80,6 +80,25 @@ class situation extends base
             ->set_type(column::TYPE_TEXT)
             ->add_fields("{$situationalias}.shortname")
             ->set_is_sortable(true);
+
+        $columns[] = (new column(
+            'shortnamewithlinks',
+            new lang_string('situation:shortnamewithlinks', 'mod_competvet'),
+            $this->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->add_joins($this->get_context_and_modules_joins())
+            ->set_type(column::TYPE_TEXT)
+            ->add_fields("{$cmmodulealias}.id AS cmmoduleid")
+            ->add_fields("{$situationalias}.shortname")
+            ->set_is_sortable(true)
+            ->add_callback(static function(?string $value, stdClass $row): string {
+                if ($value === null) {
+                    return '';
+                }
+                return html_writer::link(new moodle_url('/mod/competvet/view.php', ['id' => $row->cmmoduleid]),
+                    $row->shortname);
+            });
 
         $columns[] = (new column(
             'evalnum',
@@ -117,25 +136,81 @@ class situation extends base
             $this->get_entity_name()
         ))
             ->add_joins($this->get_joins())
+            ->add_joins($this->get_context_and_modules_joins())
             ->set_type(column::TYPE_LONGTEXT)
             ->add_field("{$competvetalias}.intro", 'intro')
             ->add_fields("{$competvetalias}.introformat, {$competvetalias}.id as competvetid, {$cmmodulealias}.id AS cmmoduleid")
             ->add_fields(context_helper::get_preload_record_columns_sql($contextalias))
-            ->set_is_sortable(false)
+            ->set_is_sortable(true)
             ->set_callback(static function(?string $intro, stdClass $row): string {
+                global $CFG;
                 if ($intro === null) {
                     return '';
                 }
+
+                require_once("{$CFG->libdir}/filelib.php");
                 context_helper::preload_from_record($row);
                 $context = \context_module::instance($row->cmmoduleid);
 
-                $intro = file_rewrite_pluginfile_urls($intro, 'pluginfile.php', $context->id, 'competvet',
-                    'intro', $row->competvetid);
+                $intro = \file_rewrite_pluginfile_urls(
+                    $intro,
+                    'pluginfile.php',
+                    $context->id,
+                    'competvet',
+                    'intro',
+                    $row->competvetid
+                );
 
                 return format_text($intro, $row->introformat, ['context' => $context]);
             });
+        // System reports do not support aggregation, so while waiting for this to be implemented, we can
+        // use the groupconcatdistinct aggregation to get a list of all the tags for a given situation. See MDL-76392.
+        $tagalias = $this->get_table_alias('tag');
+        $contextalias = $this->get_table_alias('context');
+        $field = "{$tagalias}.rawname";
+        $fieldsort = database::sql_group_concat_sort($field);
+
+        $groupconcatsql = $DB->sql_group_concat($field, ', ', $fieldsort);
+        $instancealias = $this->get_table_alias('tag_instance');
+        $sql = "(SELECT {$groupconcatsql}
+                FROM {tag_instance} {$instancealias}
+                LEFT JOIN {tag} {$tagalias} ON {$tagalias}.id = {$instancealias}.tagid
+                WHERE {$instancealias}.contextid = {$contextalias}.id)";
+
+        $columns[] = (new column(
+            'tagnames',
+            new lang_string('situation:tagnames', 'mod_competvet'),
+            $this->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->add_joins($this->get_context_and_modules_joins())
+            ->set_type(column::TYPE_TEXT)
+            ->add_field($sql, 'tagnames')
+            ->set_is_sortable(true);
 
         return $columns;
+    }
+
+    /**
+     * Add context and module joins
+     *
+     * @return void
+     */
+    public function get_context_and_modules_joins(): array {
+        $competvetalias = $this->get_table_alias('competvet');
+        $modulealias = $this->get_table_alias('modules');
+        $coursemodulealias = $this->get_table_alias('course_modules');
+        $contextalias = $this->get_table_alias('context');
+        $situationalias = $this->get_table_alias('competvet_situation');
+        return
+            [
+                "LEFT JOIN {competvet} {$competvetalias} ON {$competvetalias}.id = {$situationalias}.competvetid",
+                "LEFT JOIN {course_modules} {$coursemodulealias} ON {$competvetalias}.id = {$coursemodulealias}.instance",
+                "LEFT JOIN {modules} {$modulealias}
+             ON {$modulealias}.id = {$coursemodulealias}.module AND {$modulealias}.name = 'competvet'",
+                "LEFT JOIN {context} {$contextalias} ON {$contextalias}.instanceid = {$coursemodulealias}.id AND contextlevel = " .
+                CONTEXT_MODULE,
+            ];
     }
 
     /**
@@ -143,14 +218,21 @@ class situation extends base
      *
      * @return filter[]
      */
-    protected function get_all_filters(): array
-    {
+    protected function get_all_filters(): array {
         $situationalias = $this->get_table_alias('competvet_situation');
 
         $filters[] = (new filter(
             number::class,
             'shortname',
             new lang_string('situation:shortname', 'mod_competvet'),
+            $this->get_entity_name(),
+            "{$situationalias}.shortname"
+        ))->add_joins($this->get_joins());
+
+        $filters[] = (new filter(
+            number::class,
+            'shortnamewithlinks',
+            new lang_string('situation:shortnamewithlinks', 'mod_competvet'),
             $this->get_entity_name(),
             "{$situationalias}.shortname"
         ))->add_joins($this->get_joins());
@@ -187,14 +269,15 @@ class situation extends base
      *
      * @return array
      */
-    protected function get_default_table_aliases(): array
-    {
+    protected function get_default_table_aliases(): array {
         return [
-            'competvet' => 'mcompetvet',
+            'competvet' => 'sit_mcompetvet',
             'competvet_situation' => 'situation',
-            'modules' => 'modules',
-            'course_modules' => 'cmodules',
-            'context' => 'ctxmodule',
+            'modules' => 'sit_modules',
+            'course_modules' => 'sit_cmodules',
+            'context' => 'sit_ctxmodule',
+            'tag' => 'sit_tag',
+            'tag_instance' => 'sit_tagi',
         ];
     }
 
@@ -203,8 +286,7 @@ class situation extends base
      *
      * @return lang_string
      */
-    protected function get_default_entity_title(): lang_string
-    {
+    protected function get_default_entity_title(): lang_string {
         return new lang_string('entity:situation', 'mod_competvet');
     }
 }

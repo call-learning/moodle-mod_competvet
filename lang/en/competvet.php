@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 $string['admincompetvet:role'] = 'Admin CompetVet';
 $string['admincompetvet:role:desc'] = 'Admin CompetVet can do anything on any situation of the platform.';
+$string['allmysituations'] = 'All my situations';
 $string['pluginname'] = 'CompetVet';
 $string['modulename'] = 'CompetVet';
 $string['modulenameplural'] = 'CompetVet';
@@ -97,6 +98,8 @@ $string['report:plannings'] = 'Plannings report';
 $string['entity:planning'] = 'Planning';
 $string['entity:situation'] = 'Situation';
 $string['situation:def'] = 'Situation definition';
+$string['situation:shortnamewithlinks'] = 'Situation short name';
+$string['situation:tagnames'] = 'Situation tags';
 $string['situation:shortname'] = 'Situation short name';
 $string['situation:shortname_help'] = 'Situation short name';
 $string['situation:evalnum'] = 'Required evaluations number';

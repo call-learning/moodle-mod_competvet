@@ -40,20 +40,6 @@ class situations_test extends advanced_testcase {
     protected $courses;
 
     /**
-     * All for user provider
-     *
-     * @return array[]
-     */
-    public static function all_for_user_provider(): array {
-        return [
-            'student situations' => ['student1', ['SIT1', 'SIT2', 'SIT3', 'SIT4', 'SIT5', 'SIT6', 'SIT7', 'SIT8', 'SIT9']],
-            'observer1 situations' => ['observer1', ['SIT1', 'SIT2', 'SIT3']],
-            'observer2 situations' => ['observer2', ['SIT4', 'SIT5', 'SIT6']],
-            'teacher1 situations' => ['teacher1', ['SIT1', 'SIT2', 'SIT3']],
-        ];
-    }
-
-    /**
      * All for user provider with planning
      *
      * @return array[]
@@ -88,25 +74,6 @@ class situations_test extends advanced_testcase {
         $generator = $this->getDataGenerator();
         $competvetgenerator = $generator->get_plugin_generator('mod_competvet');
         $this->generates_definition($this->get_data_definition_set_1(), $generator, $competvetgenerator);
-    }
-
-    /**
-     * Get all for user
-     *
-     * @param string $username
-     * @param array $expected
-     * @return void
-     * @dataProvider all_for_user_provider
-     * @covers       \mod_competvet\local\api\situations::get_all_situations_for
-     */
-    public function test_get_all_situation_for($username, $expected) {
-        $user = core_user::get_user_by_username($username);
-        $situations = situations::get_all_situations_for($user->id);
-        $situationssn = array_map(function($situation) {
-            return $situation->get('shortname');
-        }, $situations);
-        sort($situationssn);
-        $this->assertEquals($expected, array_values($situationssn), "Expected situations for user $username are different.");
     }
 
     /**

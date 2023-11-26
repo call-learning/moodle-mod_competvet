@@ -113,6 +113,16 @@ class planning extends base {
             ->set_type(column::TYPE_TEXT)
             ->add_fields("{$planningalias}.session")
             ->set_is_sortable(true);
+
+        $columns[] = (new column(
+            'session',
+            new lang_string('planning:session', 'mod_competvet'),
+            $this->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->set_type(column::TYPE_TEXT)
+            ->add_fields("{$planningalias}.session")
+            ->set_is_sortable(true);
         return $columns;
     }
 
