@@ -28,9 +28,8 @@ $tagareas =  [
     [
         'itemtype' => 'competvet_situation',
         'component' => 'mod_competvet',
-        'callback' => '\mod_competvet\tags::get_tagged_situations',
-        'callbackfile' => '/user/lib.php',
         'collection' => 'situations',
+        'callback' => '\mod_competvet\tags::get_tagged_situations',
         'customurl' => '/mod/competvet/tag_search.php',
         'searchable' => true,
         'showstandard' => core_tag_tag::STANDARD_ONLY,

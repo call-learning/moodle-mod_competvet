@@ -46,20 +46,14 @@ class situation extends persistent {
      * Get all situations for a given user
      *
      * @param int $userid
-     * @return array|situation[]
+     * @return array|int[]
      */
-    public static function get_all_situations_for(int $userid): array {
+    public static function get_all_situations_id_for(int $userid): array {
         // If there is nothing cached for this user, then we build the situation list for this user.
         $situationcache = cache::make('mod_competvet', 'usersituations');
 
         if ($situationcache->has($userid)) {
-            global $DB;
-            if (empty($situationcache->get($userid))) {
-                return [];
-            }
-            [$where, $params] = $DB->get_in_or_equal($situationcache->get($userid), SQL_PARAMS_NAMED, 'situationsid', false);
-            $situations = self::get_records_select('id ' . $where, $params);
-            return $situations;
+            return $situationcache->get($userid);
         }
         // First get all course the user is enrolled in.
         $courses = enrol_get_users_courses($userid);
@@ -73,16 +67,16 @@ class situation extends persistent {
                 }
             }
         }
-        $situations = [];
+        $situationsid = [];
         foreach ($instancesid as $instanceid) {
             $newsituations = self::get_records(['competvetid' => $instanceid]);
-            $situations = array_merge($situations, $newsituations);
+            $newsituationsid = array_map(function ($situation) {
+                return $situation->get('id');
+            }, $newsituations);
+            $situationsid = array_merge($situationsid, $newsituationsid);
         }
-        $situationsid = array_map(function ($situation) {
-            return $situation->get('id');
-        }, $situations);
         $situationcache->set($userid, $situationsid);
-        return $situations;
+        return $situationsid;
     }
 
     /**

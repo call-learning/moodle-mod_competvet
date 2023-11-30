@@ -33,15 +33,12 @@ function xmldb_competvet_upgrade($oldversion) {
     global $CFG, $DB;
 
     $dbman = $DB->get_manager();
-    if ($oldversion < 2023082216) {
-        \mod_competvet\setup::create_update_roles();
+    if ($oldversion < 2023112905) {
+        $postinstall = new mod_competvet\task\post_install();
+        $postinstall->set_custom_data(['setup_update_tags']);
+        core\task\manager::queue_adhoc_task($postinstall);
         // Competvet savepoint reached.
-        upgrade_mod_savepoint(true, 2023082216, 'competvet');
-    }
-    if ($oldversion < 2023082223) {
-        \mod_competvet\setup::setup_update_tags();
-        // Competvet savepoint reached.
-        upgrade_mod_savepoint(true, 2023082223, 'competvet');
+        upgrade_mod_savepoint(true, 2023112905, 'competvet');
     }
     return true;
 }

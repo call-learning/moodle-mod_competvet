@@ -208,7 +208,8 @@ class situation extends base {
                 "LEFT JOIN {course_modules} {$coursemodulealias} ON {$competvetalias}.id = {$coursemodulealias}.instance",
                 "LEFT JOIN {modules} {$modulealias}
              ON {$modulealias}.id = {$coursemodulealias}.module AND {$modulealias}.name = 'competvet'",
-                "LEFT JOIN {context} {$contextalias} ON {$contextalias}.instanceid = {$coursemodulealias}.id AND contextlevel = " .
+                "LEFT JOIN {context} {$contextalias} ON {$contextalias}.instanceid = {$coursemodulealias}.id
+                    AND {$contextalias}.contextlevel = " .
                 CONTEXT_MODULE,
             ];
     }

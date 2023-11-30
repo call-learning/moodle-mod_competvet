@@ -36,7 +36,7 @@ class situations {
      * @return array[] array of situations
      */
     public static function get_all_situations_with_planning_for(int $userid): array {
-        $situations = situation::get_all_situations_for($userid);
+        $situations = situation::get_all_situations_id_for($userid);
         $situationswithplanning = [];
         foreach ($situations as $situation) {
             $situationrecord = $situation->to_record();

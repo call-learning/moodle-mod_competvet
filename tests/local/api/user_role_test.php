@@ -19,6 +19,7 @@ use advanced_testcase;
 use context_module;
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\situation;
+use mod_competvet\task\post_install;
 
 /**
  * User role test

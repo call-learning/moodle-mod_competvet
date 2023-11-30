@@ -95,6 +95,7 @@ $string['responsibleucue:role:desc'] = 'Responsible UC/UE role: a user with this
  but can also create a new situation and plannings.';
 $string['planning:confirmdelete'] = 'Are you sure you want to delete this planning?';
 $string['report:plannings'] = 'Plannings report';
+$string['report:situations'] = 'Situation report';
 $string['entity:planning'] = 'Planning';
 $string['entity:situation'] = 'Situation';
 $string['situation:def'] = 'Situation definition';
@@ -106,9 +107,9 @@ $string['situation:evalnum'] = 'Required evaluations number';
 $string['situation:evalnum_help'] = 'Required evaluations number';
 $string['situation:autoevalnum'] = 'Required autoevaluation number';
 $string['situation:autoevalnum_help'] = 'Required autoevaluation number';
-$string['situation:tags:firstyear'] = 'Première année';
-$string['situation:tags:secondyear'] = 'Deuxième année';
-$string['situation:tags:thirdyear'] = 'Troisième année';
+$string['situation:tags:y:1'] = 'First year';
+$string['situation:tags:y:2'] = 'Second year';
+$string['situation:tags:y:3'] = 'Third year';
 $string['situation:selector'] = 'Situation selector';
 $string['situation:intro'] = 'Situation Intro';
 $string['situation:name'] = 'Situation Name (Full)';
@@ -118,4 +119,5 @@ $string['savingchanges'] = 'Saving changes';
 $string['situation:idnumber'] = 'Situation Unique ID';
 $string['tagarea_competvet_situation'] = 'Situations';
 $string['tagcollection_situations'] = 'Situations';
+
 

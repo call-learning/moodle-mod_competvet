@@ -56,7 +56,6 @@ class mod_competvet_generator extends testing_module_generator {
             $possiblesituationnames = self::get_situation_sample_names();
             $random = rand(0, count($possiblesituationnames) - 1);
             $record->name = $possiblesituationnames[$random][0] . ' ' . $this->instancecount;
-            $record->shortname = $possiblesituationnames[$random][1] . '-' . $this->instancecount;
         }
         if (empty($record->idnumber)) {
             // Strip spaces in the name and convert to uppercase.
@@ -64,7 +63,7 @@ class mod_competvet_generator extends testing_module_generator {
         }
         if (empty($record->shortname)) {
             // Strip spaces in the name and convert to uppercase.
-            $record->shortname = strtoupper(preg_replace('/\s+/', '', $record->name));
+            $record->shortname = clean_param(strtoupper(preg_replace('/\s+/', '', $record->name)), PARAM_ALPHANUMEXT);
         }
 
         // Now take care of the tags.

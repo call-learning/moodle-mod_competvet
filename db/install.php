@@ -27,7 +27,7 @@
  * Custom code to be run on installing the plugin.
  */
 function xmldb_competvet_install() {
-    \mod_competvet\setup::create_update_roles();
-    \mod_competvet\setup::setup_update_tags();
+    $postinstall = new mod_competvet\task\post_install();
+    core\task\manager::queue_adhoc_task($postinstall);
     return true;
 }

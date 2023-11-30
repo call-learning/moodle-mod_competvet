@@ -21,6 +21,7 @@ require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
 use advanced_testcase;
 use core_user;
 use mod_competvet\local\persistent\situation;
+use mod_competvet\task\post_install;
 use test_data_definition;
 
 /**
@@ -71,8 +72,9 @@ class situation_test extends advanced_testcase {
      */
     public function test_get_all_situation_for($username, $expected) {
         $user = core_user::get_user_by_username($username);
-        $situations = situation::get_all_situations_for($user->id);
-        $situationssn = array_map(function($situation) {
+        $situations = situation::get_all_situations_id_for($user->id);
+        $situationssn = array_map(function($situationid) {
+            $situation = situation::get_record(['id' => $situationid]);
             return $situation->get('shortname');
         }, $situations);
         sort($situationssn);

@@ -15,11 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet;
 
+use cache;
 use context_system;
 use core_reportbuilder\datasource;
 use core_reportbuilder\local\helpers\report as helper;
 use core_reportbuilder\local\models\report as report_model;
 use core_reportbuilder\manager;
+use core_tag_area;
 use core_tag_tag;
 use mod_competvet\reportbuilder\datasource\plannings;
 
@@ -35,9 +37,9 @@ class setup {
      * Language string for situation tags
      */
     const SITUATION_TAG_LS = [
-        'firstyear',
-        'secondyear',
-        'thirdyear',
+        'y:1',
+        'y:2',
+        'y:3',
     ];
     /**
      * Custom report infos.
@@ -61,7 +63,7 @@ class setup {
             $roledefinitions = \mod_competvet\competvet::COMPETVET_ROLES;
         }
         $existingroles = get_all_roles();
-        $existingrolesshortnames = array_flip(array_map(function($role) {
+        $existingrolesshortnames = array_flip(array_map(function ($role) {
             return $role->shortname;
         }, $existingroles)); // Shortname to ID.
         $roles = [];
@@ -103,15 +105,29 @@ class setup {
      * @return void
      */
     public static function setup_update_tags() {
-        if (core_tag_tag::is_enabled('mod_competvet', 'competvet_situation')) {
-            // Find the collection named situations.
-            $situationscollectionid = \core_tag_area::get_collection('mod_competvet', 'competvet_situation');
-            if ($situationscollectionid) {
-                $situationtags = array_map(function($languagestring) {
-                    return get_string('situation:tags:' . $languagestring, competvet::COMPONENT_NAME);
-                }, self::SITUATION_TAG_LS);
-                core_tag_tag::create_if_missing($situationscollectionid, $situationtags, true);
-            }
+        // We must use tags here, so enable them.
+        set_config('usetags', true);
+        $tagareas = core_tag_area::get_areas();
+        $tagarea = $tagareas['competvet_situation']['mod_competvet'] ?? null;
+        if (!$tagarea) {
+            throw new \coding_exception('Unable to create tag area for mod_competvet');
+        }
+        $data = ['enabled' => true];
+        \core_tag_area::update($tagarea, $data);
+        core_tag_tag::create_if_missing($tagarea->tagcollid, self::SITUATION_TAG_LS, true);
+
+        $tags = \core_tag_tag::get_by_name_bulk(
+            $tagarea->tagcollid,
+            self::SITUATION_TAG_LS,
+            'id, name, rawname, tagcollid, userid, description, descriptionformat'
+        );
+        foreach ($tags as $tagname => $taginfo) {
+            $taginfo->update(
+                [
+                    'description' => get_string('situation:tags:' . $tagname, competvet::COMPONENT_NAME),
+                    'descriptionformat' => FORMAT_PLAIN,
+                ]
+            );
         }
     }
 

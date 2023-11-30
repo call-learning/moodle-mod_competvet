@@ -17,12 +17,12 @@
 declare(strict_types=1);
 
 namespace mod_competvet\reportbuilder\local\systemreports;
+
 use core_group\reportbuilder\local\entities\group;
 use core_reportbuilder\system_report;
 use mod_competvet\local\persistent\situation as situationAlias;
 use mod_competvet\reportbuilder\local\entities\planning;
 use mod_competvet\reportbuilder\local\entities\situation;
-use mod_competvet\reportbuilder\local\entities\situation_tags;
 
 /**
  * Situations for a given user
@@ -53,12 +53,9 @@ class situations_per_user extends system_report {
         if ($userid) {
             global $DB;
             // Here we hack a bit the report so we get only the situations visible to the user.
-            $situations = situationAlias::get_all_situations_for($userid);
-            if (!empty($situations)) {
-                $situationids = array_map(function($situation) {
-                    return $situation->get('id');
-                }, $situations);
-                [$where, $params] = $DB->get_in_or_equal($situationids, SQL_PARAMS_NAMED, 'situationids');
+            $situationsid = situationAlias::get_all_situations_id_for($userid);
+            if (!empty($situationsid)) {
+                [$where, $params] = $DB->get_in_or_equal($situationsid, SQL_PARAMS_NAMED, 'situationids');
                 $this->add_base_condition_sql(
                     "{$situationalias}.situationid = {$where}",
                     $params
@@ -81,8 +78,7 @@ class situations_per_user extends system_report {
             ->add_join("LEFT JOIN {groups} {$groupsalias} ON {$groupsalias}.id = {$planningalias}.groupid")
             ->add_join("LEFT JOIN {context} {$groupscontextalias}
             ON {$groupscontextalias}.contextlevel = " . CONTEXT_COURSE . "
-           AND {$groupscontextalias}.instanceid = {$groupsalias}.courseid")
-        );
+           AND {$groupscontextalias}.instanceid = {$groupsalias}.courseid"));
         // Now we can call our helper methods to add the content we want to include in the report.
         $this->add_columns();
         $this->add_filters();
@@ -143,16 +139,16 @@ class situations_per_user extends system_report {
      * Note the use of ":id" placeholder which will be substituted according to actual values in the row
      */
     protected function add_actions(): void {
-        //$context = $this->get_context();
-        //$competvet = competvet::get_from_context($context);
+        // $context = $this->get_context();
+        // $competvet = competvet::get_from_context($context);
         //// Action to view individual task log on a popup window.
-        //$this->add_action((new action(
-        //    new moodle_url(''),
-        //    new pix_icon('t/edit', ''),
-        //    ['data-action' => 'editsituation', 'data-situation-id' => ':id', 'data-cmid' => $competvet->get_course_module_id()],
-        //    false,
-        //    new lang_string('edit'),
-        //)));
+        // $this->add_action((new action(
+        // new moodle_url(''),
+        // new pix_icon('t/edit', ''),
+        // ['data-action' => 'editsituation', 'data-situation-id' => ':id', 'data-cmid' => $competvet->get_course_module_id()],
+        // false,
+        // new lang_string('edit'),
+        // )));
     }
 
     protected function can_view(): bool {
