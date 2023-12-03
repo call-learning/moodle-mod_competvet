@@ -15,9 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\local\api;
 
+use context_system;
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
+use mod_competvet\local\reportbuilder_helper;
+use mod_competvet\reportbuilder\local\systemreports\situations_per_user;
 
 /**
  * Situations API
@@ -29,6 +32,17 @@ use mod_competvet\local\persistent\situation;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class situations {
+    const SITUATION_FIELDS = [
+        'shortname',
+        'name',
+        'evalnum',
+        'autoevalnum',
+    ];
+    const PLANNING_FIELDS = [
+        'startdateraw',
+        'enddateraw',
+        'session',
+    ];
     /**
      * Get all situations with plannings for a given user
      *
@@ -36,38 +50,57 @@ class situations {
      * @return array[] array of situations
      */
     public static function get_all_situations_with_planning_for(int $userid): array {
-        $situations = situation::get_all_situations_id_for($userid);
-        $situationswithplanning = [];
-        foreach ($situations as $situation) {
-            $situationrecord = $situation->to_record();
-            self::unset_persistent_records($situationrecord);
-            unset($situationrecord->competvetid);
-            // Now add the module description and the role assigned in this module.
-            $competvet = competvet::get_from_situation($situation);
-            $instance = $competvet->get_instance();
-            $situationrecord->description =
-                format_module_intro(competvet::MODULE_NAME, $instance, $competvet->get_course_module_id(), false);
-            $situationrecord->name = $instance->name;
-            $roles = get_user_roles($competvet->get_context(), $userid) ?? [];
-            $situationrecord->roles = json_encode(
-                array_values(
-                    array_map(function ($role) {
-                        return $role->shortname;
-                    }, $roles)
-                )
-            );
-            $plannings = planning::get_records(['situationid' => $situation->get('id')]);
-            $situationrecord->plannings = [];
-            foreach ($plannings as $planning) {
-                $planningrecord = $planning->to_record();
-                self::unset_persistent_records($planningrecord);
-                unset($planningrecord->situationid);
-                $planningrecord->groupname = groups_get_group_name($planning->get('groupid'));
-                $situationrecord->plannings[] = $planningrecord;
+        $situationsid = situation::get_all_situations_id_for($userid);
+        $context = context_system::instance();
+        $situationreport = \core_reportbuilder\system_report_factory::create(
+            situations_per_user::class,
+            $context,
+            competvet::COMPONENT_NAME,
+            '',
+            0,
+            [
+                'situationsid' => json_encode($situationsid),
+                'cardview' => true,
+            ]
+        );
+        $situationsandplannings = reportbuilder_helper::get_data_from_report(
+            $situationreport,
+            [],
+            null,
+            0
+        );
+        $situations = [];
+        foreach($situationsandplannings as $situationandplanning) {
+            $situationid = $situationandplanning['id'];
+            if (empty($situations[$situationid])) {
+                $situations[$situationid] = [
+                    'plannings' => [],
+                    'tags' => [],
+                    'shortname' => $situationandplanning['situation:shortname'],
+                    'name' => $situationandplanning['situation:name'],
+                    'evalnum' =>  $situationandplanning['situation:evalnum'],
+                    'autoevalnum' => $situationandplanning['situation:autoevalnum'],
+                    ];
+                foreach(self::SITUATION_FIELDS as $field) {
+                    $situations[$situationid][$field] = $situationandplanning["situation:{$field}"];
+                }
+                $situations[$situationid]['id'] = $situationandplanning['id'];
+                $tags = explode(",", $situationandplanning['situation:tagnames'] ?? []);
+                $tags = array_map('trim', $tags);
+                $situations[$situationid]['tags'] = json_encode($tags);
             }
-            $situationswithplanning[] = $situationrecord;
+            $newplanning = [];
+            foreach(self::PLANNING_FIELDS as $field) {
+                $newplanning["planning:$field"] = $situationandplanning["planning:$field"];
+            }
+            $newplanning['groupname'] = $situationandplanning["group:name"];
+            $situations[$situationid]['plannings'][] = $newplanning;
+
         }
-        return $situationswithplanning;
+        usort($situations, function($a, $b) use ($situations) {
+            return $a['shortname'] <=> $b['shortname'];
+        });
+        return $situations;
     }
 
     /**

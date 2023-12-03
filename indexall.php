@@ -23,8 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use core_reportbuilder\form\card_view;
 use mod_competvet\competvet;
+use mod_competvet\local\persistent\situation;
 use mod_competvet\reportbuilder\local\systemreports\situations_per_user;
 
 require(__DIR__ . '/../../config.php');
@@ -43,7 +43,7 @@ if ($userid != $USER->id) {
 }
 $PAGE->set_context($context);
 $PAGE->set_title($pagetitle);
-
+$situationsid = json_encode(situation::get_all_situations_id_for($userid));
 $situationreport = \core_reportbuilder\system_report_factory::create(
     situations_per_user::class,
     $context,
@@ -51,7 +51,7 @@ $situationreport = \core_reportbuilder\system_report_factory::create(
     '',
     0,
     [
-        'userid' => $userid,
+        'situationsid' => json_encode($situationsid),
         'cardview' => true,
     ]
 );

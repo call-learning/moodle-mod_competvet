@@ -16,6 +16,7 @@
 namespace mod_competvet\local\persistent;
 
 use cache;
+use context_module;
 use core\persistent;
 use lang_string;
 use mod_competvet\competvet;
@@ -34,21 +35,18 @@ class situation extends persistent {
     const TABLE = 'competvet_situation';
 
     /**
-     *
-     * @param $id
-     * @return situation
-     */
-    public static function get_from_module_instance_id($id): self {
-        return self::get_record(['competvetid' => $id]);
-    }
-
-    /**
      * Get all situations for a given user
+     *
+     * Note: this is necessary to have a cache as the situation assigned to a user are more complex to compute
+     * than if a user is assigned to a course. We need to check also the planning so we know if this user
+     * has his/her group assigned to the situation. There will be even more complex computation when we will
+     * enable / disable part of the situation based on other component such as list or caselog.
      *
      * @param int $userid
      * @return array|int[]
      */
     public static function get_all_situations_id_for(int $userid): array {
+        static $studentroleid = null;
         // If there is nothing cached for this user, then we build the situation list for this user.
         $situationcache = cache::make('mod_competvet', 'usersituations');
 
@@ -58,22 +56,28 @@ class situation extends persistent {
         // First get all course the user is enrolled in.
         $courses = enrol_get_users_courses($userid);
         // Get all situations for this user in this course.
-        $instancesid = [];
+        $situationsid = [];
+        if (is_null($studentroleid)) {
+            $roles = get_all_roles(\context_system::instance());
+            $studentroleid = array_search('student', array_column($roles, 'shortname', 'id'));
+        }
         foreach ($courses as $course) {
             $coursemodinfo = get_fast_modinfo($course->id, $userid);
             foreach ($coursemodinfo->get_instances_of(competvet::MODULE_NAME) as $cm) {
                 if ($cm->get_user_visible()) {
-                    $instancesid[] = $cm->instance;
+                    $situation = self::get_record(['competvetid' => $cm->instance]);
+                    // First case: this is a student, let's look into plannings.
+                    $cmcontext = context_module::instance($cm->id);
+                    if (user_has_role_assignment($userid, $studentroleid, $cmcontext->id)) {
+                        if (planning::is_user_in_planned_groups($userid, $situation)) {
+                            $situationsid[] = $situation->get('id');
+                        }
+                    } else {
+                        // If not a student, if you see the activity, you will also see the situation.
+                        $situationsid[] = $situation->get('id');
+                    }
                 }
             }
-        }
-        $situationsid = [];
-        foreach ($instancesid as $instanceid) {
-            $newsituations = self::get_records(['competvetid' => $instanceid]);
-            $newsituationsid = array_map(function ($situation) {
-                return $situation->get('id');
-            }, $newsituations);
-            $situationsid = array_merge($situationsid, $newsituationsid);
         }
         $situationcache->set($userid, $situationsid);
         return $situationsid;

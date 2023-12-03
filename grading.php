@@ -47,7 +47,7 @@ $title = get_string('subpagetitle', 'assign', $args);
 $title = $courseshortname . ': ' . $title;
 $PAGE->set_title($title);
 
-$compevet = new competvet($modulecontext, $cm);
+$compevet = competvet::get_from_context($modulecontext);
 $gradingapp = new app($USER->id, 0, $compevet);
 echo $OUTPUT->header();
 

@@ -118,6 +118,13 @@ class competvet {
     /**
      * Situation instance
      *
+     * @var cm_info $cminfo
+     */
+    private $cminfo;
+
+    /**
+     * Situation instance
+     *
      * @var situation $situation
      */
     private $situation;
@@ -125,7 +132,7 @@ class competvet {
     /**
      * Module instance
      *
-     * @var false|mixed|\stdClass $instance
+     * @var stdClass $instance
      */
     private $instance;
     /**
@@ -138,25 +145,16 @@ class competvet {
     /**
      * Constructor for the competVet class
      *
-     * @param int $courseid
      * @param int $cmid
      */
-    public function __construct(int $courseid, int $cmid) {
-        global $DB;
-        [$this->course, $this->cminfo] =
-            get_course_and_cm_from_cmid($cmid, self::MODULE_NAME, $courseid);
-        $this->situation = situation::get_record(['competvetid' => $this->cminfo->instance]);
-        $this->instance = $DB->get_record('competvet', ['id' => $this->cminfo->instance]);
-        $this->context = \context_module::instance($this->cminfo->id);
-    }
-
-    /**
-     * Get course context
-     *
-     * @return context_course
-     */
-    public function get_course_context(): context_course {
-        return \context_course::instance($this->course->id);
+    private function __construct(int $cmid, int $instanceid = null) {
+        if (!empty($instanceid)) {
+            [$this->course, $this->cminfo] = get_course_and_cm_from_instance($instanceid, self::MODULE_NAME);
+        } else {
+            [$this->course, $this->cminfo] = get_course_and_cm_from_cmid($cmid, self::MODULE_NAME);
+        }
+        $this->instance = null; // Instance and situation are lazy loaded.
+        $this->situation = null;
     }
 
     /**
@@ -170,7 +168,7 @@ class competvet {
         if ($context->contextlevel !== CONTEXT_MODULE) {
             throw new \coding_exception('Invalid context level');
         }
-        return new self($context->get_course_context()->instanceid, $context->instanceid);
+        return new self($context->instanceid);
     }
 
     /**
@@ -180,8 +178,7 @@ class competvet {
      * @return self
      */
     public static function get_from_instance_id(int $competvetid): self {
-        [$course, $cm] = get_course_and_cm_from_instance($competvetid, self::MODULE_NAME);
-        return new self($course->id, $cm->id);
+        return new self(0, $competvetid);
     }
 
     /**
@@ -192,10 +189,8 @@ class competvet {
      * @throws \coding_exception
      */
     public static function get_from_situation(situation $situation): self {
-        [$course, $cm] = get_course_and_cm_from_instance($situation->get('competvetid'), self::MODULE_NAME);
-        return new self($course->id, $cm->id);
+        return new self(0, $situation->get('competvetid'));
     }
-
 
     public static function get_component() {
         return 'mod_competvet';
@@ -206,20 +201,14 @@ class competvet {
     }
 
     /**
-     * Return module record/instance
-     *
-     * @return stdClass
-     */
-    public function get_instance(): stdClass {
-        return $this->instance;
-    }
-
-    /**
      * Situation
      *
      * @return situation
      */
     public function get_situation(): situation {
+        if (empty($this->situation)) {
+            $this->situation = situation::get_record(['competvetid' => $this->cminfo->instance]);
+        }
         return $this->situation;
     }
 
@@ -229,7 +218,20 @@ class competvet {
      * @return int
      */
     public function get_instance_id(): int {
-        return $this->instance->id;
+        return $this->get_instance()->id;
+    }
+
+    /**
+     * Return module record/instance
+     *
+     * @return stdClass
+     */
+    public function get_instance(): stdClass {
+        if (empty($this->instance)) {
+            global $DB;
+            $this->instance = $DB->get_record('competvet', ['id' => $this->cminfo->instance]);
+        }
+        return $this->instance;
     }
 
     /**
@@ -245,10 +247,20 @@ class competvet {
      * Get course module id
      *
      * Shorthand for get_course_module()->id
+     *
      * @return int
      */
     public function get_course_module_id(): int {
         return $this->cminfo->id;
+    }
+
+    /**
+     * Get course id
+     *
+     * @return int
+     */
+    public function get_course_id(): int {
+        return $this->get_course()->id;
     }
 
     /**
@@ -261,20 +273,14 @@ class competvet {
     }
 
     /**
-     * Get course id
-     *
-     * @return int
-     */
-    public function get_course_id(): int {
-        return $this->course->id;
-    }
-
-    /**
      * Get context
      *
      * @return context_module
      */
     public function get_context(): \context_module {
+        if (empty($this->context)) {
+            $this->context = \context_module::instance($this->cminfo->id);
+        }
         return $this->context;
     }
 
@@ -282,12 +288,11 @@ class competvet {
      * Get course module record
      *
      * @param bool $extended
-     * @return mixed
+     * @return object
      */
-    public function get_course_module_record(bool $extended = false) {
-        $record = $this->instance->to_record();
+    public function get_course_module_record(bool $extended = false): object {
+        $record = $this->get_instance()->to_record();
         if ($extended) {
-            $cmrecord = $this->cminfo->get_course_module_record(true);
             $record->modname = self::MODULE_NAME;
             $record->coursemodule = $this->cminfo->id;
         }

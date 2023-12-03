@@ -14,12 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\local\api;
+defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
 
 use advanced_testcase;
-use context_module;
-use mod_competvet\competvet;
+use core_user;
 use mod_competvet\local\persistent\situation;
-use mod_competvet\task\post_install;
+use test_data_definition;
 
 /**
  * User role test
@@ -29,23 +31,16 @@ use mod_competvet\task\post_install;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class user_role_test extends advanced_testcase {
-    /**
-     * @var \stdClass $course
-     */
-    protected $course;
-    /**
-     * @var \stdClass $coursemodule
-     */
-    protected $coursemodule;
+    use test_data_definition;
 
     /**
      * User enrolments provider
      *
      * @return array[]
      */
-    public static function user_enrolments_provider_top(): array {
+    public static function user_enrolments_provider_all(): array {
         return array_map(function ($item) {
-            return ['roles' => $item['roles'], 'expected' => $item['expected_top']];
+            return ['user' => $item['user'], 'expected' => $item['expected_all']];
         }, self::basic_provider());
     }
 
@@ -56,30 +51,46 @@ class user_role_test extends advanced_testcase {
      */
     private static function basic_provider(): array {
         return [
-            'simple student' => [
-                'roles' => ['student'],
-                'expected_top' => 'student',
-                'expected_all' => ['student'],
+            'simple student 1' => [
+                'user' => 'student1',
+                'expected_top' => ['SIT1' => 'student', 'SIT2' => 'student', 'SIT3' => 'student', 'SIT4' => 'student',
+                    'SIT5' => 'student', 'SIT6' => 'student', 'SIT7' => 'student', 'SIT8' => 'student', 'SIT9' => 'student', ],
+                'expected_all' => ['SIT1' => ['student'], 'SIT2' => ['student'], 'SIT3' => ['student'], 'SIT4' => ['student'],
+                    'SIT5' => ['student'], 'SIT6' => ['student'], 'SIT7' => ['student'], 'SIT8' => ['student'],
+                    'SIT9' => ['student'], ],
+            ],
+            'simple student 2' => [
+                'user' => 'student2',
+                'expected_top' => ['SIT1' => 'student', 'SIT2' => 'student', 'SIT3' => 'student', 'SIT4' => 'student',
+                    'SIT5' => 'student', 'SIT6' => 'student', 'SIT7' => 'student', 'SIT8' => 'student', 'SIT9' => 'student', ],
+                'expected_all' => ['SIT1' => ['student'], 'SIT2' => ['student'], 'SIT3' => ['student'], 'SIT4' => ['student'],
+                    'SIT5' => ['student'], 'SIT6' => ['student'], 'SIT7' => ['student'], 'SIT8' => ['student'],
+                    'SIT9' => ['student'], ],
             ],
             'observer and assessor' => [
-                'roles' => ['assessor', 'observer', 'editingteacher'],
-                'expected_top' => 'assessor',
-                'expected_all' => ['assessor', 'observer'],
-            ],
-            'assessor and assessor' => [
-                'roles' => ['assessor', 'evaluator', 'teacher'],
-                'expected_top' => 'evaluator',
-                'expected_all' => ['assessor', 'evaluator'],
+                'user' => 'observerandassessor',
+                'expected_top' => ['SIT1' => 'observer', 'SIT2' => 'observer', 'SIT3' => 'observer', 'SIT4' => 'unknown',
+                    'SIT5' => 'unknown', 'SIT6' => 'unknown', 'SIT7' => 'assessor', 'SIT8' => 'assessor', 'SIT9' => 'assessor', ],
+                'expected_all' => ['SIT1' => ['observer'], 'SIT2' => ['observer'], 'SIT3' => ['observer'], 'SIT4' => ['unknown'],
+                    'SIT5' => ['unknown'], 'SIT6' => ['unknown'], 'SIT7' => ['assessor'], 'SIT8' => ['assessor'],
+                    'SIT9' => ['assessor'], ],
             ],
             'manager so unknown' => [
-                'roles' => ['manager'],
-                'expected_top' => 'unknown',
-                'expected_all' => ['unknown'],
+                'user' => 'manager',
+                'expected_top' => ['SIT1' => 'unknown', 'SIT2' => 'unknown', 'SIT3' => 'unknown', 'SIT4' => 'unknown',
+                    'SIT5' => 'unknown', 'SIT6' => 'unknown', 'SIT7' => 'unknown', 'SIT8' => 'unknown', 'SIT9' => 'unknown', ],
+                'expected_all' => ['SIT1' => ['unknown'], 'SIT2' => ['unknown'], 'SIT3' => ['unknown'], 'SIT4' => ['unknown'],
+                    'SIT5' => ['unknown'], 'SIT6' => ['unknown'], 'SIT7' => ['unknown'], 'SIT8' => ['unknown'],
+                    'SIT9' => ['unknown'], ],
             ],
             'observer and student' => [
-                'roles' => ['observer', 'student'],
-                'expected_top' => 'exception',
-                'expected_all' => ['student', 'observer'],
+                'user' => 'studentandobserver',
+                'expected_top' => ['SIT1' => 'unknown', 'SIT2' => 'unknown', 'SIT3' => 'unknown', 'SIT4' => 'unknown',
+                    'SIT5' => 'unknown', 'SIT6' => 'unknown', 'SIT7' => 'exception', 'SIT8' => 'exception', 'SIT9' => 'exception', ],
+                'expected_all' => ['SIT1' => ['unknown'], 'SIT2' => ['unknown'], 'SIT3' => ['unknown'], 'SIT4' => ['unknown'],
+                    'SIT5' => ['unknown'], 'SIT6' => ['unknown'], 'SIT7' => ['student', 'observer'],
+                    'SIT8' => ['student', 'observer'],
+                    'SIT9' => ['student', 'observer'], ],
             ],
         ];
     }
@@ -89,10 +100,40 @@ class user_role_test extends advanced_testcase {
      *
      * @return array[]
      */
-    public static function user_enrolments_provider_all(): array {
+    public static function user_enrolments_provider_top(): array {
         return array_map(function ($item) {
-            return ['roles' => $item['roles'], 'expected' => $item['expected_all']];
+            return ['user' => $item['user'], 'expected' => $item['expected_top']];
         }, self::basic_provider());
+    }
+
+    /**
+     * All situation providers
+     *
+     * @return array[]
+     */
+    public static function all_situations_provider(): array {
+        return [
+            'simple student1' => [
+                'user' => 'student1',
+                'expected' => 'student',
+            ],
+            'simple student2' => [
+                'user' => 'student1',
+                'expected' => 'student',
+            ],
+            'assessor, evaluator and observer' => [
+                'user' => 'observerandevalandassessor',
+                'expected' => 'evaluator',
+            ],
+            'assessor and evaluator' => [
+                'user' => 'assessorandevaluator',
+                'expected' => 'evaluator',
+            ],
+            'conflicting roles' => [
+                'user' => 'studentandobserver',
+                'expected' => 'exception',
+            ],
+        ];
     }
 
     /**
@@ -101,37 +142,24 @@ class user_role_test extends advanced_testcase {
      * @return void
      */
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest();
         $generator = $this->getDataGenerator();
-        $this->course = $generator->create_course();
-        $this->coursemodule = $generator->create_module('competvet', ['course' => $this->course->id, 'shortname' => 'SIT1']);
+        $competvetgenerator = $generator->get_plugin_generator('mod_competvet');
+        $this->generates_definition($this->get_data_definition_set_1(), $generator, $competvetgenerator);
     }
 
     /**
      * Test get_top_for_all_situations
      *
-     * @param string $courserole
-     * @param array $situationsroles
+     * @param string $user
      * @param string $expected
      * @return void
      * @covers       \mod_competvet\local\api\user_role::get_top
      * @dataProvider all_situations_provider
      */
-    public function test_get_top_for_all_situations(string $courserole, array $situationsroles, string $expected) {
-        $generator = $this->getDataGenerator();
-        $generator->create_module('competvet', ['course' => $this->course->id, 'shortname' => 'SIT2']);
-        $generator->create_module('competvet', ['course' => $this->course->id, 'shortname' => 'SIT3']);
-
-        $user = $generator->create_and_enrol($this->course, $courserole);
-        foreach ($situationsroles as $situationsn => $roles) {
-            $situation = situation::get_record(['shortname' => $situationsn]);
-            $competvet = competvet::get_from_instance_id($situation->get('competvetid'));
-            foreach ($roles as $role) {
-                global $DB;
-                $roleid = $DB->get_field('role', 'id', ['shortname' => $role]);
-                role_assign($roleid, $user->id, $competvet->get_context());
-            }
-        }
+    public function test_get_top_for_all_situations(string $user, string $expected) {
+        $user = core_user::get_user_by_username($user);
         if ($expected === 'exception') {
             $this->expectException(\moodle_exception::class);
             user_role::get_top_for_all_situations($user->id);
@@ -141,93 +169,48 @@ class user_role_test extends advanced_testcase {
     }
 
     /**
-     * All situation providers
-     * @return array[]
-     */
-    public static function all_situations_provider(): array {
-        return [
-            'simple student' => [
-                'courserole' => 'student',
-                'situationsroles' => [
-                    'SIT1' => ['student'],
-                    'SIT2' => ['student'],
-                ],
-                'expected' => 'student',
-            ],
-            'assessor, evaluator and observer' => [
-                'courserole' => 'assessor',
-                'situationsroles' => [
-                    'SIT1' => ['assessor'],
-                    'SIT2' => ['evaluator'],
-                    'SIT3' => ['observer'],
-                ],
-                'expected' => 'evaluator',
-            ],
-            'assessor and evaluator' => [
-                'courserole' => 'assessor',
-                'situationsroles' => [
-                    'SIT1' => ['assessor'],
-                    'SIT2' => ['evaluator'],
-                ],
-                'expected' => 'evaluator',
-            ],
-            'conflicting roles' => [
-                'courserole' => 'student',
-                'situations' => [
-                    'SIT1' => ['student'],
-                    'SIT2' => ['observer'],
-                ],
-                'expected' => 'exception',
-            ],
-        ];
-    }
-
-    /**
      * Test get top user type
      *
-     * @param $roles
-     * @param $expected
+     * @param string $user
+     * @param array $expected
      * @return void
      * @covers       \mod_competvet\local\api\user_role::get_top
      * @dataProvider user_enrolments_provider_top
      */
-    public function test_get_top($roles, $expected) {
-        $generator = $this->getDataGenerator();
-        $user = $generator->create_user();
-        foreach ($roles as $role) {
-            $generator->enrol_user($user->id, $this->course->id, $role);
+    public function test_get_top(string $user, array $expected) {
+        $user = core_user::get_user_by_username($user);
+        $situations = situation::get_records([], 'shortname', 'ASC');
+        $result = [];
+        foreach ($situations as $situation) {
+            try {
+                $result[$situation->get('shortname')] = user_role::get_top($user->id, $situation->get('id'));
+            } catch (\moodle_exception $e) {
+                $result[$situation->get('shortname')] = 'exception';
+            }
         }
-        $competvet = competvet::get_from_instance_id($this->coursemodule->id);
-        $situation = $competvet->get_situation();
-        if ($expected === 'exception') {
-            $this->expectException(\moodle_exception::class);
-        }
-        $this->assertEquals($expected, user_role::get_top($user->id, $situation->get('id')));
+        $this->assertSame($expected, $result);
     }
 
     /**
      * Test get top user type
      *
-     * @param $roles
-     * @param $expected
+     * @param string $user
+     * @param array $expected
      * @return void
      * @covers       \mod_competvet\local\api\user_role::get_all
      * @dataProvider user_enrolments_provider_all
      */
-    public function test_get_all($roles, $expected) {
-        $generator = $this->getDataGenerator();
-        $user = $generator->create_user();
-        foreach ($roles as $role) {
-            $generator->enrol_user($user->id, $this->course->id, $role);
+    public function test_get_all(string $user, array $expected) {
+        $user = core_user::get_user_by_username($user);
+        $situations = situation::get_records([], 'shortname', 'ASC');
+        $result = [];
+        foreach ($situations as $situation) {
+            try {
+                $result[$situation->get('shortname')] = user_role::get_all($user->id, $situation->get('id'));
+            } catch (\moodle_exception $e) {
+                $result[$situation->get('shortname')] = 'exception';
+            }
         }
-        $competvet = competvet::get_from_instance_id($this->coursemodule->id);
-        $situation = $competvet->get_situation();
-        if ($expected === 'exception') {
-            $this->expectException(\moodle_exception::class);
-        }
-        $allroles = user_role::get_all($user->id, $situation->get('id'));
-        sort($allroles);
-        sort($expected);
-        $this->assertEquals($expected, $allroles);
+        $this->assertSame($expected, $result);
     }
 }

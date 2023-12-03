@@ -103,4 +103,51 @@ class planning extends persistent {
     public function get_enddate_string() {
         return userdate($this->raw_get('enddate'), get_string('strftimedate', 'core_langconfig'));
     }
+
+    /**
+     * Return true if user is member of any planning group for this situation
+     *
+     * @return bool
+     */
+    public static function is_user_in_planned_groups(int $userid, situation $situation): bool {
+        $plannings = self::get_records(['situationid' => $situation->get('id')]);
+        $planningforuser = array_filter($plannings, function ($planning) use ($userid) {
+            return groups_is_member($planning->raw_get('groupid'), $userid);
+        });
+        return !empty($planningforuser);
+    }
+
+    /**
+     * Hook to execute after a create.
+     *
+     * As situations are visible when the user (student) belongs to one of the groups, we need to make
+     * sure that we send an event that will be observed so we clear the cache
+     *
+     * @return void
+     */
+    protected function after_create() {
+    }
+    /**
+     * Hook to execute after an update.
+     *
+     * As situations are visible when the user (student) belongs to one of the groups, we need to make
+     *  sure that we send an event that will be observed so we clear the cache
+     *
+     * @param bool $result Whether or not the update was successful.
+     * @return void
+     */
+    protected function after_update($result) {
+    }
+
+    /**
+     * Hook to execute after a delete.
+     *
+     * As situations are visible when the user (student) belongs to one of the groups, we need to make
+     *  sure that we send an event that will be observed so we clear the cache
+     *
+     * @param bool $result Whether or not the delete was successful.
+     * @return void
+     */
+    protected function after_delete($result) {
+    }
 }

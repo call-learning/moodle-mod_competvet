@@ -280,7 +280,7 @@ const RANDOM_MISSING_PLANNING = 6;
         $monday = strtotime('last monday', $datenow);
         $groups = array_values(groups_get_all_groups($this->course->id));
         $competvetgenerator = $this->generator->get_plugin_generator('mod_competvet');
-        $situation = situation::get_from_module_instance_id($instance->id);
+        $situation = situation::get_record(['competvetid' => $instance->id]);
         $skippedplanning = 0;
         for ($week = 0; $week < self::PLANNING_WEEKS; $week++) {
             if (random_int(1, 1000) > 500 && $skippedplanning < self::RANDOM_MISSING_PLANNING) {

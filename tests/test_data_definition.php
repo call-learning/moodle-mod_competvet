@@ -45,11 +45,17 @@ trait test_data_definition {
                     $generator->create_group_member(['groupid' => $group->id, 'userid' => $users[$username]->id]);
                 }
             }
-            foreach ($data['activities'] as $situationname => $plannings) {
-                $module = $generator->create_module('competvet', ['course' => $course->id, 'shortname' => $situationname]);
+            foreach ($data['activities'] as $situationname => $situationinfo) {
+                $situationmodule = [...$situationinfo];
+                $situationmodule['course'] = $course->id;
+                $situationmodule['shortname'] = $situationname;
+                $situationmodule['name'] = $situationname;
+                unset($situationmodule['plannings']);
+
+                $module = $generator->create_module('competvet', $situationmodule);
                 $competvet = competvet::get_from_instance_id($module->id);
                 $situation = $competvet->get_situation();
-                foreach ($plannings as $planning) {
+                foreach ($situationinfo['plannings'] as $planning) {
                     $groupid = groups_get_group_by_name($course->id, $planning['groupname']);
                     $competvetevalgenerator->create_planning([
                         'shortname' => $situationname,
@@ -74,9 +80,75 @@ trait test_data_definition {
         return [
             'course 1' => [
                 'users' => [
-                    'student' => ['student1', 'student2', 'student3'],
-                    'observer' => ['observer1'],
+                    'student' => ['student1', 'student2'],
+                    'observer' => ['observer1', 'observerandassessor'],
                     'teacher' => ['teacher1'],
+                    'manager' => ['manager']
+                ],
+                'groups' => [
+                    'group 8.1' => [
+                        'users' => ['student1'],
+                    ],
+                    'group 8.2' => [
+                        'users' => ['student2'],
+                    ],
+                    'group 8.3' => [
+                        'users' => [],
+                    ],
+                    'group 8.4' => [
+                        'users' => [],
+                    ],
+                ],
+                'activities' => [
+                    'SIT1' => [
+                        'situationtags' => ['y:1'],
+                        'plannings' => [
+                            [
+                                'startdate' => $startdate,
+                                'enddate' => $startdate + $oneweek,
+                                'groupname' => 'group 8.1',
+                            ],
+                            [
+                                'startdate' => $startdate + $oneweek,
+                                'enddate' => $startdate + $oneweek * 2,
+                                'groupname' => 'group 8.2',
+                            ],
+                        ],
+                    ],
+                    'SIT2' => [
+                        'situationtags' => ['y:2'],
+                        'plannings' => [
+                            [
+                                'startdate' => $startdate + $onemonth,
+                                'enddate' => $startdate + $onemonth + $oneweek,
+                                'groupname' => 'group 8.1',
+                            ],
+                        ],
+                    ],
+                    'SIT3' => [
+                        'situationtags' => ['y:3'],
+                        'plannings' => [
+                            [
+                                'startdate' => $startdate + $onemonth * 2,
+                                'enddate' => $startdate + $onemonth * 2 + $oneweek,
+                                'groupname' => 'group 8.1',
+                            ],
+                            [
+                                'startdate' => $startdate + $onemonth * 2 + $oneweek,
+                                'enddate' => $startdate + $onemonth * 2 + $oneweek * 2,
+                                'groupname' => 'group 8.2',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'course 2' => [
+                'users' => [
+                    'student' => ['student1', 'student2', 'student3', 'student4'],
+                    'observer' => ['observer2', 'observerandevalandassessor'],
+                    'evaluator' => ['observerandevalandassessor'],
+                    'assessor' => ['observerandevalandassessor'],
+                    'teacher' => ['teacher2'],
                 ],
                 'groups' => [
                     'group 8.1' => [
@@ -85,78 +157,63 @@ trait test_data_definition {
                     'group 8.2' => [
                         'users' => ['student3'],
                     ],
-                ],
-                'activities' => [
-                    'SIT1' => [
-                        ['startdate' => $startdate, 'enddate' => $startdate + $oneweek, 'groupname' => 'group 8.1'],
-                        ['startdate' => $startdate + $oneweek, 'enddate' => $startdate + $oneweek * 2, 'groupname' => 'group 8.2'],
-                        ['startdate' => $startdate + $oneweek, 'enddate' => $startdate + $oneweek * 2, 'groupname' => 'group 8.1'],
-                    ],
-                    'SIT2' => [
-                        ['startdate' => $startdate + $onemonth, 'enddate' => $startdate + $onemonth + $oneweek,
-                            'groupname' => 'group 8.1',],
-                        ['startdate' => $startdate + $onemonth + $oneweek, 'enddate' => $startdate + $onemonth + $oneweek * 2,
-                            'groupname' => 'group 8.2',],
-                    ],
-                    'SIT3' => [
-                        ['startdate' => $startdate + $onemonth * 2, 'enddate' => $startdate + $onemonth * 2 + $oneweek,
-                            'groupname' => 'group 8.1',],
-                        ['startdate' => $startdate + $onemonth * 2 + $oneweek,
-                            'enddate' => $startdate + $onemonth * 2 + $oneweek * 2, 'groupname' => 'group 8.2',],
-                    ],
-                ],
-            ],
-            'course 2' => [
-                'users' => [
-                    'student' => ['student1', 'student2', 'student3', 'student4'],
-                    'observer' => ['observer2'],
-                    'teacher' => ['teacher2'],
-                ],
-                'groups' => [
-                    'group 8.1' => [
-                        'users' => ['student1', 'student2'],
-                    ],
                     'group 8.3' => [
-                        'users' => ['student3'],
-                    ],
-                    'group 8.4' => [
                         'users' => ['student4'],
                     ],
                 ],
                 'activities' => [
                     'SIT4' => [
-                        ['startdate' => $startdate + $onemonth * 3, 'enddate' => $startdate + $onemonth * 2 + $oneweek,
-                            'groupname' => 'group 8.1',],
-                        ['startdate' => $startdate + $onemonth * 3 + $oneweek,
-                            'enddate' => $startdate + $onemonth * 3 + $oneweek * 2, 'groupname' => 'group 8.3',],
-                        ['startdate' => $startdate + $onemonth * 3 + $oneweek * 2,
-                            'enddate' => $startdate + $onemonth * 3 + $oneweek * 3, 'groupname' => 'group 8.4',],
+                        'situationtags' => ['y:1'],
+                        'plannings' => [
+                            [
+                                'startdate' => $startdate + $onemonth * 3,
+                                'enddate' => $startdate + $onemonth * 2 + $oneweek,
+                                'groupname' => 'group 8.1',
+                            ],
+                            [
+                                'startdate' => $startdate + $onemonth * 3 + $oneweek,
+                                'enddate' => $startdate + $onemonth * 3 + $oneweek * 2,
+                                'groupname' => 'group 8.3',
+                            ],
+                        ],
                     ],
                     'SIT5' => [
-                        ['startdate' => $startdate + $onemonth * 4, 'enddate' => $startdate + $onemonth * 2 + $oneweek,
-                            'groupname' => 'group 8.1',],
-                        ['startdate' => $startdate + $onemonth * 4 + $oneweek,
-                            'enddate' => $startdate + $onemonth * 4 + $oneweek * 2, 'groupname' => 'group 8.3',],
-                        ['startdate' => $startdate + $onemonth * 4 + $oneweek * 2,
-                            'enddate' => $startdate + $onemonth * 4 + $oneweek * 3, 'groupname' => 'group 8.4',],
+                        'situationtags' => ['y:2'],
+                        'plannings' => [
+                            [
+                                'startdate' => $startdate + $onemonth * 4,
+                                'enddate' => $startdate + $onemonth * 2 + $oneweek,
+                                'groupname' => 'group 8.2',
+                            ],
+                            [
+                                'startdate' => $startdate + $onemonth * 4 + $oneweek,
+                                'enddate' => $startdate + $onemonth * 4 + $oneweek * 2,
+                                'groupname' => 'group 8.3',
+                            ],
+                        ],
                     ],
                     'SIT6' => [
-                        ['startdate' => $startdate + $onemonth * 5, 'enddate' => $startdate + $onemonth * 2 + $oneweek,
-                            'groupname' => 'group 8.1',],
-                        ['startdate' => $startdate + $onemonth * 5 + $oneweek,
-                            'enddate' => $startdate + $onemonth * 5 + $oneweek * 2, 'groupname' => 'group 8.3',],
-                        ['startdate' => $startdate + $onemonth * 5 + $oneweek * 2,
-                            'enddate' => $startdate + $onemonth * 5 + $oneweek * 3, 'groupname' => 'group 8.4',],
+                        'situationtags' => ['y:3'],
+                        'plannings' => [
+                            [
+                                'startdate' => $startdate + $onemonth * 5,
+                                'enddate' => $startdate + $onemonth * 2 + $oneweek,
+                                'groupname' => 'group 8.3',
+                            ],
+                        ],
                     ],
                 ],
             ],
             'course 3' => [
                 'users' => [
-                    'student' => ['student1', 'student2', 'student3', 'student4'],
+                    'student' => ['student1', 'student2', 'student3', 'student4', 'studentandobserver'],
+                    'observer' => ['observer2', 'studentandobserver'],
+                    'evaluator' => ['assessorandevaluator'],
+                    'assessor' => ['assessorandevaluator', 'observerandassessor'],
                 ],
                 'groups' => [
                     'group 8.1' => [
-                        'users' => ['student1', 'student2'],
+                        'users' => ['student1', 'student2', 'studentandobserver'],
                     ],
                     'group 8.3' => [
                         'users' => ['student3'],
@@ -167,28 +224,34 @@ trait test_data_definition {
                 ],
                 'activities' => [
                     'SIT7' => [
-                        ['startdate' => $startdate + $onemonth * 6, 'enddate' => $startdate + $onemonth * 2 + $oneweek,
-                            'groupname' => 'group 8.1',],
-                        ['startdate' => $startdate + $onemonth * 6 + $oneweek,
-                            'enddate' => $startdate + $onemonth * 6 + $oneweek * 2, 'groupname' => 'group 8.3',],
-                        ['startdate' => $startdate + $onemonth * 6 + $oneweek * 2,
-                            'enddate' => $startdate + $onemonth * 6 + $oneweek * 3, 'groupname' => 'group 8.4',],
+                        'situationtags' => ['y:1'],
+                        'plannings' => [
+                            [
+                                'startdate' => $startdate + $onemonth * 6,
+                                'enddate' => $startdate + $onemonth * 2 + $oneweek,
+                                'groupname' => 'group 8.1',
+                            ],
+                        ],
                     ],
                     'SIT8' => [
-                        ['startdate' => $startdate + $onemonth * 7, 'enddate' => $startdate + $onemonth * 2 + $oneweek,
-                            'groupname' => 'group 8.1',],
-                        ['startdate' => $startdate + $onemonth * 7 + $oneweek,
-                            'enddate' => $startdate + $onemonth * 7 + $oneweek * 2, 'groupname' => 'group 8.3',],
-                        ['startdate' => $startdate + $onemonth * 7 + $oneweek * 2,
-                            'enddate' => $startdate + $onemonth * 7 + $oneweek * 3, 'groupname' => 'group 8.4',],
+                        'situationtags' => ['y:2'],
+                        'plannings' => [
+                            [
+                                'startdate' => $startdate + $onemonth * 7,
+                                'enddate' => $startdate + $onemonth * 2 + $oneweek,
+                                'groupname' => 'group 8.3',
+                            ],
+                        ],
                     ],
                     'SIT9' => [
-                        ['startdate' => $startdate + $onemonth * 8, 'enddate' => $startdate + $onemonth * 2 + $oneweek,
-                            'groupname' => 'group 8.1',],
-                        ['startdate' => $startdate + $onemonth * 8 + $oneweek,
-                            'enddate' => $startdate + $onemonth * 8 + $oneweek * 2, 'groupname' => 'group 8.3',],
-                        ['startdate' => $startdate + $onemonth * 8 + $oneweek * 2,
-                            'enddate' => $startdate + $onemonth * 8 + $oneweek * 3, 'groupname' => 'group 8.4',],
+                        'situationtags' => ['y:3'],
+                        'plannings' => [
+                            [
+                                'startdate' => $startdate + $onemonth * 8,
+                                'enddate' => $startdate + $onemonth * 2 + $oneweek,
+                                'groupname' => 'group 8.4',
+                            ],
+                        ],
                     ],
                 ],
             ],

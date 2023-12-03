@@ -18,11 +18,16 @@ declare(strict_types=1);
 
 namespace mod_competvet\reportbuilder\local\systemreports;
 
+use context;
 use core_group\reportbuilder\local\entities\group;
+use core_reportbuilder\local\report\action;
 use core_reportbuilder\system_report;
-use mod_competvet\local\persistent\situation as situationAlias;
+use lang_string;
 use mod_competvet\reportbuilder\local\entities\planning;
 use mod_competvet\reportbuilder\local\entities\situation;
+use moodle_url;
+use pix_icon;
+use stdClass;
 
 /**
  * Situations for a given user
@@ -48,22 +53,21 @@ class situations_per_user extends system_report {
         $this->set_main_table('competvet_situation', $situationalias);
 
         // Join situation entity to competvet.
-
-        $userid = $this->get_parameter('userid', 0, PARAM_INT);
-        if ($userid) {
+        if ($situationidsjson = $this->get_parameter('onlyforsituations', "[]", PARAM_RAW)) {
             global $DB;
-            // Here we hack a bit the report so we get only the situations visible to the user.
-            $situationsid = situationAlias::get_all_situations_id_for($userid);
-            if (!empty($situationsid)) {
-                [$where, $params] = $DB->get_in_or_equal($situationsid, SQL_PARAMS_NAMED, 'situationids');
+            $situationids = json_decode($situationidsjson);
+            if (!empty($situationids)) {
+                [$where, $params] = $DB->get_in_or_equal($situationids, SQL_PARAMS_NAMED, 'situationids');
                 $this->add_base_condition_sql(
                     "{$situationalias}.situationid = {$where}",
                     $params
                 );
             }
-            // TODO : in case of empty situation, maybe throw an error ?
         }
-        $this->add_entity($situationentity);
+        $contextalias = $situationentity->get_table_alias('context');
+        $coursemodulealias = $situationentity->get_table_alias('course_modules');
+        $this->add_base_fields("{$situationalias}.id, {$contextalias}.id AS contextid, {$coursemodulealias}.id AS cmid");
+        $this->add_entity($situationentity->add_joins($situationentity->get_context_and_modules_joins()));
 
         $planningentity = new planning();
         $planningalias = $planningentity->get_table_alias('competvet_planning');
@@ -101,6 +105,8 @@ class situations_per_user extends system_report {
     protected function add_columns(): void {
         $columns = [
             'situation:shortnamewithlinks',
+            'situation:shortname',
+            'situation:name',
             'situation:evalnum',
             'situation:autoevalnum',
             'situation:intro',
@@ -139,16 +145,18 @@ class situations_per_user extends system_report {
      * Note the use of ":id" placeholder which will be substituted according to actual values in the row
      */
     protected function add_actions(): void {
-        // $context = $this->get_context();
-        // $competvet = competvet::get_from_context($context);
-        //// Action to view individual task log on a popup window.
-        // $this->add_action((new action(
-        // new moodle_url(''),
-        // new pix_icon('t/edit', ''),
-        // ['data-action' => 'editsituation', 'data-situation-id' => ':id', 'data-cmid' => $competvet->get_course_module_id()],
-        // false,
-        // new lang_string('edit'),
-        // )));
+        global $FULLME;
+        // Action to view individual task log on a popup window.
+        $returnurl = new moodle_url($FULLME);
+        $this->add_action((new action(
+            new moodle_url('/course/modedit.php', ['update' => ':cmid']),
+            new pix_icon('t/edit', '', 'core'),
+            [],
+            false,
+            new lang_string('edit')
+        ))->add_callback(function (stdClass $row): bool {
+            return empty($row->component) && has_capability('moodle/cohort:manage', context::instance_by_id($row->contextid));
+        }));
     }
 
     protected function can_view(): bool {

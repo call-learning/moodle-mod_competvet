@@ -13,15 +13,13 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-namespace local\persistent;
+namespace mod_competvet\local\persistent;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
 
 use advanced_testcase;
 use core_user;
-use mod_competvet\local\persistent\situation;
-use mod_competvet\task\post_install;
 use test_data_definition;
 
 /**
@@ -41,9 +39,10 @@ class situation_test extends advanced_testcase {
      */
     public static function all_for_user_provider(): array {
         return [
-            'student situations' => ['student1', ['SIT1', 'SIT2', 'SIT3', 'SIT4', 'SIT5', 'SIT6', 'SIT7', 'SIT8', 'SIT9']],
+            'student1 situations' => ['student1', ['SIT1', 'SIT2', 'SIT3', 'SIT4', 'SIT7']],
+            'student2 situations' => ['student2', ['SIT1', 'SIT3', 'SIT4', 'SIT7']],
             'observer1 situations' => ['observer1', ['SIT1', 'SIT2', 'SIT3']],
-            'observer2 situations' => ['observer2', ['SIT4', 'SIT5', 'SIT6']],
+            'observer2 situations' => ['observer2', ['SIT4', 'SIT5', 'SIT6', 'SIT7', 'SIT8', 'SIT9']],
             'teacher1 situations' => ['teacher1', ['SIT1', 'SIT2', 'SIT3']],
         ];
     }
@@ -73,12 +72,11 @@ class situation_test extends advanced_testcase {
     public function test_get_all_situation_for($username, $expected) {
         $user = core_user::get_user_by_username($username);
         $situations = situation::get_all_situations_id_for($user->id);
-        $situationssn = array_map(function($situationid) {
+        $situationssn = array_map(function ($situationid) {
             $situation = situation::get_record(['id' => $situationid]);
             return $situation->get('shortname');
         }, $situations);
         sort($situationssn);
         $this->assertEquals($expected, array_values($situationssn), "Expected situations for user $username are different.");
     }
-
 }

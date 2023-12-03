@@ -46,22 +46,31 @@ class situations_test extends advanced_testcase {
      * @return array[]
      */
     public static function all_for_user_provider_with_planning(): array {
-        //@codingStandardsIgnoreStart
+        global $CFG;
+        $results = [];
+        include_once($CFG->dirroot . '/mod/competvet/tests/fixtures/situation_tests_results.php');
         return [
-            'student situations' => ['student1',
-                '[{"shortname":"SIT1","evalnum":"1","autoevalnum":"1","description":"<div class=\"no-overflow\">Test competvet 1<\/div>","name":"CompetVet 1","roles":"[\"student\"]","plannings":[{"startdate":"1698793200","enddate":"1698793200","groupname":"group 8.1"},{"startdate":"1699398000","enddate":"1699398000","groupname":"group 8.2"},{"startdate":"1699398000","enddate":"1699398000","groupname":"group 8.1"}]},{"shortname":"SIT2","evalnum":"1","autoevalnum":"1","description":"<div class=\"no-overflow\">Test competvet 2<\/div>","name":"CompetVet 2","roles":"[\"student\"]","plannings":[{"startdate":"1701385200","enddate":"1701385200","groupname":"group 8.1"},{"startdate":"1701990000","enddate":"1701990000","groupname":"group 8.2"}]},{"shortname":"SIT3","evalnum":"1","autoevalnum":"1","description":"<div class=\"no-overflow\">Test competvet 3<\/div>","name":"CompetVet 3","roles":"[\"student\"]","plannings":[{"startdate":"1703977200","enddate":"1703977200","groupname":"group 8.1"},{"startdate":"1704582000","enddate":"1704582000","groupname":"group 8.2"}]},{"shortname":"SIT4","evalnum":"1","autoevalnum":"1","description":"<div class=\"no-overflow\">Test competvet 4<\/div>","name":"CompetVet 4","roles":"[\"student\"]","plannings":[{"startdate":"1706569200","enddate":"1706569200","groupname":"group 8.1"},{"startdate":"1707174000","enddate":"1707174000","groupname":"group 8.3"},{"startdate":"1707778800","enddate":"1707778800","groupname":"group 8.4"}]},{"shortname":"SIT5","evalnum":"1","autoevalnum":"1","description":"<div class=\"no-overflow\">Test competvet 5<\/div>","name":"CompetVet 5","roles":"[\"student\"]","plannings":[{"startdate":"1709161200","enddate":"1709161200","groupname":"group 8.1"},{"startdate":"1709766000","enddate":"1709766000","groupname":"group 8.3"},{"startdate":"1710370800","enddate":"1710370800","groupname":"group 8.4"}]},{"shortname":"SIT6","evalnum":"1","autoevalnum":"1","description":"<div class=\"no-overflow\">Test competvet 6<\/div>","name":"CompetVet 6","roles":"[\"student\"]","plannings":[{"startdate":"1711753200","enddate":"1711753200","groupname":"group 8.1"},{"startdate":"1712358000","enddate":"1712358000","groupname":"group 8.3"},{"startdate":"1712962800","enddate":"1712962800","groupname":"group 8.4"}]},{"shortname":"SIT7","evalnum":"1","autoevalnum":"1","description":"<div class=\"no-overflow\">Test competvet 7<\/div>","name":"CompetVet 7","roles":"[\"student\"]","plannings":[{"startdate":"1714345200","enddate":"1714345200","groupname":"group 8.1"},{"startdate":"1714950000","enddate":"1714950000","groupname":"group 8.3"},{"startdate":"1715554800","enddate":"1715554800","groupname":"group 8.4"}]},{"shortname":"SIT8","evalnum":"1","autoevalnum":"1","description":"<div class=\"no-overflow\">Test competvet 8<\/div>","name":"CompetVet 8","roles":"[\"student\"]","plannings":[{"startdate":"1716937200","enddate":"1716937200","groupname":"group 8.1"},{"startdate":"1717542000","enddate":"1717542000","groupname":"group 8.3"},{"startdate":"1718146800","enddate":"1718146800","groupname":"group 8.4"}]},{"shortname":"SIT9","evalnum":"1","autoevalnum":"1","description":"<div class=\"no-overflow\">Test competvet 9<\/div>","name":"CompetVet 9","roles":"[\"student\"]","plannings":[{"startdate":"1719529200","enddate":"1719529200","groupname":"group 8.1"},{"startdate":"1720134000","enddate":"1720134000","groupname":"group 8.3"},{"startdate":"1720738800","enddate":"1720738800","groupname":"group 8.4"}]}]'
+            'student1 situations' => [
+                'student1',
+                $results['student1results'],
             ],
-            'observer1 situations' => ['observer1',
-                '[{"shortname":"SIT1","evalnum":"1","autoevalnum":"1","description":"<div class=\"no-overflow\">Test competvet 1<\/div>","name":"CompetVet 1","roles":"[\"observer\"]","plannings":[{"startdate":"1698793200","enddate":"1698793200","groupname":"group 8.1"},{"startdate":"1699398000","enddate":"1699398000","groupname":"group 8.2"},{"startdate":"1699398000","enddate":"1699398000","groupname":"group 8.1"}]},{"shortname":"SIT2","evalnum":"1","autoevalnum":"1","description":"<div class=\"no-overflow\">Test competvet 2<\/div>","name":"CompetVet 2","roles":"[\"observer\"]","plannings":[{"startdate":"1701385200","enddate":"1701385200","groupname":"group 8.1"},{"startdate":"1701990000","enddate":"1701990000","groupname":"group 8.2"}]},{"shortname":"SIT3","evalnum":"1","autoevalnum":"1","description":"<div class=\"no-overflow\">Test competvet 3<\/div>","name":"CompetVet 3","roles":"[\"observer\"]","plannings":[{"startdate":"1703977200","enddate":"1703977200","groupname":"group 8.1"},{"startdate":"1704582000","enddate":"1704582000","groupname":"group 8.2"}]}]'
+            'student2 situations' => [
+                'student2',
+                $results['student2results'],
             ],
-            'observer2 situations' => ['observer2',
-                '[{"shortname":"SIT4","evalnum":"1","autoevalnum":"1","description":"<div class=\"no-overflow\">Test competvet 4<\/div>","name":"CompetVet 4","roles":"[\"observer\"]","plannings":[{"startdate":"1706569200","enddate":"1706569200","groupname":"group 8.1"},{"startdate":"1707174000","enddate":"1707174000","groupname":"group 8.3"},{"startdate":"1707778800","enddate":"1707778800","groupname":"group 8.4"}]},{"shortname":"SIT5","evalnum":"1","autoevalnum":"1","description":"<div class=\"no-overflow\">Test competvet 5<\/div>","name":"CompetVet 5","roles":"[\"observer\"]","plannings":[{"startdate":"1709161200","enddate":"1709161200","groupname":"group 8.1"},{"startdate":"1709766000","enddate":"1709766000","groupname":"group 8.3"},{"startdate":"1710370800","enddate":"1710370800","groupname":"group 8.4"}]},{"shortname":"SIT6","evalnum":"1","autoevalnum":"1","description":"<div class=\"no-overflow\">Test competvet 6<\/div>","name":"CompetVet 6","roles":"[\"observer\"]","plannings":[{"startdate":"1711753200","enddate":"1711753200","groupname":"group 8.1"},{"startdate":"1712358000","enddate":"1712358000","groupname":"group 8.3"},{"startdate":"1712962800","enddate":"1712962800","groupname":"group 8.4"}]}]'
+            'observer1 situations' => [
+                'observer1',
+                $results['observer1results'],
             ],
-            'teacher1 situations' => ['teacher1',
-                '[{"shortname":"SIT1","evalnum":"1","autoevalnum":"1","description":"<div class=\"no-overflow\">Test competvet 1<\/div>","name":"CompetVet 1","roles":"[\"teacher\"]","plannings":[{"startdate":"1698793200","enddate":"1698793200","groupname":"group 8.1"},{"startdate":"1699398000","enddate":"1699398000","groupname":"group 8.2"},{"startdate":"1699398000","enddate":"1699398000","groupname":"group 8.1"}]},{"shortname":"SIT2","evalnum":"1","autoevalnum":"1","description":"<div class=\"no-overflow\">Test competvet 2<\/div>","name":"CompetVet 2","roles":"[\"teacher\"]","plannings":[{"startdate":"1701385200","enddate":"1701385200","groupname":"group 8.1"},{"startdate":"1701990000","enddate":"1701990000","groupname":"group 8.2"}]},{"shortname":"SIT3","evalnum":"1","autoevalnum":"1","description":"<div class=\"no-overflow\">Test competvet 3<\/div>","name":"CompetVet 3","roles":"[\"teacher\"]","plannings":[{"startdate":"1703977200","enddate":"1703977200","groupname":"group 8.1"},{"startdate":"1704582000","enddate":"1704582000","groupname":"group 8.2"}]}]'
+            'observer2 situations' => [
+                'observer2',
+                $results['observer2results'],
+            ],
+            'teacher1 situations' => [
+                'teacher1',
+                $results['teacher1results'],
             ],
         ];
-        //@codingStandardsIgnoreEnd
     }
 
     /**
@@ -86,23 +95,36 @@ class situations_test extends advanced_testcase {
      * @dataProvider all_for_user_provider_with_planning
      * @covers       \mod_competvet\local\api\situations::get_all_situations_for
      */
-    public function test_get_all_situations_with_planning_for($username, $expected) {
+    public function test_get_all_situations_with_planning_for(string $username, array $expected) {
         $user = core_user::get_user_by_username($username);
         $situations = situations::get_all_situations_with_planning_for($user->id);
-        usort($situations, function($sit1, $sit2) {
-            return $sit1->shortname <=> $sit2->shortname;
+        usort($situations, function ($sit1, $sit2) {
+            return $sit1['shortname'] <=> $sit2['shortname'];
+        });
+        usort($expected, function ($sit1, $sit2) {
+            return $sit1['shortname'] <=> $sit2['shortname'];
         });
         $this->remove_ids_for_assertions($situations);
-        $this->assertEquals($expected, json_encode($situations));
+        $this->assertSame($expected, $situations);
     }
 
+    /**
+     * Remove ids so we can compare the tables.
+     *
+     * @param $record
+     * @return void
+     */
     private function remove_ids_for_assertions(&$record) {
         if (is_scalar($record)) {
             return;
         }
-        foreach ($record as $field => $value) {
-            if (str_ends_with($field, 'id')) {
-                unset($record->$field);
+        foreach ($record as $field => &$value) {
+            if (str_ends_with($field, 'id') || $field === 'id') {
+                if (is_array($record)) {
+                    unset($record[$field]);
+                } else {
+                    unset($record->{$field});
+                }
             }
             if (is_array($value)) {
                 foreach ($value as &$subrecord) {
