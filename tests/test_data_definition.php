@@ -83,7 +83,7 @@ trait test_data_definition {
                     'student' => ['student1', 'student2'],
                     'observer' => ['observer1', 'observerandassessor'],
                     'teacher' => ['teacher1'],
-                    'manager' => ['manager']
+                    'manager' => ['manager'],
                 ],
                 'groups' => [
                     'group 8.1' => [

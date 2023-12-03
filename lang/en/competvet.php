@@ -114,6 +114,7 @@ $string['situation:selector'] = 'Situation selector';
 $string['situation:intro'] = 'Situation Intro';
 $string['situation:name'] = 'Situation Name (Full)';
 $string['situation:tags'] = 'Tags for situation';
+$string['situation:cmid'] = 'Course Module ID for the situation';
 $string['sendstudentnotifications'] = 'Send student notifications';
 $string['savingchanges'] = 'Saving changes';
 $string['situation:idnumber'] = 'Situation Unique ID';

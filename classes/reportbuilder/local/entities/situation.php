@@ -188,6 +188,19 @@ class situation extends base {
             ->add_field($sql, 'tagnames')
             ->set_is_sortable(true);
 
+
+        $columns[] = (new column(
+            'cmid',
+            new lang_string('situation:cmid', 'mod_competvet'),
+            $this->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->add_joins($this->get_context_and_modules_joins())
+            ->set_type(column::TYPE_INTEGER)
+            ->add_field("{$cmmodulealias}.id", 'cmid')
+            ->add_fields(context_helper::get_preload_record_columns_sql($contextalias))
+            ->set_is_sortable(true);
+
         return $columns;
     }
 

@@ -19,11 +19,9 @@ declare(strict_types=1);
 namespace mod_competvet\reportbuilder\local\systemreports;
 
 use context;
-use core_group\reportbuilder\local\entities\group;
 use core_reportbuilder\local\report\action;
 use core_reportbuilder\system_report;
 use lang_string;
-use mod_competvet\reportbuilder\local\entities\planning;
 use mod_competvet\reportbuilder\local\entities\situation;
 use moodle_url;
 use pix_icon;
@@ -32,11 +30,14 @@ use stdClass;
 /**
  * Situations for a given user
  *
+ * Used in the situations API:
+ * @see \mod_competvet\local\api\situations::get_all_situations_with_planning_for
+ *
  * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class situations_per_user extends system_report {
+class situations extends system_report {
     /**
      * Return the conditions that will be added to the report upon creation
      *
@@ -68,21 +69,6 @@ class situations_per_user extends system_report {
         $coursemodulealias = $situationentity->get_table_alias('course_modules');
         $this->add_base_fields("{$situationalias}.id, {$contextalias}.id AS contextid, {$coursemodulealias}.id AS cmid");
         $this->add_entity($situationentity->add_joins($situationentity->get_context_and_modules_joins()));
-
-        $planningentity = new planning();
-        $planningalias = $planningentity->get_table_alias('competvet_planning');
-        $this->add_entity($planningentity
-            ->add_join(
-                "LEFT JOIN {competvet_planning} {$planningalias} ON {$planningalias}.situationid = {$situationalias}.id"
-            ));
-        $groupentity = new group();
-        $groupsalias = $groupentity->get_table_alias('groups');
-        $groupscontextalias = $groupentity->get_table_alias('context');
-        $this->add_entity($groupentity
-            ->add_join("LEFT JOIN {groups} {$groupsalias} ON {$groupsalias}.id = {$planningalias}.groupid")
-            ->add_join("LEFT JOIN {context} {$groupscontextalias}
-            ON {$groupscontextalias}.contextlevel = " . CONTEXT_COURSE . "
-           AND {$groupscontextalias}.instanceid = {$groupsalias}.courseid"));
         // Now we can call our helper methods to add the content we want to include in the report.
         $this->add_columns();
         $this->add_filters();
@@ -111,10 +97,7 @@ class situations_per_user extends system_report {
             'situation:autoevalnum',
             'situation:intro',
             'situation:tagnames',
-            'planning:startdate',
-            'planning:enddate',
-            'planning:session',
-            'group:name',
+            'situation:cmid',
         ];
 
         $this->add_columns_from_entities($columns);

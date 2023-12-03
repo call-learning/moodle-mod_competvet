@@ -20,6 +20,7 @@ use context_module;
 use core\persistent;
 use lang_string;
 use mod_competvet\competvet;
+use mod_competvet\utils;
 
 /**
  * Criterion template entity
@@ -46,7 +47,6 @@ class situation extends persistent {
      * @return array|int[]
      */
     public static function get_all_situations_id_for(int $userid): array {
-        static $studentroleid = null;
         // If there is nothing cached for this user, then we build the situation list for this user.
         $situationcache = cache::make('mod_competvet', 'usersituations');
 
@@ -57,10 +57,7 @@ class situation extends persistent {
         $courses = enrol_get_users_courses($userid);
         // Get all situations for this user in this course.
         $situationsid = [];
-        if (is_null($studentroleid)) {
-            $roles = get_all_roles(\context_system::instance());
-            $studentroleid = array_search('student', array_column($roles, 'shortname', 'id'));
-        }
+        $studentrolesid = utils::get_student_roles_id();
         foreach ($courses as $course) {
             $coursemodinfo = get_fast_modinfo($course->id, $userid);
             foreach ($coursemodinfo->get_instances_of(competvet::MODULE_NAME) as $cm) {
@@ -68,7 +65,7 @@ class situation extends persistent {
                     $situation = self::get_record(['competvetid' => $cm->instance]);
                     // First case: this is a student, let's look into plannings.
                     $cmcontext = context_module::instance($cm->id);
-                    if (user_has_role_assignment($userid, $studentroleid, $cmcontext->id)) {
+                    if (utils::is_student($userid, $cmcontext->id)) {
                         if (planning::is_user_in_planned_groups($userid, $situation)) {
                             $situationsid[] = $situation->get('id');
                         }

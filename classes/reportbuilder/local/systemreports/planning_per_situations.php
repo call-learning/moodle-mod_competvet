@@ -18,43 +18,63 @@ declare(strict_types=1);
 
 namespace mod_competvet\reportbuilder\local\systemreports;
 
+use context;
 use core_group\reportbuilder\local\entities\group;
-use core_reportbuilder\local\helpers\database;
 use core_reportbuilder\local\report\action;
 use core_reportbuilder\system_report;
 use lang_string;
-use mod_competvet\competvet;
 use mod_competvet\reportbuilder\local\entities\planning;
 use mod_competvet\reportbuilder\local\entities\situation;
 use moodle_url;
 use pix_icon;
+use stdClass;
 
 /**
- * Planning per situation
+ * Situations for a given user
  *
- * Used in the situations API
- * @see \mod_competvet\local\api\situations::get_all_situations_with_planning_for
  * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class planning_per_situation extends system_report {
-    protected function initialise(): void {
-        $planningentity = new planning();
+class planning_per_situations extends system_report {
+    /**
+     * Return the conditions that will be added to the report upon creation
+     *
+     * @return string[]
+     */
+    public function get_default_conditions(): array {
+        return [];
+    }
 
-        $planningalias = $planningentity->get_table_alias('competvet_planning');
-        $this->set_main_table('competvet_planning', $planningalias);
-        $this->add_entity($planningentity);
-        $mainplanningalias = $this->get_main_table_alias();
-        $this->add_base_fields("{$mainplanningalias}.id");
-        // Join situation entity to collection.
+    protected function initialise(): void {
         $situationentity = new situation();
+
         $situationalias = $situationentity->get_table_alias('competvet_situation');
-        $this->add_entity($situationentity
+        $this->set_main_table('competvet_situation', $situationalias);
+
+        // Join situation entity to competvet.
+        if ($situationidsjson = $this->get_parameter('onlyforsituations', "[]", PARAM_RAW)) {
+            global $DB;
+            $situationids = json_decode($situationidsjson);
+            if (!empty($situationids)) {
+                [$where, $params] = $DB->get_in_or_equal($situationids, SQL_PARAMS_NAMED, 'situationids');
+                $this->add_base_condition_sql(
+                    "{$situationalias}.situationid = {$where}",
+                    $params
+                );
+            }
+        }
+        $contextalias = $situationentity->get_table_alias('context');
+        $coursemodulealias = $situationentity->get_table_alias('course_modules');
+        $this->add_base_fields("{$situationalias}.id, {$contextalias}.id AS contextid, {$coursemodulealias}.id AS cmid");
+        $this->add_entity($situationentity->add_joins($situationentity->get_context_and_modules_joins()));
+
+        $planningentity = new planning();
+        $planningalias = $planningentity->get_table_alias('competvet_planning');
+        $this->add_entity($planningentity
             ->add_join(
-                "LEFT JOIN {competvet_situation} {$situationalias} ON {$situationalias}.id = {$planningalias}.situationid"
+                "LEFT JOIN {competvet_planning} {$planningalias} ON {$planningalias}.situationid = {$situationalias}.id"
             ));
-        // Group entity.
         $groupentity = new group();
         $groupsalias = $groupentity->get_table_alias('groups');
         $groupscontextalias = $groupentity->get_table_alias('context');
@@ -63,28 +83,10 @@ class planning_per_situation extends system_report {
             ->add_join("LEFT JOIN {context} {$groupscontextalias}
             ON {$groupscontextalias}.contextlevel = " . CONTEXT_COURSE . "
            AND {$groupscontextalias}.instanceid = {$groupsalias}.courseid"));
-        $situationid = $this->get_parameter('situationid', 0, PARAM_INT);
-        if ($situationid) {
-            $paramsituationid = database::generate_param_name();
-            $this->add_base_condition_sql(
-                "{$mainplanningalias}.situationid = :$paramsituationid",
-                [$paramsituationid => $situationid]
-            );
-        }
-        $groupnames = $this->get_parameter('groupnames', 0, PARAM_TEXT);
-        if ($groupnames) {
-            global $DB;
-            $realgroupnames = explode(',', $groupnames);
-            $paramgroupnames = database::generate_param_name();
-            [$where, $params] = $DB->get_in_or_equal($realgroupnames, SQL_PARAMS_NAMED, $paramgroupnames);
-            $this->add_base_condition_sql(
-                "{$groupsalias}.name $where",
-                $params
-            );
-        }
         // Now we can call our helper methods to add the content we want to include in the report.
         $this->add_columns();
         $this->add_filters();
+        $this->add_actions();
 
         // Here we do this intentionally as any button inserted in the page results in a javascript error.
         // This is due to fact that if we insert it in an existing form this will nest the form and this is not allowed.
@@ -102,6 +104,13 @@ class planning_per_situation extends system_report {
      */
     protected function add_columns(): void {
         $columns = [
+            'situation:shortnamewithlinks',
+            'situation:shortname',
+            'situation:name',
+            'situation:evalnum',
+            'situation:autoevalnum',
+            'situation:intro',
+            'situation:tagnames',
             'planning:startdate',
             'planning:enddate',
             'planning:session',
@@ -111,7 +120,7 @@ class planning_per_situation extends system_report {
         $this->add_columns_from_entities($columns);
 
         // Default sorting.
-        $this->set_initial_sort_column('planning:startdate', SORT_ASC);
+        $this->set_initial_sort_column('situation:shortnamewithlinks', SORT_ASC);
     }
 
     /**
@@ -122,12 +131,32 @@ class planning_per_situation extends system_report {
      */
     protected function add_filters(): void {
         $filters = [
-            'planning:startdate',
-            'planning:enddate',
-            'group:name',
+            'situation:shortnamewithlinks',
+            'situation:evalnum',
+            'situation:situationselect',
         ];
 
         $this->add_filters_from_entities($filters);
+    }
+
+    /**
+     * Add the system report actions. An extra column will be appended to each row, containing all actions added here
+     *
+     * Note the use of ":id" placeholder which will be substituted according to actual values in the row
+     */
+    protected function add_actions(): void {
+        global $FULLME;
+        // Action to view individual task log on a popup window.
+        $returnurl = new moodle_url($FULLME);
+        $this->add_action((new action(
+            new moodle_url('/course/modedit.php', ['update' => ':cmid']),
+            new pix_icon('t/edit', '', 'core'),
+            [],
+            false,
+            new lang_string('edit')
+        ))->add_callback(function (stdClass $row): bool {
+            return empty($row->component) && has_capability('moodle/cohort:manage', context::instance_by_id($row->contextid));
+        }));
     }
 
     protected function can_view(): bool {

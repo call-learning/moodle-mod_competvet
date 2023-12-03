@@ -6,9 +6,9 @@ $results['student1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1699398000',
-                    'planning:enddateraw' => '1699398000',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1699398000',
+                    'enddateraw' => '1699398000',
+                    'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
             ],
@@ -23,9 +23,9 @@ $results['student1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1701990000',
-                    'planning:enddateraw' => '1701990000',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1701990000',
+                    'enddateraw' => '1701990000',
+                    'session' => '2023',
                     'groupname' => 'group 8.2',
                 ],
             ],
@@ -40,9 +40,9 @@ $results['student1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1704582000',
-                    'planning:enddateraw' => '1704582000',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1704582000',
+                    'enddateraw' => '1704582000',
+                    'session' => '2023',
                     'groupname' => 'group 8.2',
                 ],
             ],
@@ -57,9 +57,9 @@ $results['student1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1707778800',
-                    'planning:enddateraw' => '1707778800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1707778800',
+                    'enddateraw' => '1707778800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -74,9 +74,9 @@ $results['student1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1710370800',
-                    'planning:enddateraw' => '1710370800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1710370800',
+                    'enddateraw' => '1710370800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -91,9 +91,9 @@ $results['student1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1712962800',
-                    'planning:enddateraw' => '1712962800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1712962800',
+                    'enddateraw' => '1712962800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -108,9 +108,9 @@ $results['student1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1715554800',
-                    'planning:enddateraw' => '1715554800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1715554800',
+                    'enddateraw' => '1715554800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -125,9 +125,9 @@ $results['student1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1718146800',
-                    'planning:enddateraw' => '1718146800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1718146800',
+                    'enddateraw' => '1718146800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -142,9 +142,9 @@ $results['student1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1720738800',
-                    'planning:enddateraw' => '1720738800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1720738800',
+                    'enddateraw' => '1720738800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -162,9 +162,9 @@ $results['student2results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1699398000',
-                    'planning:enddateraw' => '1699398000',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1699398000',
+                    'enddateraw' => '1699398000',
+                    'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
             ],
@@ -180,9 +180,9 @@ $results['student2results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1701990000',
-                    'planning:enddateraw' => '1701990000',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1701990000',
+                    'enddateraw' => '1701990000',
+                    'session' => '2023',
                     'groupname' => 'group 8.2',
                 ],
             ],
@@ -198,9 +198,9 @@ $results['student2results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1704582000',
-                    'planning:enddateraw' => '1704582000',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1704582000',
+                    'enddateraw' => '1704582000',
+                    'session' => '2023',
                     'groupname' => 'group 8.2',
                 ],
             ],
@@ -216,9 +216,9 @@ $results['student2results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1707778800',
-                    'planning:enddateraw' => '1707778800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1707778800',
+                    'enddateraw' => '1707778800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -234,9 +234,9 @@ $results['student2results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1710370800',
-                    'planning:enddateraw' => '1710370800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1710370800',
+                    'enddateraw' => '1710370800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -252,9 +252,9 @@ $results['student2results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1712962800',
-                    'planning:enddateraw' => '1712962800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1712962800',
+                    'enddateraw' => '1712962800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -270,9 +270,9 @@ $results['student2results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1715554800',
-                    'planning:enddateraw' => '1715554800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1715554800',
+                    'enddateraw' => '1715554800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -288,9 +288,9 @@ $results['student2results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1718146800',
-                    'planning:enddateraw' => '1718146800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1718146800',
+                    'enddateraw' => '1718146800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -306,9 +306,9 @@ $results['student2results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1720738800',
-                    'planning:enddateraw' => '1720738800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1720738800',
+                    'enddateraw' => '1720738800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -326,9 +326,9 @@ $results['observer1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1699398000',
-                    'planning:enddateraw' => '1699398000',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1699398000',
+                    'enddateraw' => '1699398000',
+                    'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
             ],
@@ -345,9 +345,9 @@ $results['observer1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1701990000',
-                    'planning:enddateraw' => '1701990000',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1701990000',
+                    'enddateraw' => '1701990000',
+                    'session' => '2023',
                     'groupname' => 'group 8.2',
                 ],
             ],
@@ -364,9 +364,9 @@ $results['observer1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1704582000',
-                    'planning:enddateraw' => '1704582000',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1704582000',
+                    'enddateraw' => '1704582000',
+                    'session' => '2023',
                     'groupname' => 'group 8.2',
                 ],
             ],
@@ -383,9 +383,9 @@ $results['observer1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1707778800',
-                    'planning:enddateraw' => '1707778800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1707778800',
+                    'enddateraw' => '1707778800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -402,9 +402,9 @@ $results['observer1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1710370800',
-                    'planning:enddateraw' => '1710370800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1710370800',
+                    'enddateraw' => '1710370800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -421,9 +421,9 @@ $results['observer1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1712962800',
-                    'planning:enddateraw' => '1712962800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1712962800',
+                    'enddateraw' => '1712962800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -440,9 +440,9 @@ $results['observer1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1715554800',
-                    'planning:enddateraw' => '1715554800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1715554800',
+                    'enddateraw' => '1715554800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -459,9 +459,9 @@ $results['observer1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1718146800',
-                    'planning:enddateraw' => '1718146800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1718146800',
+                    'enddateraw' => '1718146800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -478,9 +478,9 @@ $results['observer1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1720738800',
-                    'planning:enddateraw' => '1720738800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1720738800',
+                    'enddateraw' => '1720738800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -499,9 +499,9 @@ $results['observer2results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1699398000',
-                    'planning:enddateraw' => '1699398000',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1699398000',
+                    'enddateraw' => '1699398000',
+                    'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
             ],
@@ -518,9 +518,9 @@ $results['observer2results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1701990000',
-                    'planning:enddateraw' => '1701990000',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1701990000',
+                    'enddateraw' => '1701990000',
+                    'session' => '2023',
                     'groupname' => 'group 8.2',
                 ],
             ],
@@ -537,9 +537,9 @@ $results['observer2results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1704582000',
-                    'planning:enddateraw' => '1704582000',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1704582000',
+                    'enddateraw' => '1704582000',
+                    'session' => '2023',
                     'groupname' => 'group 8.2',
                 ],
             ],
@@ -556,9 +556,9 @@ $results['observer2results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1707778800',
-                    'planning:enddateraw' => '1707778800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1707778800',
+                    'enddateraw' => '1707778800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -575,9 +575,9 @@ $results['observer2results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1710370800',
-                    'planning:enddateraw' => '1710370800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1710370800',
+                    'enddateraw' => '1710370800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -594,9 +594,9 @@ $results['observer2results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1712962800',
-                    'planning:enddateraw' => '1712962800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1712962800',
+                    'enddateraw' => '1712962800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -613,9 +613,9 @@ $results['observer2results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1715554800',
-                    'planning:enddateraw' => '1715554800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1715554800',
+                    'enddateraw' => '1715554800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -632,9 +632,9 @@ $results['observer2results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1718146800',
-                    'planning:enddateraw' => '1718146800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1718146800',
+                    'enddateraw' => '1718146800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -651,9 +651,9 @@ $results['observer2results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1720738800',
-                    'planning:enddateraw' => '1720738800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1720738800',
+                    'enddateraw' => '1720738800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -672,9 +672,9 @@ $results['teacher1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1699398000',
-                    'planning:enddateraw' => '1699398000',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1699398000',
+                    'enddateraw' => '1699398000',
+                    'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
             ],
@@ -691,9 +691,9 @@ $results['teacher1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1701990000',
-                    'planning:enddateraw' => '1701990000',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1701990000',
+                    'enddateraw' => '1701990000',
+                    'session' => '2023',
                     'groupname' => 'group 8.2',
                 ],
             ],
@@ -710,9 +710,9 @@ $results['teacher1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1704582000',
-                    'planning:enddateraw' => '1704582000',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1704582000',
+                    'enddateraw' => '1704582000',
+                    'session' => '2023',
                     'groupname' => 'group 8.2',
                 ],
             ],
@@ -729,9 +729,9 @@ $results['teacher1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1707778800',
-                    'planning:enddateraw' => '1707778800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1707778800',
+                    'enddateraw' => '1707778800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -748,9 +748,9 @@ $results['teacher1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1710370800',
-                    'planning:enddateraw' => '1710370800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1710370800',
+                    'enddateraw' => '1710370800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -767,9 +767,9 @@ $results['teacher1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1712962800',
-                    'planning:enddateraw' => '1712962800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1712962800',
+                    'enddateraw' => '1712962800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -786,9 +786,9 @@ $results['teacher1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1715554800',
-                    'planning:enddateraw' => '1715554800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1715554800',
+                    'enddateraw' => '1715554800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -805,9 +805,9 @@ $results['teacher1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1718146800',
-                    'planning:enddateraw' => '1718146800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1718146800',
+                    'enddateraw' => '1718146800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],
@@ -824,9 +824,9 @@ $results['teacher1results'] = [
             [
 
                 [
-                    'planning:startdateraw' => '1720738800',
-                    'planning:enddateraw' => '1720738800',
-                    'planning:session' => '2023',
+                    'startdateraw' => '1720738800',
+                    'enddateraw' => '1720738800',
+                    'session' => '2023',
                     'groupname' => 'group 8.4',
                 ],
             ],

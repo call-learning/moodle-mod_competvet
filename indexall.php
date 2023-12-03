@@ -25,7 +25,7 @@
 
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\situation;
-use mod_competvet\reportbuilder\local\systemreports\situations_per_user;
+use mod_competvet\reportbuilder\local\systemreports\planning_per_situations;
 
 require(__DIR__ . '/../../config.php');
 global $PAGE, $DB, $OUTPUT, $USER;
@@ -45,7 +45,7 @@ $PAGE->set_context($context);
 $PAGE->set_title($pagetitle);
 $situationsid = json_encode(situation::get_all_situations_id_for($userid));
 $situationreport = \core_reportbuilder\system_report_factory::create(
-    situations_per_user::class,
+    planning_per_situations::class,
     $context,
     competvet::COMPONENT_NAME,
     '',

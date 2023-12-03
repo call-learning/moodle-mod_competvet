@@ -127,4 +127,34 @@ class utils {
         // Remove persistent fields from definition.
         return array_diff_key($persistentfields, array_flip($fieldstoremove));
     }
+
+    /**
+     * Get IDs for student Role.
+     *
+     * @return array
+     */
+    public static function get_student_roles_id(): array {
+        static $studentrolesid = null;
+        if (is_null($studentrolesid)) {
+            $roles = get_all_roles(\context_system::instance());
+            $studentrolesid = array_filter(array_column($roles, 'shortname', 'id'), function ($shortname) {
+                return $shortname === 'student';
+            });
+        }
+        return array_keys($studentrolesid);
+    }
+
+    /**
+     * Is the user student in this context
+     *
+     * @return bool
+     */
+    public static function is_student(int $userid, int $contextid): bool {
+        $isstudent = false;
+        $studentrolesid = self::get_student_roles_id();
+        foreach ($studentrolesid as $studentroleid) {
+            $isstudent = $isstudent || user_has_role_assignment($userid, $studentroleid, $contextid);
+        }
+        return $isstudent;
+    }
 }
