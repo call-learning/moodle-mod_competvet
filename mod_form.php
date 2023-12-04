@@ -40,16 +40,15 @@ require_once($CFG->dirroot . '/course/moodleform_mod.php');
  * @copyright   2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_competvet_mod_form extends moodleform_mod
-{
+class mod_competvet_mod_form extends moodleform_mod {
+
     // The pagination size for the planning list.
     const PLANNING_PAGINATION_SIZE = 10;
 
     /**
      * Defines forms elements
      */
-    public function definition()
-    {
+    public function definition() {
         global $CFG, $DB;
 
         $mform = $this->_form;
@@ -90,8 +89,7 @@ class mod_competvet_mod_form extends moodleform_mod
      *
      * @return void
      */
-    protected function add_situation_fields()
-    {
+    protected function add_situation_fields() {
         $mform = $this->_form;
         $mform->addElement('header', 'situationdef', get_string('situation:def', 'competvet'));
         $mform->setExpanded('situationdef');
@@ -142,8 +140,7 @@ class mod_competvet_mod_form extends moodleform_mod
     /**
      * Display planning.
      */
-    private function display_planning()
-    {
+    private function display_planning() {
         global $PAGE;
         $mform = $this->_form;
         // Get the current value of situationid.
@@ -182,8 +179,7 @@ class mod_competvet_mod_form extends moodleform_mod
      *
      * @return void
      */
-    public function definition_after_data()
-    {
+    public function definition_after_data() {
         parent::definition_after_data();
         $mform = $this->_form;
         $itemnumber = 0;

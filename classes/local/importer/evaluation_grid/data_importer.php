@@ -102,12 +102,12 @@ class data_importer extends \tool_importer\data_importer {
         $evalgrid = evaluation_grid_entity::get_default_grid();
 
         if (!empty($row['evalgridid']) && trim($row['evalgridid']) != evaluation_grid_entity::DEFAULT_GRID_SHORTNAME) {
-            $newevalgrid = evaluation_grid_entity::get_record(array('idnumber' => $row['evalgridid']));
+            $newevalgrid = evaluation_grid_entity::get_record(['idnumber' => $row['evalgridid']]);
             // Create one if it does not exist.
             if (!$newevalgrid) {
                 $evalgrid = new evaluation_grid_entity(0, (object) [
                         'name' => get_string('evaluationgrid:default', 'local_cveteval'),
-                        'idnumber' => $row['evalgridid']
+                        'idnumber' => $row['evalgridid'],
                 ]);
                 // Create it.
                 $evalgrid->create();

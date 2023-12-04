@@ -28,8 +28,8 @@ global $DB;
 $id = required_param('id', PARAM_INT);
 
 $cm = get_coursemodule_from_id('competvet', $id, 0, false, MUST_EXIST);
-$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-$moduleinstance = $DB->get_record('competvet', array('id' => $cm->instance), '*', MUST_EXIST);
+$course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+$moduleinstance = $DB->get_record('competvet', ['id' => $cm->instance], '*', MUST_EXIST);
 
 require_login($course, true, $cm);
 

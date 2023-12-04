@@ -63,7 +63,7 @@ class app implements named_templatable, renderable {
         $export->groupid = $this->groupid;
         $export->name = $this->competvet->get_context()->get_context_name(true, false, false);
         $export->courseid = $this->competvet->get_course()->id;
-        $export->participants = array();
+        $export->participants = [];
         $export->filters = $this->competvet->get_filters();
 
         foreach (array_values($this->participants) as $num => $record) {

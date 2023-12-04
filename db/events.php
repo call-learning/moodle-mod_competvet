@@ -13,7 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
  * Events for CompetVet
  *
@@ -22,11 +21,10 @@
  * @copyright   2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
 
 $observers = [
-    // We observer those event in order to purge relevant cache
+    // We observer those event in order to purge relevant cache.
     [
         'eventname'   => '\core\event\user_enrolment_created',
         'callback'    => '\mod_competvet\local\observers\user_enrolment_observer::user_enrolment_created',

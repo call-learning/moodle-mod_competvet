@@ -176,8 +176,8 @@ abstract class base_helper {
         try {
             return $this->processor->import($options);
         } catch (moodle_exception $e) {
-            $eventparams = array('context' => context_system::instance(),
-                'other' => array('filename' => $this->csvpath, 'error' => $e->getMessage()));
+            $eventparams = ['context' => context_system::instance(),
+                'other' => ['filename' => $this->csvpath, 'error' => $e->getMessage()], ];
             $event = $this->importeventclass::create($eventparams);
             $event->trigger();
             if (defined('CLI_SCRIPT')) {

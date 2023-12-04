@@ -28,7 +28,6 @@ use moodle_url;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class plannings_edit_form extends dynamic_form {
-
     /**
      * Process the form submission
      *
@@ -40,15 +39,15 @@ class plannings_edit_form extends dynamic_form {
         $context = $this->get_context_for_dynamic_submission();
         $data = $this->get_data();
 
-        // Get data id from context_module
+        // Get data id from context_module.
         $modinfo = $this->get_modinfo();
         $situationid = $modinfo->instance;
         $planningentries = [];
         for ($planningindex = 0; $planningindex < $data->planningcount; $planningindex++) {
             $planningentry = [];
             foreach (['groupid', 'startdate', 'enddate', 'planningid'] as $field) {
-                if ($data->$field[$planningindex]) {
-                    $planningentry[$field] = $data->$field[$planningindex];
+                if ($data->{$field}[$planningindex]) {
+                    $planningentry[$field] = $data->{$field}[$planningindex];
                 }
             }
             if (count($planningentry) >= 3) {
@@ -70,7 +69,7 @@ class plannings_edit_form extends dynamic_form {
         }
         $returnurl = new moodle_url('/course/modedit.php', [
             'update' => $context->instanceid,
-            'return' => true
+            'return' => true,
         ]);
         return [
             'result' => true,
@@ -191,24 +190,29 @@ class plannings_edit_form extends dynamic_form {
         $this->_ajaxformdata['planningid'] = $this->_ajaxformdata['planningid'] ?? $currentplanningids;
         $this->_ajaxformdata['planningcount'] = $this->_ajaxformdata['planningcount'] ?? $planningcount;
         // Add repeat form elements with a groupid, a startdate and an enddate using moodleform::repeat_elements method.
-        $this->repeat_elements([
+        $this->repeat_elements(
+            [
             $mform->createElement('select', 'groupid', get_string('group', 'mod_competvet'), $this->get_groups()),
             $mform->createElement('date_time_selector', 'startdate', get_string('startdate', 'mod_competvet')),
             $mform->createElement('date_time_selector', 'enddate', get_string('enddate', 'mod_competvet')),
             $mform->createElement('hidden', 'planningid'),
             $mform->createElement('button', 'deleteplanning', get_string('delete')),
-        ], 1, [
+            ],
+            1,
+            [
             'groupid' => ['type' => PARAM_INT],
             'startdate' => ['type' => PARAM_INT],
             'enddate' => ['type' => PARAM_INT],
             'planningid' => ['type' => PARAM_INT],
             'deleteplanning' => ['type' => PARAM_RAW],
-        ], 'planningcount',
+            ],
+            'planningcount',
             'planningadd',
             3,
             get_string('addplanning', 'mod_competvet'),
             false,
-            'deleteplanning');
+            'deleteplanning'
+        );
         foreach ($this->_ajaxformdata['planningid'] as $index => $planingid) {
             $this->_form->setDefault("planningid[$index]", $planingid);
         }
@@ -223,10 +227,10 @@ class plannings_edit_form extends dynamic_form {
     private function get_groups() {
         $context = $this->get_context_for_dynamic_submission();
         $groups = groups_get_all_groups($context->get_course_context()->instanceid);
-        $groupsnames = array_map(function($group) {
+        $groupsnames = array_map(function ($group) {
             return $group->name;
         }, $groups);
-        $groupsid = array_map(function($group) {
+        $groupsid = array_map(function ($group) {
             return $group->id;
         }, $groups);
         $indexedgroups = array_combine($groupsid, $groupsnames);

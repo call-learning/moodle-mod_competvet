@@ -109,9 +109,9 @@ if ($error = tool_generator_course_backend::check_shortname_available($shortname
 \core\session\manager::set_user(get_admin());
 
 class extended_tool_generator_course_backend extends tool_generator_course_backend {
-const PLANNING_WEEKS = 30;
+    const PLANNING_WEEKS = 30;
     const WEEK_SIZE = 7 * 24 * 3600;
-const RANDOM_MISSING_PLANNING = 6;
+    const RANDOM_MISSING_PLANNING = 6;
     private static $paramgroups = [1, 5, 10, 100, 300, 500];
     /**
      * @var array Number of assignments in course

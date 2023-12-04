@@ -73,24 +73,24 @@ class import_helper extends base_helper {
      * @return data_transformer
      */
     protected function create_transformer() {
-        $transformdef = array(
+        $transformdef = [
                 'Evaluation Grid Id' =>
-                        array(
-                                array('to' => 'evalgridid', 'transformcallback' => base_helper::class . '::trimmed')
-                        ),
+                        [
+                                ['to' => 'evalgridid', 'transformcallback' => base_helper::class . '::trimmed'],
+                        ],
                 'Criterion Id' =>
-                        array(
-                                array('to' => 'idnumber', 'transformcallback' => base_helper::class . ':trimmed')
-                        ),
+                        [
+                                ['to' => 'idnumber', 'transformcallback' => base_helper::class . ':trimmed'],
+                        ],
                 'Criterion Parent Id' =>
-                        array(
-                                array('to' => 'parentidnumber', 'transformcallback' => base_helper::class . ':trimmed')
-                        ),
+                        [
+                                ['to' => 'parentidnumber', 'transformcallback' => base_helper::class . ':trimmed'],
+                        ],
                 'Criterion Label' =>
-                        array(
-                                array('to' => 'label', 'transformcallback' => base_helper::class . ':trimmed')
-                        )
-        );
+                        [
+                                ['to' => 'label', 'transformcallback' => base_helper::class . ':trimmed'],
+                        ],
+        ];
         return new standard($transformdef);
     }
 

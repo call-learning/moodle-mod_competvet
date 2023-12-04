@@ -13,16 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
-/**
- * Plugin upgrade steps are defined here.
- *
- * @package     mod_competvet
- * @category    upgrade
- * @copyright   2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-defined('MOODLE_INTERNAL') || die;
 /**
  * Execute local_cveteval upgrade from the given old version.
  *

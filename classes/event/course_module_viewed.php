@@ -31,10 +31,10 @@ class course_module_viewed extends \core\event\course_module_viewed {
      * @return course_module_viewed
      */
     public static function create_from_competvet(\stdClass $book, \context_module $context) {
-        $data = array(
+        $data = [
             'context' => $context,
-            'objectid' => $book->id
-        );
+            'objectid' => $book->id,
+        ];
         /** @var course_module_viewed $event */
         $event = self::create($data);
         $event->add_record_snapshot('competvet', $book);
@@ -53,6 +53,6 @@ class course_module_viewed extends \core\event\course_module_viewed {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'competvet', 'restore' => 'competvet');
+        return ['db' => 'competvet', 'restore' => 'competvet'];
     }
 }

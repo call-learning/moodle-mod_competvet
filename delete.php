@@ -40,7 +40,7 @@ if ($hasconfirmed) {
         case 'eval':
             $appraisalid = $entityid;
             $appraisal = new \mod_competvet\local\persistent\appraisal(0, (object) [
-                'id' => $entityid
+                'id' => $entityid,
             ]);
             $appraisal->delete();
             $appraisalcriteria =

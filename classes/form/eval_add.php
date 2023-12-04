@@ -138,7 +138,7 @@ class eval_add extends moodleform {
                 'appraiserid' => $appraiserid,
                 'evalplanid' => $evalplanid,
                 'comment' => $data->comment,
-                'context' => $data->context
+                'context' => $data->context,
             ]);
             $appraisal->save();
             foreach ($data as $key => $value) {
@@ -151,7 +151,7 @@ class eval_add extends moodleform {
                             'criterionid' => $criterionid,
                             'appraisalid' => $appraisal->get('id'),
                             'grade' => 0,
-                            'comment' => ''
+                            'comment' => '',
                         ]);
 
                         $appraisalcriterion->set($type, ($type == 'grade') ? (int) $value : $value);

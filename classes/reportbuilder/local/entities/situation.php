@@ -188,7 +188,6 @@ class situation extends base {
             ->add_field($sql, 'tagnames')
             ->set_is_sortable(true);
 
-
         $columns[] = (new column(
             'cmid',
             new lang_string('situation:cmid', 'mod_competvet'),

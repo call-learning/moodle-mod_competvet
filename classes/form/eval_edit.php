@@ -65,7 +65,7 @@ class eval_edit extends moodleform {
                                 'criterionid' => $criterionid,
                                 'appraisalid' => $appraisal->get('id'),
                                 'grade' => 0,
-                                'comment' => ''
+                                'comment' => '',
                             ]);
                         }
                         $appraisalcriterion->set($type, ($type == 'grade') ? (int) $value : $value);

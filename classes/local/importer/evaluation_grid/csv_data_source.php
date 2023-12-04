@@ -43,20 +43,20 @@ class csv_data_source extends \tool_importer\local\source\csv_data_source {
         return [
                 'Evaluation Grid Id' => [
                         'type' => field_types::TYPE_TEXT,
-                        'required' => true
+                        'required' => true,
                 ],
                 'Criterion Id' => [
                         'type' => field_types::TYPE_TEXT,
-                        'required' => true
+                        'required' => true,
                 ],
                 'Criterion Parent Id' => [
                         'type' => field_types::TYPE_TEXT,
-                        'required' => false
+                        'required' => false,
                 ],
                 'Criterion Label' => [
                         'type' => field_types::TYPE_TEXT,
-                        'required' => true
-                ]
+                        'required' => true,
+                ],
         ];
     }
 }

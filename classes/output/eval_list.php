@@ -75,7 +75,7 @@ class eval_list implements renderable, templatable {
                 foreach ($planningentries as $planning) {
                     $appraisals = \mod_competvet\local\persistent\entity::get_records([
                         'studentid' => $studentid,
-                        'evalplanid' => $planning->id
+                        'evalplanid' => $planning->id,
                     ]);
                     foreach ($appraisals as $appraisal) {
                         $oappraisal = $appraisal->to_record();

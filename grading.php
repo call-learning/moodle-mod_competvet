@@ -41,7 +41,7 @@ $PAGE->activityheader->disable();
 $courseshortname = $modulecontext->get_course_context()->get_context_name(false, true);
 $args = [
     'contextname' => $modulecontext->get_context_name(false, true),
-    'subpage' => get_string('grading', 'assign')
+    'subpage' => get_string('grading', 'assign'),
 ];
 $title = get_string('subpagetitle', 'assign', $args);
 $title = $courseshortname . ': ' . $title;

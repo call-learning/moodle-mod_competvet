@@ -53,7 +53,7 @@ class planning_edit_form extends dynamic_form {
         }
         $returnurl = new moodle_url('/course/modedit.php', [
             'update' => $context->instanceid,
-            'return' => true
+            'return' => true,
         ]);
         return [
             'result' => true,

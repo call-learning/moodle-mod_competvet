@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$tagareas =  [
+$tagareas = [
     [
         'itemtype' => 'competvet_situation',
         'component' => 'mod_competvet',
@@ -33,5 +33,5 @@ $tagareas =  [
         'customurl' => '/mod/competvet/tag_search.php',
         'searchable' => true,
         'showstandard' => core_tag_tag::STANDARD_ONLY,
-    ]
+    ],
 ];

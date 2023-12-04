@@ -35,7 +35,7 @@ class eval_gradeitem extends competvet_gradeitem {
      */
     public static function load_from_context(context $context): self {
         $competvet = competvet::get_from_context($context);
-        $instance =  new static(competvet::COMPONENT_NAME, $context, 'eval');
+        $instance = new static(competvet::COMPONENT_NAME, $context, 'eval');
         $instance->competvet = $competvet;
         return $instance;
     }
