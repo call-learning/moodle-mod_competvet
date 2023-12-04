@@ -35,15 +35,20 @@ use mod_competvet\utils;
  */
 class situations {
     const SITUATION_FIELDS = [
-        'shortname',
-        'name',
-        'evalnum',
-        'autoevalnum',
+        'situation:shortname' => 'shortname',
+        'situation:name' => 'name',
+        'situation:evalnum' => 'evalnum',
+        'situation:autoevalnum' => 'autoevalnum',
+        'situation:intro' => 'intro',
+        'id' => 'id',
     ];
     const PLANNING_FIELDS = [
-        'startdateraw',
-        'enddateraw',
-        'session',
+        'planning:startdateraw' => 'startdate',
+        'planning:enddateraw' => 'enddate',
+        'planning:session' => 'session',
+        'group:name' => 'groupname',
+        'planning:groupid' => 'groupid',
+        'id' => 'id',
     ];
 
     /**
@@ -62,7 +67,7 @@ class situations {
             '',
             0,
             [
-                'situationsid' => json_encode($situationsid),
+                'onlyforsituationsid' => join(",", $situationsid),
             ]
         );
         $allsituations = reportbuilder_helper::get_data_from_report(
@@ -74,9 +79,7 @@ class situations {
         $situations = [];
         foreach ($allsituations as $situation) {
             $situationid = $situation['id'];
-            foreach (self::SITUATION_FIELDS as $field) {
-                $situation[$situationid][$field] = $situation["situation:{$field}"];
-            }
+
             $parameters  = [
                 'situationid' => $situationid,
             ];
@@ -105,26 +108,28 @@ class situations {
             if (empty($allplannings)) {
                 continue; // Do not add situations with empty plannings as user is not involved.
             }
-            $newplanning = [];
-            foreach ($allplannings as $planning) {
-                foreach (self::PLANNING_FIELDS as $field) {
-                    $newplanning[$field] = $planning["planning:$field"];
-                }
-                $newplanning["groupname"] = $planning["group:name"];
-            }
-            $situations[$situationid] = [
+
+            $newsituation = [
                 'plannings' => [],
                 'tags' => [],
-                'shortname' => $situation['situation:shortname'],
-                'name' => $situation['situation:name'],
-                'evalnum' => $situation['situation:evalnum'],
-                'autoevalnum' => $situation['situation:autoevalnum'],
             ];
-            $situations[$situationid]['id'] = $situation['id'];
+            foreach (self::SITUATION_FIELDS as $originalname => $targetfieldname) {
+                $newsituation[$targetfieldname] = $situation[$originalname];
+            }
+            foreach ($allplannings as $planning) {
+                $newplanning = [];
+                foreach (self::PLANNING_FIELDS as $originalname => $targetfieldname) {
+                    $newplanning[$targetfieldname] = $planning[$originalname];
+                }
+                $newsituation['plannings'][] = $newplanning;
+            }
             $tags = explode(",", $situation['situation:tagnames'] ?? []);
             $tags = array_map('trim', $tags);
-            $situations[$situationid]['tags'] = json_encode($tags);
-            $situations[$situationid]['plannings'][] = $newplanning;
+            $newsituation['tags'] = json_encode($tags);
+            $newsituation['roles'] = json_encode(user_role::get_all($userid, $situationid)); // We don't fetch it through
+            // report builder as it is too complicated.
+            // TODO: Cache this information too.
+            $situations[$situationid] = $newsituation;
         }
         usort($situations, function ($a, $b) use ($situations) {
             return $a['shortname'] <=> $b['shortname'];

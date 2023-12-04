@@ -91,4 +91,11 @@ $capabilities = [
             'manager' => CAP_ALLOW,
         ],
     ],
+    'mod/competvet:viewmysituations' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => [
+            'user' => CAP_ALLOW,
+        ],
+    ],
 ];

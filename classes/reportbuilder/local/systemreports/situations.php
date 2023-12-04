@@ -19,6 +19,7 @@ declare(strict_types=1);
 namespace mod_competvet\reportbuilder\local\systemreports;
 
 use context;
+use core_reportbuilder\local\helpers\database;
 use core_reportbuilder\local\report\action;
 use core_reportbuilder\system_report;
 use lang_string;
@@ -54,13 +55,14 @@ class situations extends system_report {
         $this->set_main_table('competvet_situation', $situationalias);
 
         // Join situation entity to competvet.
-        if ($situationidsjson = $this->get_parameter('onlyforsituations', "[]", PARAM_RAW)) {
+        if ($situationids = $this->get_parameter('onlyforsituationsid', "", PARAM_RAW)) {
             global $DB;
-            $situationids = json_decode($situationidsjson);
+            $situationids = explode(',', $situationids);
             if (!empty($situationids)) {
-                [$where, $params] = $DB->get_in_or_equal($situationids, SQL_PARAMS_NAMED, 'situationids');
+                $situationparamprefix = database::generate_param_name();
+                [$where, $params] = $DB->get_in_or_equal($situationids, SQL_PARAMS_NAMED, $situationparamprefix);
                 $this->add_base_condition_sql(
-                    "{$situationalias}.situationid = {$where}",
+                    "{$situationalias}.id {$where}",
                     $params
                 );
             }
@@ -143,6 +145,6 @@ class situations extends system_report {
     }
 
     protected function can_view(): bool {
-        return has_capability('mod/competvet:view', $this->get_context());
+        return has_capability('mod/competvet:viewmysituations', $this->get_context());
     }
 }

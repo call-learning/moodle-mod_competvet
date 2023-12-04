@@ -22,6 +22,7 @@ use advanced_testcase;
 use core_user;
 use mod_competvet\local\api\situations;
 use mod_competvet\task\post_install;
+use mod_competvet\tests\test_helpers;
 use stdClass;
 use test_data_definition;
 
@@ -84,6 +85,7 @@ class situations_test extends advanced_testcase {
         $generator = $this->getDataGenerator();
         $competvetgenerator = $generator->get_plugin_generator('mod_competvet');
         $this->generates_definition($this->get_data_definition_set_1(), $generator, $competvetgenerator);
+        $this->setAdminUser(); // Needed for report builder to work.
     }
 
     /**
@@ -104,34 +106,7 @@ class situations_test extends advanced_testcase {
         usort($expected, function ($sit1, $sit2) {
             return $sit1['shortname'] <=> $sit2['shortname'];
         });
-        $this->remove_ids_for_assertions($situations);
+        test_helpers::remove_elements_for_assertions($situations, ['id', 'intro', 'roles']);
         $this->assertSame($expected, $situations);
-    }
-
-    /**
-     * Remove ids so we can compare the tables.
-     *
-     * @param $record
-     * @return void
-     */
-    private function remove_ids_for_assertions(&$record) {
-        if (is_scalar($record)) {
-            return;
-        }
-        foreach ($record as $field => &$value) {
-            if (str_ends_with($field, 'id') || $field === 'id') {
-                if (is_array($record)) {
-                    unset($record[$field]);
-                } else {
-                    unset($record->{$field});
-                }
-            }
-            if (is_array($value)) {
-                foreach ($value as &$subrecord) {
-                    $this->remove_ids_for_assertions($subrecord);
-                }
-            }
-            $this->remove_ids_for_assertions($value);
-        }
     }
 }

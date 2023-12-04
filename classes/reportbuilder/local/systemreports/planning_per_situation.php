@@ -105,7 +105,9 @@ class planning_per_situation extends system_report {
             'planning:startdate',
             'planning:enddate',
             'planning:session',
+            'planning:groupid',
             'group:name',
+
         ];
 
         $this->add_columns_from_entities($columns);

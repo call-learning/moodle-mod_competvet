@@ -61,7 +61,7 @@ trait test_data_definition {
                         'shortname' => $situationname,
                         'courseid' => $course->id,
                         'startdate' => $planning['startdate'],
-                        'enddate' => $planning['startdate'],
+                        'enddate' => $planning['enddate'],
                         'groupid' => $groupid,
                         'situationid' => $situation->get('id'),
                     ]);
