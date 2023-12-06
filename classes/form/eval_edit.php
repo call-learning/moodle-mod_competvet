@@ -43,33 +43,33 @@ class eval_edit extends moodleform {
     public function process_data($course, $moduleinstance) {
         $data = $this->get_data();
         // Check if appraisal exist, if not create it.
-        $appraisal = \mod_competvet\local\persistent\entity::get_record([
+        $observation = \mod_competvet\local\persistent\entity::get_record([
             'id' => $data->entityid,
         ]);
 
-        if ($appraisal) {
-            $appraisal->set('comment', $data->comment);
-            $appraisal->set('context', $data->context);
-            $appraisal->save();
+        if ($observation) {
+            $observation->set('comment', $data->comment);
+            $observation->set('context', $data->context);
+            $observation->save();
             foreach ($data as $key => $value) {
                 foreach (['criterion_grade_' => 'grade', 'criterion_comment_' => 'comment'] as $prefix => $type) {
                     if (strpos($key, $prefix) === 0) {
                         $prefixlen = strlen($prefix);
                         $criterionid = substr($key, $prefixlen);
-                        $appraisalcriterion = \mod_competvet\local\persistent\appraisal_criterion\entity::get_record([
+                        $observationcriterion = \mod_competvet\local\persistent\observation_criterion\entity::get_record([
                             'criterionid' => $criterionid,
-                            'appraisalid' => $appraisal->get('id'),
+                            'observationid' => $observation->get('id'),
                         ]);
-                        if (!$appraisalcriterion) {
-                            $appraisalcriterion = new \mod_competvet\local\persistent\appraisal_criterion\entity(0, (object) [
+                        if (!$observationcriterion) {
+                            $observationcriterion = new \mod_competvet\local\persistent\observation_criterion\entity(0, (object) [
                                 'criterionid' => $criterionid,
-                                'appraisalid' => $appraisal->get('id'),
+                                'observationid' => $observation->get('id'),
                                 'grade' => 0,
                                 'comment' => '',
                             ]);
                         }
-                        $appraisalcriterion->set($type, ($type == 'grade') ? (int) $value : $value);
-                        $appraisalcriterion->save();
+                        $observationcriterion->set($type, ($type == 'grade') ? (int) $value : $value);
+                        $observationcriterion->save();
                     }
                 }
             }
@@ -87,13 +87,13 @@ class eval_edit extends moodleform {
     public function set_data($defaultvalues) {
         if (!empty($defaultvalues['entityid'])) {
             global $DB;
-            $appraisalid = $defaultvalues['entityid'];
-            $appraisal = new \mod_competvet\local\persistent\entity($appraisalid);
-            $appraisalcriteria =
-                \mod_competvet\local\persistent\appraisal_criterion\entity::get_records(['appraisalid' => $appraisalid]);
-            $defaultvalues['comment'] = $appraisal->get('comment');
-            $defaultvalues['context'] = $appraisal->get('context');
-            foreach ($appraisalcriteria as $criterion) {
+            $observationid = $defaultvalues['entityid'];
+            $observation = new \mod_competvet\local\persistent\entity($observationid);
+            $observationcriteria =
+                \mod_competvet\local\persistent\observation_criterion\entity::get_records(['observationid' => $observationid]);
+            $defaultvalues['comment'] = $observation->get('comment');
+            $defaultvalues['context'] = $observation->get('context');
+            foreach ($observationcriteria as $criterion) {
                 $defaultvalues['criterion_grade_' . $criterion->get('criterionid')] = $criterion->get('grade');
                 $defaultvalues['criterion_comment_' . $criterion->get('criterionid')] = $criterion->get('comment');
             }

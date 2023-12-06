@@ -19,17 +19,17 @@ use core\persistent;
 use lang_string;
 
 /**
- * Criterion template entity
+ * Observation Context entity
  *
  * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class appraisal extends persistent {
+class observation_context extends persistent {
     /**
      * Current table
      */
-    const TABLE = 'competvet_appraisal';
+    const TABLE = 'competvet_obs_context';
 
     /**
      * Usual properties definition for a persistent
@@ -38,34 +38,16 @@ class appraisal extends persistent {
      */
     protected static function define_properties() {
         return [
-            'studentid' => [
+            'observationid' => [
                 'type' => PARAM_INT,
                 'null' => NULL_NOT_ALLOWED,
-                'message' => new lang_string('invaliddata', 'competvet', 'studentid'),
-            ],
-            'appraiserid' => [
-                'type' => PARAM_INT,
-                'null' => NULL_NOT_ALLOWED,
-                'message' => new lang_string('invaliddata', 'competvet', 'appraiserid'),
-            ],
-            'evalplanid' => [
-                'type' => PARAM_INT,
-                'null' => NULL_NOT_ALLOWED,
-                'message' => new lang_string('invaliddata', 'competvet', 'evalplanid'),
+                'message' => new lang_string('invaliddata', 'competvet', 'observationid'),
             ],
             'context' => [
                 'type' => PARAM_TEXT,
                 'default' => '',
             ],
             'contextformat' => [
-                'type' => PARAM_INT,
-                'default' => FORMAT_PLAIN,
-            ],
-            'comment' => [
-                'type' => PARAM_TEXT,
-                'default' => '',
-            ],
-            'commentformat' => [
                 'type' => PARAM_INT,
                 'default' => FORMAT_PLAIN,
             ],

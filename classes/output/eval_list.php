@@ -73,20 +73,20 @@ class eval_list implements renderable, templatable {
                     $DB->get_records('competvet_plan', ['situationid' => $cm->instance, 'groupid' => $groupid],
                         'groupid, startdate, enddate ASC');
                 foreach ($planningentries as $planning) {
-                    $appraisals = \mod_competvet\local\persistent\entity::get_records([
+                    $observations = \mod_competvet\local\persistent\entity::get_records([
                         'studentid' => $studentid,
                         'evalplanid' => $planning->id,
                     ]);
-                    foreach ($appraisals as $appraisal) {
-                        $oappraisal = $appraisal->to_record();
-                        $appraiser = core_user::get_user($appraisal->get('appraiserid'));
+                    foreach ($observations as $observation) {
+                        $oobservation = $observation->to_record();
+                        $appraiser = core_user::get_user($observation->get('appraiserid'));
                         $picture = new user_picture($appraiser);
-                        $oappraisal->appraisername = fullname($appraiser);
-                        $oappraisal->appraiserpicture = $output->render($picture);
+                        $oobservation->appraisername = fullname($appraiser);
+                        $oobservation->appraiserpicture = $output->render($picture);
 
-                        $oappraisal->criteria = [];
-                        $appraisalcriteria = \mod_competvet\local\persistent\appraisal_criterion\entity::get_records([
-                            'appraisalid' => $appraisal->get('id'),
+                        $oobservation->criteria = [];
+                        $observationcriteria = \mod_competvet\local\persistent\observation_criterion\entity::get_records([
+                            'observationid' => $observation->get('id'),
                         ]);
                         $criteria = $DB->get_records_sql('SELECT
                              e.id,
@@ -99,36 +99,36 @@ class eval_list implements renderable, templatable {
                             []
                         );
 
-                        $appraisalcriteriaids = array_map(
-                            function($appraisal) {
-                                return $appraisal->get('criterionid');
+                        $observationcriteriaids = array_map(
+                            function($observation) {
+                                return $observation->get('criterionid');
                             },
-                            $appraisalcriteria
+                            $observationcriteria
                         );
-                        $appraisalcriteria = array_combine($appraisalcriteriaids, $appraisalcriteria);
+                        $observationcriteria = array_combine($observationcriteriaids, $observationcriteria);
                         foreach ($criteria as $criterion) {
-                            if (!empty($appraisalcriteria[$criterion->id])) {
-                                $appraisalcriterion = $appraisalcriteria[$criterion->id];
-                                $ocriterion = $appraisalcriterion->to_record();
+                            if (!empty($observationcriteria[$criterion->id])) {
+                                $observationcriterion = $observationcriteria[$criterion->id];
+                                $ocriterion = $observationcriterion->to_record();
                                 $ocriterion->criterionname = $criterion->label;
                                 $ocriterion->level = $criterion->parentid > 1 ? 3 : 0;
-                                $oappraisal->criteria[] = $ocriterion;
+                                $oobservation->criteria[] = $ocriterion;
                             }
                         }
-                        $oappraisal->planningstart = $planning->startdate;
-                        $oappraisal->planningend = $planning->enddate;
-                        $oappraisal->actions = [];
+                        $oobservation->planningstart = $planning->startdate;
+                        $oobservation->planningend = $planning->enddate;
+                        $oobservation->actions = [];
                         foreach (['edit', 'delete'] as $action) {
                             $button = new \single_button(
                                 new \moodle_url(
                                     '/mod/competvet/'.$action.'.php',
-                                    ['id' => $this->cmid, 'currenttype' => 'eval', 'entityid' => $appraisal->get('id')]
+                                    ['id' => $this->cmid, 'currenttype' => 'eval', 'entityid' => $observation->get('id')]
                                 ),
                                 get_string($action)
                             );
-                            $oappraisal->actions[] = $button->export_for_template($output);
+                            $oobservation->actions[] = $button->export_for_template($output);
                         }
-                        $ostudent->evaluations[] = $oappraisal;
+                        $ostudent->evaluations[] = $oobservation;
                     }
                     $ostudent->evalrows = count($ostudent->evaluations) + 1;
                 }

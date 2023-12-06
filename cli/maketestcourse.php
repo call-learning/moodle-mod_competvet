@@ -26,6 +26,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_competvet\competvet;
+use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
 
 define('CLI_SCRIPT', true);
@@ -112,6 +114,22 @@ class extended_tool_generator_course_backend extends tool_generator_course_backe
     const PLANNING_WEEKS = 30;
     const WEEK_SIZE = 7 * 24 * 3600;
     const RANDOM_MISSING_PLANNING = 6;
+    /**
+     * @var string LOREM_IPSUM
+     */
+    const LOREM_IPSUM = '<p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit '
+    . 'anim id est laborum <br/> Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu '
+    . 'fugiat nulla pariatur.<br />  Etre capable de se rep&eacute;rer dans un espace clos avec un arthroscope '
+    . '<br />  Maitriser la triangulation<br />  Connaitre l&rsquo;organisation pratique de la pr&eacute;paration '
+    . 'd&rsquo;une intervention sous arthroscopie.<br />  Connaitre et maitriser les voies '
+    . 'd&rsquo;abord arthroscopique de l&rsquo;&eacute;paule du chien<br />  Connaitre et maitriser les '
+    . 'voies d&rsquo;abord arthroscopique du coude du chien<br />  Savoir rechercher les diff&eacute;rentes '
+    . 'sites d&rsquo;exploration dans l&rsquo;&eacute;paule du chien<br />  Savoir rechercher les '
+    . 'diff&eacute;rentes sites d&rsquo;exploration dans le coude du chien<br />  Connaitre les '
+    . 'diff&eacute;rentes l&eacute;sions de l&rsquo;&eacute;paule chez le chien<br /> '
+    . 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor '
+    . 'incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation '
+    . 'ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>';
     private static $paramgroups = [1, 5, 10, 100, 300, 500];
     /**
      * @var array Number of assignments in course
@@ -146,11 +164,15 @@ class extended_tool_generator_course_backend extends tool_generator_course_backe
         'responsibleucue' => [],
         'evaluator' => [],
         'assessor' => [],
-    ];
+    ]; // 30 weeks.
     /**
      * @var stdClass Course object
      */
-    private $course; // 30 weeks.
+    private $course;
+    /**
+     * @var array $situations
+     */
+    private $situations;
 
     /**
      * Runs the entire 'make' process.
@@ -195,7 +217,7 @@ class extended_tool_generator_course_backend extends tool_generator_course_backe
         $this->create_groups();
 
         // Create situations.
-        $this->create_situations($courseprop->getValue($this));
+        $situations = $this->create_situations();
 
         // Now to make it simple we will take the 3 roles and assign them to the
         foreach (array_keys(\mod_competvet\competvet::COMPETVET_ROLES) as $rolename) {
@@ -209,30 +231,6 @@ class extended_tool_generator_course_backend extends tool_generator_course_backe
         }
 
         return $this->course->id;
-    }
-
-    /**
-     * Creates a number of Situations activities.
-     */
-    private function create_situations() {
-        $generatoreflection = new ReflectionClass('tool_generator_course_backend');
-        $generatoreflection->getMethod('get_target_section')->setAccessible(true);
-        // Set up generator.
-        $competvetgenerator = $this->generator->get_plugin_generator('mod_competvet');
-
-        // Create competvet.
-        $number = self::$paramadmincompetvet[$this->size];
-        $this->log('createcompetvet', ['number' => $number], true);
-        for ($i = 0; $i < $number; $i++) {
-            $record = ['course' => $this->course];
-            $options = ['section' => $generatoreflection->getMethod('get_target_section')->invoke($this)];
-            $instance = $competvetgenerator->create_instance($record, $options);
-            // Now create random planning.
-            $this->create_plannings($instance);
-            $this->dot($i, $number);
-        }
-
-        $this->end_log();
     } // 6 weeks without planning.
 
     /**
@@ -269,6 +267,53 @@ class extended_tool_generator_course_backend extends tool_generator_course_backe
             $this->lastpercentage = $this->lastdot;
             $this->starttime = microtime(true);
         }
+    }
+
+    private function create_groups() {
+        $generatoreflection = new ReflectionClass($this);
+        $useridsprop = $generatoreflection->getParentClass()->getProperty('userids');
+        $useridsprop->setAccessible(true);
+        $users = $useridsprop->getValue($this);
+        $paramusers = $generatoreflection->getParentClass()->getStaticPropertyValue('paramusers');
+        $count = self::$paramgroups[$this->size];
+        for ($number = 0; $number <= $count; $number++) {
+            $this->groups[$number] = $this->generator->create_group([
+                'courseid' => $this->course->id,
+                'name' => 'Group ' . $number,
+                'description' => 'Group ' . $number . ' description',
+            ]);
+        }
+        for ($usernumber = 1; $usernumber <= $paramusers[$this->size]; $usernumber++) {
+            $this->generator->create_group_member([
+                'groupid' => $this->groups[$usernumber % $count]->id,
+                'userid' => $users[$usernumber],
+            ]);
+        }
+    }
+
+    /**
+     * Creates a number of Situations activities.
+     */
+    private function create_situations() {
+        $generatoreflection = new ReflectionClass('tool_generator_course_backend');
+        $generatoreflection->getMethod('get_target_section')->setAccessible(true);
+        // Set up generator.
+        $competvetgenerator = $this->generator->get_plugin_generator('mod_competvet');
+
+        // Create competvet.
+        $number = self::$paramadmincompetvet[$this->size];
+        $this->log('createcompetvet', ['number' => $number], true);
+        for ($i = 0; $i < $number; $i++) {
+            $record = ['course' => $this->course];
+            $options = ['section' => $generatoreflection->getMethod('get_target_section')->invoke($this)];
+            $instance = $competvetgenerator->create_instance($record, $options);
+            // Now create random planning.
+            $this->create_plannings($instance);
+            $this->situation[] = situation::get_record(['id' => $instance->id]);
+            $this->dot($i, $number);
+        }
+
+        $this->end_log();
     }
 
     /**
@@ -412,26 +457,44 @@ class extended_tool_generator_course_backend extends tool_generator_course_backe
         $this->end_log();
     }
 
-    private function create_groups() {
-        $generatoreflection = new ReflectionClass($this);
-        $useridsprop = $generatoreflection->getParentClass()->getProperty('userids');
-        $useridsprop->setAccessible(true);
-        $users = $useridsprop->getValue($this);
-        $paramusers = $generatoreflection->getParentClass()->getStaticPropertyValue('paramusers');
-        $count = self::$paramgroups[$this->size];
-        for ($number = 0; $number <= $count; $number++) {
-            $this->groups[$number] = $this->generator->create_group([
-                'courseid' => $this->course->id,
-                'name' => 'Group ' . $number,
-                'description' => 'Group ' . $number . ' description',
-            ]);
+    /**
+     * Create observations for all students
+     *
+     * @return void
+     */
+    private function create_observations() {
+        foreach ($this->situations as $situation) {
+            $competvet = competvet::get_from_situation($situation);
+            $groups = groups_get_all_groups($competvet->get_course()->id);
+            $observers = array_values($this->userswithroles['observer']);
+            $competvetgenerator = $this->generator->get_plugin_generator('mod_competvet');
+            foreach ($groups as $groupid => $group) {
+                $plannings = planning::get_records(['situationid' => $situation->get('id'), 'groupid' => $groupid]);
+                foreach ($plannings as $planning) {
+                    $observationcount = rand(1, $situation->get('observationcount') < 1 ? 1 : $situation->get('observationcount'));
+                    for (; $observationcount > 0; $observationcount--) {
+                        $competvetgenerator->create_observation([
+                            'situationid' => $situation->get('id'),
+                            'studentid' => $group->members[random_int(0, count($group->members) - 1)],
+                            'appraiserid' => $observers[random_int(0, count($observers) - 1)],
+                            'evalplanid' => $planning->get('id'),
+                            'comment' => $this->get_random_text(100),
+                            'commentformat' => FORMAT_HTML,
+                        ]);
+                        // Create subcriterions.
+                    }
+                }
+            }
         }
-        for ($usernumber = 1; $usernumber <= $paramusers[$this->size]; $usernumber++) {
-            $this->generator->create_group_member([
-                'groupid' => $this->groups[$usernumber % $count]->id,
-                'userid' => $users[$usernumber],
-            ]);
-        }
+    }
+
+    /**
+     * Get an substring from the LOREM_IPSUM
+     *
+     * @return string
+     */
+    private function get_random_text(int $size): string {
+        return core_text::substr(self::LOREM_IPSUM, 0, $size);
     }
 }
 

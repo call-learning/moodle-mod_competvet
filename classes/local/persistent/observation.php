@@ -16,53 +16,59 @@
 namespace mod_competvet\local\persistent;
 
 use core\persistent;
+use lang_string;
 
 /**
- * Appraisal Criterion
+ * Observation entity
  *
  * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class appraisal_criterion extends persistent {
+class observation extends persistent {
     /**
      * Current table
      */
-    const TABLE = 'competvet_appr_crit';
+    const TABLE = 'competvet_observation';
 
     /**
-     * Return the custom definition of the properties of this model.
+     * Usual properties definition for a persistent
      *
-     * Each property MUST be listed here.
-     *
-     * @return array Where keys are the property names.
+     * @return array|array[]
      */
     protected static function define_properties() {
         return [
-            'criterionid' => [
+            'studentid' => [
+                'type' => PARAM_INT,
                 'null' => NULL_NOT_ALLOWED,
-                'type' => PARAM_INT,
-                'message' => new lang_string('invaliddata', 'competvet', 'criterionid'),
+                'message' => new lang_string('invaliddata', 'competvet', 'studentid'),
             ],
-            'appraisalid' => [
+            'observerid' => [
+                'type' => PARAM_INT,
                 'null' => NULL_NOT_ALLOWED,
-                'type' => PARAM_INT,
-                'message' => new lang_string('invaliddata', 'competvet', 'appraisalid'),
+                'message' => new lang_string('invaliddata', 'competvet', 'appraiserid'),
             ],
-            'grade' => [
+            'evalplanid' => [
+                'type' => PARAM_INT,
                 'null' => NULL_NOT_ALLOWED,
-                'type' => PARAM_INT,
-                'message' => new lang_string('invaliddata', 'competvet', 'grade'),
+                'message' => new lang_string('invaliddata', 'competvet', 'evalplanid'),
             ],
-            'comment' => [
-                'null' => NULL_ALLOWED,
-                'type' => PARAM_TEXT,
-            ],
-            'commentformat' => [
+            'status' => [
                 'type' => PARAM_INT,
-                'default' => FORMAT_PLAIN,
+                'default' => 0,
+                'message' => new lang_string('invaliddata', 'competvet', 'status'),
+                'choices' => array_keys(self::STATUS),
             ],
         ];
     }
-}
 
+    /**
+     * Status definition
+     */
+    const STATUS = [
+        0 => 'notstarted',
+        1 => 'inprogress',
+        2 => 'completed',
+        3 => 'archived',
+    ];
+}

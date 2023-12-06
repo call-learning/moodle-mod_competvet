@@ -133,29 +133,29 @@ class eval_add extends moodleform {
             $studentid = $data->studentid;
             $appraiserid = $data->appraiserid;
             $evalplanid = $data->evalplanid;
-            $appraisal = new \mod_competvet\local\persistent\entity(0, (object) [
+            $observation = new \mod_competvet\local\persistent\entity(0, (object) [
                 'studentid' => $studentid,
                 'appraiserid' => $appraiserid,
                 'evalplanid' => $evalplanid,
                 'comment' => $data->comment,
                 'context' => $data->context,
             ]);
-            $appraisal->save();
+            $observation->save();
             foreach ($data as $key => $value) {
                 foreach (['criterion_grade_' => 'grade', 'criterion_comment_' => 'comment'] as $prefix => $type) {
                     if (strpos($key, $prefix) === 0) {
                         $prefixlen = strlen($prefix);
                         $criterionid = substr($key, $prefixlen);
 
-                        $appraisalcriterion = new \mod_competvet\local\persistent\appraisal_criterion\entity(0, (object) [
+                        $observationcriterion = new \mod_competvet\local\persistent\observation_criterion\entity(0, (object) [
                             'criterionid' => $criterionid,
-                            'appraisalid' => $appraisal->get('id'),
+                            'observationid' => $observation->get('id'),
                             'grade' => 0,
                             'comment' => '',
                         ]);
 
-                        $appraisalcriterion->set($type, ($type == 'grade') ? (int) $value : $value);
-                        $appraisalcriterion->save();
+                        $observationcriterion->set($type, ($type == 'grade') ? (int) $value : $value);
+                        $observationcriterion->save();
                     }
                 }
             }

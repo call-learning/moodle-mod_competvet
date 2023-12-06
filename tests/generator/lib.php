@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-use mod_competvet\local\persistent\appraisal;
-use mod_competvet\local\persistent\appraisal_criterion;
+use mod_competvet\local\persistent\observation;
+use mod_competvet\local\persistent\observation_criterion;
 use mod_competvet\local\persistent\criterion\criterion;
 use mod_competvet\local\persistent\evaluation_grid;
 use mod_competvet\local\persistent\planning;
@@ -120,13 +120,13 @@ class mod_competvet_generator extends testing_module_generator {
     }
 
     /**
-     * Create a new instance of appraisal.
+     * Create a new instance of observation.
      *
      * @param array|stdClass|null $record
      * @return stdClass
      */
-    public function create_appraisal($record = null) {
-        return $this->create_from_entity_name(appraisal::class, $record);
+    public function create_observation($record = null) {
+        return $this->create_from_entity_name(observation::class, $record);
     }
 
     /**
@@ -152,13 +152,13 @@ class mod_competvet_generator extends testing_module_generator {
     }
 
     /**
-     * Create a new instance of appraisal_criterion.
+     * Create a new instance of observation_criterion.
      *
      * @param array|stdClass|null $record
      * @return stdClass
      */
-    public function create_appraisal_criterion($record = null) {
-        return $this->create_from_entity_name(appraisal_criterion::class, $record);
+    public function create_observation_criterion($record = null) {
+        return $this->create_from_entity_name(observation_criterion::class, $record);
     }
 
     /**

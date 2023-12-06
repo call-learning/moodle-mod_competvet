@@ -30,9 +30,9 @@ class behat_mod_competvet_generator extends behat_generator_base {
      */
     protected function get_creatable_entities(): array {
         return [
-            'appraisals' => [
-                'singular' => 'appraisal',
-                'datagenerator' => 'appraisal',
+            'observations' => [
+                'singular' => 'observation',
+                'datagenerator' => 'observations',
                 'required' => ['student', 'appraiser', 'evalplan'],
                 'switchids' => ['student' => 'studentid', 'appraiser' => 'appraiserid', 'evalplan' => 'evalplanid'],
             ],

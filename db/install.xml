@@ -107,16 +107,14 @@
                 <KEY NAME="evalgridid_fk" TYPE="foreign" FIELDS="evalgridid" REFTABLE="competvet_evalgrid" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
-        <TABLE NAME="competvet_appraisal" COMMENT="Appraisals for student.">
+        <TABLE NAME="competvet_observation" COMMENT="Observation for student.">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="studentid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="appraiserid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="observerid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="planningid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="context" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="contextformat" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="comment" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="commentformat" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="status" TYPE="int" LENGTH="3" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Status for the observation NOTSTARTED(0), INPROGRESS(1),COMPLETED(2),
+                ARCHIVED(3)."/>
                 <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -124,16 +122,52 @@
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
                 <KEY NAME="studentid_fk" TYPE="foreign" FIELDS="studentid" REFTABLE="user" REFFIELDS="id"/>
-                <KEY NAME="appraiserid_fk" TYPE="foreign" FIELDS="appraiserid" REFTABLE="user" REFFIELDS="id"/>
+                <KEY NAME="observerid_fk" TYPE="foreign" FIELDS="observerid" REFTABLE="user" REFFIELDS="id"/>
                 <KEY NAME="planningid_fk" TYPE="foreign" FIELDS="planningid" REFTABLE="competvet_planning" REFFIELDS="id"/>
                 <KEY NAME="usermodified_fk" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
-        <TABLE NAME="competvet_appr_crit" COMMENT="Appraisals for student for each criterion in the template.">
+        <TABLE NAME="competvet_obs_comment" COMMENT="Comments made on observations (EVAL) for the global observation.">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="observationid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="comment" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="commentformat" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="usercreated"  TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="observationid_fk" TYPE="foreign" FIELDS="observationid" REFTABLE="competvet_observation" REFFIELDS="id"/>
+                <KEY NAME="usermodified_fk" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
+                <KEY NAME="usercreated_fk" TYPE="foreign" FIELDS="usercreated" REFTABLE="user" REFFIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="competvet_obs_context" COMMENT="Context (EVAL) given by student for each observation.">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="observationid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="context" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="contextformat" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="usercreated"  TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="observationid_fk" TYPE="foreign" FIELDS="observationid" REFTABLE="competvet_observation" REFFIELDS="id"/>
+                <KEY NAME="usermodified_fk" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
+                <KEY NAME="usercreated_fk" TYPE="foreign" FIELDS="usercreated" REFTABLE="user" REFFIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="competvet_obs_crit" COMMENT="observations criteria (EVAL) for student - for each criterion in the evaluation grid.">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="criterionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="appraisalid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="observationid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="comment" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="commentformat" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
@@ -144,7 +178,7 @@
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
                 <KEY NAME="criterionid_fk" TYPE="foreign" FIELDS="criterionid" REFTABLE="competvet_criterion" REFFIELDS="id"/>
-                <KEY NAME="appraisalid_fk" TYPE="foreign" FIELDS="id" REFTABLE="competvet_appraisal" REFFIELDS="id"/>
+                <KEY NAME="observationid_fk" TYPE="foreign" FIELDS="id" REFTABLE="competvet_observation" REFFIELDS="id"/>
                 <KEY NAME="usermodified_fk" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
@@ -155,7 +189,8 @@
                 <FIELD NAME="itemnumber" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The grade itemnumber"/>
                 <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The user who was graded"/>
                 <FIELD NAME="grade" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5"
-                       COMMENT="The numerical grade for this user's competvet assessment. Can be determined by scales/advancedgradingforms etc but will always be converted back to a floating point number."/>
+                       COMMENT="The numerical grade for this user's competvet assessment. Can be determined by scales/advancedgradingforms etc but will always be converted back
+                       to a floating point number."/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
             </FIELDS>

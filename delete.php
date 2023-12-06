@@ -38,14 +38,14 @@ $hasconfirmed = optional_param('confirm', 0, PARAM_INT);
 if ($hasconfirmed) {
     switch ($currenttype) {
         case 'eval':
-            $appraisalid = $entityid;
-            $appraisal = new \mod_competvet\local\persistent\appraisal(0, (object) [
+            $observationid = $entityid;
+            $observation = new \mod_competvet\local\persistent\observation(0, (object) [
                 'id' => $entityid,
             ]);
-            $appraisal->delete();
-            $appraisalcriteria =
-                \mod_competvet\local\persistent\appraisal_criterion::get_records(['appraisalid' => $appraisalid]);
-            foreach ($appraisalcriteria as $criterion) {
+            $observation->delete();
+            $observationcriteria =
+                \mod_competvet\local\persistent\observation_criterion::get_records(['observationid' => $observationid]);
+            foreach ($observationcriteria as $criterion) {
                 $criterion->delete();
             }
             break;
