@@ -109,6 +109,35 @@ class situation extends persistent {
                 'default' => 1,
                 'formtype' => 'text',
             ],
+            'evalgrid' => [
+                'type' => PARAM_INT,
+                'default' => 0,
+                'message' => new lang_string('invaliddatafor', 'competvet', 'evalgridid'),
+                'formtype' => 'hidden',
+            ],
         ];
+    }
+
+    /**
+     * Get evaluation criteria for this situation
+     * @return array
+     */
+    public function get_eval_criteria(): array {
+        return criterion::get_records(['evalgridid' => $this->get('evalgrid')], 'sort ASC');
+    }
+
+    /**
+     * Make sure evalgridid and set it to default grid if ever.
+     *
+     * @return void
+     */
+    protected function before_create() {
+        static $defaultgrid = null;
+        if (empty($defaultgrid)) {
+            $defaultgrid = evaluation_grid::get_default_grid();
+        }
+        if ($this->raw_get('evalgrid') === null) {
+            $this->raw_set('evalgrid', $defaultgrid->get('id'));
+        }
     }
 }

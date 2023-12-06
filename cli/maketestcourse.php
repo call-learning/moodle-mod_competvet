@@ -473,15 +473,32 @@ class extended_tool_generator_course_backend extends tool_generator_course_backe
                 foreach ($plannings as $planning) {
                     $observationcount = rand(1, $situation->get('observationcount') < 1 ? 1 : $situation->get('observationcount'));
                     for (; $observationcount > 0; $observationcount--) {
-                        $competvetgenerator->create_observation([
+                        $observation = $competvetgenerator->create_observation([
                             'situationid' => $situation->get('id'),
                             'studentid' => $group->members[random_int(0, count($group->members) - 1)],
                             'appraiserid' => $observers[random_int(0, count($observers) - 1)],
                             'evalplanid' => $planning->get('id'),
+                        ]);
+                        $competvetgenerator->create_observation_context([
+                            'observationid' => $observation->id,
                             'comment' => $this->get_random_text(100),
                             'commentformat' => FORMAT_HTML,
                         ]);
+                        $competvetgenerator->create_observation_comment([
+                            'observationid' => $observation->id,
+                            'context' => $this->get_random_text(100),
+                            'contextformat' => FORMAT_HTML,
+                        ]);
                         // Create subcriterions.
+                        foreach ($situation->get_criterions() as $criterion) {
+                            $competvetgenerator->create_observation_criterion([
+                                'criterionid' => $criterion->get('id'),
+                                'observationid' => $observation->id,
+                                'grade' => empty($criterion->get('parentid')) ? rand(1, 100) : null,
+                                'comment' => empty($criterion->get('parentid')) ? null : $this->get_random_text(100),
+                                'commentformat' => FORMAT_HTML,
+                            ]);
+                        }
                     }
                 }
             }

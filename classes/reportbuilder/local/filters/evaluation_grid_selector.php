@@ -20,29 +20,30 @@ namespace mod_competvet\reportbuilder\local\filters;
 
 use core_reportbuilder\local\filters\base;
 use core_reportbuilder\local\helpers\database;
+use mod_competvet\local\persistent\evaluation_grid;
 use mod_competvet\local\persistent\situation;
 use MoodleQuickForm;
 
 /**
- * Situation selector
+ * Evaluation Grid selector
  *
  * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class situation_selector extends base_entity_selector {
+class evaluation_grid_selector extends base_entity_selector {
     /**
-     * Get all situations
+     * Get all evaluation grids
      * @return array[]
      */
     protected function get_values(): array {
-        $situations = situation::get_records();
-        $situationsid = array_map(function ($situation) {
-            return $situation->get('id');
-        }, $situations);
-        $situationsnames = array_map(function ($situation) {
-            return $situation->get('shortname');
-        }, $situations);
-        return [$situationsid, $situationsnames];
+        $evaluationgrids = evaluation_grid::get_records();
+        $evaluationgridsid = array_map(function ($evaluationgrid) {
+            return $evaluationgrid->get('id');
+        }, $evaluationgrids);
+        $evaluationgridsnames = array_map(function ($evaluationgrid) {
+            return $evaluationgrid->get('shortname') . ' - ' . $evaluationgrid->get('name');
+        }, $evaluationgrids);
+        return [$evaluationgridsid, $evaluationgridsnames];
     }
 }
