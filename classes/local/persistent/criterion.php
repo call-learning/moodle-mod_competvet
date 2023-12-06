@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-namespace mod_competvet\local\persistent\criterion;
+namespace mod_competvet\local\persistent;
 
 use core\persistent;
 use lang_string;

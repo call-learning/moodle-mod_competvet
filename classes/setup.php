@@ -23,7 +23,11 @@ use core_reportbuilder\local\models\report as report_model;
 use core_reportbuilder\manager;
 use core_tag_area;
 use core_tag_tag;
+use mod_competvet\local\importer\criterion_importer;
+use mod_competvet\local\persistent\criterion;
+use mod_competvet\local\persistent\evaluation_grid;
 use mod_competvet\reportbuilder\datasource\plannings;
+use mod_competvet\task\create_update_default_grid;
 
 /**
  * Setup routines
@@ -166,5 +170,24 @@ class setup {
             }
         }
         manager::reset_caches();
+    }
+
+    /**
+     * Create the default grid.
+     * @return void
+     */
+    public static function create_default_grid() {
+        global $CFG;
+        $evalgrid = evaluation_grid::get_default_grid();
+        if (empty($evalgrid)) {
+            $evalgrid = new evaluation_grid(0, (object) [
+                'name' => get_string('evaluationgrid:default', 'mod_competvet'),
+                'idnumber' => evaluation_grid::DEFAULT_GRID_SHORTNAME,
+            ]);
+            // Create it and upload the criteria.
+            $evalgrid->create();
+        }
+        $criterionimporter = new criterion_importer(criterion::class);
+        $criterionimporter->import($CFG->dirroot . '/mod/competvet/data/default_evaluation_grid.csv');
     }
 }

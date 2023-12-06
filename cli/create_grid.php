@@ -22,7 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_competvet\task\upload_default_criteria_grid;
+use mod_competvet\task\create_update_default_grid;
 
 define('CLI_SCRIPT', true);
 require(__DIR__ . '/../../../config.php');
@@ -55,9 +55,9 @@ if ($options['help']) {
     cli_writeln($usage);
     die();
 }
-$records = mod_competvet\local\persistent\criterion\entity::get_records();
+$records = mod_competvet\local\persistent\criterion::get_records();
 cli_writeln('Deleting ' . count($records) . ' records');
 foreach($records as $record) {
     $record->delete();
 }
-upload_default_criteria_grid::create_default_grid();
+\mod_competvet\setup::create_default_grid();

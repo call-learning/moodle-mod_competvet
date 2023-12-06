@@ -18,7 +18,7 @@ namespace mod_competvet\local\persistent;
 use core\persistent;
 use core\task\manager;
 use lang_string;
-use mod_competvet\task\upload_default_criteria_grid;
+use mod_competvet\task\create_update_default_grid;
 
 /**
  * Evaluation grid entity
@@ -44,22 +44,9 @@ class evaluation_grid extends persistent {
      *
      * @return evaluation_grid
      */
-    public static function get_default_grid(): evaluation_grid {
+    public static function get_default_grid(): ?evaluation_grid {
         $evalgrid = self::get_record(['idnumber' => self::DEFAULT_GRID_SHORTNAME]);
-        if (!$evalgrid) {
-            $evalgrid = new self(0, (object) [
-                'name' => get_string('evaluationgrid:default', 'mod_competvet'),
-                'idnumber' => self::DEFAULT_GRID_SHORTNAME,
-            ]);
-            // Create it and upload the criteria.
-            $evalgrid->create();
-            $task = new upload_default_criteria_grid();
-            manager::queue_adhoc_task($task, true); // Upload default grid.
-            return $evalgrid;
-        } else {
-            return $evalgrid;
-        }
-
+        return $evalgrid ?: null;
     }
 
     /**

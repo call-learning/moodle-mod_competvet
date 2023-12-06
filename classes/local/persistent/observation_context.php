@@ -43,6 +43,11 @@ class observation_context extends persistent {
                 'null' => NULL_NOT_ALLOWED,
                 'message' => new lang_string('invaliddata', 'competvet', 'observationid'),
             ],
+            'usercreated' => [
+                'type' => PARAM_INT,
+                'null' => NULL_NOT_ALLOWED,
+                'message' => new lang_string('invaliddata', 'competvet', 'usercreated'),
+            ],
             'context' => [
                 'type' => PARAM_TEXT,
                 'default' => '',

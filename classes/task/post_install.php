@@ -21,15 +21,15 @@ namespace mod_competvet\task;
  * at this point \core_tag_area::reset_definitions_for_component is called, this is discarded after install or update
  * so cannot be directly called in the update process.
  *
- * @package   tool_moodlenet
- * @copyright 2022 Shamim Rezaie <shamim@moodle.com>
+ * @package   mod_competvet
+ * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class post_install extends \core\task\adhoc_task {
     public function execute() {
         $methods = $this->get_custom_data();
         if (empty($methods)) {
-            $methods = ['setup_update_tags', 'create_update_roles'];
+            $methods = ['setup_update_tags', 'create_update_roles', 'create_default_grid'];
         }
         foreach ($methods as $method) {
             \mod_competvet\setup::$method();

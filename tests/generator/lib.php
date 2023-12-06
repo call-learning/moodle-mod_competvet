@@ -14,10 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-use mod_competvet\local\persistent\observation;
-use mod_competvet\local\persistent\observation_criterion;
-use mod_competvet\local\persistent\criterion\criterion;
+use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\evaluation_grid;
+use mod_competvet\local\persistent\observation;
+use mod_competvet\local\persistent\observation_comment;
+use mod_competvet\local\persistent\observation_context;
+use mod_competvet\local\persistent\observation_criterion;
 use mod_competvet\local\persistent\planning;
 
 defined('MOODLE_INTERNAL') || die();
@@ -152,6 +154,26 @@ class mod_competvet_generator extends testing_module_generator {
     }
 
     /**
+     * Create a new instance of observation_context.
+     *
+     * @param array|stdClass|null $record
+     * @return stdClass
+     */
+    public function create_observation_context($record = null) {
+        return $this->create_from_entity_name(observation_context::class, $record);
+    }
+
+    /**
+     * Create a new instance of observation_comment.
+     *
+     * @param array|stdClass|null $record
+     * @return stdClass
+     */
+    public function create_observation_comment($record = null) {
+        return $this->create_from_entity_name(observation_comment::class, $record);
+    }
+
+    /**
      * Create a new instance of observation_criterion.
      *
      * @param array|stdClass|null $record
@@ -160,7 +182,6 @@ class mod_competvet_generator extends testing_module_generator {
     public function create_observation_criterion($record = null) {
         return $this->create_from_entity_name(observation_criterion::class, $record);
     }
-
     /**
      * Create a new instance of criterion.
      *

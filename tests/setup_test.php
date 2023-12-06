@@ -19,6 +19,8 @@ use advanced_testcase;
 use context_course;
 use context_module;
 use context_system;
+use mod_competvet\local\persistent\criterion;
+use mod_competvet\local\persistent\evaluation_grid;
 use mod_competvet\task\post_install;
 
 /**
@@ -64,6 +66,31 @@ class setup_test extends advanced_testcase {
             $this->assertContains($tagsn, $situationtagsname);
         }
     }
+
+
+    /**
+     * Test default grid created and installed
+     *
+     * @return void
+     *
+     * @covers \mod_competvet\setup::crerate_default_grid
+     */
+    public function test_default_grid_setup() {
+        $evalgrid = evaluation_grid::get_default_grid();
+        $this->assertEquals(40, criterion::count_records(['evalgridid' => $evalgrid->get('id')]));
+        foreach (['Q001', 'Q035'] as $critname) {
+            $crit = criterion::get_record(['evalgridid' => $evalgrid->get('id'), 'idnumber' => $critname]);
+            $this->assertEquals(
+                5,
+                criterion::count_records(['evalgridid' => $evalgrid->get('id'), 'parentid' => $crit->get('id')])
+            );
+            $this->assertSame([1, 2, 3, 4, 5], array_map(
+                fn($c) => $c->get('sort'),
+                criterion::get_records(['evalgridid' => $evalgrid->get('id'), 'parentid' => $crit->get('id')])
+            ));
+        }
+    }
+
 
     /**
      * Test roles access.
