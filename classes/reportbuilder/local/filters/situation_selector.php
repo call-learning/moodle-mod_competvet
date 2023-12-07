@@ -17,11 +17,7 @@
 declare(strict_types=1);
 
 namespace mod_competvet\reportbuilder\local\filters;
-
-use core_reportbuilder\local\filters\base;
-use core_reportbuilder\local\helpers\database;
 use mod_competvet\local\persistent\situation;
-use MoodleQuickForm;
 
 /**
  * Situation selector

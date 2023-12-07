@@ -19,6 +19,7 @@ declare(strict_types=1);
 namespace mod_competvet\reportbuilder\local\entities;
 
 use core_reportbuilder\local\entities\base;
+use core_reportbuilder\local\filters\number;
 use core_reportbuilder\local\filters\text;
 use core_reportbuilder\local\report\{column, filter};
 use lang_string;
@@ -122,14 +123,14 @@ class criterion extends base {
             ->set_type(column::TYPE_INTEGER)
             ->add_fields("{$criterionalias}.evalgridid")
             ->set_is_sortable(true)
-            ->set_callback(function ($row) {
+            ->set_callback(function ($evalgridid) {
                 static $evalgrids = [];
-                if (!isset($evalgrids[$row->evalgridid])) {
-                    $evalgrids[$row->evalgridid] = evaluation_grid::get_record([
-                        'id' => $row->evalgridid,
+                if (!isset($evalgrids[$evalgridid])) {
+                    $evalgrids[$evalgridid] = evaluation_grid::get_record([
+                        'id' => $evalgridid,
                     ]);
                 }
-                return $evalgrids[$row->evalgridid]->get('name');
+                return $evalgrids[$evalgridid]->get('name');
             });
 
         return $columns;
@@ -157,6 +158,14 @@ class criterion extends base {
             new lang_string('criterion:idnumber', 'mod_competvet'),
             $this->get_entity_name(),
             "{$criterionalias}.idnumber"
+        ))->add_joins($this->get_joins());
+
+        $filters[] = (new filter(
+            number::class,
+            'sort',
+            new lang_string('criterion:idnumber', 'mod_competvet'),
+            $this->get_entity_name(),
+            "{$criterionalias}.sort"
         ))->add_joins($this->get_joins());
 
         $filters[] = (new filter(

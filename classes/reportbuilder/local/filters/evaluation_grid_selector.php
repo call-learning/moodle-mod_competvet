@@ -18,11 +18,7 @@ declare(strict_types=1);
 
 namespace mod_competvet\reportbuilder\local\filters;
 
-use core_reportbuilder\local\filters\base;
-use core_reportbuilder\local\helpers\database;
 use mod_competvet\local\persistent\evaluation_grid;
-use mod_competvet\local\persistent\situation;
-use MoodleQuickForm;
 
 /**
  * Evaluation Grid selector
@@ -42,7 +38,7 @@ class evaluation_grid_selector extends base_entity_selector {
             return $evaluationgrid->get('id');
         }, $evaluationgrids);
         $evaluationgridsnames = array_map(function ($evaluationgrid) {
-            return $evaluationgrid->get('shortname') . ' - ' . $evaluationgrid->get('name');
+            return $evaluationgrid->get('name') . ' - ' . $evaluationgrid->get('idnumber');
         }, $evaluationgrids);
         return [$evaluationgridsid, $evaluationgridsnames];
     }

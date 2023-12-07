@@ -33,7 +33,7 @@ use lang_string;
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class evalgrid extends base {
+class evaluation_grid extends base {
     /**
      * Database tables that this entity uses and their default aliases
      *
@@ -51,7 +51,7 @@ class evalgrid extends base {
      * @return lang_string
      */
     protected function get_default_entity_title(): lang_string {
-        return new lang_string('entity:evaluationgrid', 'mod_competvet');
+        return new lang_string('entity:evaluation_grid', 'mod_competvet');
     }
 
     /**
@@ -86,7 +86,7 @@ class evalgrid extends base {
 
         $columns[] = (new column(
             'name',
-            new lang_string('evaluationgrid:name', 'mod_competvet'),
+            new lang_string('evaluation_grid:name', 'mod_competvet'),
             $this->get_entity_name()
         ))
             ->add_joins($this->get_joins())
@@ -95,7 +95,7 @@ class evalgrid extends base {
             ->set_is_sortable(true);
         $columns[] = (new column(
             'idnumber',
-            new lang_string('evaluationgrid:idnumber', 'mod_competvet'),
+            new lang_string('evaluation_grid:idnumber', 'mod_competvet'),
             $this->get_entity_name()
         ))
             ->add_joins($this->get_joins())
@@ -116,7 +116,7 @@ class evalgrid extends base {
         $filters[] = (new filter(
             text::class,
             'name',
-            new lang_string('evaluationgrid:name', 'mod_competvet'),
+            new lang_string('evaluation_grid:name', 'mod_competvet'),
             $this->get_entity_name(),
             "{$evalgridalias}.name"
         ))->add_joins($this->get_joins());
@@ -124,7 +124,7 @@ class evalgrid extends base {
         $filters[] = (new filter(
             text::class,
             'idnumber',
-            new lang_string('evaluationgrid:idnumber', 'mod_competvet'),
+            new lang_string('evaluation_grid:idnumber', 'mod_competvet'),
             $this->get_entity_name(),
             "{$evalgridalias}.idnumber"
         ))->add_joins($this->get_joins());
