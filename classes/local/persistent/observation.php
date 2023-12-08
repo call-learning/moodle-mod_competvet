@@ -48,7 +48,7 @@ class observation extends persistent {
                 'null' => NULL_NOT_ALLOWED,
                 'message' => new lang_string('invaliddata', 'competvet', 'appraiserid'),
             ],
-            'evalplanid' => [
+            'planningid' => [
                 'type' => PARAM_INT,
                 'null' => NULL_NOT_ALLOWED,
                 'message' => new lang_string('invaliddata', 'competvet', 'evalplanid'),

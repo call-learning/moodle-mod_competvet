@@ -19,7 +19,7 @@ use context_module;
 use context_system;
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\situation;
-use mod_competvet\local\reportbuilder_helper;
+use mod_competvet\reportbuilder\local\helpers\data_retriever_helper;
 use mod_competvet\reportbuilder\local\systemreports\planning_per_situation;
 use mod_competvet\reportbuilder\local\systemreports\situations as situations_report;
 use mod_competvet\utils;
@@ -70,7 +70,7 @@ class situations {
                 'onlyforsituationsid' => join(",", $situationsid),
             ]
         );
-        $allsituations = reportbuilder_helper::get_data_from_report(
+        $allsituations = data_retriever_helper::get_data_from_report(
             $situationreport,
             [],
             null,
@@ -99,7 +99,7 @@ class situations {
                 0,
                 $parameters
             );
-            $allplannings = reportbuilder_helper::get_data_from_report(
+            $allplannings = data_retriever_helper::get_data_from_report(
                 $allplanningsreport,
                 [],
                 null,

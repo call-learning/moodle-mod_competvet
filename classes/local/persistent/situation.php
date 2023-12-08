@@ -120,10 +120,11 @@ class situation extends persistent {
 
     /**
      * Get evaluation criteria for this situation
+     *
      * @return array
      */
     public function get_eval_criteria(): array {
-        return criterion::get_records(['evalgridid' => $this->get('evalgrid')], 'sort ASC');
+        return criterion::get_records(['evalgridid' => $this->get('evalgrid')]) ?: [];
     }
 
     /**

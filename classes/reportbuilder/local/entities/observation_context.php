@@ -24,13 +24,13 @@ use core_reportbuilder\local\report\{column, filter};
 use lang_string;
 
 /**
- * Observation comment entity
+ * Observation context entity
  *
  * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class observation_comment extends base {
+class observation_context extends base {
     /**
      * Database tables that this entity uses and their default aliases
      *
@@ -38,7 +38,7 @@ class observation_comment extends base {
      */
     protected function get_default_table_aliases(): array {
         return [
-            'competvet_obs_comment' => 'obscomment',
+            'competvet_obs_context' => 'obscontext',
         ];
     }
 
@@ -48,7 +48,7 @@ class observation_comment extends base {
      * @return lang_string
      */
     protected function get_default_entity_title(): lang_string {
-        return new lang_string('entity:observation_comment', 'mod_competvet');
+        return new lang_string('entity:observation_context', 'mod_competvet');
     }
 
     /**
@@ -79,19 +79,19 @@ class observation_comment extends base {
      * @return column[]
      */
     protected function get_all_columns(): array {
-        $obscommentalias = $this->get_table_alias('competvet_obs_comment');
+        $obscontextalias = $this->get_table_alias('competvet_obs_context');
 
         $columns[] = (new column(
-            'comment',
-            new lang_string('observation_comment:comment', 'mod_competvet'),
+            'context',
+            new lang_string('observation_context:context', 'mod_competvet'),
             $this->get_entity_name()
         ))
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_TEXT)
-            ->add_fields("{$obscommentalias}.comment, {$obscommentalias}.commentformat")
+            ->add_fields("{$obscontextalias}.context, {$obscontextalias}.contextformat")
             ->set_is_sortable(true)
             ->set_callback(function ($row) {
-                return format_text($row->comment, $row->commentformat);
+                return format_text($row->context, $row->contextformat);
             });
         return $columns;
     }
@@ -102,14 +102,14 @@ class observation_comment extends base {
      * @return filter[]
      */
     protected function get_all_filters(): array {
-        $obscommentalias = $this->get_table_alias('competvet_obs_comment');
+        $obscontextalias = $this->get_table_alias('competvet_obs_context');
 
         $filters[] = (new filter(
             text::class,
-            'comment',
-            new lang_string('observation_comment:name', 'mod_competvet'),
+            'context',
+            new lang_string('observation_context:name', 'mod_competvet'),
             $this->get_entity_name(),
-            "{$obscommentalias}.comment"
+            "{$obscontextalias}.context"
         ))->add_joins($this->get_joins());
 
         return $filters;

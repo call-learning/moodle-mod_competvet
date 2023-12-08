@@ -19,38 +19,19 @@ declare(strict_types=1);
 namespace mod_competvet\reportbuilder\local\entities;
 
 use core_reportbuilder\local\entities\base;
-use core_reportbuilder\local\filters\text;
+use core_reportbuilder\local\filters\autocomplete;
 use core_reportbuilder\local\report\{column, filter};
 use lang_string;
+use mod_competvet\local\persistent\observation as observation_entity;
 
 /**
- * Observation comment entity
+ * Observation entity
  *
  * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class observation_comment extends base {
-    /**
-     * Database tables that this entity uses and their default aliases
-     *
-     * @return array
-     */
-    protected function get_default_table_aliases(): array {
-        return [
-            'competvet_obs_comment' => 'obscomment',
-        ];
-    }
-
-    /**
-     * The default title for this entity
-     *
-     * @return lang_string
-     */
-    protected function get_default_entity_title(): lang_string {
-        return new lang_string('entity:observation_comment', 'mod_competvet');
-    }
-
+class observation extends base {
     /**
      * Initialise the entity
      *
@@ -79,20 +60,20 @@ class observation_comment extends base {
      * @return column[]
      */
     protected function get_all_columns(): array {
-        $obscommentalias = $this->get_table_alias('competvet_obs_comment');
+        $obsalias = $this->get_table_alias('competvet_observation');
+        $statusstring = array_map(fn($status) => get_string("observation:status:{$status}", 'mod_competvet'),
+                observation_entity::STATUS);
 
         $columns[] = (new column(
-            'comment',
-            new lang_string('observation_comment:comment', 'mod_competvet'),
+            'status',
+            new lang_string('observation:status', 'mod_competvet'),
             $this->get_entity_name()
         ))
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_TEXT)
-            ->add_fields("{$obscommentalias}.comment, {$obscommentalias}.commentformat")
+            ->add_fields("{$obsalias}.status")
             ->set_is_sortable(true)
-            ->set_callback(function ($row) {
-                return format_text($row->comment, $row->commentformat);
-            });
+            ->set_callback(fn($status) => $statusstring[$status] ?? $status);
         return $columns;
     }
 
@@ -102,16 +83,41 @@ class observation_comment extends base {
      * @return filter[]
      */
     protected function get_all_filters(): array {
-        $obscommentalias = $this->get_table_alias('competvet_obs_comment');
+        $obsalias = $this->get_table_alias('competvet_observation');
 
         $filters[] = (new filter(
-            text::class,
-            'comment',
-            new lang_string('observation_comment:name', 'mod_competvet'),
+            autocomplete::class,
+            'status',
+            new lang_string('observation:status', 'mod_competvet'),
             $this->get_entity_name(),
-            "{$obscommentalias}.comment"
-        ))->add_joins($this->get_joins());
-
+            "{$obsalias}.status"
+        ))->add_joins($this->get_joins())
+        ->set_options(
+            array_map(
+                fn($status) => get_string("observation:status:{$status}", 'mod_competvet'),
+                observation_entity::STATUS
+            )
+        );
         return $filters;
+    }
+
+    /**
+     * Database tables that this entity uses and their default aliases
+     *
+     * @return array
+     */
+    protected function get_default_table_aliases(): array {
+        return [
+            'competvet_observation' => 'observation',
+        ];
+    }
+
+    /**
+     * The default title for this entity
+     *
+     * @return lang_string
+     */
+    protected function get_default_entity_title(): lang_string {
+        return new lang_string('entity:competvet_observation', 'mod_competvet');
     }
 }

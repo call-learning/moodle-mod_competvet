@@ -29,7 +29,7 @@ class observation_comment extends persistent {
     /**
      * Current table
      */
-    const TABLE = 'competvet_obs_appr_context';
+    const TABLE = 'competvet_obs_comment';
 
     /**
      * Usual properties definition for a persistent

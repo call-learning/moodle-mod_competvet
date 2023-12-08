@@ -25,7 +25,12 @@
 use core_grades\component_gradeitem;
 use core_grades\component_gradeitems;
 use mod_competvet\competvet;
+use mod_competvet\local\persistent\observation;
+use mod_competvet\local\persistent\observation_comment;
+use mod_competvet\local\persistent\observation_context;
+use mod_competvet\local\persistent\observation_criterion;
 use mod_competvet\local\persistent\situation;
+use mod_competvet\local\persistent\planning;
 use mod_competvet\utils;
 
 /**
@@ -132,6 +137,26 @@ function competvet_delete_instance($id) {
         return false;
     }
     $situation = situation::get_record(['competvetid' => $id], MUST_EXIST);
+    $plannings = planning::get_records(['situationid' => $situation->get('id')]);
+    foreach ($plannings as $planning) {
+        $observations = observation::get_records(['planningid' => $planning->get('id')]);
+        foreach ($observations as $observation) {
+            $observationcomment = observation_comment::get_records(['observationid' => $observation->get('id')]);
+            $observationcontext = observation_context::get_records(['observationid' => $observation->get('id')]);
+            foreach ($observationcomment as $comment) {
+                $comment->delete();
+            }
+            foreach ($observationcontext as $context) {
+                $context->delete();
+            }
+            $obscriteria = observation_criterion::get_records(['observationid' => $observation->get('id')]);
+            foreach ($obscriteria as $criterion) {
+                $criterion->delete();
+            }
+            $observation->delete();
+        }
+        $planning->delete();
+    }
     $situation->delete();
 
     $DB->delete_records('competvet', ['id' => $id]);
@@ -250,7 +275,7 @@ function competvet_grade_item_update($moduleinstance, $grades = false) {
     $itemnames = component_gradeitems::get_itemname_mapping_for_component(competvet::COMPONENT_NAME);
     $categoryname = clean_param($moduleinstance->name, PARAM_NOTAGS);
     $category = grade_category::fetch(['courseid' => $moduleinstance->course,
-        'fullname' => clean_param($moduleinstance->name, PARAM_NOTAGS), ]);
+        'fullname' => clean_param($moduleinstance->name, PARAM_NOTAGS),]);
     if (!$category) {
         $category = new grade_category(['courseid' => $moduleinstance->course, 'fullname' => $categoryname]);
         $category->insert();

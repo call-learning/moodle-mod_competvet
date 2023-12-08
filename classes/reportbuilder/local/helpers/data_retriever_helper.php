@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-namespace mod_competvet\local;
+namespace mod_competvet\reportbuilder\local\helpers;
 
 use core_reportbuilder\local\report\base;
 use core_reportbuilder\table\custom_report_table_view;
@@ -30,7 +30,7 @@ use core_table\local\filter\string_filter;
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class reportbuilder_helper {
+class data_retriever_helper {
     /**
      * Get all data from a given
      *

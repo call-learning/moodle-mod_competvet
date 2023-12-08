@@ -217,12 +217,13 @@ class extended_tool_generator_course_backend extends tool_generator_course_backe
         $this->create_groups();
 
         // Create situations.
-        $situations = $this->create_situations();
-
+        $this->create_situations();
+        $this->create_plannings();
         // Now to make it simple we will take the 3 roles and assign them to the
         foreach (array_keys(\mod_competvet\competvet::COMPETVET_ROLES) as $rolename) {
             $this->create_users_with_roles($rolename);
         }
+        $this->create_observations();
         // Log total time.
         $this->log('coursecompleted', round(microtime(true) - $entirestart, 1));
 
@@ -302,46 +303,52 @@ class extended_tool_generator_course_backend extends tool_generator_course_backe
 
         // Create competvet.
         $number = self::$paramadmincompetvet[$this->size];
-        $this->log('createcompetvet', ['number' => $number], true);
+        $this->log('createcompetvets', $number, true);
+        $this->situations = [];
         for ($i = 0; $i < $number; $i++) {
             $record = ['course' => $this->course];
             $options = ['section' => $generatoreflection->getMethod('get_target_section')->invoke($this)];
             $instance = $competvetgenerator->create_instance($record, $options);
             // Now create random planning.
-            $this->create_plannings($instance);
-            $this->situation[] = situation::get_record(['id' => $instance->id]);
+            $this->situations[] = situation::get_record(['id' => $instance->id]);
             $this->dot($i, $number);
         }
-
         $this->end_log();
     }
 
     /**
      * Creates a number of Planning for each situation
      */
-    private function create_plannings(object $instance) {
+    private function create_plannings() {
         $datenow = time();
         // Get the closest monday at 00:00.
-        $monday = strtotime('last monday', $datenow);
         $groups = array_values(groups_get_all_groups($this->course->id));
         $competvetgenerator = $this->generator->get_plugin_generator('mod_competvet');
-        $situation = situation::get_record(['competvetid' => $instance->id]);
         $skippedplanning = 0;
-        for ($week = 0; $week < self::PLANNING_WEEKS; $week++) {
-            if (random_int(1, 1000) > 500 && $skippedplanning < self::RANDOM_MISSING_PLANNING) {
-                $skippedplanning++;
-                continue;
+        $total = self::PLANNING_WEEKS;
+        foreach ($this->situations as $situation) {
+            $this->log('createplannings', ['count' => self::PLANNING_WEEKS, 'situation' => $situation->get('shortname')], true);
+            $monday = strtotime('last monday', $datenow);
+            for ($week = 0; $week < self::PLANNING_WEEKS; $week++) {
+                if (random_int(1, 1000) > 500 && $skippedplanning < self::RANDOM_MISSING_PLANNING) {
+                    $skippedplanning++;
+                    continue;
+                }
+                foreach ($groups as $group) {
+                    $record = [
+                        'situationid' => $situation->get('id'),
+                        'startdate' => $monday,
+                        'groupid' => $group->id,
+                        'enddate' => $monday + self::WEEK_SIZE,
+                    ];
+                    $competvetgenerator->create_planning($record);
+                    $monday += self::WEEK_SIZE;
+                }
+                $this->dot($week, $total);
             }
-            $group = $groups[random_int(0, count($groups) - 1)];
-            $record = [
-                'situationid' => $situation->get('id'),
-                'startdate' => $monday,
-                'groupid' => $group->id,
-                'enddate' => $monday + self::WEEK_SIZE,
-            ];
-            $competvetgenerator->create_planning($record);
-            $monday += self::WEEK_SIZE;
+            $this->end_log();
         }
+
     }
 
     /**
@@ -463,34 +470,45 @@ class extended_tool_generator_course_backend extends tool_generator_course_backe
      * @return void
      */
     private function create_observations() {
+        $count = count($this->situations);
+        $this->log('createobservations', $count, true);
+        $done = 0;
         foreach ($this->situations as $situation) {
             $competvet = competvet::get_from_situation($situation);
-            $groups = groups_get_all_groups($competvet->get_course()->id);
+            $groups = groups_get_all_groups($competvet->get_course()->id, 0, 0, 'g.*', true);
             $observers = array_values($this->userswithroles['observer']);
             $competvetgenerator = $this->generator->get_plugin_generator('mod_competvet');
             foreach ($groups as $groupid => $group) {
                 $plannings = planning::get_records(['situationid' => $situation->get('id'), 'groupid' => $groupid]);
+                $gmembers = array_values($group->members);
+                if (empty($gmembers) || empty($gmembers)) {
+                    continue;
+                }
                 foreach ($plannings as $planning) {
-                    $observationcount = rand(1, $situation->get('observationcount') < 1 ? 1 : $situation->get('observationcount'));
+                    $observationcount = $situation->get('evalnum');
                     for (; $observationcount > 0; $observationcount--) {
+                        $observerid = $observers[random_int(0, count($observers) - 1)];
+                        $studentid = $gmembers[random_int(0, count($gmembers) - 1)];
                         $observation = $competvetgenerator->create_observation([
                             'situationid' => $situation->get('id'),
-                            'studentid' => $group->members[random_int(0, count($group->members) - 1)],
-                            'appraiserid' => $observers[random_int(0, count($observers) - 1)],
-                            'evalplanid' => $planning->get('id'),
+                            'studentid' => $studentid,
+                            'observerid' => $observerid,
+                            'planningid' => $planning->get('id'),
                         ]);
                         $competvetgenerator->create_observation_context([
                             'observationid' => $observation->id,
                             'comment' => $this->get_random_text(100),
                             'commentformat' => FORMAT_HTML,
+                            'usercreated' => $studentid,
                         ]);
                         $competvetgenerator->create_observation_comment([
                             'observationid' => $observation->id,
                             'context' => $this->get_random_text(100),
                             'contextformat' => FORMAT_HTML,
+                            'usercreated' => $observerid,
                         ]);
                         // Create subcriterions.
-                        foreach ($situation->get_criterions() as $criterion) {
+                        foreach ($situation->get_eval_criteria() as $criterion) {
                             $competvetgenerator->create_observation_criterion([
                                 'criterionid' => $criterion->get('id'),
                                 'observationid' => $observation->id,
@@ -502,7 +520,9 @@ class extended_tool_generator_course_backend extends tool_generator_course_backe
                     }
                 }
             }
+            $this->dot($done++, $count);
         }
+        $this->end_log();
     }
 
     /**
