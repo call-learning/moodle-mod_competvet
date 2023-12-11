@@ -42,14 +42,6 @@ class situations {
         'situation:intro' => 'intro',
         'id' => 'id',
     ];
-    const PLANNING_FIELDS = [
-        'planning:startdateraw' => 'startdate',
-        'planning:enddateraw' => 'enddate',
-        'planning:session' => 'session',
-        'group:name' => 'groupname',
-        'planning:groupid' => 'groupid',
-        'id' => 'id',
-    ];
 
     /**
      * Get all situations with plannings for a given user
@@ -60,78 +52,49 @@ class situations {
     public static function get_all_situations_with_planning_for(int $userid): array {
         $situationsid = situation::get_all_situations_id_for($userid);
         $context = context_system::instance();
-        $situationreport = \core_reportbuilder\system_report_factory::create(
+
+        $allsituations = data_retriever_helper::get_data_from_system_report(
             situations_report::class,
             $context,
-            competvet::COMPONENT_NAME,
-            '',
-            0,
             [
                 'onlyforsituationsid' => join(",", $situationsid),
-            ]
+            ],
         );
-        $allsituations = data_retriever_helper::get_data_from_report(
-            $situationreport,
-            [],
-            null,
-            0
-        );
+
         $situations = [];
         foreach ($allsituations as $situation) {
             $situationid = $situation['id'];
 
-            $parameters  = [
-                'situationid' => $situationid,
-            ];
-            $situationcontext = context_module::instance($situation['situation:cmid']);
-            if (utils::is_student($userid, $situationcontext->id)) {
-                $allgroups = groups_get_all_groups($situationcontext->get_course_context()->instanceid, $userid);
-                $allgroupnames = array_map(function ($g) {
-                    return $g->name;
-                }, $allgroups);
-                $parameters['groupnames'] = join(",", $allgroupnames);
-            }
-            $allplanningsreport = \core_reportbuilder\system_report_factory::create(
-                planning_per_situation::class,
-                $situationcontext,
-                competvet::COMPONENT_NAME,
-                '',
-                0,
-                $parameters
-            );
-            $allplannings = data_retriever_helper::get_data_from_report(
-                $allplanningsreport,
-                [],
-                null,
-                0
-            );
+
+            $allplannings = plannings::get_plannings_for_situation_id($situationid, $userid);
             if (empty($allplannings)) {
                 continue; // Do not add situations with empty plannings as user is not involved.
             }
-
-            $newsituation = [
-                'plannings' => [],
-                'tags' => [],
-            ];
+            if (empty($allplannings)) {
+                continue; // Do not add situations with empty plannings as user is not involved.
+            }
+            $newsituation = [];
+            $newsituation['plannings'] = $allplannings;
+            $tags = explode(",", $situation['situation:tagnames'] ?? []);
+            $tags = array_map('trim', $tags);
+            sort($tags);
+            $newsituation['tags'] = json_encode($tags);
+            $newsituation['translatedtags'] = json_encode(array_map(
+                fn($tag) => (object)
+                [$tag =>
+                    get_string_manager()->string_exists("situation:tags:{$tag}", 'mod_competvet') ?
+                        get_string("situation:tags:{$tag}", 'mod_competvet') : $tags
+                ]
+                , $tags));
             foreach (self::SITUATION_FIELDS as $originalname => $targetfieldname) {
                 $newsituation[$targetfieldname] = $situation[$originalname];
             }
-            foreach ($allplannings as $planning) {
-                $newplanning = [];
-                foreach (self::PLANNING_FIELDS as $originalname => $targetfieldname) {
-                    $newplanning[$targetfieldname] = $planning[$originalname];
-                }
-                $newsituation['plannings'][] = $newplanning;
-            }
-            $tags = explode(",", $situation['situation:tagnames'] ?? []);
-            $tags = array_map('trim', $tags);
-            $newsituation['tags'] = json_encode($tags);
             $newsituation['roles'] = json_encode(user_role::get_all($userid, $situationid)); // We don't fetch it through
             // report builder as it is too complicated.
             // TODO: Cache this information too.
             $situations[$situationid] = $newsituation;
         }
-        usort($situations, function ($a, $b) use ($situations) {
+        usort($situations, function($a, $b) use ($situations) {
             return $a['shortname'] <=> $b['shortname'];
         });
         return $situations;

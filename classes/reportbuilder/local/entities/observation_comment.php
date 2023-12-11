@@ -90,7 +90,7 @@ class observation_comment extends base {
             ->set_type(column::TYPE_TEXT)
             ->add_fields("{$obscommentalias}.comment, {$obscommentalias}.commentformat")
             ->set_is_sortable(true)
-            ->set_callback(function ($row) {
+            ->set_callback(function ($value, $row) {
                 return format_text($row->comment, $row->commentformat);
             });
         return $columns;

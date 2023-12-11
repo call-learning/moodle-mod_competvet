@@ -90,7 +90,7 @@ class observation_context extends base {
             ->set_type(column::TYPE_TEXT)
             ->add_fields("{$obscontextalias}.context, {$obscontextalias}.contextformat")
             ->set_is_sortable(true)
-            ->set_callback(function ($row) {
+            ->set_callback(function ($value, $row) {
                 return format_text($row->context, $row->contextformat);
             });
         return $columns;

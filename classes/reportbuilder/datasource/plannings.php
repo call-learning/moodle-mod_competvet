@@ -106,4 +106,6 @@ class plannings extends datasource {
 
         $this->add_all_from_entities();
     }
+
+
 }

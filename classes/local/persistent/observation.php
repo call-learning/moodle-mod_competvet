@@ -71,4 +71,21 @@ class observation extends persistent {
         2 => 'completed',
         3 => 'archived',
     ];
+
+    /**
+     * Status not started: student asked for evaluation but not yet taken into account by observer.
+     */
+    const STATUS_NOTSTARTED = 0;
+    /**
+     * Status in progress: student is being evaluated by observer.
+     */
+    const STATUS_INPROGRESS = 1;
+    /**
+     * Status completed: student has been evaluated by observer.
+     */
+    const STATUS_COMPLETED = 2;
+    /**
+     * Status archived: student has been evaluated by observer and archived, so not counted in the stats.
+     */
+    const STATUS_ARCHIVED = 3;
 }

@@ -17,7 +17,6 @@
 namespace mod_competvet;
 
 use cm_info;
-use context_course;
 use context_module;
 use core_grades\component_gradeitems;
 use grade_item;
@@ -172,13 +171,50 @@ class competvet {
     }
 
     /**
-     * Get the competVet instance from the competvet id (situation id)
+     * Get the competVet instance from the competvet id module
      *
      * @param int $competvetid
      * @return self
      */
     public static function get_from_instance_id(int $competvetid): self {
         return new self(0, $competvetid);
+    }
+
+    /**
+     * Get the competVet instance from the situationid
+     *
+     * @param int $situationid
+     * @return self
+     */
+    public static function get_from_situation_id(int $situationid): self {
+        $situation = situation::get_record(['id' => $situationid]);
+        if (empty($situation)) {
+            throw new \moodle_exception('invalidsituationid', 'mod_competvet', '', $situationid);
+        }
+        return new self(0, $situation->get('competvetid'));
+    }
+
+    /**
+     * Get components
+     *
+     * @return string
+     */
+    public static function get_component() {
+        return 'mod_competvet';
+    }
+
+    /**
+     * Require view access
+     *
+     * @param int $situationid
+     * @param int $userid
+     * @return void
+     * @throws \moodle_exception
+     */
+    public static function require_view_access(int $situationid, int $userid) {
+        $competvet = self::get_from_situation_id($situationid);
+        $context = $competvet->get_context();
+        require_capability('mod/competvet:view', $context, $userid);
     }
 
     /**
@@ -192,8 +228,16 @@ class competvet {
         return new self(0, $situation->get('competvetid'));
     }
 
-    public static function get_component() {
-        return 'mod_competvet';
+    /**
+     * Get context
+     *
+     * @return context_module
+     */
+    public function get_context(): \context_module {
+        if (empty($this->context)) {
+            $this->context = \context_module::instance($this->cminfo->id);
+        }
+        return $this->context;
     }
 
     public function list_participants_with_filter_status_and_group(int $groupid): array {
@@ -270,18 +314,6 @@ class competvet {
      */
     public function get_course(): \stdClass {
         return $this->course;
-    }
-
-    /**
-     * Get context
-     *
-     * @return context_module
-     */
-    public function get_context(): \context_module {
-        if (empty($this->context)) {
-            $this->context = \context_module::instance($this->cminfo->id);
-        }
-        return $this->context;
     }
 
     /**

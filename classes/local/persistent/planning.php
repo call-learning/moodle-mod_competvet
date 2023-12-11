@@ -48,6 +48,35 @@ class planning extends persistent {
         return self::get_record($params);
     }
 
+    public static function get_status_for_planning_id(int $planningid, int $userid, bool $isstudent) {
+        $planning = self::get_record(['id' => $planningid]);
+        $situation = situation::get_record(['id' => $planning->raw_get('situationid')]);
+        // First check: is this the current week ?
+        $now = time();
+        if ($now >= $planning->raw_get('startdate') && $now <= $planning->raw_get('enddate')) {
+            return self::STATUS_CURRENT;
+        }
+        if ($now < $planning->raw_get('startdate')) {
+            return self::STATUS_FUTURE;
+        }
+        // Second check: is this a past week and what is the status depending on the completion.
+        $params = ['planningid' => $planningid];
+        if ($isstudent) {
+            $params['studentid'] = $userid;
+        } else {
+            $params['observerid'] = $userid;
+        }
+        $allobservations = observation::get_records($params);
+        $allfinished = array_filter($allobservations, function ($observation) {
+            return $observation->raw_get('status') == observation::STATUS_COMPLETED;
+        });
+        $allfinishedcount = count($allfinished);
+        if ($allfinishedcount > $situation->get('evalnum')) {
+            return self::STATUS_OBSERVER_COMPLETED;
+        }
+        return self::STATUS_OBSERVER_LATE;
+    }
+
     /**
      * Return the custom definition of the properties of this model.
      *
@@ -86,6 +115,14 @@ class planning extends persistent {
         ];
     }
 
+    /**
+     * Get printable version of start time
+     *
+     * @return string
+     */
+    public static function get_planning_date_string($timestamp) {
+        return userdate($timestamp, get_string('strftimedate', 'core_langconfig'));
+    }
     /**
      * Get printable version of start time
      *
@@ -150,4 +187,36 @@ class planning extends persistent {
      */
     protected function after_delete($result) {
     }
+
+    /**
+     * Status definition
+     */
+    const STATUS = [
+        0 => 'current',
+        2 => 'future',
+        3 => 'other',
+        10 => 'observerlate',
+        11 => 'observercompleted',
+    ];
+
+    /**
+     * Status current: this week's observations.
+     */
+    const STATUS_CURRENT = 0;
+    /**
+     * Status current: this week's observations.
+     */
+    const STATUS_FUTURE = 1;
+    /**
+     * Status in progress: observation that have not real meaninful status.
+     */
+    const STATUS_OTHER = 3;
+    /**
+     * Status in progress: observation that needs to be done but have not been completed.
+     */
+    const STATUS_OBSERVER_LATE = 10;
+    /**
+     * Status completed: observation that have been finished.
+     */
+    const STATUS_OBSERVER_COMPLETED = 11;
 }
