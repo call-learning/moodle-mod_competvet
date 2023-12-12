@@ -19,43 +19,46 @@ use core\persistent;
 use lang_string;
 
 /**
- * Observation Context entity
+ * Observation for a given Criterion
  *
  * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class observation_context extends persistent {
+class observation_criterion_comment extends persistent {
     /**
      * Current table
      */
-    const TABLE = 'competvet_obs_context';
+    const TABLE = 'competvet_obs_crit_com';
 
     /**
-     * Usual properties definition for a persistent
+     * Return the custom definition of the properties of this model.
      *
-     * @return array|array[]
+     * Each property MUST be listed here.
+     *
+     * @return array Where keys are the property names.
      */
     protected static function define_properties() {
         return [
-            'observationid' => [
-                'type' => PARAM_INT,
+            'criterionid' => [
                 'null' => NULL_NOT_ALLOWED,
+                'type' => PARAM_INT,
+                'message' => new lang_string('invaliddata', 'competvet', 'criterionid'),
+            ],
+            'observationid' => [
+                'null' => NULL_NOT_ALLOWED,
+                'type' => PARAM_INT,
                 'message' => new lang_string('invaliddata', 'competvet', 'observationid'),
             ],
-            'usercreated' => [
-                'type' => PARAM_INT,
-                'null' => NULL_NOT_ALLOWED,
-                'message' => new lang_string('invaliddata', 'competvet', 'usercreated'),
+            'comment' => [
+                'null' => NULL_ALLOWED,
+                'type' => PARAM_RAW,
             ],
-            'context' => [
-                'type' => PARAM_TEXT,
-                'default' => '',
-            ],
-            'contextformat' => [
+            'commentformat' => [
                 'type' => PARAM_INT,
                 'default' => FORMAT_PLAIN,
             ],
         ];
     }
 }
+

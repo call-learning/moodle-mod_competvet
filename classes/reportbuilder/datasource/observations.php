@@ -19,14 +19,6 @@ declare(strict_types=1);
 namespace mod_competvet\reportbuilder\datasource;
 
 use core_reportbuilder\datasource;
-use core_reportbuilder\local\entities\user;
-use core_reportbuilder\local\report\base;
-use lang_string;
-use mod_competvet\reportbuilder\local\entities\observation;
-use mod_competvet\reportbuilder\local\entities\observation_comment;
-use mod_competvet\reportbuilder\local\entities\observation_context;
-use mod_competvet\reportbuilder\local\entities\planning;
-use mod_competvet\reportbuilder\local\entities\situation;
 use mod_competvet\reportbuilder\local\helpers\observations_helper;
 
 /**
@@ -61,7 +53,6 @@ class observations extends datasource {
             'planning:enddate',
             'situation:shortname',
             'observation_comment:comment',
-            'observation_context:context',
             'situation:evalnum',
         ];
     }

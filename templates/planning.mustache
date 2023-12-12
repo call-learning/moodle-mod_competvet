@@ -1,0 +1,94 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_competvet/view/planning
+
+
+    Example context (json):
+    {
+        'usersbytype': [
+            {
+                'usertype': 'teacher',
+                'label': 'Observers',
+                'users': [
+                    {
+                        'fullname': 'Observer 1',
+                        'pictureurl': 'http://localhost/moodle/pluginfile.php/1/user/icon/f1',
+                    },
+                    {
+                        'fullname': 'Observer 2',
+                        'pictureurl': 'http://localhost/moodle/pluginfile.php/2/user/icon/f1',
+                    }
+                ]
+            },
+            {
+                'usertype': 'student',
+                'label': 'Students - Group XY',
+                'users': [
+                    {
+                        'fullname': 'Student 1',
+                        'pictureurl': 'http://localhost/moodle/pluginfile.php/3/user/icon/f1',
+                        'viewurl': 'http://localhost/moodle/user/view.php?id=3'
+                    },
+                    {
+                        'fullname': 'Student 2',
+                        'pictureurl': 'http://localhost/moodle/pluginfile.php/4/user/icon/f1',
+                        'viewurl': 'http://localhost/moodle/user/view.php?id=4'
+                    }
+                ]
+            }
+        ]
+    }
+}}
+<div class="competvet-view-planning">
+    <div class="accordion" id="users-accordion">
+        {{#usersbytype}}
+            <div class="card">
+                <div class="card-header" id="competvet-view-users-heading-{{usertype}}">
+                    <h2 class="mb-0">
+                        <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#competvet-view-users-{{usertype}}"
+                                aria-expanded="true" aria-controls="competvet-view-users-{{usertype}}">
+                            {{label}}
+                        </button>
+                    </h2>
+                </div>
+                <div id="competvet-view-users-{{usertype}}" class="collapse show" aria-labelledby="competvet-view-users-heading-{{usertype}}" data-parent="#users-accordion">
+                    <div class="card-body">
+                        {{#users}}
+                            <div class="container m-3 py-1">
+                                <div>
+                                    <img src="{{pictureurl}}" alt="{{label}}" class="userpicture" style="width:2em;">
+                                    {{#viewurl}}
+                                        <a href="{{viewurl}}"><span>{{fullname}}</span></a>
+                                    {{/viewurl}}
+                                    {{^viewurl}}
+                                        <span>{{fullname}}</span>
+                                    {{/viewurl}}
+                                </div>
+                                <div>
+                                    {{#stats}}
+                                        <span><span class="badge badge-primary badge-pill">{{nbdone}}/{{nbrequired}}</span></span> <span class="small">{{label}}</span>
+                                    {{/stats}}
+                                </div>
+                            </div>
+                        {{/users}}
+                    </div>
+                </div>
+            </div>
+        {{/usersbytype}}
+    </div>
+</div>

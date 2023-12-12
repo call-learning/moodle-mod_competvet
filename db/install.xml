@@ -41,6 +41,8 @@
                 <FIELD NAME="autoevalnum" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Required amount of auto evaluations."/>
                 <FIELD NAME="evalgrid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"
                        COMMENT="The id evaluation grid for the eval component."/>
+                <FIELD NAME="certifgrid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"
+                       COMMENT="The id evaluation grid for the certif component."/>
                 <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of when the instance was added to the course."/>
                 <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of when the instance was last modified."/>
@@ -49,6 +51,7 @@
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
                 <KEY NAME="instance_fk" TYPE="foreign" FIELDS="competvetid" REFTABLE="competvet" REFFIELDS="id"/>
                 <KEY NAME="evalgrid_fk" TYPE="foreign" FIELDS="evalgrid" REFTABLE="competvet_evalgrid" REFFIELDS="id"/>
+                <KEY NAME="certifgrid_fk" TYPE="foreign" FIELDS="certifgrid" REFTABLE="competvet_evalgrid" REFFIELDS="id"/>
                 <KEY NAME="usermodified_fk" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
             </KEYS>
             <INDEXES>
@@ -92,7 +95,7 @@
                 <KEY NAME="usermodified_fk" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
-        <TABLE NAME="competvet_criterion" COMMENT="Criterion template.">
+        <TABLE NAME="competvet_criterion" COMMENT="Criterion template can be used in eval or certif (flat list).">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="label" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
@@ -116,8 +119,8 @@
                 <FIELD NAME="studentid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="observerid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="planningid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="status" TYPE="int" LENGTH="3" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Status for the observation NOTSTARTED(0), INPROGRESS(1),COMPLETED(2),
-                ARCHIVED(3)."/>
+                <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"
+                       COMMENT="Status for the observation NOTSTARTED(0), INPROGRESS(1), COMPLETED(2), ARCHIVED(3)."/>
                 <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -134,6 +137,9 @@
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="observationid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="type" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"
+                       COMMENT="Type of comment: OBSERVATION CONTEXT(1), OBSERVATION COMMENT(2),
+                       PRIVATE OBSERVATION COMMENT(3), AUTOEVAL PROGRES(10), AUTOEVAL AMELIORATION (11), AUTOEVAL MANQUE (12)."/>
                 <FIELD NAME="comment" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="commentformat" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="usercreated"  TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -148,30 +154,28 @@
                 <KEY NAME="usercreated_fk" TYPE="foreign" FIELDS="usercreated" REFTABLE="user" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
-        <TABLE NAME="competvet_obs_context" COMMENT="Context (EVAL) given by student for each observation.">
+        <TABLE NAME="competvet_obs_crit_level" COMMENT="observations criteria level (EVAL) for student - for each criterion in the evaluation grid.">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="criterionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="observationid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="context" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="contextformat" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="usercreated"  TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="level" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-                <KEY NAME="observationid_fk" TYPE="foreign" FIELDS="observationid" REFTABLE="competvet_observation" REFFIELDS="id"/>
+                <KEY NAME="criterionid_fk" TYPE="foreign" FIELDS="criterionid" REFTABLE="competvet_criterion" REFFIELDS="id"/>
+                <KEY NAME="observationid_fk" TYPE="foreign" FIELDS="id" REFTABLE="competvet_observation" REFFIELDS="id"/>
                 <KEY NAME="usermodified_fk" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
-                <KEY NAME="usercreated_fk" TYPE="foreign" FIELDS="usercreated" REFTABLE="user" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
-        <TABLE NAME="competvet_obs_crit" COMMENT="observations criteria (EVAL) for student - for each criterion in the evaluation grid.">
+        <TABLE NAME="competvet_obs_crit_com" COMMENT="observations criteria comments (EVAL) for student - for each criterion in the evaluation grid.">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="criterionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="observationid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="comment" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="commentformat" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>

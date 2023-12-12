@@ -93,6 +93,17 @@ class observation_comment extends base {
             ->set_callback(function ($value, $row) {
                 return format_text($row->comment, $row->commentformat);
             });
+
+        $columns[] = (new column(
+            'type',
+            new lang_string('observation_comment:type', 'mod_competvet'),
+            $this->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->set_type(column::TYPE_TEXT)
+            ->add_fields("{$obscommentalias}.comment, {$obscommentalias}.commentformat")
+            ->set_is_sortable(true)
+            ->set_callback(fn($value, $row) => \mod_competvet\local\persistent\observation_comment::from_type_to_string($value));
         return $columns;
     }
 

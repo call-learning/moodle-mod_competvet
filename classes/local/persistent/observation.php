@@ -30,6 +30,46 @@ class observation extends persistent {
      * Current table
      */
     const TABLE = 'competvet_observation';
+    /**
+     * Observation category: autoeval
+     */
+    const CATEGORY_EVAL_AUTOEVAL = 1;
+    /**
+     * Observation category: eval
+     */
+    const CATEGORY_EVAL_OBSERVATION = 2;
+    /**
+     * Categories definition
+     */
+    const CATEGORIES = [
+        self::CATEGORY_EVAL_AUTOEVAL => 'eval:autoeval',
+        self::CATEGORY_EVAL_OBSERVATION => 'eval:observation',
+    ];
+    /**
+     * Status definition
+     */
+    const STATUS = [
+        self::STATUS_NOTSTARTED => 'notstarted',
+        self::STATUS_INPROGRESS => 'inprogress',
+        self::STATUS_COMPLETED => 'completed',
+        self::STATUS_ARCHIVED => 'archived',
+    ];
+    /**
+     * Status not started: student asked for evaluation but not yet taken into account by observer.
+     */
+    const STATUS_NOTSTARTED = 0;
+    /**
+     * Status in progress: student is being evaluated by observer.
+     */
+    const STATUS_INPROGRESS = 1;
+    /**
+     * Status completed: student has been evaluated by observer.
+     */
+    const STATUS_COMPLETED = 2;
+    /**
+     * Status archived: student has been evaluated by observer and archived, so not counted in the stats.
+     */
+    const STATUS_ARCHIVED = 3;
 
     /**
      * Usual properties definition for a persistent
@@ -63,29 +103,39 @@ class observation extends persistent {
     }
 
     /**
-     * Status definition
+     * Is this observation an eval or autoeval
+     *
+     * @return int
      */
-    const STATUS = [
-        0 => 'notstarted',
-        1 => 'inprogress',
-        2 => 'completed',
-        3 => 'archived',
-    ];
+    public function get_observation_type(): int {
+        return $this->raw_get('observerid') == $this->raw_get('studentid') ? self::CATEGORY_EVAL_AUTOEVAL :
+            self::CATEGORY_EVAL_OBSERVATION;
+    }
 
     /**
-     * Status not started: student asked for evaluation but not yet taken into account by observer.
+     * Get the comments for the observation
+     *
+     * @return observation_comment[]
      */
-    const STATUS_NOTSTARTED = 0;
+    public function get_comments() {
+        return observation_comment::get_records(['observationid' => $this->raw_get('id')]);
+    }
+
     /**
-     * Status in progress: student is being evaluated by observer.
+     * Get the levels for the criteria of the observation
+     *
+     * @return observation_criterion_level[]
      */
-    const STATUS_INPROGRESS = 1;
+    public function get_criteria_levels() {
+        return observation_criterion_level::get_records(['observationid' => $this->raw_get('id')]);
+    }
+
     /**
-     * Status completed: student has been evaluated by observer.
+     * Get the comments for the criteria of the observation
+     *
+     * @return observation_criterion_comment[] An array of observation_criterion_comment objects
      */
-    const STATUS_COMPLETED = 2;
-    /**
-     * Status archived: student has been evaluated by observer and archived, so not counted in the stats.
-     */
-    const STATUS_ARCHIVED = 3;
+    public function get_criteria_comments() {
+        return observation_criterion_comment::get_records(['observationid' => $this->raw_get('id')]);
+    }
 }

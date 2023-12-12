@@ -16,9 +16,12 @@
 namespace mod_competvet;
 
 use context_module;
+use context_user;
 use core_tag_collection;
+use core_user;
 use moodle_url;
 use tabobject;
+use user_picture;
 
 /**
  * Utils class
@@ -156,5 +159,24 @@ class utils {
             $isstudent = $isstudent || user_has_role_assignment($userid, $studentroleid, $contextid);
         }
         return $isstudent;
+    }
+
+    /**
+     * Get user information (picture and fullname) for the given user id.
+     *
+     * @param int $userid The ID of the user.
+     * @return array associative array with id, fullname and userpictureurl.
+     */
+    public static function get_user_info(int $userid): array {
+        global $PAGE;
+        $user = core_user::get_user($userid);
+        $userpicture = new user_picture($user);
+        $userpicture->includetoken = true;
+        $userpicture->size = 1; // Size f1.
+        return [
+            'id' => $userid,
+            'fullname' => fullname($user),
+            'userpictureurl' => $userpicture->get_url($PAGE)->out(false),
+        ];
     }
 }

@@ -17,6 +17,8 @@ namespace mod_competvet\local\persistent;
 
 use core\persistent;
 use lang_string;
+use mod_competvet\competvet;
+use mod_competvet\utils;
 
 /**
  * Evaluation planning entity
@@ -46,35 +48,6 @@ class planning extends persistent {
             'enddate' => $enddate,
         ];
         return self::get_record($params);
-    }
-
-    public static function get_status_for_planning_id(int $planningid, int $userid, bool $isstudent) {
-        $planning = self::get_record(['id' => $planningid]);
-        $situation = situation::get_record(['id' => $planning->raw_get('situationid')]);
-        // First check: is this the current week ?
-        $now = time();
-        if ($now >= $planning->raw_get('startdate') && $now <= $planning->raw_get('enddate')) {
-            return self::STATUS_CURRENT;
-        }
-        if ($now < $planning->raw_get('startdate')) {
-            return self::STATUS_FUTURE;
-        }
-        // Second check: is this a past week and what is the status depending on the completion.
-        $params = ['planningid' => $planningid];
-        if ($isstudent) {
-            $params['studentid'] = $userid;
-        } else {
-            $params['observerid'] = $userid;
-        }
-        $allobservations = observation::get_records($params);
-        $allfinished = array_filter($allobservations, function ($observation) {
-            return $observation->raw_get('status') == observation::STATUS_COMPLETED;
-        });
-        $allfinishedcount = count($allfinished);
-        if ($allfinishedcount > $situation->get('evalnum')) {
-            return self::STATUS_OBSERVER_COMPLETED;
-        }
-        return self::STATUS_OBSERVER_LATE;
     }
 
     /**
@@ -189,34 +162,34 @@ class planning extends persistent {
     }
 
     /**
-     * Status definition
+     * Category definition
      */
-    const STATUS = [
-        0 => 'current',
-        2 => 'future',
-        3 => 'other',
-        10 => 'observerlate',
-        11 => 'observercompleted',
+    const CATEGORY = [
+        self::CATEGORY_CURRENT => 'current',
+        self::CATEGORY_FUTURE => 'future',
+        self::CATEGORY_OTHER => 'other',
+        self::CATEGORY_OBSERVER_LATE => 'observerlate',
+        self::CATEGORY_OBSERVER_COMPLETED => 'observercompleted',
     ];
 
     /**
-     * Status current: this week's observations.
+     * Category current: this week's observations.
      */
-    const STATUS_CURRENT = 0;
+    const CATEGORY_CURRENT = 0;
     /**
-     * Status current: this week's observations.
+     * Category current: this week's observations.
      */
-    const STATUS_FUTURE = 1;
+    const CATEGORY_FUTURE = 1;
     /**
-     * Status in progress: observation that have not real meaninful status.
+     * Category in progress: observation that have not real meaninful category.
      */
-    const STATUS_OTHER = 3;
+    const CATEGORY_OTHER = 3;
     /**
-     * Status in progress: observation that needs to be done but have not been completed.
+     * Category in progress: observation that needs to be done but have not been completed.
      */
-    const STATUS_OBSERVER_LATE = 10;
+    const CATEGORY_OBSERVER_LATE = 10;
     /**
-     * Status completed: observation that have been finished.
+     * Category completed: observation that have been finished.
      */
-    const STATUS_OBSERVER_COMPLETED = 11;
+    const CATEGORY_OBSERVER_COMPLETED = 11;
 }

@@ -44,7 +44,7 @@ if ($hasconfirmed) {
             ]);
             $observation->delete();
             $observationcriteria =
-                \mod_competvet\local\persistent\observation_criterion::get_records(['observationid' => $observationid]);
+                \mod_competvet\local\persistent\observation_criterion_grade::get_records(['observationid' => $observationid]);
             foreach ($observationcriteria as $criterion) {
                 $criterion->delete();
             }

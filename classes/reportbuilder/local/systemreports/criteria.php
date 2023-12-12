@@ -20,57 +20,55 @@ namespace mod_competvet\reportbuilder\local\systemreports;
 
 use core_reportbuilder\local\helpers\database;
 use core_reportbuilder\system_report;
-use mod_competvet\reportbuilder\local\helpers\observations_helper;
+use mod_competvet\local\persistent\evaluation_grid;
+use mod_competvet\reportbuilder\local\entities\criterion;
+use mod_competvet\local\persistent\situation as situation_persistent;
 
 /**
- * Planning per situation
+ * Criteria for a given situation (or all criteria if situationid is not provided)
  *
- * Used in the situations API
+ * Used in the situations API:
+ * @see \mod_competvet\local\api\situations::get_all_criteria()
  *
  * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class observations_per_planning extends system_report {
-    use observations_helper;
-
+class criteria extends system_report {
     /**
-     * Initialise
+     * Return the conditions that will be added to the report upon creation
      *
-     * @return void
+     * @return string[]
      */
+    public function get_default_conditions(): array {
+        return [];
+    }
+
     protected function initialise(): void {
-        $this->add_observations_entities();
-        $observationalias = $this->get_main_table_alias();
-        if ($planningsidcsv = $this->get_parameter('onlyforplanningid', "", PARAM_RAW)) {
-            global $DB;
-            $planningsid = explode(',', $planningsidcsv);
-            if (!empty($planningsid)) {
-                $observationaliasprefix = database::generate_param_name();
-                [$where, $params] = $DB->get_in_or_equal($planningsid, SQL_PARAMS_NAMED, $observationaliasprefix);
+        $criterionentity = new criterion();
+
+        $criterionalias = $criterionentity->get_table_alias('competvet_criterion');
+        $this->set_main_table('competvet_criterion', $criterionalias);
+        $this->add_entity($criterionentity);
+        $this->add_base_fields("{$criterionalias}.id");
+        // Only for situation id if provided.
+        if ($situationid = $this->get_parameter('situationid', 0, PARAM_INT)) {
+            if ($situationid) {
+                $situation = new situation_persistent($situationid);
+                $evalgridid = $situation->get('evalgrid');
+                if (empty($evalgridid)) {
+                    $evalgridid = evaluation_grid::get_default_grid()->get('id');
+                }
+                $situationevalgridprefix = database::generate_param_name();
                 $this->add_base_condition_sql(
-                    "{$observationalias}.planningid {$where}",
-                    $params
+                    "{$criterionalias}.evalgridid = :{$situationevalgridprefix}",
+                    [$situationevalgridprefix => $evalgridid]
                 );
             }
         }
-        if ($statuscsv = $this->get_parameter('onlyforstatus', "", PARAM_RAW)) {
-            global $DB;
-            $status = explode(',', $statuscsv);
-            if (!empty($status)) {
-                $observationaliasprefix = database::generate_param_name();
-                [$where, $params] = $DB->get_in_or_equal($status, SQL_PARAMS_NAMED, $observationaliasprefix);
-                $this->add_base_condition_sql(
-                    "{$observationalias}.status {$where}",
-                    $params
-                );
-            }
-        }
-        $this->add_base_fields("{$observationalias}.id");
         // Now we can call our helper methods to add the content we want to include in the report.
         $this->add_columns();
         $this->add_filters();
-        // Select only for planningid.
 
         // Here we do this intentionally as any button inserted in the page results in a javascript error.
         // This is due to fact that if we insert it in an existing form this will nest the form and this is not allowed.
@@ -88,20 +86,18 @@ class observations_per_planning extends system_report {
      */
     protected function add_columns(): void {
         $columns = [
-            'observation:status',
-            'student:fullname',
-            'observer:fullname',
-            'planning:startdate',
-            'planning:enddate',
-            'situation:shortname',
-            'observation_comment:comment',
-            'situation:evalnum',
+            'criterion:label',
+            'criterion:idnumber',
+            'criterion:sort',
+            'criterion:parentlabel',
+            'criterion:parentidnumber',
+            'criterion:parentid',
         ];
 
         $this->add_columns_from_entities($columns);
 
         // Default sorting.
-        $this->set_initial_sort_column('planning:startdate', SORT_ASC);
+        $this->set_initial_sort_column('criterion:sort', SORT_ASC);
     }
 
     /**
@@ -112,19 +108,16 @@ class observations_per_planning extends system_report {
      */
     protected function add_filters(): void {
         $filters = [
-            'observation:status',
-            'student:fullname',
-            'observer:fullname',
-            'planning:startdate',
-            'planning:enddate',
-            'situation:shortname',
-            'observation_comment:comment',
+            'criterion:label',
+            'criterion:idnumber',
+            'criterion:sort',
+            'criterion:gridselect',
         ];
 
         $this->add_filters_from_entities($filters);
     }
 
     protected function can_view(): bool {
-        return has_capability('mod/competvet:view', $this->get_context());
+        return has_capability('mod/competvet:viewmysituations', $this->get_context());
     }
 }

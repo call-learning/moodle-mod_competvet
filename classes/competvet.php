@@ -20,6 +20,7 @@ use cm_info;
 use context_module;
 use core_grades\component_gradeitems;
 use grade_item;
+use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
 use stdClass;
 
@@ -208,13 +209,20 @@ class competvet {
      *
      * @param int $situationid
      * @param int $userid
-     * @return void
+     * @return bool
      * @throws \moodle_exception
      */
-    public static function require_view_access(int $situationid, int $userid) {
-        $competvet = self::get_from_situation_id($situationid);
-        $context = $competvet->get_context();
-        require_capability('mod/competvet:view', $context, $userid);
+    public function has_view_access(int $userid): bool {
+        $context = $this->get_context();
+        $canview = has_capability('mod/competvet:view', $context, $userid) || is_siteadmin($userid);
+        if (!$canview) {
+            return false;
+        }
+        // Check if student is in one of the plannings.
+        if (utils::is_student($userid, $context->id)) {
+            return planning::is_user_in_planned_groups($userid, $this->get_situation());
+        }
+        return true;
     }
 
     /**

@@ -26,7 +26,6 @@ use core_grades\component_gradeitems;
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\reportbuilder\local\systemreports\planning_per_situation;
-use mod_competvet\table\custom_report_table_view_form_embed;
 use mod_competvet\utils;
 
 defined('MOODLE_INTERNAL') || die();

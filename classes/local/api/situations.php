@@ -20,6 +20,7 @@ use context_system;
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\reportbuilder\local\helpers\data_retriever_helper;
+use mod_competvet\reportbuilder\local\systemreports\criteria;
 use mod_competvet\reportbuilder\local\systemreports\planning_per_situation;
 use mod_competvet\reportbuilder\local\systemreports\situations as situations_report;
 use mod_competvet\utils;
@@ -47,9 +48,16 @@ class situations {
      * Get all situations with plannings for a given user
      *
      * @param int $userid
+     * @param bool $nofuture
      * @return array[] array of situations
      */
-    public static function get_all_situations_with_planning_for(int $userid): array {
+    public static function get_all_situations_with_planning_for(int $userid, bool $nofuture = false): array {
+        global $USER;
+        if ($userid == $USER->id) {
+            require_capability('mod/competvet:viewmysituations', context_system::instance(), $USER->id);
+        } else {
+            require_capability('mod/competvet:viewother', context_system::instance(), $USER->id);
+        }
         $situationsid = situation::get_all_situations_id_for($userid);
         $context = context_system::instance();
 
@@ -64,9 +72,7 @@ class situations {
         $situations = [];
         foreach ($allsituations as $situation) {
             $situationid = $situation['id'];
-
-
-            $allplannings = plannings::get_plannings_for_situation_id($situationid, $userid);
+            $allplannings = plannings::get_plannings_for_situation_id($situationid, $userid, $nofuture);
             if (empty($allplannings)) {
                 continue; // Do not add situations with empty plannings as user is not involved.
             }
@@ -75,7 +81,7 @@ class situations {
             }
             $newsituation = [];
             $newsituation['plannings'] = $allplannings;
-            $tags = explode(",", $situation['situation:tagnames'] ?? []);
+            $tags = explode(",", $situation['situation:tagnames'] ?? "");
             $tags = array_map('trim', $tags);
             sort($tags);
             $newsituation['tags'] = json_encode($tags);
@@ -83,21 +89,54 @@ class situations {
                 fn($tag) => (object)
                 [$tag =>
                     get_string_manager()->string_exists("situation:tags:{$tag}", 'mod_competvet') ?
-                        get_string("situation:tags:{$tag}", 'mod_competvet') : $tags
-                ]
-                , $tags));
+                        get_string("situation:tags:{$tag}", 'mod_competvet') : $tags,
+                ],
+                $tags
+            ));
             foreach (self::SITUATION_FIELDS as $originalname => $targetfieldname) {
                 $newsituation[$targetfieldname] = $situation[$originalname];
             }
             $newsituation['roles'] = json_encode(user_role::get_all($userid, $situationid)); // We don't fetch it through
-            // report builder as it is too complicated.
+            // Do not go through report builder as it is too complicated.
             // TODO: Cache this information too.
             $situations[$situationid] = $newsituation;
         }
-        usort($situations, function($a, $b) use ($situations) {
+        usort($situations, function ($a, $b) use ($situations) {
             return $a['shortname'] <=> $b['shortname'];
         });
         return $situations;
+    }
+
+    /**
+     * Get all criteria for a given situation
+     *
+     * @param int $situationid
+     * @return array|array[]
+     */
+    public static function get_all_criteria(int $situationid) {
+        global $USER;
+        require_capability('mod/competvet:viewmysituations', context_system::instance(), $USER->id);
+        $context = context_system::instance();
+        $criteria = data_retriever_helper::get_data_from_system_report(
+            criteria::class,
+            $context,
+            [
+                'situationid' => $situationid,
+            ],
+        );
+        $criteria = array_map(function ($criterion) {
+            return [
+                'id' => $criterion['id'],
+                'label' => $criterion['criterion:label'],
+                'idnumber' => $criterion['criterion:idnumber'],
+                'sort' => $criterion['criterion:sort'],
+                'parentid' => $criterion['criterion:parentid'],
+                'parentlabel' => $criterion['criterion:parentlabel'],
+                'parentidnumber' => $criterion['criterion:parentidnumber'],
+            ];
+        }, $criteria);
+        return $criteria;
+
     }
 
     /**

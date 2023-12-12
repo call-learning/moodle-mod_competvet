@@ -20,10 +20,9 @@ use core_reportbuilder\local\report\base;
 use lang_string;
 use mod_competvet\reportbuilder\local\entities\observation;
 use mod_competvet\reportbuilder\local\entities\observation_comment;
-use mod_competvet\reportbuilder\local\entities\observation_context;
 use mod_competvet\reportbuilder\local\entities\planning;
 use mod_competvet\reportbuilder\local\entities\situation;
-
+use \mod_competvet\local\persistent\observation_comment as observation_comment_entity;
 /**
  * Report builder helper : common code for datasource and system report
  *
@@ -81,19 +80,29 @@ trait observations_helper {
                    ON {$observeralias}.id = {$observationalias}.observerid"));
         $observerentity->get_column('fullname')->set_title(new lang_string('observer:fullname', 'mod_competvet'));
         // Add comments to observation.
-        $obscommententity = new observation_comment();
+        foreach(observation_comment_entity::COMMENT_TYPES as $type => $entityname) {
+            $this->add_comment_entity( $type, $entityname, $observationalias);
+        }
+    }
+
+    /**
+     * Adds comments to an observation entity.
+     *
+     * @param int $type The type of the comment.
+     * @param string $entityname The name of the entity.
+     * @param string $observationalias The alias of the observation.
+     * @return void
+     */
+    private function add_comment_entity(int $type, string $entityname, string $observationalias): void {
+        // Add comments to observation.
+        $obscommententity = (new observation_comment())
+            ->set_entity_name($entityname)
+            ->set_table_aliases(['competvet_obs_comment' => 'obs' . $entityname])
+            ->set_entity_title(new lang_string('observation:comment:' . $entityname, 'mod_competvet'));
         $obscommentalias = $obscommententity->get_table_alias('competvet_obs_comment');
         $this->add_entity($obscommententity
             ->add_join(
-                "LEFT JOIN {competvet_obs_comment} {$obscommentalias} ON {$obscommentalias}.observationid = {$observationalias}.id"
+                "LEFT JOIN {competvet_obs_comment} {$obscommentalias} ON {$obscommentalias}.observationid = {$observationalias}.id AND {$obscommentalias}.type = {$type}"
             ));
-        // Add context to observation.
-        $obscontextentity = new observation_context();
-        $obscontextalias = $obscontextentity->get_table_alias('competvet_obs_context');
-        $this->add_entity($obscontextentity
-            ->add_join(
-                "LEFT JOIN {competvet_obs_context} {$obscontextalias} ON {$obscontextalias}.observationid = {$observationalias}.id"
-            ));
-
     }
 }

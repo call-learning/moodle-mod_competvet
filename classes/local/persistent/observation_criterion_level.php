@@ -19,17 +19,17 @@ use core\persistent;
 use lang_string;
 
 /**
- * Observation for a given Criterion
+ * Observation level for a given Criterion
  *
  * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class observation_criterion extends persistent {
+class observation_criterion_level extends persistent {
     /**
      * Current table
      */
-    const TABLE = 'competvet_obs_crit';
+    const TABLE = 'competvet_obs_crit_level';
 
     /**
      * Return the custom definition of the properties of this model.
@@ -50,18 +50,10 @@ class observation_criterion extends persistent {
                 'type' => PARAM_INT,
                 'message' => new lang_string('invaliddata', 'competvet', 'observationid'),
             ],
-            'grade' => [
+            'level' => [
                 'null' => NULL_NOT_ALLOWED,
                 'type' => PARAM_INT,
                 'message' => new lang_string('invaliddata', 'competvet', 'grade'),
-            ],
-            'comment' => [
-                'null' => NULL_ALLOWED,
-                'type' => PARAM_TEXT,
-            ],
-            'commentformat' => [
-                'type' => PARAM_INT,
-                'default' => FORMAT_PLAIN,
             ],
         ];
     }

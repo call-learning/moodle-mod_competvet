@@ -22,11 +22,13 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_competvet\local\api\plannings;
+use mod_competvet\output\view\base;
 use mod_competvet\utils;
 
 require(__DIR__ . '/../../config.php');
 
-global $DB, $PAGE, $OUTPUT;
+global $DB, $PAGE, $OUTPUT, $USER;
 
 [$cm, $course, $moduleinstance, $tabs, $currenttype] = utils::page_requirements('view');
 
@@ -47,9 +49,9 @@ $addbutton = new single_button(
     ),
     get_string('add')
 );
-$PAGE->set_button($OUTPUT->render($addbutton));
 
-// Add 3 pages tabs 'eval', 'planning' and 'view'.
+$PAGE->set_button($OUTPUT->render($addbutton));
+$PAGE->set_context($modulecontext);
 echo $OUTPUT->header();
 echo $OUTPUT->heading($moduleinstance->name);
 
@@ -64,7 +66,8 @@ echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
 echo $OUTPUT->render($gradebutton);
 echo $OUTPUT->box_end('generalbox boxaligncenter', 'intro');
 
-echo $OUTPUT->tabtree($tabs, $currenttype);
-$eval = new \mod_competvet\output\eval_list($cm->id);
-echo $OUTPUT->render($eval);
+$widget = base::factory($USER->id);
+$widget->set_data();
+$renderer = $PAGE->get_renderer('mod_competvet');
+echo $renderer->render($widget);
 echo $OUTPUT->footer();

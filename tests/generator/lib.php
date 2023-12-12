@@ -18,8 +18,9 @@ use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\evaluation_grid;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\observation_comment;
-use mod_competvet\local\persistent\observation_context;
-use mod_competvet\local\persistent\observation_criterion;
+use mod_competvet\local\persistent\observation_criterion_comment;
+use mod_competvet\local\persistent\observation_criterion_grade;
+use mod_competvet\local\persistent\observation_criterion_level;
 use mod_competvet\local\persistent\planning;
 
 defined('MOODLE_INTERNAL') || die();
@@ -154,16 +155,6 @@ class mod_competvet_generator extends testing_module_generator {
     }
 
     /**
-     * Create a new instance of observation_context.
-     *
-     * @param array|stdClass|null $record
-     * @return stdClass
-     */
-    public function create_observation_context($record = null) {
-        return $this->create_from_entity_name(observation_context::class, $record);
-    }
-
-    /**
      * Create a new instance of observation_comment.
      *
      * @param array|stdClass|null $record
@@ -174,13 +165,22 @@ class mod_competvet_generator extends testing_module_generator {
     }
 
     /**
-     * Create a new instance of observation_criterion.
+     * Create a new instance of observation_criterion level.
      *
      * @param array|stdClass|null $record
      * @return stdClass
      */
-    public function create_observation_criterion($record = null) {
-        return $this->create_from_entity_name(observation_criterion::class, $record);
+    public function create_observation_criterion_level($record = null) {
+        return $this->create_from_entity_name(observation_criterion_level::class, $record);
+    }
+    /**
+     * Create a new instance of observation_criterion level.
+     *
+     * @param array|stdClass|null $record
+     * @return stdClass
+     */
+    public function create_observation_criterion_comment($record = null) {
+        return $this->create_from_entity_name(observation_criterion_comment::class, $record);
     }
     /**
      * Create a new instance of criterion.

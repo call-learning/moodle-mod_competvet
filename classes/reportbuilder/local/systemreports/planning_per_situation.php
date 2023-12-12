@@ -46,7 +46,7 @@ class planning_per_situation extends system_report {
         $this->set_main_table('competvet_planning', $planningalias);
         $this->add_entity($planningentity);
         $mainplanningalias = $this->get_main_table_alias();
-        $this->add_base_fields("{$mainplanningalias}.id");
+        $this->add_base_fields("{$mainplanningalias}.id, {$mainplanningalias}.situationid, {$mainplanningalias}.groupid");
         // Join situation entity to collection.
         $situationentity = new situation();
         $situationalias = $situationentity->get_table_alias('competvet_situation');
@@ -69,17 +69,6 @@ class planning_per_situation extends system_report {
             $this->add_base_condition_sql(
                 "{$mainplanningalias}.situationid = :$paramsituationid",
                 [$paramsituationid => $situationid]
-            );
-        }
-        $groupnames = $this->get_parameter('groupnames', 0, PARAM_TEXT);
-        if ($groupnames) {
-            global $DB;
-            $realgroupnames = explode(',', $groupnames);
-            $paramgroupnames = database::generate_param_name();
-            [$where, $params] = $DB->get_in_or_equal($realgroupnames, SQL_PARAMS_NAMED, $paramgroupnames);
-            $this->add_base_condition_sql(
-                "{$groupsalias}.name $where",
-                $params
             );
         }
         // Now we can call our helper methods to add the content we want to include in the report.

@@ -32,6 +32,43 @@ class observation_comment extends persistent {
     const TABLE = 'competvet_obs_comment';
 
     /**
+     * Comment types array
+     */
+    const COMMENT_TYPES = [
+        self::OBSERVATION_CONTEXT => 'context',
+        self::OBSERVATION_COMMENT => 'comment',
+        self::PRIVATE_OBSERVATION_COMMENT => 'privatecomment',
+        self::AUTOEVAL_PROGRESS => 'progress',
+        self::AUTOEVAL_AMELIORATION => 'improvement',
+        self::AUTOEVAL_MANQUE => 'missing',
+    ];
+    /**
+     * Observation context types constants
+     */
+    const OBSERVATION_CONTEXT = 1;
+    /**
+     * Observation comment types constants
+     */
+    const OBSERVATION_COMMENT = 2;
+    /**
+     * Private observation comment types constants
+     */
+    const PRIVATE_OBSERVATION_COMMENT = 3;
+    /**
+     * Auto-evaluation progress types constants
+     */
+    const AUTOEVAL_PROGRESS = 10;
+    /**
+     * Auto-evaluation improvement types constants
+     */
+    const AUTOEVAL_AMELIORATION = 11;
+    /**
+     * Auto-evaluation missing types constants
+     */
+    const AUTOEVAL_MANQUE = 12;
+
+
+    /**
      * Usual properties definition for a persistent
      *
      * @return array|array[]
@@ -49,13 +86,30 @@ class observation_comment extends persistent {
                 'message' => new lang_string('invaliddata', 'competvet', 'usercreated'),
             ],
             'comment' => [
-                'type' => PARAM_TEXT,
+                'type' => PARAM_RAW,
                 'default' => '',
             ],
             'commentformat' => [
                 'type' => PARAM_INT,
                 'default' => FORMAT_PLAIN,
             ],
+            'type' => [
+                'type' => PARAM_INT,
+                'default' => 0,
+                'message' => new lang_string('invaliddata', 'competvet', 'type'),
+                'choices' => array_keys(self::COMMENT_TYPES),
+            ],
         ];
     }
+
+    /**
+     * Get comment type from ID
+     *
+     * @param int $id The ID of the comment type
+     * @return string The corresponding comment type string
+     */
+    public static function from_type_to_string(int $id): string {
+        return get_string('observation:comment:' . self::COMMENT_TYPES[$id], 'mod_competvet');
+    }
+
 }

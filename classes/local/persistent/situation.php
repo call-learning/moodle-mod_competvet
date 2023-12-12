@@ -57,21 +57,15 @@ class situation extends persistent {
         $courses = enrol_get_users_courses($userid);
         // Get all situations for this user in this course.
         $situationsid = [];
-        $studentrolesid = utils::get_student_roles_id();
         foreach ($courses as $course) {
             $coursemodinfo = get_fast_modinfo($course->id, $userid);
             foreach ($coursemodinfo->get_instances_of(competvet::MODULE_NAME) as $cm) {
                 if ($cm->get_user_visible()) {
-                    $situation = self::get_record(['competvetid' => $cm->instance]);
+                    $competvet = competvet::get_from_instance_id($cm->instance);
                     // First case: this is a student, let's look into plannings.
-                    $cmcontext = context_module::instance($cm->id);
-                    if (utils::is_student($userid, $cmcontext->id)) {
-                        if (planning::is_user_in_planned_groups($userid, $situation)) {
-                            $situationsid[] = $situation->get('id');
-                        }
-                    } else {
+                    if ($competvet->has_view_access($userid)) {
                         // If not a student, if you see the activity, you will also see the situation.
-                        $situationsid[] = $situation->get('id');
+                        $situationsid[] = $competvet->get_situation()->get('id');
                     }
                 }
             }
@@ -124,7 +118,11 @@ class situation extends persistent {
      * @return array
      */
     public function get_eval_criteria(): array {
-        return criterion::get_records(['evalgridid' => $this->get('evalgrid')]) ?: [];
+        $evalgridid =  $this->raw_get('evalgrid');
+        if (empty($evalgridid)) {
+            $evalgridid = evaluation_grid::get_default_grid()->get('id');
+        }
+        return criterion::get_records(['evalgridid' => $evalgridid]) ?: [];
     }
 
     /**

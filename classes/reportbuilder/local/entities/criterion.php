@@ -25,7 +25,6 @@ use core_reportbuilder\local\report\{column, filter};
 use lang_string;
 use mod_competvet\local\persistent\evaluation_grid;
 use mod_competvet\reportbuilder\local\filters\evaluation_grid_selector;
-use mod_competvet\reportbuilder\local\filters\situation_selector;
 
 /**
  * Criterion entity
@@ -35,26 +34,6 @@ use mod_competvet\reportbuilder\local\filters\situation_selector;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class criterion extends base {
-    /**
-     * Database tables that this entity uses and their default aliases
-     *
-     * @return array
-     */
-    protected function get_default_table_aliases(): array {
-        return [
-            'competvet_criterion' => 'criterion',
-        ];
-    }
-
-    /**
-     * The default title for this entity
-     *
-     * @return lang_string
-     */
-    protected function get_default_entity_title(): lang_string {
-        return new lang_string('entity:criterion', 'mod_competvet');
-    }
-
     /**
      * Initialise the entity
      *
@@ -115,6 +94,39 @@ class criterion extends base {
             ->set_is_sortable(true);
 
         $columns[] = (new column(
+            'parentid',
+            new lang_string('criterion:parentid', 'mod_competvet'),
+            $this->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->set_type(column::TYPE_INTEGER)
+            ->add_fields("{$criterionalias}.parentid")
+            ->set_is_sortable(true);
+
+        $parentcriterionalias = $this->get_table_alias('competvet_criterion_parent');
+        $columns[] = (new column(
+            'parentlabel',
+            new lang_string('criterion:parentlabel', 'mod_competvet'),
+            $this->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->add_join("LEFT JOIN {competvet_criterion} {$parentcriterionalias} ON ${parentcriterionalias}.id = {$criterionalias}.parentid")
+            ->set_type(column::TYPE_TEXT)
+            ->add_fields("{$parentcriterionalias}.label")
+            ->set_is_sortable(true);
+
+        $columns[] = (new column(
+            'parentidnumber',
+            new lang_string('criterion:parentidnumber', 'mod_competvet'),
+            $this->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->add_join("LEFT JOIN {competvet_criterion} {$parentcriterionalias} ON ${parentcriterionalias}.id = {$criterionalias}.parentid")
+            ->set_type(column::TYPE_TEXT)
+            ->add_fields("{$parentcriterionalias}.idnumber")
+            ->set_is_sortable(true);
+
+        $columns[] = (new column(
             'evalgrid',
             new lang_string('criterion:evalgrid', 'mod_competvet'),
             $this->get_entity_name()
@@ -123,7 +135,7 @@ class criterion extends base {
             ->set_type(column::TYPE_INTEGER)
             ->add_fields("{$criterionalias}.evalgridid")
             ->set_is_sortable(true)
-            ->set_callback(function ($evalgridid) {
+            ->set_callback(function($evalgridid) {
                 static $evalgrids = [];
                 if (!isset($evalgrids[$evalgridid])) {
                     $evalgrids[$evalgridid] = evaluation_grid::get_record([
@@ -177,5 +189,26 @@ class criterion extends base {
         ))->add_joins($this->get_joins());
 
         return $filters;
+    }
+
+    /**
+     * Database tables that this entity uses and their default aliases
+     *
+     * @return array
+     */
+    protected function get_default_table_aliases(): array {
+        return [
+            'competvet_criterion' => 'criterion',
+            'competvet_criterion_parent' => 'parentcriterion',
+        ];
+    }
+
+    /**
+     * The default title for this entity
+     *
+     * @return lang_string
+     */
+    protected function get_default_entity_title(): lang_string {
+        return new lang_string('entity:criterion', 'mod_competvet');
     }
 }

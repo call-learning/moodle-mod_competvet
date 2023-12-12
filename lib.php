@@ -27,8 +27,7 @@ use core_grades\component_gradeitems;
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\observation_comment;
-use mod_competvet\local\persistent\observation_context;
-use mod_competvet\local\persistent\observation_criterion;
+use mod_competvet\local\persistent\observation_criterion_level;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\utils;
@@ -142,14 +141,10 @@ function competvet_delete_instance($id) {
         $observations = observation::get_records(['planningid' => $planning->get('id')]);
         foreach ($observations as $observation) {
             $observationcomment = observation_comment::get_records(['observationid' => $observation->get('id')]);
-            $observationcontext = observation_context::get_records(['observationid' => $observation->get('id')]);
             foreach ($observationcomment as $comment) {
                 $comment->delete();
             }
-            foreach ($observationcontext as $context) {
-                $context->delete();
-            }
-            $obscriteria = observation_criterion::get_records(['observationid' => $observation->get('id')]);
+            $obscriteria = observation_criterion_level::get_records(['observationid' => $observation->get('id')]);
             foreach ($obscriteria as $criterion) {
                 $criterion->delete();
             }
