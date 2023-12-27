@@ -22,7 +22,6 @@ require_once($CFG->dirroot . '/admin/tool/generator/classes/course_backend.php')
 use coding_exception;
 use core_text;
 use html_writer;
-use mod_competvet\competvet;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\observation_comment;
 use mod_competvet\local\persistent\planning;
@@ -45,7 +44,7 @@ class generator_course_backend extends tool_generator_course_backend {
     /**
      * Number of plannings
      */
-    const PLANNING_WEEKS = 30;
+    const PLANNING_WEEKS = 10;
     /**
      * Timespan for a week
      */
@@ -53,7 +52,13 @@ class generator_course_backend extends tool_generator_course_backend {
     /**
      * Some missing planning
      */
-    const RANDOM_MISSING_PLANNING = 6;
+    const SKIPPED_PLANNING = 3;
+
+    /**
+     * Some missing planning
+     */
+    const SKIPPED_OBSERVATIONS = 4;
+
     /**
      * Number of evaluations
      */
@@ -256,10 +261,11 @@ class generator_course_backend extends tool_generator_course_backend {
         $this->situations = [];
         for ($i = 0; $i < $number; $i++) {
             $record =
-                ['course' => $this->course, 'autoevalnum' => rand(1, self::EVAL_AUTOEVAL), 'evalnum' => rand(1, self::EVAL_COUNT)];
+                ['course' => $this->course,
+                    'autoevalnum' => $this->fixeddataset ? self::EVAL_AUTOEVAL : random_int(1, self::EVAL_AUTOEVAL),
+                    'evalnum' => $this->fixeddataset ? self::EVAL_COUNT : random_int(1, self::EVAL_COUNT),];
             $options = ['section' => $generatoreflection->getMethod('get_target_section')->invoke($this)];
             $instance = $competvetgenerator->create_instance($record, $options);
-            // Now create random planning.
             $this->situations[] = situation::get_record(['id' => $instance->id]);
             $this->dot($i, $number);
         }
@@ -270,18 +276,16 @@ class generator_course_backend extends tool_generator_course_backend {
      * Creates a number of Planning for each situation
      */
     private function create_plannings() {
-        $datenow = time() - (self::PLANNING_WEEKS / 2 * self::WEEK_SIZE);
+        $startdate = time() - (self::PLANNING_WEEKS / 2 * self::WEEK_SIZE);
         // Get the closest monday at 00:00.
         $groups = array_values(groups_get_all_groups($this->course->id));
         $competvetgenerator = $this->generator->get_plugin_generator('mod_competvet');
-        $skippedplanning = 0;
-        $total = self::PLANNING_WEEKS;
+        $total = self::PLANNING_WEEKS - (self::PLANNING_WEEKS / self::SKIPPED_PLANNING);
         foreach ($this->situations as $situation) {
             $this->log('createplannings', ['count' => self::PLANNING_WEEKS, 'situation' => $situation->get('shortname')], true);
-            $monday = strtotime('last monday', $datenow);
+            $monday = strtotime('last monday', $startdate);
             for ($week = 0; $week < self::PLANNING_WEEKS; $week++) {
-                if (random_int(1, 1000) > 500 && $skippedplanning < self::RANDOM_MISSING_PLANNING) {
-                    $skippedplanning++;
+                if ($week % self::SKIPPED_PLANNING == 0) {
                     continue;
                 }
                 foreach ($groups as $group) {
@@ -419,33 +423,50 @@ class generator_course_backend extends tool_generator_course_backend {
      * @return void
      */
     private function create_observations() {
+        $groups = groups_get_all_groups($this->course->id, 0, 0, 'g.*', true);
         foreach ($this->situations as $situation) {
-            $competvet = competvet::get_from_situation($situation);
-            $groups = groups_get_all_groups($competvet->get_course()->id, 0, 0, 'g.*', true);
             $observers = array_values($this->userswithroles['observer']);
-            foreach ($groups as $groupid => $group) {
-                $plannings = planning::get_records(['situationid' => $situation->get('id'), 'groupid' => $groupid]);
-                $gmembers = array_values($group->members);
+            $observerscount = count($observers);
+            $plannings = planning::get_records(['situationid' => $situation->get('id')], 'groupid');
+            $count = array_reduce($plannings, function($carry, $item) use ($groups) {
+                return $carry + count($groups[$item->get('groupid')]->members);
+            }, 0);
+            $count = $count - $count / self::SKIPPED_OBSERVATIONS;
+            $situationname = $situation->get('shortname');
+            $this->log('createobservations', ['situation' => $situationname, 'count' => $count], true);
+            $done = 0;
+            $planingindex = 0;
+            foreach ($plannings as $planning) {
+                $gmembers = array_values($groups[$planning->get('groupid')]->members);
                 if (empty($gmembers) || empty($gmembers)) {
                     continue;
                 }
-                $situationname = $situation->get('shortname');
-                $count = count($plannings) * count($gmembers);
-                $done = 0;
-                $this->log('createobservations', ['situation' => $situationname, 'count' => $count], true);
-                foreach ($plannings as $planning) {
-                    foreach ($gmembers as $studentid) {
-                        $maxcount = $situation->get('evalnum');
-                        $observationcount = rand(1, $maxcount + 1 ?? 2);
-                        for (; $observationcount > 0; $observationcount--) {
-                            $observerid = $observers[random_int(0, count($observers) - 1)];
-                            $this->create_observation($situation, $planning, $studentid, $observerid);
-                        }
+                $planingindex++;
+                if ($planingindex % self::SKIPPED_OBSERVATIONS == 0) {
+                    continue;
+                }
+                foreach ($gmembers as $studentid) {
+                    // Observation.
+                    $maxcount = $situation->get('evalnum');
+                    $observationcount = $this->fixeddataset ? $maxcount : random_int(1, $maxcount + 1 ?? 2);
+                    for (; $observationcount > 0; $observationcount--) {
+                        $observerindex =
+                            $this->fixeddataset ? min($observationcount, $observerscount - 1) :
+                                random_int(0, $observerscount - 1);
+                        $observerid = $observers[$observerindex];
+                        $this->create_observation($situation, $planning, $studentid, $observerid);
+                    }
+                    // Autoevaluations.
+                    $maxcount = $situation->get('autoevalnum');
+                    $observationcount = $this->fixeddataset ? $maxcount : random_int(1, $maxcount + 1 ?? 2);
+                    for (; $observationcount > 0; $observationcount--) {
+                        $this->create_observation($situation, $planning, $studentid, $studentid);
                     }
                     $this->dot($done++, $count);
                 }
-                $this->end_log();
+
             }
+            $this->end_log();
         }
     }
 
@@ -458,20 +479,34 @@ class generator_course_backend extends tool_generator_course_backend {
      * @param int $observerid
      * @return void
      */
-    private function create_observation(situation $situation, planning $planning, int $studentid, int $observerid,
-        ?int $obstatus = null): void {
+    private function create_observation(
+        situation $situation,
+        planning $planning,
+        int $studentid,
+        int $observerid,
+        ?int $obstatus = null
+    ): void {
         $competvetgenerator = $this->generator->get_plugin_generator('mod_competvet');
+        if (!empty($obstatus)) {
+            $status = $obstatus;
+        } else {
+            static $currentstatusindex = 0;
+            $currentstatusindex++;
+            $currentstatusindex = $currentstatusindex % count(observation::STATUS);
+            $statustoset = array_flip(array_keys(observation::STATUS))[$currentstatusindex];
+            $status = $this->fixeddataset ? $statustoset : random_int(0, observation::STATUS_ARCHIVED);
+        }
         $observation = $competvetgenerator->create_observation([
             'situationid' => $situation->get('id'),
             'studentid' => $studentid,
             'observerid' => $observerid,
             'planningid' => $planning->get('id'),
-            'status' => is_null($obstatus) ? rand(0, observation::STATUS_ARCHIVED) : $obstatus, // Random status.
+            'status' => $status,
         ]);
         foreach (observation_comment::COMMENT_TYPES as $type => $entityname) {
             $competvetgenerator->create_observation_comment([
                 'observationid' => $observation->id,
-                'context' => $this->get_random_text(100),
+                'context' => $this->generate_text(100),
                 'contextformat' => FORMAT_HTML,
                 'usercreated' => $observerid,
                 'type' => $type,
@@ -483,14 +518,14 @@ class generator_course_backend extends tool_generator_course_backend {
                 $competvetgenerator->create_observation_criterion_comment([
                     'criterionid' => $criterion->get('id'),
                     'observationid' => $observation->id,
-                    'comment' => $this->get_random_text(100),
+                    'comment' => $this->generate_text(100),
                     'commentformat' => FORMAT_HTML,
                 ]);
             } else {
                 $competvetgenerator->create_observation_criterion_level([
                     'criterionid' => $criterion->get('id'),
                     'observationid' => $observation->id,
-                    'level' => rand(1, 100)
+                    'level' => $this->fixeddataset ? 50 : random_int(1, 100),
                 ]);
             }
         }
@@ -501,7 +536,14 @@ class generator_course_backend extends tool_generator_course_backend {
      *
      * @return string
      */
-    private function get_random_text(int $size): string {
-        return core_text::substr(self::LOREM_IPSUM, 0, $size);
+    private function generate_text(int $size): string {
+        $strlen = strlen(self::LOREM_IPSUM);
+        $size = min($size, $strlen);
+        if ($this->fixeddataset) {
+            $start = 0;
+        } else {
+            $start = random_int(0, $strlen - $size - random_int(0, $size));
+        }
+        return core_text::substr(self::LOREM_IPSUM, $start, $size);
     }
 }
