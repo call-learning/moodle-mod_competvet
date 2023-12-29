@@ -52,51 +52,29 @@ class utils {
      * @return array
      */
     public static function page_requirements($action) {
-        global $DB, $PAGE;
-
+        global $PAGE;
         // Course module id.
-        $id = optional_param('id', 0, PARAM_INT);
+        $cmid = optional_param('id', 0, PARAM_INT);
 
         // Activity instance id.
-        $c = optional_param('c', 0, PARAM_INT);
+        $instanceid = optional_param('c', 0, PARAM_INT);
 
-        $currentype = optional_param('currenttype', 'eval', PARAM_ALPHA);
-
-        if ($id) {
-            $cm = get_coursemodule_from_id('competvet', $id, 0, false, MUST_EXIST);
-            $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
-            $moduleinstance = $DB->get_record('competvet', ['id' => $cm->instance], '*', MUST_EXIST);
+        if ($instanceid) {
+            $competvet = competvet::get_from_instance_id($instanceid);
         } else {
-            $moduleinstance = $DB->get_record('competvet', ['id' => $c], '*', MUST_EXIST);
-            $course = $DB->get_record('course', ['id' => $moduleinstance->course], '*', MUST_EXIST);
-            $cm = get_coursemodule_from_instance('competvet', $moduleinstance->id, $course->id, false, MUST_EXIST);
+            $competvet = competvet::get_from_cmid($cmid);
         }
-
-        // Add 3 pages tabs 'eval', 'planning' and 'view'.
-        $tabs = [];
-        $tabs[] = new tabobject(
-            'eval',
-            new moodle_url('/mod/competvet/' . $action . '.php', ['id' => $id, 'currenttype' => 'eval']),
-            get_string('grade_eval_name', 'competvet')
-        );
-        $tabs[] = new tabobject(
-            'list',
-            new moodle_url('/mod/competvet/' . $action . '.php', ['id' => $id, 'currenttype' => 'list']),
-            get_string('grade_list_name', 'competvet')
-        );
-        $tabs[] = new tabobject(
-            'caselogs',
-            new moodle_url('/mod/competvet/' . $action . '.php', ['id' => $id, 'currenttype' => 'caselogs']),
-            get_string('grade_caselog_name', 'competvet')
-        );
+        $cm = $competvet->get_course_module();
+        $course = $competvet->get_course();
+        $moduleinstance = $competvet->get_instance();
 
         require_login($course, true, $cm);
-        $PAGE->set_url('/mod/competvet/' . $action . '.php', ['id' => $cm->id, 'currentype' => $currentype]);
+        $PAGE->set_url('/mod/competvet/' . $action . '.php', ['id' => $cm->id]);
         $modulecontext = context_module::instance($cm->id);
         $PAGE->set_title(format_string($moduleinstance->name) . ' - ' . get_string($action, 'competvet'));
         $PAGE->set_heading(format_string($course->fullname));
         $PAGE->set_context($modulecontext);
-        return [$cm, $course, $moduleinstance, $tabs, $currentype];
+        return [$cm, $course, $moduleinstance];
     }
 
     /**

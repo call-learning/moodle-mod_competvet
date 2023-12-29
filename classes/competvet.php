@@ -172,6 +172,16 @@ class competvet {
     }
 
     /**
+     * Get the competVet instance from the context (module)
+     *
+     * @param int $cmid
+     * @return self
+     */
+    public static function get_from_cmid(int $cmid): self {
+        return new self($cmid);
+    }
+
+    /**
      * Get the competVet instance from the competvet id module
      *
      * @param int $competvetid

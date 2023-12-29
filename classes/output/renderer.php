@@ -44,7 +44,7 @@ class renderer extends \plugin_renderer_base {
             );
         }
         $output = $this->output->tabtree($tabtree, $currenttab);
-        $output .= $this->render_from_template('mod_competvet/student_evaluations', $data);
+        $output .= $this->render_from_template($evaluationinfo->get_template_name($this->output), $data);
         return $output;
     }
 }

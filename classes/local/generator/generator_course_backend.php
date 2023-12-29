@@ -506,8 +506,8 @@ class generator_course_backend extends tool_generator_course_backend {
         foreach (observation_comment::COMMENT_TYPES as $type => $entityname) {
             $competvetgenerator->create_observation_comment([
                 'observationid' => $observation->id,
-                'context' => $this->generate_text(100),
-                'contextformat' => FORMAT_HTML,
+                'comment' => $this->generate_text(100),
+                'commentformat' => FORMAT_HTML,
                 'usercreated' => $observerid,
                 'type' => $type,
             ]);

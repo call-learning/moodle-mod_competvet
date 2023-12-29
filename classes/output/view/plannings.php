@@ -15,10 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\output\view;
 
-use mod_competvet\local\persistent\planning;
+use mod_competvet\competvet;
 use mod_competvet\local\api\plannings as plannings_api;
+use mod_competvet\local\persistent\planning;
 use moodle_url;
 use renderer_base;
+use single_button;
 use stdClass;
 
 /**
@@ -51,11 +53,11 @@ class plannings extends base {
      * @return array|array[]|stdClass
      */
     public function export_for_template(renderer_base $output) {
-        $planningids = array_map(function ($planning) {
+        $planningids = array_map(function($planning) {
             return $planning['id'];
         }, $this->plannings);
         $planningwithids = array_combine($planningids, $this->plannings);
-        $planningstatsbycategory = array_reduce($this->planningstats, function ($carry, $item) {
+        $planningstatsbycategory = array_reduce($this->planningstats, function($carry, $item) {
             $carry[$item['categorytext']][] = $item;
             return $carry;
         }, []);
@@ -102,16 +104,26 @@ class plannings extends base {
         if (empty($data)) {
             global $USER, $PAGE;
             $context = $PAGE->context;
-            $competvet = \mod_competvet\competvet::get_from_context($context);
+            $competvet = competvet::get_from_context($context);
             $currentplannings = plannings_api::get_plannings_for_situation_id($competvet->get_situation()->get('id'), $USER->id);
-            $planningids = array_map(function ($planning) {
+            $planningids = array_map(function($planning) {
                 return $planning['id'];
             }, $currentplannings);
             $planningstats = plannings_api::get_planning_infos($planningids, $USER->id);
             $viewplanning =
-                new moodle_url('/mod/competvet/view.php', ['pagetype' => 'planning', 'id' => $competvet->get_course_module_id()]);
+                new moodle_url($this->baseurl, ['pagetype' => 'planning', 'id' => $competvet->get_course_module_id()]);
             $data = [$currentplannings, $planningstats, $viewplanning];
         }
         [$this->plannings, $this->planningstats, $this->viewplanning] = $data;
+    }
+
+    /**
+     * Get back button navigation.
+     * We assume here that the back button will be on a single page (view.php)
+     *
+     * @return single_button|null
+     */
+    public function get_back_button(): ?single_button {
+        return null;
     }
 }

@@ -15,8 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\output\view;
 
+use core\output\named_templatable;
 use mod_competvet\competvet;
 use renderable;
+use single_button;
 use templatable;
 
 /**
@@ -26,7 +28,7 @@ use templatable;
  * @copyright  2023 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class base implements renderable, templatable {
+abstract class base implements renderable, named_templatable {
     /**
      * Constructor for this renderable.
      *
@@ -66,8 +68,26 @@ abstract class base implements renderable, templatable {
      *
      * The idea behind it is to reuse the template in mod_competvet and local_competvet
      *
-     * @param mixed ...$data Array containing two elements: $plannings and $planningstats.
+     * @param mixed ...$data Array containing elements necessary to build the internal state
      * @return void
      */
     abstract public function set_data(...$data);
+
+    /**
+     * Get back button navigation.
+     * We assume here that the back button will be on a single page (view.php)
+     *
+     * @return single_button|null
+     */
+    abstract public function get_back_button(): ?single_button;
+
+    /**
+     * Get the template name to use for this renderable.
+     *
+     * @param \renderer_base $renderer
+     * @return string
+     */
+    public function get_template_name(\renderer_base $renderer): string {
+        return 'mod_competvet/view/' . $this->pagetype;
+    }
 }

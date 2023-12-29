@@ -30,7 +30,7 @@ require(__DIR__ . '/../../config.php');
 
 global $DB, $PAGE, $OUTPUT, $USER;
 
-[$cm, $course, $moduleinstance, $tabs, $currenttype] = utils::page_requirements('view');
+[$cm, $course, $moduleinstance] = utils::page_requirements('view');
 
 $modulecontext = context_module::instance($cm->id);
 
@@ -42,16 +42,10 @@ $event->add_record_snapshot('course', $course);
 $event->add_record_snapshot('competvet', $moduleinstance);
 $event->trigger();
 
-$addbutton = new single_button(
-    new moodle_url(
-        '/mod/competvet/add.php',
-        ['id' => $cm->id, 'currenttype' => $currenttype]
-    ),
-    get_string('add')
-);
-
-$PAGE->set_button($OUTPUT->render($addbutton));
 $PAGE->set_context($modulecontext);
+$widget = base::factory($USER->id);
+$widget->set_data();
+$renderer = $PAGE->get_renderer('mod_competvet');
 echo $OUTPUT->header();
 echo $OUTPUT->heading($moduleinstance->name);
 
@@ -64,10 +58,10 @@ $gradebutton = new single_button(
 );
 echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
 echo $OUTPUT->render($gradebutton);
+$backbutton = $widget->get_back_button();
+if (!empty($backbutton)) {
+    echo $OUTPUT->container($OUTPUT->render($backbutton), 'float-right');
+}
 echo $OUTPUT->box_end('generalbox boxaligncenter', 'intro');
-
-$widget = base::factory($USER->id);
-$widget->set_data();
-$renderer = $PAGE->get_renderer('mod_competvet');
 echo $renderer->render($widget);
 echo $OUTPUT->footer();

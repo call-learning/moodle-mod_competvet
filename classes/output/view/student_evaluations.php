@@ -16,9 +16,11 @@
 namespace mod_competvet\output\view;
 
 use core_user;
+use mod_competvet\competvet;
 use mod_competvet\local\api\observations;
 use moodle_url;
 use renderer_base;
+use single_button;
 use stdClass;
 
 /**
@@ -56,31 +58,44 @@ class student_evaluations extends base {
      */
     public function export_for_template(renderer_base $output) {
         $results = [
-            'evaluationsbycat' => [],
+            'evaluationsbytype' => [],
         ];
         foreach ($this->evaluations as $evaluationtype => $evaluationlist) {
-            $evaluationsbycategory = array_reduce($evaluationlist, function ($carry, $item) {
-                $carry[$item['categorytext']][] = $item;
+            $evaluationsubcategories = array_reduce($evaluationlist, function ($carry, $item) {
+                $carry[$item['category']][] = $item;
                 return $carry;
             }, []);
-            $evaluationcatinfo = [
-                    'category' => $evaluationtype,
-                    'ishidden' => $evaluationtype != $this->currenttab,
-                    'evaluations' => [],
-                ];
-            foreach ($evaluationsbycategory as $evaluations) {
+            $evaluationtypeinfo = [
+                'type' => $evaluationtype,
+                'ishidden' => $evaluationtype != $this->currenttab,
+                'evaluations' => [],
+            ];
+            foreach ($evaluationsubcategories as $category => $evaluations) {
+                $evaluationswithinfo = [];
+                $categorytext = "";
                 foreach ($evaluations as $evaluation) {
+                    if (empty($categorytext)) {
+                        $categorytext = $evaluation['categorytext'];
+                    }
                     $observer = core_user::get_user($evaluation['observerid']);
                     $evaluationinfo = [
                         'picture' => $output->user_picture($observer),
                         'fullname' => fullname($observer),
                         'evaluationtime' => $evaluation['time'],
-                        'viewurl' => (new moodle_url($this->views[$evaluationtype], ['evalid' => $evaluation['id']]))->out(false),
+                        'viewurl' => (new moodle_url(
+                            $this->views[$evaluationtype],
+                            ['evalid' => $evaluation['id']]
+                        ))->out(false),
                     ];
-                    $evaluationcatinfo['evaluations'][] = $evaluationinfo;
+                    $evaluationswithinfo[] = $evaluationinfo;
                 }
+                $evaluationtypeinfo['evaluations'][] = [
+                    'categorytext' => $categorytext,
+                    'category' => $category,
+                    'evaluations' => $evaluationswithinfo,
+                ];
             }
-            $results['evaluationsbycat'][] = $evaluationcatinfo;
+            $results['evaluationsbytype'][] = $evaluationtypeinfo;
         }
 
         $results['tabs'] = [];
@@ -135,26 +150,52 @@ class student_evaluations extends base {
             global $PAGE;
             $context = $PAGE->context;
             $planningid = required_param('planningid', PARAM_INT);
-            $userid = required_param('userid', PARAM_INT);
-            $userevaluations = observations::get_user_evaluation($planningid, $userid);
-            $competvet = \mod_competvet\competvet::get_from_context($context);
-            $planninginfo = array_values(observations::get_planning_info_for_student($planningid, $userid));
+            $studentid = required_param('studentid', PARAM_INT);
+            $userevaluations = observations::get_user_evaluation($planningid, $studentid);
+            $competvet = competvet::get_from_context($context);
+            $planninginfo = array_values(observations::get_planning_info_for_student($planningid, $studentid));
             $data = [$userevaluations, $planninginfo, [
                 'eval' => new moodle_url(
-                    '/mod/competvet/view.php',
+                    $this->baseurl,
                     ['pagetype' => 'student_eval', 'id' => $competvet->get_course_module_id()]
                 ),
                 'list' => new moodle_url(
-                    '/mod/competvet/view.php',
+                    $this->baseurl,
                     ['pagetype' => 'student_list', 'id' => $competvet->get_course_module_id()]
                 ),
                 'certif' => new moodle_url(
-                    '/mod/competvet/view.php',
+                    $this->baseurl,
                     ['pagetype' => 'student_certif', 'id' => $competvet->get_course_module_id()]
                 ),
             ],
             ];
         }
         [$this->evaluations, $this->planninginfo, $this->views] = $data;
+    }
+
+    /**
+     * Get back button navigation.
+     * We assume here that the back button will be on a single page (view.php)
+     *
+     * @return single_button|null
+     */
+    public function get_back_button(): ?single_button {
+        if (empty($data)) {
+            global $PAGE;
+            $context = $PAGE->context;
+            $planningid = required_param('planningid', PARAM_INT);
+            $competvet = competvet::get_from_context($context);
+            $cmid = $competvet->get_course_module_id();
+        } else {
+            [$planningid, $cmid] = $data;
+        }
+        $backbutton = new single_button(
+            new moodle_url(
+                $this->baseurl,
+                ['pagetype' => 'planning', 'id' => $cmid, 'planningid' => $planningid]
+            ),
+            get_string('back', 'competvet')
+        );
+        return $backbutton;
     }
 }

@@ -15,11 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\output\view;
 
+use mod_competvet\competvet;
 use mod_competvet\local\api\observations as observations_api;
 use mod_competvet\local\api\plannings as plannings_api;
 use mod_competvet\local\persistent\planning as plannings_entity;
 use moodle_url;
 use renderer_base;
+use single_button;
 use stdClass;
 
 /**
@@ -62,7 +64,7 @@ class planning extends base {
             foreach ($userlist as $user) {
                 $userinfo = new stdClass();
                 if ($usertype == 'students') {
-                    $userinfo->viewurl = (new moodle_url($this->viewstudent, ['userid' => $user['id']]))->out(false);
+                    $userinfo->viewurl = (new moodle_url($this->viewstudent, ['studentid' => $user['id']]))->out(false);
                 }
                 $userinfo->pictureurl = $user['userpictureurl'];
                 $userinfo->fullname = $user['fullname'];
@@ -79,7 +81,9 @@ class planning extends base {
                     }
                 }
                 if (empty($results[$usertype])) {
-                    $results[$usertype] = ['usertype' => $usertype, 'label' => get_string('planning:page:' . $usertype, 'mod_competvet', $this->currentgroupname), 'users' => []];
+                    $results[$usertype] = ['usertype' => $usertype,
+                        'label' => get_string('planning:page:' . $usertype, 'mod_competvet', $this->currentgroupname),
+                        'users' => []];
                 }
                 $results[$usertype]['users'][] = $userinfo;
             }
@@ -105,14 +109,33 @@ class planning extends base {
             $users = plannings_api::get_users_for_planning_id($planningid);
             $studentinfo = observations_api::get_planning_info_for_students($planningid);
             $context = $PAGE->context;
-            $competvet = \mod_competvet\competvet::get_from_context($context);
+            $competvet = competvet::get_from_context($context);
             $viewstudenturl =
-                new moodle_url('/mod/competvet/view.php',
+                new moodle_url($this->baseurl,
                     ['pagetype' => 'student_evaluations', 'id' => $competvet->get_course_module_id(), 'planningid' => $planningid]);
             $planning = plannings_entity::get_record(['id' => $planningid]);
             $currentgroupname = groups_get_group_name($planning->get('groupid'));
             $data = [$users, $studentinfo, $currentgroupname, $viewstudenturl];
         }
         [$this->users, $this->studentinfo, $this->currentgroupname, $this->viewstudent] = $data;
+    }
+
+    /**
+     * Get back button navigation.
+     * We assume here that the back button will be on a single page (view.php)
+     *
+     * @return single_button|null
+     */
+    public function get_back_button(): ?single_button {
+
+        global $PAGE;
+        $context = $PAGE->context;
+        $competvet = competvet::get_from_context($context);
+        $cmid = $competvet->get_course_module_id();
+        $backbutton = new single_button(
+            new moodle_url($this->baseurl, ['pagetype' => 'plannings', 'id' => $cmid]),
+            get_string('back', 'competvet')
+        );
+        return $backbutton;
     }
 }
