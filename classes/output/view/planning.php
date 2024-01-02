@@ -16,7 +16,7 @@
 namespace mod_competvet\output\view;
 
 use mod_competvet\competvet;
-use mod_competvet\local\api\observations as observations_api;
+use mod_competvet\local\api\plannings as observations_api;
 use mod_competvet\local\api\plannings as plannings_api;
 use mod_competvet\local\persistent\planning as plannings_entity;
 use moodle_url;
@@ -81,9 +81,11 @@ class planning extends base {
                     }
                 }
                 if (empty($results[$usertype])) {
-                    $results[$usertype] = ['usertype' => $usertype,
+                    $results[$usertype] = [
+                        'usertype' => $usertype,
                         'label' => get_string('planning:page:' . $usertype, 'mod_competvet', $this->currentgroupname),
-                        'users' => []];
+                        'users' => [],
+                    ];
                 }
                 $results[$usertype]['users'][] = $userinfo;
             }

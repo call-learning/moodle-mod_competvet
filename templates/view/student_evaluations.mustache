@@ -25,9 +25,7 @@
 }}
 <div class="competvet-view-evaluations">
     <div class="accordion" id="evaluations-accordion">
-        {{#evaluationsbytype}}
-            {{^ishidden}}
-                {{#evaluations}}
+                {{#observations}}
                     <div class="card">
                         <div class="card-header" id="competvet-view-evaluations-cat-heading-{{category}}">
                             <h2 class="mb-0">
@@ -40,14 +38,12 @@
                         <div id="competvet-view-evaluations-cat-{{category}}" class="collapse show" aria-labelledby="competvet-view-evaluations-cat-heading-{{category}}"
                              data-parent="#evaluations-accordion">
                             <div class="card-body">
-                                {{#evaluations}}
-                                    {{> mod_competvet/view/evaluation}}
-                                {{/evaluations}}
+                                {{#list}}
+                                    {{> mod_competvet/view/observation_card}}
+                                {{/list}}
                             </div>
                         </div>
                     </div>
-                {{/evaluations}}
-            {{/ishidden}}
-        {{/evaluationsbytype}}
+                {{/observations}}
     </div>
 </div>

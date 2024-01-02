@@ -16,14 +16,10 @@
 namespace mod_competvet\local\api;
 
 use mod_competvet\local\persistent\observation;
-use mod_competvet\local\persistent\planning;
-use mod_competvet\local\persistent\situation;
 
 /**
  * Observation  API
  *
- * TODO Rename this to evaluation as it is more generic and will involve eval, certif and list
- * TODO Rework on the comment structure, so we have one comment type in the DB instead of context/comment
  *
  * This is a set of API used both locally by mod_competvet and local_competvet
  *
@@ -39,7 +35,7 @@ class observations {
      * @param int $userid
      * @return array
      */
-    public static function get_user_evaluation(int $planningid, int $userid): array {
+    public static function get_user_observations(int $planningid, int $userid): array {
         $result = [];
         // To be replaced asap by a system report.
         $observations =
@@ -57,91 +53,11 @@ class observations {
                 'categorytext' => get_string('observation:category:' . observation::CATEGORIES[$category], 'competvet'),
             ];
         }
-        if (!empty($evalobservations)) {
-            $result['eval'] = $evalobservations;
-        }
-        return $result;
+        return $evalobservations;
     }
 
     /**
-     * Get planning info for student
-     *
-     * @param int $planningid
-     * @param int $userid
-     * @return array
-     */
-    public static function get_planning_info_for_student(int $planningid, int $userid): array {
-        $params = ['planningid' => $planningid, 'status' => observation::STATUS_COMPLETED, 'studentid' => $userid];
-        $observations =
-            observation::get_records($params, 'studentid, observerid');
-        $result = [];
-        $planning = planning::get_record(['id' => $planningid]);
-        $situation = situation::get_record(['id' => $planning->get('situationid')]);
-        $result[$userid] = self::create_planning_info_for_student($userid, $situation, $observations);
-        return $result;
-    }
-
-    /**
-     * Creates planning information for a student.
-     *
-     * @param int $studentid The ID of the student.
-     * @param situation $situation The situation object.
-     * @param array $existingobservations An array of existing observations.
-     * @return array The planning information for the student.
-     */
-    protected static function create_planning_info_for_student(int $studentid, situation $situation, array $existingobservations) {
-        $result = [
-            'id' => $studentid,
-            'info' => [],
-        ];
-        // Check for eval.
-        $eval = [
-            'type' => 'eval',
-            'nbdone' => 0,
-            'nbrequired' => $situation->get('evalnum'),
-        ];
-        $autoeval = [
-            'type' => 'autoeval',
-            'nbdone' => 0,
-            'nbrequired' => $situation->get('autoevalnum'),
-        ];
-        foreach ($existingobservations as $observation) {
-            if ($observation->get('studentid') != $studentid) {
-                continue;
-            }
-            if ($observation->get_observation_type() == observation::CATEGORY_EVAL_AUTOEVAL) {
-                $autoeval['nbdone']++;
-            } else {
-                $eval['nbdone']++;
-            }
-        }
-        $result['info'][] = $eval;
-        $result['info'][] = $autoeval;
-        return $result;
-    }
-
-    /**
-     * Get planning info for students
-     *
-     * @param int $planningid
-     * @return array
-     */
-    public static function get_planning_info_for_students(int $planningid): array {
-        $params = ['planningid' => $planningid, 'status' => observation::STATUS_COMPLETED];
-        $observations =
-            observation::get_records($params, 'studentid, observerid');
-        $results = [];
-        $planning = planning::get_record(['id' => $planningid]);
-        $situation = situation::get_record(['id' => $planning->get('situationid')]);
-        $students = plannings::get_students_for_planning_id($planningid);
-        foreach ($students as $student) {
-            $results[$student->id] = self::create_planning_info_for_student($student->id, $situation, $observations);
-        }
-        return $results;
-    }
-
-    /**
-     * Get all observations for a given planning
+     * Get observation information
      *
      * @param int $observationid
      * @param int $userid

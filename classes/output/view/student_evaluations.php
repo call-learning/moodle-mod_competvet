@@ -18,6 +18,7 @@ namespace mod_competvet\output\view;
 use core_user;
 use mod_competvet\competvet;
 use mod_competvet\local\api\observations;
+use mod_competvet\local\api\plannings;
 use moodle_url;
 use renderer_base;
 use single_button;
@@ -32,9 +33,9 @@ use stdClass;
  */
 class student_evaluations extends base {
     /**
-     * @var array $evaluations The evaluations' information.
+     * @var array $observations The evaluations' information.
      */
-    protected array $evaluations;
+    protected array $observations;
 
     /**
      * @var array $planninginfo The planning information.
@@ -58,46 +59,35 @@ class student_evaluations extends base {
      */
     public function export_for_template(renderer_base $output) {
         $results = [
-            'evaluationsbytype' => [],
+            'observations' => [],
         ];
-        foreach ($this->evaluations as $evaluationtype => $evaluationlist) {
-            $evaluationsubcategories = array_reduce($evaluationlist, function ($carry, $item) {
-                $carry[$item['category']][] = $item;
-                return $carry;
-            }, []);
-            $evaluationtypeinfo = [
-                'type' => $evaluationtype,
-                'ishidden' => $evaluationtype != $this->currenttab,
-                'evaluations' => [],
-            ];
-            foreach ($evaluationsubcategories as $category => $evaluations) {
-                $evaluationswithinfo = [];
-                $categorytext = "";
-                foreach ($evaluations as $evaluation) {
-                    if (empty($categorytext)) {
-                        $categorytext = $evaluation['categorytext'];
-                    }
-                    $observer = core_user::get_user($evaluation['observerid']);
+        if ($this->currenttab == 'eval') {
+            $results['observations'] = array_values(
+                array_reduce($this->observations, function($carry, $item) use ($output) {
+                    $observer = core_user::get_user($item['observerid']);
                     $evaluationinfo = [
                         'picture' => $output->user_picture($observer),
                         'fullname' => fullname($observer),
-                        'evaluationtime' => $evaluation['time'],
+                        'evaluationtime' => $item['time'],
                         'viewurl' => (new moodle_url(
-                            $this->views[$evaluationtype],
-                            ['evalid' => $evaluation['id']]
+                            $this->views['eval'],
+                            ['evalid' => $item['id']]
                         ))->out(false),
                     ];
-                    $evaluationswithinfo[] = $evaluationinfo;
-                }
-                $evaluationtypeinfo['evaluations'][] = [
-                    'categorytext' => $categorytext,
-                    'category' => $category,
-                    'evaluations' => $evaluationswithinfo,
-                ];
-            }
-            $results['evaluationsbytype'][] = $evaluationtypeinfo;
+                    if (!isset($carry[$item['category']])) {
+                        $carry[$item['category']] = [
+                            'categorytext' => $item['categorytext'],
+                            'category' => $item['category'],
+                            'list' => [],
+                        ];
+                    }
+                    $carry[$item['category']]['list'][] = $evaluationinfo;
+                    return $carry;
+                },
+                    []
+                )
+            );
         }
-
         $results['tabs'] = [];
         // Concatenate stats for autoeval and eval.
 
@@ -151,10 +141,10 @@ class student_evaluations extends base {
             $context = $PAGE->context;
             $planningid = required_param('planningid', PARAM_INT);
             $studentid = required_param('studentid', PARAM_INT);
-            $userevaluations = observations::get_user_evaluation($planningid, $studentid);
+            $userobservations = observations::get_user_observations($planningid, $studentid);
             $competvet = competvet::get_from_context($context);
-            $planninginfo = array_values(observations::get_planning_info_for_student($planningid, $studentid));
-            $data = [$userevaluations, $planninginfo, [
+            $planninginfo = array_values(plannings::get_planning_info_for_student($planningid, $studentid));
+            $data = [$planninginfo, [
                 'eval' => new moodle_url(
                     $this->baseurl,
                     ['pagetype' => 'student_eval', 'id' => $competvet->get_course_module_id()]
@@ -168,9 +158,10 @@ class student_evaluations extends base {
                     ['pagetype' => 'student_certif', 'id' => $competvet->get_course_module_id()]
                 ),
             ],
+                $userobservations,
             ];
         }
-        [$this->evaluations, $this->planninginfo, $this->views] = $data;
+        [$this->planninginfo, $this->views, $this->observations] = $data;
     }
 
     /**
