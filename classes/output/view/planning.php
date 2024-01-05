@@ -33,14 +33,9 @@ use stdClass;
  */
 class planning extends base {
     /**
-     * @var array $users The users to display.
+     * @var array $userinformation The users to display.
      */
-    protected array $users;
-
-    /**
-     * @var array $studentinfo The student info.
-     */
-    protected array $studentinfo;
+    protected array $userswithinfo;
 
     /**
      * @var moodle_url $viewstudent The url to view a planning.
@@ -60,7 +55,7 @@ class planning extends base {
     public function export_for_template(renderer_base $output) {
         $results = [];
 
-        foreach ($this->users as $usertype => $userlist) {
+        foreach ($this->userswithinfo as $usertype => $userlist) {
             foreach ($userlist as $user) {
                 $userinfo = new stdClass();
                 if ($usertype == 'students') {
@@ -68,7 +63,7 @@ class planning extends base {
                 }
                 $userinfo->pictureurl = $user['userpictureurl'];
                 $userinfo->fullname = $user['fullname'];
-                $userplanninginfo = $this->studentinfo[$user['id']]['info'] ?? [];
+                $userplanninginfo = $user['info'] ?? [];
                 if (!empty($userplanninginfo)) {
                     $userplanninginfo = array_combine(array_column($userplanninginfo, 'type'), $userplanninginfo);
                     foreach ($userplanninginfo as $infotype => $userinfovalue) {
@@ -108,8 +103,7 @@ class planning extends base {
         if (empty($data)) {
             global $PAGE;
             $planningid = required_param('planningid', PARAM_INT);
-            $users = plannings_api::get_users_for_planning_id($planningid);
-            $studentinfo = observations_api::get_planning_info_for_students($planningid);
+            $userswithinfo = plannings_api::get_users_infos_for_planning_id($planningid);
             $context = $PAGE->context;
             $competvet = competvet::get_from_context($context);
             $viewstudenturl =
@@ -117,9 +111,9 @@ class planning extends base {
                     ['pagetype' => 'student_evaluations', 'id' => $competvet->get_course_module_id(), 'planningid' => $planningid]);
             $planning = plannings_entity::get_record(['id' => $planningid]);
             $currentgroupname = groups_get_group_name($planning->get('groupid'));
-            $data = [$users, $studentinfo, $currentgroupname, $viewstudenturl];
+            $data = [$userswithinfo, $currentgroupname, $viewstudenturl];
         }
-        [$this->users, $this->studentinfo, $this->currentgroupname, $this->viewstudent] = $data;
+        [$this->userswithinfo, $this->currentgroupname, $this->viewstudent] = $data;
     }
 
     /**

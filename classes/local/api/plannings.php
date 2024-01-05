@@ -100,29 +100,6 @@ class plannings {
         return $plannings;
     }
 
-    public static function get_user_stats_for_planning(int $planningid, int $userid): ?array {
-        $planning = planning::get_record(['id' => $planningid]);
-        $competvet = competvet::get_from_situation_id($planning->get('situation'));
-        $situationcontext = $competvet->get_context();
-        $isstudent = utils::is_student($userid, $situationcontext->id);
-        if ($isstudent) {
-            return null;
-        }
-        // $context = \context_system::instance();
-        // $allobservations = data_retriever_helper::get_data_from_system_report(
-        // observations_per_planning::class,
-        // $context,
-        // ['onlyforplanningid' => "$planningid",
-        // 'onlyforstatus' => join(',', [
-        // observation::STATUS_NOTSTARTED, observation::STATUS_INPROGRESS,
-        // ]),
-        // ]
-        // );
-        // $requiredevals = $allobservations[0]['situation:evalnum'] ?? 0;
-
-        return ['nbstudentstoeval' => 2, 'nbstudents' => 3];
-    }
-
     /**
      * Get all observations statistics for a given set of planning and for userid
      *
@@ -225,28 +202,6 @@ class plannings {
     }
 
     /**
-     * Retrieves the users associated with a given planning ID.
-     *
-     * @param int $planningid The ID of the planning.
-     * @return array An array of users.
-     */
-    public static function get_users_for_planning_id(int $planningid): array {
-        $studentsid = self::get_students_for_planning_id($planningid);
-        $students = [];
-        foreach ($studentsid as $studentid => $student) {
-            $students[] = utils::get_user_info($studentid);
-        }
-        $observers = [];
-        $observersid = self::get_observers_for_planning_id($planningid);
-        foreach ($observersid as $observerid => $role) {
-            $observer = utils::get_user_info($observerid);
-            $observer['rolename'] = $role;
-            $observers[] = $observer;
-        }
-        return ['students' => $students, 'observers' => $observers];
-    }
-
-    /**
      * Retrieves the users which are observers associated with a given planning ID.
      *
      * @param int $planningid The ID of the planning.
@@ -278,10 +233,13 @@ class plannings {
         $params = ['planningid' => $planningid, 'status' => observation::STATUS_COMPLETED, 'studentid' => $userid];
         $observations =
             observation::get_records($params, 'studentid, observerid');
-        $result = [];
         $planning = planning::get_record(['id' => $planningid]);
         $situation = situation::get_record(['id' => $planning->get('situationid')]);
-        $result[$userid] = self::create_planning_info_for_student($userid, $situation, $observations);
+        $result =
+            [
+                'id' => $userid,
+                'info' => self::create_planning_info_for_student($userid, $situation, $observations),
+            ];
         return $result;
     }
 
@@ -294,10 +252,7 @@ class plannings {
      * @return array The planning information for the student.
      */
     protected static function create_planning_info_for_student(int $studentid, situation $situation, array $existingobservations) {
-        $result = [
-            'id' => $studentid,
-            'info' => [],
-        ];
+        $info = [];
         // Check for eval.
         $eval = [
             'type' => 'eval',
@@ -319,29 +274,9 @@ class plannings {
                 $eval['nbdone']++;
             }
         }
-        $result['info'][] = $eval;
-        $result['info'][] = $autoeval;
-        return $result;
-    }
-
-    /**
-     * Get planning info for students
-     *
-     * @param int $planningid
-     * @return array
-     */
-    public static function get_planning_info_for_students(int $planningid): array {
-        $params = ['planningid' => $planningid, 'status' => observation::STATUS_COMPLETED];
-        $observations =
-            observation::get_records($params, 'studentid, observerid');
-        $results = [];
-        $planning = planning::get_record(['id' => $planningid]);
-        $situation = situation::get_record(['id' => $planning->get('situationid')]);
-        $students = plannings::get_students_for_planning_id($planningid);
-        foreach ($students as $student) {
-            $results[$student->id] = self::create_planning_info_for_student($student->id, $situation, $observations);
-        }
-        return $results;
+        $info[] = $eval;
+        $info[] = $autoeval;
+        return $info;
     }
 
     /**
@@ -357,4 +292,32 @@ class plannings {
         return $planningarray;
     }
 
+    /**
+     * Get users infos for planning id
+     *
+     * @param int|null $planningid
+     * @return void
+     */
+    public static function get_users_infos_for_planning_id(?int $planningid): array {
+        $studentsid = self::get_students_for_planning_id($planningid);
+        $students = [];
+        $planning = planning::get_record(['id' => $planningid]);
+        $situation = situation::get_record(['id' => $planning->get('situationid')]);
+        foreach ($studentsid as $studentid => $student) {
+            $userinfo = utils::get_user_info($studentid);
+            $params = ['planningid' => $planningid, 'status' => observation::STATUS_COMPLETED, 'studentid' => $studentid];
+            $observations =
+                observation::get_records($params, 'studentid, observerid');
+            $userinfo['info'] = self::create_planning_info_for_student($studentid, $situation, $observations);
+            $students[] = $userinfo;
+        }
+        $observers = [];
+        $observersid = self::get_observers_for_planning_id($planningid);
+        foreach ($observersid as $observerid => $role) {
+            $observer = utils::get_user_info($observerid);
+            $observer['rolename'] = $role;
+            $observers[] = $observer;
+        }
+        return ['students' => $students, 'observers' => $observers];
+    }
 }

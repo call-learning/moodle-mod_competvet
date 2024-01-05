@@ -144,7 +144,9 @@ class student_evaluations extends base {
             $userobservations = observations::get_user_observations($planningid, $studentid);
             $competvet = competvet::get_from_context($context);
             $planninginfo = array_values(plannings::get_planning_info_for_student($planningid, $studentid));
-            $data = [$planninginfo, [
+            $data = [
+                $planninginfo,
+                [
                 'eval' => new moodle_url(
                     $this->baseurl,
                     ['pagetype' => 'student_eval', 'id' => $competvet->get_course_module_id()]
