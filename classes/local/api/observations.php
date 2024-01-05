@@ -16,6 +16,10 @@
 namespace mod_competvet\local\api;
 
 use mod_competvet\local\persistent\observation;
+use mod_competvet\local\persistent\observation_comment;
+use mod_competvet\local\persistent\planning;
+use mod_competvet\local\persistent\situation;
+use mod_competvet\utils;
 
 /**
  * Observation  API
@@ -36,8 +40,6 @@ class observations {
      * @return array
      */
     public static function get_user_observations(int $planningid, int $userid): array {
-        $result = [];
-        // To be replaced asap by a system report.
         $observations =
             observation::get_records(['planningid' => $planningid, 'studentid' => $userid]);
         $evalobservations = [];
@@ -45,8 +47,8 @@ class observations {
             $category = $observation->get_observation_type();
             $evalobservations[] = [
                 'id' => $observation->get('id'),
-                'studentid' => $observation->get('studentid'),
-                'observerid' => $observation->get('observerid'),
+                'studentinfo' => utils::get_user_info($observation->get('studentid')),
+                'observerinfo' => utils::get_user_info($observation->get('observerid')),
                 'status' => $observation->get('status'),
                 'time' => $observation->get('timemodified'),
                 'category' => $category,
@@ -67,22 +69,72 @@ class observations {
         // To be replaced asap by a system report.
         $observation =
             observation::get_record(['id' => $observationid]);
-
+        $planning = planning::get_record(['id' => $observation->get('planningid')]);
+        $situation = situation::get_record(['id' => $planning->get('situationid')]);
+        $criteria = $situation->get_eval_criteria();
+        $criteria = array_combine(
+            array_map(fn($crit) => $crit->get('id'), $criteria),
+            $criteria
+        );
+        $comments = $observation->get_comments();
+        $contexts = array_filter($comments, fn($comment) => $comment->get('type') == observation_comment::OBSERVATION_CONTEXT);
+        $context = end($contexts);
+        $othercomments = array_filter($comments, fn($comment) => $comment->get('type') != observation_comment::OBSERVATION_CONTEXT);
+        $contextrecord = [];
+        if (!empty($context)) {
+            $contextrecord = $context->to_record();
+            $contextrecord->userinfo = utils::get_user_info($context->get('usercreated'));
+            $contextrecord->comment = format_text($contextrecord->comment, $contextrecord->commentformat);
+            unset($contextrecord->commentformat);
+            $contextrecord = (array) $contextrecord;
+        }
         $result = [
             'id' => $observation->get('id'),
             'category' => $observation->get_observation_type(),
+            'context' => $contextrecord,
             'comments' =>
-                array_map(function ($obs) {
-                    return $obs->to_record();
-                }, $observation->get_comments()),
-            'criterialevels' => array_map(function ($obs) {
-                return $obs->to_record();
+                array_values(
+                    array_map(function($obscrit) {
+                        $return = (array) $obscrit->to_record();
+                        $return['userinfo'] = utils::get_user_info($return['usercreated']);
+                        $return['commentlabel'] = ''; // TODO Fill this in with labels for comment/autoeval.
+                        unset($return['usercreated']);
+                        $return['comment'] = format_text($return['comment'], $return['commentformat']);
+                        unset($return['commentformat']);
+                        return $return;
+                    }, $othercomments)
+                ),
+            'criteria' => array_map(function($obscrit) use ($criteria) {
+                $criterioninfo = (array) $criteria[$obscrit->get('criterionid')]->to_record();
+                unset($criterioninfo['timecreated']);
+                unset($criterioninfo['timemodified']);
+                unset($criterioninfo['usercreated']);
+                $return = [
+                    'criterioninfo' => $criterioninfo,
+                    'level' => $obscrit->get('level'),
+                ];
+                $return['subcriteria'] = [];
+                return $return;
             }, $observation->get_criteria_levels()),
-            'criteriacomments' => array_map(function ($obs) {
-                return $obs->to_record();
-            },
-                $observation->get_criteria_comments()),
         ];
+        $allcomments = $observation->get_criteria_comments();
+        foreach ($result['criteria'] as &$criterion) {
+            $allchildrencriteria =
+                array_filter($criteria, fn($crit) => $crit->get('parentid') == $criterion['criterioninfo']['id']);
+            $allchildrencriteriaid = array_map(fn($crit) => $crit->get('id'), $allchildrencriteria);
+            $subcriteriacomments =
+                array_values(array_filter(
+                    $allcomments,
+                    fn($comment) => in_array($comment->get('criterionid'), $allchildrencriteriaid)
+                ));
+            $criterion['subcriteria'] = array_map(function($obscrit) use ($criteria) {
+                $return = [
+                    'criterioninfo' => $criteria[$obscrit->get('criterionid')]->to_record(),
+                    'comment' => $obscrit->get('comment'),
+                ];
+                return $return;
+            }, $subcriteriacomments);
+        }
         return $result;
     }
 }

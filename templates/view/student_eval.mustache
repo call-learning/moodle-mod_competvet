@@ -28,7 +28,7 @@
         <h3>{{#str}}context, mod_competvet{{/str}}</h3>
         {{#context}}
             <div class="container">
-                {{{.}}}
+               {{{comment}}}
             </div>
         {{/context}}
         {{#criteria}}
@@ -43,13 +43,13 @@
                 <div>
                     <div class="card rounded-pill">
                         <div class="card-body">
+                            {{#userinfo}}
                             <div>
-                                {{{picture}}}
+                                <img src="{{userpictureurl}}" class="rounded-circle" width="50" height="50">
                                 <a href="{{viewurl}}"><span>{{fullname}}</span></a>
                             </div>
-                        </div>
-                        <div class="card-body">
-                            <span class="card-text border border-dark">{{{comment}}}</span>
+                            {{/userinfo}}
+                            <span class="font-italic">{{{comment}}}</span>
                         </div>
                     </div>
                 </div>

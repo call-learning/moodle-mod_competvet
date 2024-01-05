@@ -18,7 +18,6 @@ namespace mod_competvet\output\view;
 use core_user;
 use mod_competvet\competvet;
 use mod_competvet\local\api\observations;
-use mod_competvet\local\api\situations;
 use mod_competvet\local\persistent\observation;
 use moodle_url;
 use renderer_base;
@@ -42,10 +41,6 @@ class student_eval extends base {
         100 => 'success',
     ];
     /**
-     * @var array $criteria The situation criteria
-     */
-    protected array $criteria;
-    /**
      * @var array $evaluations The evaluation information.
      */
     protected array $evaluations;
@@ -58,53 +53,20 @@ class student_eval extends base {
      */
     public function export_for_template(renderer_base $output) {
         $results = [];
-        $results['context'] = array_reduce($this->evaluations['comments'], function ($carry, $item) {
-            if ($item->type == \mod_competvet\local\persistent\observation_comment::OBSERVATION_CONTEXT) {
-                $carry[] = format_text($item->comment, $item->commentformat);
-            }
-            return $carry;
-        }, []);
-        $results['comments'] = array_reduce($this->evaluations['comments'], function ($carry, $item) use ($output) {
-            if ($item->type == \mod_competvet\local\persistent\observation_comment::OBSERVATION_COMMENT) {
-                $user = core_user::get_user($item->usercreated);
-                $comment = [
-                    'fullname' => fullname($user),
-                    'picture' => $output->user_picture($user, ['size' => 50, 'class' => 'd-inline-block']),
-                    'comment' => format_text($item->comment, $item->commentformat),
-                ];
-                $carry[] = $comment;
-            }
-            return $carry;
-        }, []);
-        $criterialevels =
-            array_combine(array_column($this->evaluations['criterialevels'], 'criterionid'), $this->evaluations['criterialevels']);
-        $criteriacomments =
-            array_combine(
-                array_column($this->evaluations['criteriacomments'], 'criterionid'),
-                $this->evaluations['criteriacomments']
-            );
-        foreach ($this->criteria as $criterion) {
-            if ($criterion['parentid'] != 0) {
-                continue;
-            }
-            $info = ['label' => $criterion['label']];
-            if (!empty($criterialevels[$criterion['id']])) {
-                $level = $criterialevels[$criterion['id']]->level;
-                // Find the key in BADGELEVEL that is the closest from the level.
-                $roundedlevel = array_reduce(array_keys(self::BADGELEVEL), function ($carry, $item) use ($level) {
-                    if (abs($item - $level) < abs($carry - $level)) {
-                        return $item;
-                    }
-                    return $carry;
-                }, 0);
-                $info['badgetype'] = self::BADGELEVEL[$roundedlevel];
-                $info['level'] = $level;
-            }
-
-            if (!empty($criteriacomments[$criterion['id']])) {
-                $comment = $criteriacomments[$criterion['id']];
-                $info['comment'] = format_text($comment->comment, $comment->commentformat);
-            }
+        $results['context'] = $this->evaluations['context'];
+        $results['comments'] = $this->evaluations['comments'];
+        foreach ($this->evaluations['criteria'] as $evalcriterion) {
+            $info = ['label' => $evalcriterion['criterioninfo']['label']];
+            $level = $evalcriterion['level'];
+            // Find the key in BADGELEVEL that is the closest from the level.
+            $roundedlevel = array_reduce(array_keys(self::BADGELEVEL), function($carry, $item) use ($level) {
+                if (abs($item - $level) < abs($carry - $level)) {
+                    return $item;
+                }
+                return $carry;
+            }, 0);
+            $info['badgetype'] = self::BADGELEVEL[$roundedlevel];
+            $info['level'] = $level;
             $results['criteria'][] = $info;
         }
         return $results;
@@ -124,15 +86,11 @@ class student_eval extends base {
     public function set_data(...$data) {
         if (empty($data)) {
             global $PAGE;
-            $context = $PAGE->context;
             $evaluationid = required_param('evalid', PARAM_INT);
-            $competvet = competvet::get_from_context($context);
-
-            $criteria = situations::get_all_criteria($competvet->get_situation()->get('id'));
             $userevaluations = observations::get_observation_information($evaluationid);
-            $data = [$criteria, $userevaluations];
+            $data = [$userevaluations];
         }
-        [$this->criteria, $this->evaluations] = $data;
+        [$this->evaluations] = $data;
     }
 
     /**

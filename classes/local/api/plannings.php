@@ -304,17 +304,19 @@ class plannings {
         $planning = planning::get_record(['id' => $planningid]);
         $situation = situation::get_record(['id' => $planning->get('situationid')]);
         foreach ($studentsid as $studentid => $student) {
-            $userinfo = utils::get_user_info($studentid);
+            $userinfo = [];
+            $userinfo['userinfo'] = utils::get_user_info($studentid);
             $params = ['planningid' => $planningid, 'status' => observation::STATUS_COMPLETED, 'studentid' => $studentid];
             $observations =
                 observation::get_records($params, 'studentid, observerid');
-            $userinfo['info'] = self::create_planning_info_for_student($studentid, $situation, $observations);
+            $userinfo['planninginfo'] = self::create_planning_info_for_student($studentid, $situation, $observations);
             $students[] = $userinfo;
         }
         $observers = [];
         $observersid = self::get_observers_for_planning_id($planningid);
         foreach ($observersid as $observerid => $role) {
-            $observer = utils::get_user_info($observerid);
+            $observer = [];
+            $observer['userinfo'] = utils::get_user_info($observerid);
             $observer['rolename'] = $role;
             $observers[] = $observer;
         }

@@ -16,7 +16,6 @@
 namespace mod_competvet\output\view;
 
 use mod_competvet\competvet;
-use mod_competvet\local\api\plannings as observations_api;
 use mod_competvet\local\api\plannings as plannings_api;
 use mod_competvet\local\persistent\planning as plannings_entity;
 use moodle_url;
@@ -59,11 +58,11 @@ class planning extends base {
             foreach ($userlist as $user) {
                 $userinfo = new stdClass();
                 if ($usertype == 'students') {
-                    $userinfo->viewurl = (new moodle_url($this->viewstudent, ['studentid' => $user['id']]))->out(false);
+                    $userinfo->viewurl = (new moodle_url($this->viewstudent, ['studentid' => $user['userinfo']['id']]))->out(false);
                 }
-                $userinfo->pictureurl = $user['userpictureurl'];
-                $userinfo->fullname = $user['fullname'];
-                $userplanninginfo = $user['info'] ?? [];
+                $userinfo->pictureurl = $user['userinfo']['userpictureurl'];
+                $userinfo->fullname = $user['userinfo']['fullname'];
+                $userplanninginfo = $user['planninginfo'] ?? [];
                 if (!empty($userplanninginfo)) {
                     $userplanninginfo = array_combine(array_column($userplanninginfo, 'type'), $userplanninginfo);
                     foreach ($userplanninginfo as $infotype => $userinfovalue) {

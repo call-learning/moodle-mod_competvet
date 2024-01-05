@@ -64,10 +64,10 @@ class student_evaluations extends base {
         if ($this->currenttab == 'eval') {
             $results['observations'] = array_values(
                 array_reduce($this->observations, function($carry, $item) use ($output) {
-                    $observer = core_user::get_user($item['observerid']);
+                    $observer = $item['observerinfo'];
                     $evaluationinfo = [
-                        'picture' => $output->user_picture($observer),
-                        'fullname' => fullname($observer),
+                        'pictureurl' => $observer['userpictureurl'],
+                        'fullname' => $observer['fullname'],
                         'evaluationtime' => $item['time'],
                         'viewurl' => (new moodle_url(
                             $this->views['eval'],
