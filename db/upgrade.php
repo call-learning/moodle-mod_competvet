@@ -30,5 +30,40 @@ function xmldb_competvet_upgrade($oldversion) {
         // Competvet savepoint reached.
         upgrade_mod_savepoint(true, 2023112905, 'competvet');
     }
+    if ($oldversion < 2024011600) {
+
+        // Define field isactive to be added to competvet_obs_crit_level.
+        $table = new xmldb_table('competvet_obs_crit_level');
+        $field = new xmldb_field('isactive', XMLDB_TYPE_INTEGER, '1', null, null, null, '1', 'timemodified');
+
+        // Conditionally launch add field isactive.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024011600, 'competvet');
+    }
+    if ($oldversion < 2024011601) {
+
+        // Define field id to be added to competvet_observation.
+        $table = new xmldb_table('competvet_observation');
+        $field = new xmldb_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null);
+
+        // Conditionally launch add field id.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024011601, 'competvet');
+    }
+    if ($oldversion < 2024011604) {
+        $postinstall = new mod_competvet\task\post_install();
+        $postinstall->set_custom_data(['setup_update_tags']);
+        core\task\manager::queue_adhoc_task($postinstall);
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024011604, 'competvet');
+    }
     return true;
 }

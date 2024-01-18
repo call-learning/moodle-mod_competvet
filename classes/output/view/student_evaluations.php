@@ -15,17 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\output\view;
 
-use core_user;
 use mod_competvet\competvet;
 use mod_competvet\local\api\observations;
 use mod_competvet\local\api\plannings;
+use mod_competvet\local\persistent\situation;
 use moodle_url;
 use renderer_base;
 use single_button;
 use stdClass;
 
 /**
- * Generic renderable for the view.
+ * Generic renderable for the view: list all evaluation (eval, certif, list)
  *
  * @package    mod_competvet
  * @copyright  2023 CALL Learning - Laurent David laurent@call-learning.fr
@@ -91,14 +91,14 @@ class student_evaluations extends base {
         $results['tabs'] = [];
         // Concatenate stats for autoeval and eval.
 
-        if (!empty($this->planninginfo[0]['info'])) {
+        if (!empty($this->planninginfo['info'])) {
             $planninginfostats = [
                 'eval' => [
                     'nbdone' => 0,
                     'nbrequired' => 0,
                 ],
             ];
-            foreach ($this->planninginfo[0]['info'] as $value) {
+            foreach ($this->planninginfo['info'] as $value) {
                 $key = $value['type'];
                 if ($key == 'autoeval' || $key == 'eval') {
                     $planninginfostats['eval']['type'] = 'eval';
@@ -120,6 +120,13 @@ class student_evaluations extends base {
                 $results['tabs'][] = $tab;
             }
         }
+        // Find planning, module infos.
+        $planning = \mod_competvet\local\persistent\planning::get_record(['id' => $this->planninginfo['planningid']]);
+        $situation = situation::get_record(['id' => $planning->get('situationid')]);
+        $competvet = competvet::get_from_situation($situation);
+        $results['cmid'] = $competvet->get_course_module_id();
+        $results['planningid'] = $this->planninginfo['planningid'];
+        $results['studentid'] = $this->planninginfo['id'];
         return $results;
     }
 
@@ -143,52 +150,30 @@ class student_evaluations extends base {
             $studentid = required_param('studentid', PARAM_INT);
             $userobservations = observations::get_user_observations($planningid, $studentid);
             $competvet = competvet::get_from_context($context);
-            $planninginfo = array_values(plannings::get_planning_info_for_student($planningid, $studentid));
+            $planninginfo = plannings::get_planning_info_for_student($planningid, $studentid);
             $data = [
                 $planninginfo,
                 [
-                'eval' => new moodle_url(
-                    $this->baseurl,
-                    ['pagetype' => 'student_eval', 'id' => $competvet->get_course_module_id()]
-                ),
-                'list' => new moodle_url(
-                    $this->baseurl,
-                    ['pagetype' => 'student_list', 'id' => $competvet->get_course_module_id()]
-                ),
-                'certif' => new moodle_url(
-                    $this->baseurl,
-                    ['pagetype' => 'student_certif', 'id' => $competvet->get_course_module_id()]
-                ),
-            ],
+                    'eval' => new moodle_url(
+                        $this->baseurl,
+                        ['pagetype' => 'student_eval', 'id' => $competvet->get_course_module_id()]
+                    ),
+                    'list' => new moodle_url(
+                        $this->baseurl,
+                        ['pagetype' => 'student_list', 'id' => $competvet->get_course_module_id()]
+                    ),
+                    'certif' => new moodle_url(
+                        $this->baseurl,
+                        ['pagetype' => 'student_certif', 'id' => $competvet->get_course_module_id()]
+                    ),
+                ],
                 $userobservations,
             ];
+            $this->backurl = new moodle_url(
+                $this->baseurl,
+                ['pagetype' => 'planning', 'id' => $competvet->get_course_module_id(), 'planningid' => $planningid]
+            );
         }
         [$this->planninginfo, $this->views, $this->observations] = $data;
-    }
-
-    /**
-     * Get back button navigation.
-     * We assume here that the back button will be on a single page (view.php)
-     *
-     * @return single_button|null
-     */
-    public function get_back_button(): ?single_button {
-        if (empty($data)) {
-            global $PAGE;
-            $context = $PAGE->context;
-            $planningid = required_param('planningid', PARAM_INT);
-            $competvet = competvet::get_from_context($context);
-            $cmid = $competvet->get_course_module_id();
-        } else {
-            [$planningid, $cmid] = $data;
-        }
-        $backbutton = new single_button(
-            new moodle_url(
-                $this->baseurl,
-                ['pagetype' => 'planning', 'id' => $cmid, 'planningid' => $planningid]
-            ),
-            get_string('back', 'competvet')
-        );
-        return $backbutton;
     }
 }

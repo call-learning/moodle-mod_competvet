@@ -15,13 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\output\view;
 
-use core_user;
 use mod_competvet\competvet;
 use mod_competvet\local\api\observations;
 use mod_competvet\local\persistent\observation;
 use moodle_url;
 use renderer_base;
-use single_button;
 use stdClass;
 
 /**
@@ -41,9 +39,13 @@ class student_eval extends base {
         100 => 'success',
     ];
     /**
-     * @var array $evaluations The evaluation information.
+     * @var array $evaluation The evaluation information.
      */
-    protected array $evaluations;
+    protected array $evaluation;
+    /**
+     * @var mixed $subcriteriaurl The url to view subcriteria.
+     */
+    private mixed $subcriteriaurl;
 
     /**
      * Export this data so it can be used in a mustache template.
@@ -53,9 +55,9 @@ class student_eval extends base {
      */
     public function export_for_template(renderer_base $output) {
         $results = [];
-        $results['context'] = $this->evaluations['context'];
-        $results['comments'] = $this->evaluations['comments'];
-        foreach ($this->evaluations['criteria'] as $evalcriterion) {
+        $results['context'] = $this->evaluation['context'];
+        $results['comments'] = $this->evaluation['comments'];
+        foreach ($this->evaluation['criteria'] as $evalcriterion) {
             $info = ['label' => $evalcriterion['criterioninfo']['label']];
             $level = $evalcriterion['level'];
             // Find the key in BADGELEVEL that is the closest from the level.
@@ -66,6 +68,8 @@ class student_eval extends base {
                 return $carry;
             }, 0);
             $info['badgetype'] = self::BADGELEVEL[$roundedlevel];
+            $info['viewurl'] =
+                (new moodle_url($this->subcriteriaurl, ['criterionid' => $evalcriterion['criterioninfo']['id']]))->out(false);
             $info['level'] = $level;
             $results['criteria'][] = $info;
         }
@@ -86,36 +90,34 @@ class student_eval extends base {
     public function set_data(...$data) {
         if (empty($data)) {
             global $PAGE;
+            $context = $PAGE->context;
+            $competvet = competvet::get_from_context($context);
             $evaluationid = required_param('evalid', PARAM_INT);
             $userevaluations = observations::get_observation_information($evaluationid);
-            $data = [$userevaluations];
+            $data = [$userevaluations,
+                new moodle_url(
+                    $this->baseurl,
+                    [
+                        'pagetype' => 'student_eval_subcriteria',
+                        'id' => $competvet->get_course_module_id(),
+                        'evalid' => $evaluationid,
+                    ]
+                ),
+            ];
+            $observation = observation::get_record(['id' => $evaluationid]);
+            $planningid = $observation->get('planningid');
+            $studentid = $observation->get('studentid');
+            $this->backurl =
+                new moodle_url(
+                    $this->baseurl,
+                    [
+                        'pagetype' => 'student_evaluations',
+                        'id' => $competvet->get_course_module_id(),
+                        'planningid' => $planningid,
+                        'studentid' => $studentid
+                    ]
+                );
         }
-        [$this->evaluations] = $data;
-    }
-
-    /**
-     * Get back button navigation.
-     * We assume here that the back button will be on a single page (view.php)
-     *
-     * @return single_button|null
-     */
-    public function get_back_button(): ?single_button {
-
-        global $PAGE;
-        $context = $PAGE->context;
-        $competvet = competvet::get_from_context($context);
-        $cmid = $competvet->get_course_module_id();
-        $evaluationid = required_param('evalid', PARAM_INT);
-        $observation = observation::get_record(['id' => $evaluationid]);
-        $planningid = $observation->get('planningid');
-        $studentid = $observation->get('studentid');
-        $backbutton = new single_button(
-            new moodle_url(
-                $this->baseurl,
-                ['pagetype' => 'student_evaluations', 'id' => $cmid, 'planningid' => $planningid, 'studentid' => $studentid]
-            ),
-            get_string('back', 'competvet')
-        );
-        return $backbutton;
+        [$this->evaluation, $this->subcriteriaurl] = $data;
     }
 }

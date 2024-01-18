@@ -45,6 +45,7 @@ $event->trigger();
 $PAGE->set_context($modulecontext);
 $widget = base::factory($USER->id);
 $widget->set_data();
+$widget->check_access();
 $renderer = $PAGE->get_renderer('mod_competvet');
 echo $OUTPUT->header();
 echo $OUTPUT->heading($moduleinstance->name);

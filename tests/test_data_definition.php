@@ -81,7 +81,7 @@ trait test_data_definition {
             'course 1' => [
                 'users' => [
                     'student' => ['student1', 'student2'],
-                    'observer' => ['observer1', 'observerandassessor'],
+                    'observer' => ['observer1', 'observerandevaluator'],
                     'teacher' => ['teacher1'],
                     'manager' => ['manager'],
                 ],
@@ -145,9 +145,8 @@ trait test_data_definition {
             'course 2' => [
                 'users' => [
                     'student' => ['student1', 'student2', 'student3', 'student4'],
-                    'observer' => ['observer2', 'observerandevalandassessor'],
-                    'evaluator' => ['observerandevalandassessor'],
-                    'assessor' => ['observerandevalandassessor'],
+                    'observer' => ['observer2', 'observerandevalandevaluator'],
+                    'evaluator' => ['observerandevalandevaluator'],
                     'teacher' => ['teacher2'],
                 ],
                 'groups' => [
@@ -208,8 +207,7 @@ trait test_data_definition {
                 'users' => [
                     'student' => ['student1', 'student2', 'student3', 'student4', 'studentandobserver'],
                     'observer' => ['observer2', 'studentandobserver'],
-                    'evaluator' => ['assessorandevaluator'],
-                    'assessor' => ['assessorandevaluator', 'observerandassessor'],
+                    'evaluator' => ['observerandevaluator'],
                 ],
                 'groups' => [
                     'group 8.1' => [

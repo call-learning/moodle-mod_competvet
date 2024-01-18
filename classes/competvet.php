@@ -63,54 +63,39 @@ class competvet {
             'permissions' => [
                 CONTEXT_COURSE => [
                     'mod/competvet:addinstance' => CAP_ALLOW,
+                ],
+                CONTEXT_MODULE => [
                     'mod/competvet:canaskobservation' => CAP_PREVENT,
-                    'mod/competvet:candoeverything' => CAP_PREVENT,
                     'mod/competvet:cangrade' => CAP_ALLOW,
                     'mod/competvet:canobserve' => CAP_ALLOW,
                     'mod/competvet:editplanning' => CAP_ALLOW,
                     'mod/competvet:view' => CAP_ALLOW,
-                ],
+                ]
             ],
         ],
         'evaluator' => [
             'archetype' => 'teacher',
             'permissions' => [
-                CONTEXT_COURSE => [
-                    'mod/competvet:addinstance' => CAP_ALLOW,
+                CONTEXT_MODULE => [
                     'mod/competvet:canaskobservation' => CAP_PREVENT,
-                    'mod/competvet:candoeverything' => CAP_PREVENT,
                     'mod/competvet:cangrade' => CAP_ALLOW,
                     'mod/competvet:canobserve' => CAP_ALLOW,
                     'mod/competvet:editplanning' => CAP_PREVENT,
                     'mod/competvet:view' => CAP_ALLOW,
-                ],
-            ],
-        ],
-        'assessor' => [
-            'archetype' => 'teacher',
-            'permissions' => [
-                CONTEXT_COURSE => [
-                    'mod/competvet:addinstance' => CAP_PREVENT,
-                    'mod/competvet:canaskobservation' => CAP_PREVENT,
-                    'mod/competvet:candoeverything' => CAP_PREVENT,
-                    'mod/competvet:cangrade' => CAP_ALLOW,
-                    'mod/competvet:canobserve' => CAP_ALLOW,
-                    'mod/competvet:editplanning' => CAP_ALLOW,
-                    'mod/competvet:view' => CAP_ALLOW,
+                    'mod/competvet:viewother' => CAP_ALLOW,
                 ],
             ],
         ],
         'observer' => [
             'archetype' => 'student',
             'permissions' => [
-                CONTEXT_COURSE => [
-                    'mod/competvet:addinstance' => CAP_PREVENT,
+                CONTEXT_MODULE => [
                     'mod/competvet:canaskobservation' => CAP_PREVENT,
-                    'mod/competvet:candoeverything' => CAP_PROHIBIT,
                     'mod/competvet:cangrade' => CAP_PREVENT,
                     'mod/competvet:canobserve' => CAP_ALLOW,
                     'mod/competvet:editplanning' => CAP_PREVENT,
                     'mod/competvet:view' => CAP_ALLOW,
+                    'mod/competvet:viewother' => CAP_ALLOW,
                 ],
             ],
         ],

@@ -13,26 +13,20 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 namespace mod_competvet\form;
 
-use moodleform;
-
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->libdir . '/formslib.php');
-require_once($CFG->libdir . '/gradelib.php');
-
+use context;
+use core_form\dynamic_form;
+use mod_competvet\local\persistent\criterion;
+use moodle_url;
 /**
- * Planning edit form.
+ *
+ * Observation edit form
  *
  * @package    mod_competvet
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class eval_edit extends moodleform {
-
-    use eval_trait;
+class eval_observation_edit extends dynamic_form {
 
     /**
      * Process data
@@ -105,20 +99,66 @@ class eval_edit extends moodleform {
      * Define form
      */
     protected function definition() {
-        $customdata = $this->_customdata;
+        $rootcriteria = criterion::get_records(['parentid' => 0], 'sort');
         $mform = $this->_form;
-        if (!empty($customdata['id'])) {
-            $cmid = $customdata['id'];
-            // Nothing here as all values are set when data is set.
-            $mform->addElement('hidden', 'id', $cmid ?? 0);
-            $mform->setType('id', PARAM_INT);
+        $mform->addElement('header', 'criterion_header_context', get_string('context', 'mod_competvet'));
+        $mform->addElement(
+            'textarea',
+            'context',
+            get_string('context', 'mod_competvet')
+        );
+        $mform->setType('context', PARAM_RAW);
+        $mform->setExpanded('criterion_header_context');
+        foreach ($rootcriteria as $criterion) {
+            $critrecord = $criterion->to_record();
+            $mform->addElement('header', 'criterion_header_' . $critrecord->id, $critrecord->label);
+            $element = $mform->addElement(
+                'text',
+                'criterion_grade_' . $critrecord->id,
+                get_string('gradefor', 'mod_competvet', $critrecord->label)
+            );
+            $mform->setType('criterion_grade_' . $critrecord->id, PARAM_INT);
+            $element->updateAttributes(['class' => $element->getAttribute('class') . ' font-weight-bold']);
+            $subcriteria = criterion::get_records(['parentid' => $critrecord->id], 'sort');
+            foreach ($subcriteria as $sub) {
+                $critrecord = $sub->to_record();
+                $element = $mform->addElement(
+                    'text',
+                    'criterion_comment_' . $critrecord->id,
+                    get_string('commentfor', 'mod_competvet', $critrecord->label)
+                );
+                $mform->setType('criterion_comment_' . $critrecord->id, PARAM_TEXT);
+                $element->updateAttributes(['class' => $element->getAttribute('class') . ' ml-3']);
+            }
         }
-        $mform->addElement('hidden', 'entityid', 0);
-        $mform->setType('entityid', PARAM_INT);
-        $mform->addElement('hidden', 'currenttype', 'eval');
-        $mform->setType('currenttype', PARAM_TEXT);
-
-        $this->define_eval_form();
+        $mform->addElement('header', 'criterion_header_comment', get_string('comment', 'mod_competvet'));
+        $mform->addElement(
+            'textarea',
+            'comment',
+            get_string('comment', 'mod_competvet')
+        );
+        $mform->setExpanded('criterion_header_comment');
+        $mform->setType('comment', PARAM_RAW);
         $this->add_action_buttons();
+    }
+
+    protected function get_context_for_dynamic_submission(): context {
+        // TODO: Implement get_context_for_dynamic_submission() method.
+    }
+
+    protected function check_access_for_dynamic_submission(): void {
+        // TODO: Implement check_access_for_dynamic_submission() method.
+    }
+
+    public function process_dynamic_submission() {
+        // TODO: Implement process_dynamic_submission() method.
+    }
+
+    public function set_data_for_dynamic_submission(): void {
+        // TODO: Implement set_data_for_dynamic_submission() method.
+    }
+
+    protected function get_page_url_for_dynamic_submission(): moodle_url {
+        // TODO: Implement get_page_url_for_dynamic_submission() method.
     }
 }

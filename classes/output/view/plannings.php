@@ -20,7 +20,6 @@ use mod_competvet\local\api\plannings as plannings_api;
 use mod_competvet\local\persistent\planning;
 use moodle_url;
 use renderer_base;
-use single_button;
 use stdClass;
 
 /**
@@ -115,15 +114,5 @@ class plannings extends base {
             $data = [$currentplannings, $planningstats, $viewplanning];
         }
         [$this->plannings, $this->planningstats, $this->viewplanning] = $data;
-    }
-
-    /**
-     * Get back button navigation.
-     * We assume here that the back button will be on a single page (view.php)
-     *
-     * @return single_button|null
-     */
-    public function get_back_button(): ?single_button {
-        return null;
     }
 }

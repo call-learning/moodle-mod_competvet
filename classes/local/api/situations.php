@@ -52,12 +52,6 @@ class situations {
      * @return array[] array of situations
      */
     public static function get_all_situations_with_planning_for(int $userid, bool $nofuture = false): array {
-        global $USER;
-        if ($userid == $USER->id) {
-            require_capability('mod/competvet:viewmysituations', context_system::instance(), $USER->id);
-        } else {
-            require_capability('mod/competvet:viewother', context_system::instance(), $USER->id);
-        }
         $situationsid = situation::get_all_situations_id_for($userid);
         $context = context_system::instance();
 
@@ -114,8 +108,6 @@ class situations {
      * @return array|array[]
      */
     public static function get_all_criteria(int $situationid) {
-        global $USER;
-        require_capability('mod/competvet:viewmysituations', context_system::instance(), $USER->id);
         $context = context_system::instance();
         $criteria = data_retriever_helper::get_data_from_system_report(
             criteria::class,

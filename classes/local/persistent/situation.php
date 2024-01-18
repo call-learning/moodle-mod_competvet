@@ -16,11 +16,9 @@
 namespace mod_competvet\local\persistent;
 
 use cache;
-use context_module;
 use core\persistent;
 use lang_string;
 use mod_competvet\competvet;
-use mod_competvet\utils;
 
 /**
  * Criterion template entity
@@ -115,14 +113,43 @@ class situation extends persistent {
     /**
      * Get evaluation criteria for this situation
      *
+     * The array is sorted by sort field.
      * @return array
      */
     public function get_eval_criteria(): array {
-        $evalgridid =  $this->raw_get('evalgrid');
+        $evalgridid = $this->raw_get('evalgrid');
         if (empty($evalgridid)) {
             $evalgridid = evaluation_grid::get_default_grid()->get('id');
         }
-        return criterion::get_records(['evalgridid' => $evalgridid]) ?: [];
+        return criterion::get_records(['evalgridid' => $evalgridid], 'sort') ?:
+            [];
+    }
+
+    /**
+     * Get evaluation criteria for this situation, as a tree (array of arrays)
+     *
+     * The array is sorted by sort field.
+     * @return array of objects (criterion with additional field subcriteria)
+     */
+    public function get_eval_criteria_tree(): array {
+        $evalgridid = $this->raw_get('evalgrid');
+        if (empty($evalgridid)) {
+            $evalgridid = evaluation_grid::get_default_grid()->get('id');
+        }
+        $allcriteria = criterion::get_records(['evalgridid' => $evalgridid], 'parentid');
+        $criteriatree = [];
+        foreach ($allcriteria as $criterion) {
+            if (empty($criterion->get('parentid'))) {
+                $criteriatree[$criterion->get('id')] = $criterion->to_record();
+            } else {
+                $parentid = $criterion->get('parentid');
+                if (!isset($criteriatree[$parentid]->subcriteria)) {
+                    $criteriatree[$parentid]->subcriteria = [];
+                }
+                $criteriatree[$parentid]->subcriteria[$criterion->get('id')] = $criterion->to_record();
+            }
+        }
+        return $criteriatree;
     }
 
     /**

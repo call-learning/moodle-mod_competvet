@@ -95,9 +95,15 @@ class observation extends persistent {
             ],
             'status' => [
                 'type' => PARAM_INT,
-                'default' => 0,
+                'default' => self::STATUS_NOTSTARTED,
                 'message' => new lang_string('invaliddata', 'competvet', 'status'),
                 'choices' => array_keys(self::STATUS),
+            ],
+            'category' => [
+                'type' => PARAM_INT,
+                'default' => self::CATEGORY_EVAL_OBSERVATION,
+                'message' => new lang_string('invaliddata', 'competvet', 'status'),
+                'choices' => array_keys(self::CATEGORIES),
             ],
         ];
     }
@@ -108,8 +114,7 @@ class observation extends persistent {
      * @return int
      */
     public function get_observation_type(): int {
-        return $this->raw_get('observerid') == $this->raw_get('studentid') ? self::CATEGORY_EVAL_AUTOEVAL :
-            self::CATEGORY_EVAL_OBSERVATION;
+        return $this->raw_get('category');
     }
 
     /**

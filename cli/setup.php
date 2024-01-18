@@ -35,7 +35,7 @@ list($options, $unrecognised) = cli_get_params([
     'h' => 'help',
 ]);
 
-$possiblefunctions = ['create_update_roles', 'setup_update_tags', 'create_reports'];
+$possiblefunctions = ['create_update_roles', 'setup_update_tags', 'create_reports', 'update_all_capabilities'];
 
 $usage = "Run different setup script for testing purpose
 

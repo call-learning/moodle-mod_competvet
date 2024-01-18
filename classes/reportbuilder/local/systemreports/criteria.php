@@ -118,6 +118,6 @@ class criteria extends system_report {
     }
 
     protected function can_view(): bool {
-        return has_capability('mod/competvet:viewmysituations', $this->get_context());
+        return isloggedin();
     }
 }

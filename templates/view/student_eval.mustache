@@ -26,34 +26,39 @@
 <div class="competvet-view-student-eval">
     <div class="container">
         <h3>{{#str}}context, mod_competvet{{/str}}</h3>
-        {{#context}}
-            <div class="container">
-               {{{comment}}}
-            </div>
-        {{/context}}
-        {{#criteria}}
-            <div class="container m-3">
-                <span>{{label}}</span>
-                <span class="badge badge-{{badgetype}}">{{level}}</span>
-            </div>
-        {{/criteria}}
+        <div class="container">
+            {{#context}}
+                <div class="card rounded-pill p-3">
+                    {{{comment}}}
+                </div>
+            {{/context}}
+        </div>
+        <div class="container">
+            {{#criteria}}
+                <div class="container m-3">
+                    <span><a href="{{viewurl}}">{{label}}</a></span>
+                    <span class="badge badge-{{badgetype}}">{{level}}</span>
+                </div>
+            {{/criteria}}
+        </div>
         <h3>{{#str}}comments, mod_competvet{{/str}}</h3>
-        {{#comments}}
-            <div class="container">
+        <div class="container">
+            {{#comments}}
+
                 <div>
-                    <div class="card rounded-pill">
+                    <div class="card rounded-pill p-3">
                         <div class="card-body">
                             {{#userinfo}}
-                            <div>
-                                <img src="{{userpictureurl}}" class="rounded-circle" width="50" height="50">
-                                <a href="{{viewurl}}"><span>{{fullname}}</span></a>
-                            </div>
+                                <div>
+                                    <img src="{{userpictureurl}}" class="rounded-circle" width="50" height="50">
+                                    <a href="{{viewurl}}"><span>{{fullname}}</span></a>
+                                </div>
                             {{/userinfo}}
                             <span class="font-italic">{{{comment}}}</span>
                         </div>
                     </div>
                 </div>
-            </div>
-        {{/comments}}
+            {{/comments}}
+        </div>
     </div>
 </div>

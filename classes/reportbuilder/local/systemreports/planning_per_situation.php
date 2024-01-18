@@ -122,6 +122,6 @@ class planning_per_situation extends system_report {
     }
 
     protected function can_view(): bool {
-        return has_capability('mod/competvet:view', $this->get_context());
+        return isloggedin();
     }
 }

@@ -32,7 +32,6 @@ class user_role {
 
     const ROLES_CONFLICTS = [
         ['student', 'teacher'],
-        ['student', 'assessor'],
         ['student', 'evaluator'],
         ['student', 'observer'],
         ['student', 'admincompetvet'],

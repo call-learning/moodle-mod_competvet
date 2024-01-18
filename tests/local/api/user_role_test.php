@@ -67,13 +67,13 @@ class user_role_test extends advanced_testcase {
                     'SIT5' => ['student'], 'SIT6' => ['student'], 'SIT7' => ['student'], 'SIT8' => ['student'],
                     'SIT9' => ['student'], ],
             ],
-            'observer and assessor' => [
-                'user' => 'observerandassessor',
+            'observer and evaluator' => [
+                'user' => 'observerandevaluator',
                 'expected_top' => ['SIT1' => 'observer', 'SIT2' => 'observer', 'SIT3' => 'observer', 'SIT4' => 'unknown',
-                    'SIT5' => 'unknown', 'SIT6' => 'unknown', 'SIT7' => 'assessor', 'SIT8' => 'assessor', 'SIT9' => 'assessor', ],
+                    'SIT5' => 'unknown', 'SIT6' => 'unknown', 'SIT7' => 'evaluator', 'SIT8' => 'evaluator', 'SIT9' => 'evaluator', ],
                 'expected_all' => ['SIT1' => ['observer'], 'SIT2' => ['observer'], 'SIT3' => ['observer'], 'SIT4' => ['unknown'],
-                    'SIT5' => ['unknown'], 'SIT6' => ['unknown'], 'SIT7' => ['assessor'], 'SIT8' => ['assessor'],
-                    'SIT9' => ['assessor'], ],
+                    'SIT5' => ['unknown'], 'SIT6' => ['unknown'], 'SIT7' => ['evaluator'], 'SIT8' => ['evaluator'],
+                    'SIT9' => ['evaluator'], ],
             ],
             'manager so unknown' => [
                 'user' => 'manager',
@@ -121,12 +121,8 @@ class user_role_test extends advanced_testcase {
                 'user' => 'student1',
                 'expected' => 'student',
             ],
-            'assessor, evaluator and observer' => [
-                'user' => 'observerandevalandassessor',
-                'expected' => 'evaluator',
-            ],
-            'assessor and evaluator' => [
-                'user' => 'assessorandevaluator',
+            'evaluator and observer' => [
+                'user' => 'observerandevaluator',
                 'expected' => 'evaluator',
             ],
             'conflicting roles' => [

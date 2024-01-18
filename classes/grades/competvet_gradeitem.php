@@ -69,7 +69,7 @@ abstract class competvet_gradeitem extends component_gradeitem {
      */
     public function require_user_can_grade(stdClass $gradeduser, stdClass $grader): void {
         if (!$this->user_can_grade($gradeduser, $grader)) {
-            throw new required_capability_exception($this->competvet->get_context(), 'mod/competvet:grade', 'nopermissions', '');
+            throw new required_capability_exception($this->competvet->get_context(), 'mod/competvet:cangrade', 'nopermissions', '');
         }
     }
 

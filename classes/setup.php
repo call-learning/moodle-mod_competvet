@@ -63,6 +63,7 @@ class setup {
      */
     public static function create_update_roles(?array $roledefinitions = null): void {
         global $DB;
+        self::update_all_capabilities();
         if (empty($roledefinitions)) {
             $roledefinitions = \mod_competvet\competvet::COMPETVET_ROLES;
         }
@@ -189,5 +190,16 @@ class setup {
         }
         $criterionimporter = new criterion_importer(criterion::class);
         $criterionimporter->import($CFG->dirroot . '/mod/competvet/data/default_evaluation_grid.csv');
+    }
+
+    /**
+     * Update all capabilities.
+     *
+     * @return void
+     */
+    public static function update_all_capabilities() {
+        purge_all_caches();
+        capabilities_cleanup(competvet::COMPONENT_NAME);
+        update_capabilities(competvet::COMPONENT_NAME);
     }
 }

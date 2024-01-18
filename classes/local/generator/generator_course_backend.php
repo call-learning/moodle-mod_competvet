@@ -106,10 +106,6 @@ class generator_course_backend extends tool_generator_course_backend {
      */
     private static $paramevaluator = [1, 3, 30, 300, 1000, 3000];
     /**
-     * @var int[] number of assessors to create for each course size
-     */
-    private static $paramassessor = [1, 3, 30, 300, 1000, 3000];
-    /**
      * @var array[] $userswithroles users with specific roles.
      */
     private $userswithroles = [
@@ -117,7 +113,6 @@ class generator_course_backend extends tool_generator_course_backend {
         'admincompetvet' => [],
         'responsibleucue' => [],
         'evaluator' => [],
-        'assessor' => [],
     ]; // 30 weeks.
     /**
      * @var stdClass Course object

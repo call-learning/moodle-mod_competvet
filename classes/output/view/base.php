@@ -18,7 +18,9 @@ namespace mod_competvet\output\view;
 use core\output\named_templatable;
 use mod_competvet\competvet;
 use renderable;
+use renderer_base;
 use single_button;
+use stdClass;
 use templatable;
 
 /**
@@ -30,13 +32,27 @@ use templatable;
  */
 abstract class base implements renderable, named_templatable {
     /**
+     * @var \moodle_url
+     */
+    protected \moodle_url $backurl;
+    /**
      * Constructor for this renderable.
      *
      * @param int $userid The user we will open the grading app too.
      * @param string $pagetype
      * @param \moodle_url $baseurl
      */
-    protected function __construct(protected int $userid, protected string $pagetype, protected \moodle_url $baseurl) {
+    protected function __construct(
+        protected int $userid,
+        protected string $pagetype,
+        protected \moodle_url $baseurl
+    ) {
+        global $PAGE;
+        $backurl = optional_param('backurl', null, PARAM_URL);
+        if (!empty($backurl)) {
+            $this->backurl = new \moodle_url($backurl);
+        }
+        $this->baseurl->param('backurl', $PAGE->url->out(false));
     }
 
     /**
@@ -51,6 +67,8 @@ abstract class base implements renderable, named_templatable {
         $baseurl = new \moodle_url($FULLME);
         $baseurl->remove_all_params();
         if (empty($pagetype)) {
+            // Planning will be the default page type as there is no index like there could be in the
+            // App as we are just looking at one situation.
             $pagetype = optional_param('pagetype', 'plannings', PARAM_ALPHANUMEXT);
         }
         $class = __NAMESPACE__ . '\\' . $pagetype;
@@ -79,7 +97,12 @@ abstract class base implements renderable, named_templatable {
      *
      * @return single_button|null
      */
-    abstract public function get_back_button(): ?single_button;
+    public function get_back_button(): ?single_button {
+        if (empty($this->backurl)) {
+            return null;
+        }
+        return new single_button($this->backurl, get_string('back'), 'get');
+    }
 
     /**
      * Get the template name to use for this renderable.
@@ -89,5 +112,13 @@ abstract class base implements renderable, named_templatable {
      */
     public function get_template_name(\renderer_base $renderer): string {
         return 'mod_competvet/view/' . $this->pagetype;
+    }
+
+    /**
+     * Check if current user has access to this page and throw an exception if not.
+     *
+     * @return void
+     */
+    public function check_access(): void {
     }
 }

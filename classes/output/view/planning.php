@@ -20,7 +20,6 @@ use mod_competvet\local\api\plannings as plannings_api;
 use mod_competvet\local\persistent\planning as plannings_entity;
 use moodle_url;
 use renderer_base;
-use single_button;
 use stdClass;
 
 /**
@@ -111,26 +110,9 @@ class planning extends base {
             $planning = plannings_entity::get_record(['id' => $planningid]);
             $currentgroupname = groups_get_group_name($planning->get('groupid'));
             $data = [$userswithinfo, $currentgroupname, $viewstudenturl];
+            $this->backurl =
+                new moodle_url($this->baseurl, ['pagetype' => 'plannings', 'id' => $competvet->get_course_module_id()]);
         }
         [$this->userswithinfo, $this->currentgroupname, $this->viewstudent] = $data;
-    }
-
-    /**
-     * Get back button navigation.
-     * We assume here that the back button will be on a single page (view.php)
-     *
-     * @return single_button|null
-     */
-    public function get_back_button(): ?single_button {
-
-        global $PAGE;
-        $context = $PAGE->context;
-        $competvet = competvet::get_from_context($context);
-        $cmid = $competvet->get_course_module_id();
-        $backbutton = new single_button(
-            new moodle_url($this->baseurl, ['pagetype' => 'plannings', 'id' => $cmid]),
-            get_string('back', 'competvet')
-        );
-        return $backbutton;
     }
 }

@@ -46,4 +46,12 @@
                     </div>
                 {{/observations}}
     </div>
+    <div>
+        <a href="#" data-cmid="{{cmid}}" data-planning-id="{{planningid}}" data-student-id="{{studentid}}" data-action="eval-observation-create">{{#str}}observation:add, mod_competvet{{/str}}</a>
+    </div>
 </div>
+{{#js}}
+    require(['mod_competvet/local/forms/observation_create_form'], function(Form) {
+       Form.init();
+    });
+{{/js}}

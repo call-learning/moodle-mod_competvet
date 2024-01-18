@@ -109,6 +109,9 @@ class plannings {
      */
     public static function get_planning_infos(array $planningsids, int $userid) {
         global $DB;
+        if (empty($planningsids)) {
+            return [];
+        }
         [$where, $params] = $DB->get_in_or_equal($planningsids, SQL_PARAMS_NAMED, 'planningids');
         $plannings = planning::get_records_select("id $where", $params);
         $stats = [];
@@ -188,7 +191,10 @@ class plannings {
         $studentmembersid = array_fill_keys(array_keys($students), 0);
 
         foreach ($allcompletedobservations as $completedobservation) {
-            $studentmembersid[$completedobservation->get('studentid')] += 1;
+            $studentid = $completedobservation->get('studentid');
+            if (isset($studentmembersid[$studentid])) {
+                $studentmembersid[$studentid] += 1;
+            }
         }
         $studentfullyassessed = count(array_filter($studentmembersid, fn($count) => $count >= $requiredobservations));
         if ($nbstudents == $studentfullyassessed) {
@@ -238,6 +244,7 @@ class plannings {
         $result =
             [
                 'id' => $userid,
+                'planningid' => $planningid,
                 'info' => self::create_planning_info_for_student($userid, $situation, $observations),
             ];
         return $result;
@@ -295,15 +302,24 @@ class plannings {
     /**
      * Get users infos for planning id
      *
-     * @param int|null $planningid
+     * @param int $planningid
      * @return void
      */
-    public static function get_users_infos_for_planning_id(?int $planningid): array {
-        $studentsid = self::get_students_for_planning_id($planningid);
+    public static function get_users_infos_for_planning_id(int $planningid): array {
         $students = [];
         $planning = planning::get_record(['id' => $planningid]);
         $situation = situation::get_record(['id' => $planning->get('situationid')]);
-        foreach ($studentsid as $studentid => $student) {
+        $competvet = competvet::get_from_situation_id($planning->get('situationid'));
+        $studentsid = array_keys(self::get_students_for_planning_id($planningid));
+        if (!has_capability('mod/competvet:viewother',  $competvet->get_context())) {
+            global $USER;
+            if (in_array($USER->id,$studentsid)) {
+                $studentsid = [$USER->id];
+            } else {
+                $studentsid = [];
+            }
+        }
+        foreach ($studentsid as $studentid) {
             $userinfo = [];
             $userinfo['userinfo'] = utils::get_user_info($studentid);
             $params = ['planningid' => $planningid, 'status' => observation::STATUS_COMPLETED, 'studentid' => $studentid];
