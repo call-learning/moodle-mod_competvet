@@ -48,4 +48,12 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/competvet:editplanning',
     ],
+    'mod_competvet_eval_delete_observation' => [
+        'classname' => 'mod_competvet\\external\\delete_observation',
+        'methodname' => 'execute',
+        'description' => 'Delete an observation from its id',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:editobservation',
+    ],
 ];

@@ -73,6 +73,12 @@ class student_eval extends base {
             $info['level'] = $level;
             $results['criteria'][] = $info;
         }
+        $results['canedit'] = $this->evaluation['canedit'];
+        $results['candelete'] = $this->evaluation['candelete'];
+        $results['id'] = $this->evaluation['id'];
+        $observation  = observation::get_record(['id' => $this->evaluation['id']]);
+        $competvet = competvet::get_from_situation($observation->get_situation());
+        $results['cmid'] = $competvet->get_course_module_id();
         return $results;
     }
 

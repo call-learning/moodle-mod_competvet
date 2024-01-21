@@ -31,25 +31,12 @@ use moodle_url;
  * @package    mod_competvet
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class eval_observation_create extends dynamic_form {
+class eval_observation_ask extends dynamic_form {
 
     public function process_dynamic_submission() {
         global $USER;
         $data = $this->get_data();
-        $criteria = [];
-        foreach($data->criterion_grade as $criterionid => $grade) {
-            $criteria[] = [
-                'id' => $criterionid,
-                'grade' => $grade,
-            ];
-        }
-        foreach($data->criterion_comment as $criterionid => $comment) {
-            $criteria[] = [
-                'id' => $criterionid,
-                'comment' => $comment,
-            ];
-        }
-        $observationid = observations::create_observation(observation::CATEGORY_EVAL_OBSERVATION, $data->studentid, $data->planningid, $USER->id, $criteria);
+        $observationid = observations::create_observation(observation::CATEGORY_EVAL_OBSERVATION, $data->studentid, $data->planningid, 0, $data->context);
         return [
             'result' => true,
         ];
@@ -83,27 +70,6 @@ class eval_observation_create extends dynamic_form {
 
         $mform->addElement('textarea', 'context', get_string('observation:context', 'mod_competvet'));
         $mform->setType('context', PARAM_TEXT);
-        $planning = planning::get_record(['id' => $planningid]);
-        $situation = situation::get_record(['id' => $planning->get('situationid')]);
-
-        $criteria = $situation->get_eval_criteria_tree();
-        foreach ($criteria as $criterion) {
-            $mform->addElement('header', 'criterion_header_' . $criterion->id, $criterion->label);
-            $element = $mform->addElement('text', "criterion_grade[{$criterion->id}]",
-                get_string('gradefor', 'mod_competvet', $criterion->label)
-            );
-            $mform->setType("criterion_grade[{$criterion->id}]", PARAM_INT);
-            $element->updateAttributes(['class' => $element->getAttribute('class') . ' font-weight-bold']);
-            foreach ($criterion->subcriteria as $subcriterion) {
-                $element = $mform->addElement('text', "criterion_comment[{$subcriterion->id}]",
-                    get_string('commentfor', 'mod_competvet', $subcriterion->label)
-                );
-                $mform->setType("criterion_comment[{$subcriterion->id}]", PARAM_TEXT);
-                $element->updateAttributes(['class' => $element->getAttribute('class') . ' ml-3']);
-            }
-        }
-        $mform->addElement('textarea', 'comment', get_string('observation:comment', 'mod_competvet'));
-        $mform->setType('comment', PARAM_TEXT);
     }
 
     protected function check_access_for_dynamic_submission(): void {

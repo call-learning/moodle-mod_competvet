@@ -18,6 +18,7 @@ namespace mod_competvet\output\view;
 use mod_competvet\competvet;
 use mod_competvet\local\api\observations;
 use mod_competvet\local\api\plannings;
+use mod_competvet\local\api\user_role;
 use mod_competvet\local\persistent\situation;
 use moodle_url;
 use renderer_base;
@@ -127,6 +128,9 @@ class student_evaluations extends base {
         $results['cmid'] = $competvet->get_course_module_id();
         $results['planningid'] = $this->planninginfo['planningid'];
         $results['studentid'] = $this->planninginfo['id'];
+        $userrole = user_role::get_top($this->currentuserid, $situation->get('id'));
+        $results['isstudent'] = $userrole == 'student';
+
         return $results;
     }
 

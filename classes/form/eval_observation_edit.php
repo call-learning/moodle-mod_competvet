@@ -17,8 +17,11 @@ namespace mod_competvet\form;
 
 use context;
 use core_form\dynamic_form;
-use mod_competvet\local\persistent\criterion;
+use mod_competvet\competvet;
+use mod_competvet\local\api\observations;
+use mod_competvet\local\persistent\observation;
 use moodle_url;
+
 /**
  *
  * Observation edit form
@@ -27,138 +30,121 @@ use moodle_url;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class eval_observation_edit extends dynamic_form {
-
-    /**
-     * Process data
-     *
-     * @param object $course
-     * @param object $moduleinstance
-     */
-    public function process_data($course, $moduleinstance) {
-        $data = $this->get_data();
-        // Check if appraisal exist, if not create it.
-        $observation = \mod_competvet\local\persistent\entity::get_record([
-            'id' => $data->entityid,
-        ]);
-
-        if ($observation) {
-            $observation->set('comment', $data->comment);
-            $observation->set('context', $data->context);
-            $observation->save();
-            foreach ($data as $key => $value) {
-                foreach (['criterion_grade_' => 'grade', 'criterion_comment_' => 'comment'] as $prefix => $type) {
-                    if (strpos($key, $prefix) === 0) {
-                        $prefixlen = strlen($prefix);
-                        $criterionid = substr($key, $prefixlen);
-                        $observationcriterion = \mod_competvet\local\persistent\observation_criterion\entity::get_record([
-                            'criterionid' => $criterionid,
-                            'observationid' => $observation->get('id'),
-                        ]);
-                        if (!$observationcriterion) {
-                            $observationcriterion = new \mod_competvet\local\persistent\observation_criterion\entity(0, (object) [
-                                'criterionid' => $criterionid,
-                                'observationid' => $observation->get('id'),
-                                'grade' => 0,
-                                'comment' => '',
-                            ]);
-                        }
-                        $observationcriterion->set($type, ($type == 'grade') ? (int) $value : $value);
-                        $observationcriterion->save();
-                    }
+    public function set_data_for_dynamic_submission(): void {
+        $observationid = $this->optional_param('id', null, PARAM_INT);
+        $data = observations::get_observation_information($observationid);
+        if (empty($data['context'])) {
+            $data['context'] = '';
+            $data['context_id'] = 0;
+        } else {
+            $context = $data['context'];
+            unset($data['context']);
+            $data['context'] = $context['comment'];
+            $data['contextformat'] = FORMAT_HTML;
+            $data['context_id'] = $context['id'];
+        }
+        if ($data['comments']) {
+            $comments = $data['comments'];
+            unset($data['comments']);
+            $data['comments'] = [];
+            foreach ($comments as $comment) {
+                $data['comments'][] = $comment['comment'];
+                $data['comments_id'][] = $comment['id'];
+            }
+            $data['comments_repeat'] = count($data['comments']);
+        }
+        if ($data['criteria']) {
+            $criteria = $data['criteria'];
+            unset($data['criteria']);
+            $data['criterion_levels'] = [];
+            $data['criterion_levels_id'] = [];
+            $data['criterion_comments'] = [];
+            $data['criterion_comments_id'] = [];
+            foreach ($criteria as $criterion) {
+                $criterioninfo = $criterion['criterioninfo'];
+                $data['criterion_levels_id'][$criterioninfo['id']] = $criterion['id'];
+                $data['criterion_levels'][$criterioninfo['id']] = $criterion['level'];
+                foreach ($criterion['subcriteria'] as $subcriterion) {
+                    $subcriterioninfo = $subcriterion['criterioninfo'];
+                    $data['criterion_comments_id'][$subcriterioninfo['id']] = $subcriterion['id'];
+                    $data['criterion_comments'][$subcriterioninfo['id']] = $subcriterion['comment'];
                 }
             }
-            return true;
         }
-        return false;
+        $this->_customdata['comments_repeat'] = $data['comments_repeat'];
+        parent::set_data((object) $data);
     }
 
-    /**
-     * Set Data with existing info
-     *
-     * @param array $defaultvalues
-     * @return void
-     */
-    public function set_data($defaultvalues) {
-        if (!empty($defaultvalues['entityid'])) {
-            global $DB;
-            $observationid = $defaultvalues['entityid'];
-            $observation = new \mod_competvet\local\persistent\entity($observationid);
-            $observationcriteria =
-                \mod_competvet\local\persistent\observation_criterion\entity::get_records(['observationid' => $observationid]);
-            $defaultvalues['comment'] = $observation->get('comment');
-            $defaultvalues['context'] = $observation->get('context');
-            foreach ($observationcriteria as $criterion) {
-                $defaultvalues['criterion_grade_' . $criterion->get('criterionid')] = $criterion->get('grade');
-                $defaultvalues['criterion_comment_' . $criterion->get('criterionid')] = $criterion->get('comment');
-            }
+    public function process_dynamic_submission() {
+        try {
+            $data = $this->get_data();
+            $observation = observation::get_record(['id' => $data->id]);
+            $situation = $observation->get_situation();
+            $context = eval_observation_helper::process_form_data_context($data);
+            $comments = eval_observation_helper::process_form_data_comments($data);
+            $criteria = eval_observation_helper::process_form_data_criteria($data, $situation);
+            observations::edit_observation(
+                $data->id,
+                $context,
+                $comments,
+                $criteria,
+            );
+            return [
+                'result' => true,
+                'returnurl' => $this->get_page_url_for_dynamic_submission(),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'result' => false,
+                'error' => $e->getMessage(),
+            ];
         }
-        parent::set_data($defaultvalues);
+    }
+
+    protected function get_page_url_for_dynamic_submission(): moodle_url {
+        $observationid = $this->optional_param('id', null, PARAM_INT);
+        $observation = observation::get_record(['id' => $observationid]);
+        $competvet = competvet::get_from_situation($observation->get_situation());
+        return new moodle_url('/course/view.php', ['id' => $competvet->get_course_module_id()]);
+    }
+
+    public function definition_after_data() {
+        $mform = $this->_form;
+        eval_observation_helper::add_comments_to_form($this, $mform, $this->_customdata['comments_repeat'] ?? 1);
     }
 
     /**
      * Define form
      */
     protected function definition() {
-        $rootcriteria = criterion::get_records(['parentid' => 0], 'sort');
         $mform = $this->_form;
-        $mform->addElement('header', 'criterion_header_context', get_string('context', 'mod_competvet'));
-        $mform->addElement(
-            'textarea',
-            'context',
-            get_string('context', 'mod_competvet')
-        );
-        $mform->setType('context', PARAM_RAW);
-        $mform->setExpanded('criterion_header_context');
-        foreach ($rootcriteria as $criterion) {
-            $critrecord = $criterion->to_record();
-            $mform->addElement('header', 'criterion_header_' . $critrecord->id, $critrecord->label);
-            $element = $mform->addElement(
-                'text',
-                'criterion_grade_' . $critrecord->id,
-                get_string('gradefor', 'mod_competvet', $critrecord->label)
-            );
-            $mform->setType('criterion_grade_' . $critrecord->id, PARAM_INT);
-            $element->updateAttributes(['class' => $element->getAttribute('class') . ' font-weight-bold']);
-            $subcriteria = criterion::get_records(['parentid' => $critrecord->id], 'sort');
-            foreach ($subcriteria as $sub) {
-                $critrecord = $sub->to_record();
-                $element = $mform->addElement(
-                    'text',
-                    'criterion_comment_' . $critrecord->id,
-                    get_string('commentfor', 'mod_competvet', $critrecord->label)
-                );
-                $mform->setType('criterion_comment_' . $critrecord->id, PARAM_TEXT);
-                $element->updateAttributes(['class' => $element->getAttribute('class') . ' ml-3']);
-            }
-        }
-        $mform->addElement('header', 'criterion_header_comment', get_string('comment', 'mod_competvet'));
-        $mform->addElement(
-            'textarea',
-            'comment',
-            get_string('comment', 'mod_competvet')
-        );
-        $mform->setExpanded('criterion_header_comment');
-        $mform->setType('comment', PARAM_RAW);
-        $this->add_action_buttons();
-    }
+        $mform->addElement('header', 'eval_observation_create', get_string('observation:add', 'mod_competvet'));
+        $mform->setExpanded('eval_observation_create');
 
-    protected function get_context_for_dynamic_submission(): context {
-        // TODO: Implement get_context_for_dynamic_submission() method.
+        $observationid = $this->optional_param('id', null, PARAM_INT);
+        $mform->addElement('hidden', 'id', $observationid);
+        $mform->setType('id', PARAM_INT);
+
+        $mform->addElement('textarea', 'context', get_string('observation:comment:context', 'mod_competvet'));
+        $mform->setType('context', PARAM_TEXT);
+        $mform->addElement('hidden', 'context_id');
+        $mform->setType('id', PARAM_INT);
+
+        $observation = observation::get_record(['id' => $observationid]);
+        eval_observation_helper::add_criteria_to_form($observation->get_situation(), $this, $mform);
     }
 
     protected function check_access_for_dynamic_submission(): void {
-        // TODO: Implement check_access_for_dynamic_submission() method.
+        $context = $this->get_context_for_dynamic_submission();
+        if (!has_capability('mod/competvet:canobserve', $context)) {
+            throw new \moodle_exception('nopermission', 'error', '', get_string('nopermission', 'error'));
+        }
     }
 
-    public function process_dynamic_submission() {
-        // TODO: Implement process_dynamic_submission() method.
-    }
-
-    public function set_data_for_dynamic_submission(): void {
-        // TODO: Implement set_data_for_dynamic_submission() method.
-    }
-
-    protected function get_page_url_for_dynamic_submission(): moodle_url {
-        // TODO: Implement get_page_url_for_dynamic_submission() method.
+    protected function get_context_for_dynamic_submission(): context {
+        $observationid = $this->optional_param('id', null, PARAM_INT);
+        $observation = observation::get_record(['id' => $observationid]);
+        $competvet = competvet::get_from_situation($observation->get_situation());
+        return $competvet->get_context();
     }
 }

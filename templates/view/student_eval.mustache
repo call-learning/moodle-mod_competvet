@@ -24,6 +24,20 @@
     }
 }}
 <div class="competvet-view-student-eval">
+    <div class="d-flex justify-content-end">
+        {{#canedit}}
+            <div>
+                <button class="btn btn-primary m-3" data-cmid="{{cmid}}" data-id="{{id}}" data-action="eval-observation-edit">{{#str}}
+                    observation:edit, mod_competvet{{/str}}</button>
+            </div>
+        {{/canedit}}
+        {{#candelete}}
+            <div>
+                <button class="btn btn-danger m-3" data-cmid="{{cmid}}" data-id="{{id}}" data-action="eval-observation-delete">{{#str}}
+                    observation:delete, mod_competvet{{/str}}</button>
+            </div>
+        {{/candelete}}
+    </div>
     <div class="container">
         <h3>{{#str}}context, mod_competvet{{/str}}</h3>
         <div class="container">
@@ -62,3 +76,9 @@
         </div>
     </div>
 </div>
+{{#js}}
+    require(['mod_competvet/local/forms/observation_forms'], function(Form) {
+    Form.initDelete('mod_competvet');
+    Form.initEdit('mod_competvet');
+    });
+{{/js}}

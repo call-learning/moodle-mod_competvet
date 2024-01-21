@@ -45,7 +45,8 @@ abstract class base implements renderable, named_templatable {
     protected function __construct(
         protected int $userid,
         protected string $pagetype,
-        protected \moodle_url $baseurl
+        protected \moodle_url $baseurl,
+        protected int $currentuserid = 0,
     ) {
         global $PAGE;
         $backurl = optional_param('backurl', null, PARAM_URL);
@@ -53,6 +54,10 @@ abstract class base implements renderable, named_templatable {
             $this->backurl = new \moodle_url($backurl);
         }
         $this->baseurl->param('backurl', $PAGE->url->out(false));
+        if ($this->currentuserid == 0) {
+            global $USER;
+            $this->currentuserid = $USER->id;
+        }
     }
 
     /**

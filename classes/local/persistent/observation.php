@@ -17,6 +17,7 @@ namespace mod_competvet\local\persistent;
 
 use core\persistent;
 use lang_string;
+use mod_competvet\competvet;
 
 /**
  * Observation entity
@@ -118,21 +119,54 @@ class observation extends persistent {
     }
 
     /**
-     * Get the comments for the observation
+     * Can delete the observation
      *
-     * @return observation_comment[]
+     * @return bool
      */
-    public function get_comments() {
-        return observation_comment::get_records(['observationid' => $this->raw_get('id')]);
+    public function can_delete() {
+        return $this->can_edit();
     }
 
     /**
-     * Get the levels for the criteria of the observation
+     * Can the observation be edited
      *
-     * @return observation_criterion_level[]
+     * @return bool
      */
-    public function get_criteria_levels() {
-        return observation_criterion_level::get_records(['observationid' => $this->raw_get('id')]);
+    public function can_edit() {
+        global $USER;
+        $sameuser = $USER->id == $this->raw_get('observerid');
+        $situation = $this->get_situation();
+        $competvet = competvet::get_from_situation($situation);
+        $context = $competvet->get_context();
+        return has_capability('mod/competvet:canobserve', $context) && $sameuser;
+    }
+
+    /**
+     * Get observation context
+     *
+     * @return situation
+     */
+    public function get_situation(): situation {
+        $planning = planning::get_record(['id' => $this->raw_get('planningid')]);
+        $situation = new situation($planning->get('situationid'));
+        return $situation;
+    }
+
+    /**
+     * Delete dependencies
+     *
+     * @return void
+     */
+    public function before_delete() {
+        foreach ($this->get_criteria_comments() as $comment) {
+            $comment->delete();
+        }
+        foreach ($this->get_criteria_levels() as $level) {
+            $level->delete();
+        }
+        foreach ($this->get_comments() as $comment) {
+            $comment->delete();
+        }
     }
 
     /**
@@ -141,6 +175,42 @@ class observation extends persistent {
      * @return observation_criterion_comment[] An array of observation_criterion_comment objects
      */
     public function get_criteria_comments() {
-        return observation_criterion_comment::get_records(['observationid' => $this->raw_get('id')]);
+        return $this->get_criteria_element_by_criteria_sort_order(observation_criterion_comment::class);
+    }
+
+    private function get_criteria_element_by_criteria_sort_order(string $persistentname) {
+        global $DB;
+        $fields = $persistentname::get_sql_fields('ocl', '');
+        $sql = 'SELECT ' . $fields . '
+                FROM {' . $persistentname::TABLE . '} ocl
+                JOIN {' . criterion::TABLE . '} c ON c.id = ocl.criterionid
+                WHERE ocl.observationid = :observationid
+                ORDER BY c.sort, c.parentid ASC';
+        $params = [
+            'observationid' => $this->raw_get('id'),
+        ];
+
+        $records = $DB->get_records_sql($sql, $params);
+        return array_map(function($record) use ($persistentname) {
+            return new $persistentname($record->id, $record);
+        }, $records);
+    }
+
+    /**
+     * Get the levels for the criteria of the observation
+     *
+     * @return observation_criterion_level[]
+     */
+    public function get_criteria_levels() {
+        return $this->get_criteria_element_by_criteria_sort_order(observation_criterion_level::class);
+    }
+
+    /**
+     * Get the comments for the observation
+     *
+     * @return observation_comment[]
+     */
+    public function get_comments() {
+        return observation_comment::get_records(['observationid' => $this->raw_get('id')]);
     }
 }

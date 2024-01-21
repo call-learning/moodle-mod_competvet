@@ -46,12 +46,20 @@
                     </div>
                 {{/observations}}
     </div>
+    {{#isstudent}}
     <div>
-        <a href="#" data-cmid="{{cmid}}" data-planning-id="{{planningid}}" data-student-id="{{studentid}}" data-action="eval-observation-create">{{#str}}observation:add, mod_competvet{{/str}}</a>
+        <a href="#" data-cmid="{{cmid}}" data-planning-id="{{planningid}}" data-student-id="{{studentid}}" data-action="eval-observation-ask">{{#str}}observation:ask, mod_competvet{{/str}}</a>
     </div>
+    {{/isstudent}}
+    {{^isstudent}}
+    <div>
+        <a href="#" data-cmid="{{cmid}}" data-planning-id="{{planningid}}" data-student-id="{{studentid}}" data-action="eval-observation-add">{{#str}}observation:add, mod_competvet{{/str}}</a>
+    </div>
+    {{/isstudent}}
 </div>
 {{#js}}
-    require(['mod_competvet/local/forms/observation_create_form'], function(Form) {
-       Form.init();
-    });
+require(['mod_competvet/local/forms/observation_forms'], function(Form) {
+    Form.initAsk('mod_competvet');
+    Form.initAdd('mod_competvet');
+});
 {{/js}}

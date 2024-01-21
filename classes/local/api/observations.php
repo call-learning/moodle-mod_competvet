@@ -93,20 +93,23 @@ class observations {
         $result = [
             'id' => $observation->get('id'),
             'category' => $observation->get_observation_type(),
-            'context' => $contextrecord,
-            'comments' =>
-                array_values(
-                    array_map(function ($obscrit) {
-                        $return = (array) $obscrit->to_record();
-                        $return['userinfo'] = utils::get_user_info($return['usercreated']);
-                        $return['commentlabel'] = ''; // TODO Fill this in with labels for comment/autoeval.
-                        unset($return['usercreated']);
-                        $return['comment'] = format_text($return['comment'], $return['commentformat']);
-                        unset($return['commentformat']);
-                        return $return;
-                    }, $othercomments)
-                ),
-            'criteria' => array_map(function ($obscrit) use ($criteria) {
+        ];
+        $result['context'] = $contextrecord;
+        $result['comments'] =
+            array_values(
+                array_map(function ($obscrit) {
+                    $return = (array) $obscrit->to_record();
+                    $return['userinfo'] = utils::get_user_info($return['usercreated']);
+                    $return['commentlabel'] = ''; // TODO Fill this in with labels for comment/autoeval.
+                    unset($return['usercreated']);
+                    $return['comment'] = format_text($return['comment'], $return['commentformat']);
+                    unset($return['commentformat']);
+                    return $return;
+                }, $othercomments)
+            );
+
+        $result['criteria'] =
+            array_map(function ($obscrit) use ($criteria) {
                 $criterioninfo = (array) $criteria[$obscrit->get('criterionid')]->to_record();
                 unset($criterioninfo['timecreated']);
                 unset($criterioninfo['timemodified']);
@@ -118,8 +121,8 @@ class observations {
                 ];
                 $return['subcriteria'] = [];
                 return $return;
-            }, $observation->get_criteria_levels()),
-        ];
+            }, $observation->get_criteria_levels());
+
         $allcomments = $observation->get_criteria_comments();
         foreach ($result['criteria'] as &$criterion) {
             $allchildrencriteria =
@@ -139,52 +142,105 @@ class observations {
                 return $return;
             }, $subcriteriacomments);
         }
+        $result['canedit'] = $observation->can_edit();
+        $result['candelete'] = $observation->can_delete();
         return $result;
     }
 
     /**
      * @param int $category
-     * @param int $studentid
      * @param int $planningid
+     * @param int $studentid
      * @param int|null $observerid
+     * @param string|null $context
      * @return int
      */
-    public static function create_observation(int $category, int $studentid, int $planningid, ?int $observerid = 0, ?array $criteriaset = null): int {
+    public static function create_observation(
+        int $category,
+        int $planningid,
+        int $studentid,
+        ?int $observerid = 0,
+        ?object $context = null,
+        ?array $comments = [],
+        array $criteria = []
+    ): int {
+        global $USER;
         $observation = new observation(0);
         $observation->set('category', $category);
         $observation->set('studentid', $studentid);
         $observation->set('planningid', $planningid);
         $observation->set('observerid', $observerid);
+        $observation->set('status', observation::STATUS_NOTSTARTED);
         $observation->create();
-        // Now create the subcriteria.
+        if ($context) {
+            $contextcomment = new observation_comment(0);
+            $contextcomment->set('observationid', $observation->get('id'));
+            $contextcomment->set('type', observation_comment::OBSERVATION_CONTEXT);
+            $contextcomment->set('comment', $context->comment);
+            $contextcomment->set('commentformat', FORMAT_HTML);
+            $contextcomment->set('usercreated', $context->userinfo['id'] ?? $studentid);
+            $contextcomment->create();
+        }
+        foreach ($comments as $comment) {
+            if (!empty($comment['id'])) {
+                $obscomment = observation_comment::get_record(['id' => $comment['id']]);
+            } else {
+                $obscomment = new observation_comment(0);
+                $obscomment->set('observationid', $observation->get('id'));
+                $obscomment->set('usercreated', $observerid ?? $USER->id);
+                $obscomment->set('type', observation_comment::OBSERVATION_COMMENT);
+                $obscomment->create();
+            }
+            $obscomment->set('comment', $comment['comment']);
+            $obscomment->set('commentformat', FORMAT_HTML);
+            $obscomment->update();
+        }
+        // Now create the criteria and subcriteria structure.
         $observationid = $observation->get('id');
         $planning = planning::get_record(['id' => $planningid]);
         $situation = situation::get_record(['id' => $planning->get('situationid')]);
-        $criteria = $situation->get_eval_criteria();
-        if (!empty($criteriaset)) {
-            $criteriaset = array_combine(
-                array_column($criteriaset, 'id'),
-                $criteriaset
-            );
+        $criteriamodels = $situation->get_eval_criteria();
+        if (!empty($criteria)) {
+            // Flattern the structure so we can easily find the values.
+            $criteriadict = [];
+            foreach ($criteria as $criterion) {
+                $criterionid = $criterion['criterioninfo']['id'] ?? null;
+                if (empty($criterionid)) {
+                    continue;
+                }
+                $criteriadict[$criterionid] = $criterion;
+                foreach ($criterion['subcriteria'] as $subcriterion) {
+                    $subcriterionid = $subcriterion['criterioninfo']['id'] ?? null;
+                    if (empty($subcriterionid)) {
+                        continue;
+                    }
+                    $criteriadict[$subcriterionid] = $subcriterion;
+                }
+            }
         }
-        foreach ($criteria as $criterion) {
-            if (empty($criterion->get('parentid'))) {
+        foreach ($criteriamodels as $criterionmodel) {
+            if (empty($criterionmodel->get('parentid'))) {
                 $obscrit = new observation_criterion_level(0);
                 $obscrit->set('observationid', $observationid);
-                $obscrit->set('criterionid', $criterion->get('id'));
-                $grade = $criteriaset[$criterion->get('id')]['grade'] ?? 0;
-                $obscrit->set('level', $grade);
+                $obscrit->set('criterionid', $criterionmodel->get('id'));
+                if (isset($criteriadict[$criterionmodel->get('id')])) {
+                    $obscrit->set('level', $criteriadict[$criterionmodel->get('id')]['level']);
+                } else {
+                    $obscrit->set('level', 0);
+                }
                 $obscrit->create();
             } else {
                 $obscrit = new observation_criterion_comment(0);
                 $obscrit->set('observationid', $observationid);
-                $obscrit->set('criterionid', $criterion->get('id'));
-                $comment = $criteriaset[$criterion->get('id')]['comment'] ?? '';
-                $obscrit->set('comment', $comment);
+                $obscrit->set('criterionid', $criterionmodel->get('id'));
+                if (isset($criteriadict[$criterionmodel->get('id')])) {
+                    $obscrit->set('comment', $criteriadict[$criterionmodel->get('id')]['comment']);
+                } else {
+                    $obscrit->set('comment', '');
+                }
                 $obscrit->create();
             }
         }
-
         return $observation->get('id');
     }
 
@@ -192,31 +248,54 @@ class observations {
      * Edit an observation
      *
      * @param int $observationid
-     * @param string $context
+     * @param array $context
      * @param array $comments
      * @param array $criteria
      * @return void
      */
-    public static function edit_observation(int $observationid, string $context, array $comments, array $criteria) {
+    public static function edit_observation(int $observationid, object $context, array $comments, array $criteria) {
+        global $USER;
         $observation = observation::get_record(['id' => $observationid]);
         $observation->update();
-        $contextcomment = observation_comment::get_record(['observationid' => $observationid,
-            'type' => observation_comment::OBSERVATION_CONTEXT, ]);
-        $contextcomment->set('comment', $context);
+        if (empty($context->id)) {
+            $contextcomment = new observation_comment(0);
+            $contextcomment->set('observationid', $observationid);
+            $contextcomment->set('type', observation_comment::OBSERVATION_CONTEXT);
+            $contextcomment->set('usercreated', $USER->id);
+            $contextcomment->create();
+        } else {
+            $contextcomment = observation_comment::get_record(['id' => $context->id]);
+        }
+        $contextcomment->set('comment', $context->comment);
         $contextcomment->set('commentformat', FORMAT_HTML);
         $contextcomment->update();
+        $commentstodelete = observation_comment::get_records(['observationid' => $observationid,
+            'type' => observation_comment::OBSERVATION_COMMENT, ]);
+        $commentstodelete = array_combine(
+            array_map(fn($comment) => $comment->get('id'), $commentstodelete),
+            $commentstodelete
+        );
         foreach ($comments as $comment) {
-            if (isset($comment['id'])) {
-                $obscomment = observation_criterion_comment::get_record(['id' => $comment['id']]);
+            if (!empty($comment['id'])) {
+                $obscomment = observation_comment::get_record(['id' => $comment['id']]);
             } else {
-                $obscomment = new observation_criterion_comment(0);
+                $obscomment = new observation_comment(0);
                 $obscomment->set('observationid', $observationid);
+                $obscomment->set('usercreated', $USER->id);
+                $obscomment->set('type', observation_comment::OBSERVATION_COMMENT);
                 $obscomment->create();
             }
-            $obscomment->set('comment', $context);
+            $obscomment->set('comment', $comment['comment']);
             $obscomment->set('commentformat', FORMAT_HTML);
             $obscomment->update();
+            if ($obscomment->get('id')) {
+                unset($commentstodelete[$obscomment->get('id')]);
+            }
         }
+        foreach ($commentstodelete as $comment) {
+            $comment->delete();
+        }
+        // We are now sure we have the full structure of criteria.
         foreach ($criteria as $criterion) {
             if (isset($criterion['id'])) {
                 $obscrit = observation_criterion_level::get_record(['id' => $criterion['id']]);
