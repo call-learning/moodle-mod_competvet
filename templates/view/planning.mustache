@@ -27,11 +27,11 @@
                 'users': [
                     {
                         'fullname': 'Observer 1',
-                        'pictureurl': 'http://localhost/moodle/pluginfile.php/1/user/icon/f1',
+                        'userpictureurl': 'http://localhost/moodle/pluginfile.php/1/user/icon/f1',
                     },
                     {
                         'fullname': 'Observer 2',
-                        'pictureurl': 'http://localhost/moodle/pluginfile.php/2/user/icon/f1',
+                        'userpictureurl': 'http://localhost/moodle/pluginfile.php/2/user/icon/f1',
                     }
                 ]
             },
@@ -41,12 +41,12 @@
                 'users': [
                     {
                         'fullname': 'Student 1',
-                        'pictureurl': 'http://localhost/moodle/pluginfile.php/3/user/icon/f1',
+                        'userpictureurl': 'http://localhost/moodle/pluginfile.php/3/user/icon/f1',
                         'viewurl': 'http://localhost/moodle/user/view.php?id=3'
                     },
                     {
                         'fullname': 'Student 2',
-                        'pictureurl': 'http://localhost/moodle/pluginfile.php/4/user/icon/f1',
+                        'userpictureurl': 'http://localhost/moodle/pluginfile.php/4/user/icon/f1',
                         'viewurl': 'http://localhost/moodle/user/view.php?id=4'
                     }
                 ]
@@ -69,22 +69,7 @@
                 <div id="competvet-view-users-{{usertype}}" class="collapse show" aria-labelledby="competvet-view-users-heading-{{usertype}}" data-parent="#users-accordion">
                     <div class="card-body">
                         {{#users}}
-                            <div class="container m-3 py-1">
-                                <div>
-                                    <img src="{{pictureurl}}" alt="{{label}}" class="userpicture" style="width:2em;">
-                                    {{#viewurl}}
-                                        <a href="{{viewurl}}"><span>{{fullname}}</span></a>
-                                    {{/viewurl}}
-                                    {{^viewurl}}
-                                        <span>{{fullname}}</span>
-                                    {{/viewurl}}
-                                </div>
-                                <div>
-                                    {{#stats}}
-                                        <span><span class="badge badge-primary badge-pill">{{nbdone}}/{{nbrequired}}</span></span> <span class="small">{{label}}</span>
-                                    {{/stats}}
-                                </div>
-                            </div>
+                            {{> mod_competvet/view/user_info}}
                         {{/users}}
                     </div>
                 </div>

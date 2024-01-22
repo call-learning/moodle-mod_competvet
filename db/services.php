@@ -56,4 +56,12 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/competvet:editobservation',
     ],
+    'mod_competvet_eval_ask_for_observation' => [
+        'classname' => 'mod_competvet\\external\\ask_for_observation',
+        'methodname' => 'execute',
+        'description' => 'Ask for an observation and add it to the list of TODOs',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:view',
+    ],
 ];

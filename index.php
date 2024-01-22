@@ -22,73 +22,80 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_competvet\local\persistent\situation;
+use mod_competvet\reportbuilder\local\systemreports\situations;
 require(__DIR__ . '/../../config.php');
+global $PAGE, $DB, $OUTPUT, $USER;
 
-require_once(__DIR__ . '/lib.php');
-global $PAGE, $DB, $OUTPUT;
-$id = required_param('id', PARAM_INT);
-
+$id = optional_param('id', SITEID, PARAM_INT);
 $course = $DB->get_record('course', ['id' => $id], '*', MUST_EXIST);
-require_course_login($course);
+if ($id == SITEID) {
+    $context = context_system::instance();
+    require_login();
+} else {
+    $context = context_system::instance();
+    require_course_login($course);
+}
 
-$coursecontext = context_course::instance($course->id);
+$userid = optional_param('userid', $USER->id, PARAM_INT);
 
-$event = \mod_competvet\event\course_module_instance_list_viewed::create([
-    'context' => $coursecontext,
-]);
-$event->add_record_snapshot('course', $course);
-$event->trigger();
+$context = context_system::instance();
+$currenttab = optional_param('currenttab', 'situations', PARAM_ALPHA);
+$tabtree = [];
+$tabs = [
+    'situations' => [
+        'url' => new moodle_url('/mod/competvet/index.php', ['id' => $id, 'currenttab' => 'situations']),
+        'label' => get_string('allmysituations', 'mod_competvet'),
+    ],
+    'todo' => [
+        'url' => new moodle_url('/mod/competvet/index.php', ['id' => $id,  'currenttab' => 'todo']),
+        'label' => get_string('todos', 'mod_competvet'),
+    ],
+];
+foreach($tabs as $id => $tab) {
+    $tabtree[] = new tabobject(
+        $id,
+        $tab['url'],
+        $tab['label'],
+    );
+}
 
-$PAGE->set_url('/mod/competvet/index.php', ['id' => $id]);
-$PAGE->set_title(format_string($course->fullname));
-$PAGE->set_heading(format_string($course->fullname));
-$PAGE->set_context($coursecontext);
+$currenturl = new moodle_url($tabs[$currenttab]['url']);
+$pagetitle = $tabs[$currenttab]['label'];
+$PAGE->set_url($currenturl);
+$PAGE->set_context($context);
+$PAGE->set_title($pagetitle);
 
 echo $OUTPUT->header();
-
-$modulenameplural = get_string('modulenameplural', 'mod_competvet');
-echo $OUTPUT->heading($modulenameplural);
-
-$competvets = get_all_instances_in_course('competvet', $course);
-
-if (empty($competvets)) {
-    notice(get_string('no$competvetinstances', 'mod_competvet'), new moodle_url('/course/view.php', ['id' => $course->id]));
-}
-
-$table = new html_table();
-$table->attributes['class'] = 'generaltable mod_index';
-
-if ($course->format == 'weeks') {
-    $table->head = [get_string('week'), get_string('name')];
-    $table->align = ['center', 'left'];
-} else if ($course->format == 'topics') {
-    $table->head = [get_string('topic'), get_string('name')];
-    $table->align = ['center', 'left', 'left', 'left'];
-} else {
-    $table->head = [get_string('name')];
-    $table->align = ['left', 'left', 'left'];
-}
-
-foreach ($competvets as $competvet) {
-    if (!$competvet->visible) {
-        $link = html_writer::link(
-            new moodle_url('/mod/competvet/view.php', ['id' => $competvet->coursemodule]),
-            format_string($competvet->name, true),
-            ['class' => 'dimmed']
+echo $OUTPUT->heading($pagetitle);
+echo $OUTPUT->tabtree($tabtree, $currenttab);
+switch($currenttab) {
+    case 'situations':
+        if ($id != SITEID) {
+            $situationsid = situation::get_all_situations_in_course_id_for($userid, $course->id);
+        } else {
+            $situationsid = situation::get_all_situations_id_for($userid);
+        }
+        $report = \core_reportbuilder\system_report_factory::create(
+            situations::class,
+            $context,
+            '',
+            '',
+            0,
+            [
+                'onlyforsituationsid' => join(",", $situationsid),
+            ],
         );
-    } else {
-        $link = html_writer::link(
-            new moodle_url('/mod/competvet/view.php', ['id' => $competvet->coursemodule]),
-            format_string($competvet->name, true)
+        break;
+    case 'todo':
+        $report = \core_reportbuilder\system_report_factory::create(
+            \mod_competvet\reportbuilder\local\systemreports\todos::class,
+            $context,
+            '',
+            '',
+            0,
         );
-    }
-
-    if ($course->format == 'weeks' || $course->format == 'topics') {
-        $table->data[] = [$competvet->section, $link];
-    } else {
-        $table->data[] = [$link];
-    }
+        break;
 }
-
-echo html_writer::table($table);
+echo $report->output();
 echo $OUTPUT->footer();

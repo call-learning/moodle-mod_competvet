@@ -15,25 +15,28 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_competvet/view/observation_card
+    @template mod_competvet/view/eval_ask_observation_modal
 
 
     Example context (json):
     {
+        'observers': [
+            {
+                'fullname': 'Student 1',
+                'userpictureurl': 'http://localhost/moodle/pluginfile.php/3/user/icon/f1',
+                'viewurl': 'http://localhost/moodle/user/view.php?id=3'
+            },
+        ],
 
     }
 }}
-<div class="container ml-0 my-3">
-    <div class="card w-50">
-        <div class="card-header">
-            <div>
-                <img src="{{userpictureurl}}" class="rounded-circle" width="50" height="50">
-                <a href="{{viewurl}}"><span>{{fullname}}</span></a>
-            </div>
-        </div>
-        <div class="card-body d-flex flex-column">
-            <span class="card-text">{{#userdate}} {{{evaluationtime}}}, {{#str}} strftimedatetime, core_langconfig {{/str}}{{/userdate}}</span>
-            <a href="{{viewurl}}" class="btn btn-primary align-self-end">{{#str}} view {{/str}}</a>
-        </div>
-    </div>
+<div class="ask-observation-modal">
+    {{#observers}}
+        {{> mod_competvet/view/user_info }}
+    {{/observers}}
 </div>
+{{#js}}
+require(['mod_competvet/local/forms/observation_forms'], function(Form) {
+    Form.initUserAsk('mod_competvet', {{planningid}}, {{studentid}}, "{{context}}");
+});
+{{/js}}

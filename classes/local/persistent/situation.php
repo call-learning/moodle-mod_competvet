@@ -73,6 +73,30 @@ class situation extends persistent {
     }
 
     /**
+     * Get all situations for a given user within a course
+     *
+     * Here we do not use cache as we should have a small amount of situations
+     *
+     * @param int $userid
+     * @return array|int[]
+     */
+    public static function get_all_situations_in_course_id_for(int $userid, int $courseid): array {
+        $situationsid = [];
+
+        $coursemodinfo = get_fast_modinfo($courseid, $userid);
+        foreach ($coursemodinfo->get_instances_of(competvet::MODULE_NAME) as $cm) {
+            if ($cm->get_user_visible()) {
+                $competvet = competvet::get_from_instance_id($cm->instance);
+                // First case: this is a student, let's look into plannings.
+                if ($competvet->has_view_access($userid)) {
+                    // If not a student, if you see the activity, you will also see the situation.
+                    $situationsid[] = $competvet->get_situation()->get('id');
+                }
+            }
+        }
+        return $situationsid;
+    }
+    /**
      * Usual properties definition for a persistent
      *
      * @return array|array[]

@@ -203,29 +203,23 @@ class plannings {
         return planning::CATEGORY_OBSERVER_LATE;
     }
 
-    protected static function get_category_text_for_planning_id(int $planningid, int $category): string {
-        return get_string('planningcategory:' . planning::CATEGORY[$category], 'mod_competvet');
+    /**
+     * Get information for planning
+     *
+     * @param int $planningid
+     * @return array
+     */
+    public static function get_planning_info(int $planningid): array {
+        $planning = planning::get_record(['id' => $planningid]);
+        $planningarray = (array) $planning->to_record();
+        $planningarray = array_intersect_key($planningarray,
+            array_fill_keys(['id', 'startdate', 'enddate', 'session', 'groupid', 'situationid'], 0));
+        $planningarray['groupname'] = groups_get_group_name($planning->get('groupid'));
+        return $planningarray;
     }
 
-    /**
-     * Retrieves the users which are observers associated with a given planning ID.
-     *
-     * @param int $planningid The ID of the planning.
-     * @return array An array of users where the keys are user IDs and the values are their roles as observers.
-     */
-    private static function get_observers_for_planning_id(int $planningid): array {
-        $planning = planning::get_record(['id' => $planningid]);
-        $competvet = competvet::get_from_situation_id($planning->get('situationid'));
-        $situationcontext = $competvet->get_context();
-        $allenrolled = enrol_get_course_users_roles($situationcontext->get_course_context()->instanceid);
-        $observers = [];
-        foreach ($allenrolled as $userid => $roles) {
-            $toprole = user_role::get_top($userid, $competvet->get_situation()->get('id'));
-            if ($toprole != 'student' && $toprole != 'unknown') {
-                $observers[$userid] = $toprole;
-            }
-        }
-        return $observers;
+    protected static function get_category_text_for_planning_id(int $planningid, int $category): string {
+        return get_string('planningcategory:' . planning::CATEGORY[$category], 'mod_competvet');
     }
 
     /**
@@ -287,19 +281,6 @@ class plannings {
     }
 
     /**
-     * Get information for planning
-     * @param int $planningid
-     * @return array
-     */
-    public static function get_planning_info(int $planningid): array {
-        $planning = planning::get_record(['id' => $planningid]);
-        $planningarray = (array) $planning->to_record();
-        $planningarray = array_intersect_key($planningarray, array_fill_keys(['id', 'startdate', 'enddate', 'session', 'groupid', 'situationid'], 0));
-        $planningarray['groupname'] = groups_get_group_name($planning->get('groupid'));
-        return $planningarray;
-    }
-
-    /**
      * Get users infos for planning id
      *
      * @param int $planningid
@@ -311,9 +292,9 @@ class plannings {
         $situation = situation::get_record(['id' => $planning->get('situationid')]);
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         $studentsid = array_keys(self::get_students_for_planning_id($planningid));
-        if (!has_capability('mod/competvet:viewother',  $competvet->get_context())) {
+        if (!has_capability('mod/competvet:viewother', $competvet->get_context())) {
             global $USER;
-            if (in_array($USER->id,$studentsid)) {
+            if (in_array($USER->id, $studentsid)) {
                 $studentsid = [$USER->id];
             } else {
                 $studentsid = [];
@@ -322,20 +303,52 @@ class plannings {
         foreach ($studentsid as $studentid) {
             $userinfo = [];
             $userinfo['userinfo'] = utils::get_user_info($studentid);
+            $userinfo['userinfo']['role'] = 'student';
             $params = ['planningid' => $planningid, 'status' => observation::STATUS_COMPLETED, 'studentid' => $studentid];
             $observations =
                 observation::get_records($params, 'studentid, observerid');
             $userinfo['planninginfo'] = self::create_planning_info_for_student($studentid, $situation, $observations);
             $students[] = $userinfo;
         }
+        return ['students' => $students, 'observers' => self::get_observers_infos_for_planning_id($planningid)];
+    }
+
+    /**
+     * Get users infos for planning id
+     *
+     * @param int $planningid
+     * @return void
+     */
+    public static function get_observers_infos_for_planning_id(int $planningid): array {
         $observers = [];
         $observersid = self::get_observers_for_planning_id($planningid);
         foreach ($observersid as $observerid => $role) {
             $observer = [];
             $observer['userinfo'] = utils::get_user_info($observerid);
-            $observer['rolename'] = $role;
+            $observer['userinfo']['role'] = $role;
             $observers[] = $observer;
         }
-        return ['students' => $students, 'observers' => $observers];
+        return $observers;
+    }
+
+    /**
+     * Retrieves the users which are observers associated with a given planning ID.
+     *
+     * @param int $planningid The ID of the planning.
+     * @return array An array of users where the keys are user IDs and the values are their roles as observers.
+     */
+    private static function get_observers_for_planning_id(int $planningid): array {
+        $planning = planning::get_record(['id' => $planningid]);
+        $competvet = competvet::get_from_situation_id($planning->get('situationid'));
+        $situationcontext = $competvet->get_context();
+        $allenrolled = enrol_get_course_users_roles($situationcontext->get_course_context()->instanceid);
+        $observers = [];
+        foreach ($allenrolled as $userid => $roles) {
+            $toprole = user_role::get_top($userid, $competvet->get_situation()->get('id'));
+            if ($toprole != 'student' && $toprole != 'unknown') {
+                $observers[$userid] = $toprole;
+            }
+        }
+        return $observers;
     }
 }

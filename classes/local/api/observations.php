@@ -97,7 +97,7 @@ class observations {
         $result['context'] = $contextrecord;
         $result['comments'] =
             array_values(
-                array_map(function ($obscrit) {
+                array_map(function($obscrit) {
                     $return = (array) $obscrit->to_record();
                     $return['userinfo'] = utils::get_user_info($return['usercreated']);
                     $return['commentlabel'] = ''; // TODO Fill this in with labels for comment/autoeval.
@@ -109,7 +109,7 @@ class observations {
             );
 
         $result['criteria'] =
-            array_map(function ($obscrit) use ($criteria) {
+            array_map(function($obscrit) use ($criteria) {
                 $criterioninfo = (array) $criteria[$obscrit->get('criterionid')]->to_record();
                 unset($criterioninfo['timecreated']);
                 unset($criterioninfo['timemodified']);
@@ -133,7 +133,7 @@ class observations {
                     $allcomments,
                     fn($comment) => in_array($comment->get('criterionid'), $allchildrencriteriaid)
                 ));
-            $criterion['subcriteria'] = array_map(function ($obscrit) use ($criteria) {
+            $criterion['subcriteria'] = array_map(function($obscrit) use ($criteria) {
                 $return = [
                     'criterioninfo' => (array) $criteria[$obscrit->get('criterionid')]->to_record(),
                     'comment' => $obscrit->get('comment'),
@@ -270,7 +270,7 @@ class observations {
         $contextcomment->set('commentformat', FORMAT_HTML);
         $contextcomment->update();
         $commentstodelete = observation_comment::get_records(['observationid' => $observationid,
-            'type' => observation_comment::OBSERVATION_COMMENT, ]);
+            'type' => observation_comment::OBSERVATION_COMMENT,]);
         $commentstodelete = array_combine(
             array_map(fn($comment) => $comment->get('id'), $commentstodelete),
             $commentstodelete
@@ -353,4 +353,5 @@ class observations {
         }
         $observation->delete();
     }
+
 }

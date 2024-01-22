@@ -27,15 +27,36 @@ import Notification from 'core/notification';
 import ModalFactory from 'core/modal_factory';
 import ModalEvents from 'core/modal_events';
 import Ajax from 'core/ajax';
+import Template from "core/templates";
+
+/**
+ * Handle the follow up form.
+ * @param {Event} event
+ */
+const defaultSubmitEventHandler = (event) => {
+    if (event.detail.returnurl) {
+        window.location.assign(event.detail.returnurl);
+        window.location.reload();
+    } else {
+        Notification.addNotification({
+            type: 'error',
+            message: event.detail.error,
+        });
+    }
+};
 /**
  * Initialize module
  * @param {string} action
  * @param {string} modulename
+ * @param {function} submitEventHandler
  */
-export const initForm = async (action, modulename) => {
-    const selectedElements = document.querySelectorAll(`[data-action="eval-observation-${action}"]`);
-    if (!selectedElements.length) {
+const genericForm = async (action, modulename, submitEventHandler) => {
+    const selectedElements = getSelectedElement(action);
+    if (!selectedElements) {
         return;
+    }
+    if (typeof submitEventHandler === undefined) {
+        submitEventHandler = defaultSubmitEventHandler;
     }
     selectedElements.forEach((element) => {
         element.addEventListener('click', (event) => {
@@ -56,48 +77,88 @@ export const initForm = async (action, modulename) => {
                 },
                 saveButtonText: getString(`observation:${action}:save`, modulename),
             });
-            modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, event => {
-                if (event.detail.returnurl) {
-                    window.location.assign(event.detail.returnurl);
-                    window.location.reload();
-                } else {
-                    Notification.addNotification({
-                        type: 'error',
-                        message: event.detail.error,
-                    });
-                }
-            });
+            modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, submitEventHandler);
             modalForm.show();
         });
     });
 };
 
 export const initAdd = (modulename) => {
-    initForm('add', modulename);
+    genericForm('add', modulename);
 };
 
 export const initEdit = (modulename) => {
-    initForm('edit', modulename);
+    genericForm('edit', modulename);
 };
 
 export const initAsk = (modulename) => {
-    initForm('ask', modulename);
+    const handleAskSubmit = (event) => {
+        getString('observation:ask', modulename).then((title) => {
+            ModalFactory.create({
+                title: title,
+                body: Template.render('mod_competvet/view/eval_ask_observation_modal', {
+                    'planningid': event.detail.planningid,
+                    'studentid': event.detail.studentid,
+                    'observers': event.detail.observers,
+                    'context': event.detail.context,
+                }),
+                type: ModalFactory.types.CANCEL,
+                large: true
+            }).then((modal) => {
+                modal.show();
+                return modal;
+            }).catch(Notification.exception);
+        });
+    };
+    genericForm('ask', modulename, handleAskSubmit);
+};
+
+export const initUserAsk = (modulename, planningId, studentId, context) => {
+    const selectedElements = document.querySelectorAll('.ask-observation-modal [data-user-id]');
+    if (!selectedElements) {
+        return;
+    }
+    selectedElements.forEach((element) => {
+        element.addEventListener('click', (event) => {
+            event.preventDefault();
+            Ajax.call([{
+                methodname: 'mod_competvet_eval_ask_for_observation',
+                args: {
+                    context: context,
+                    planningid: planningId,
+                    observerid: element.dataset.userId,
+                    studentid: studentId,
+                },
+                done: (data) => {
+                    if (data.todoid) {
+                        element.classList.add('text-success');
+                    } else {
+                        getString('todo:cannotadd').then((message) => Notification.exception({message}));
+                    }
+                },
+                fail: Notification.exception
+            }]);
+        });
+    });
+};
+
+const getSelectedElement = (actionName) => {
+    return document.querySelectorAll(`[data-action="eval-observation-${actionName}"]`);
 };
 
 export const initDelete = (modulename) => {
-    const selectedElements = document.querySelectorAll(`[data-action="eval-observation-delete"]`);
-    if (!selectedElements.length) {
+    const selectedElements = getSelectedElement('delete');
+    if (!selectedElements) {
         return;
     }
-
     selectedElements.forEach((element) => {
         element.addEventListener('click', (event) => {
             event.preventDefault();
             // Init an ok cancel modal.
-            getString('deleteobservation', modulename).then((title) => {
+            getString('observation:delete', modulename).then((title) => {
                 ModalFactory.create({
                     title: title,
-                    body: getString('deleteobservationconfirm', modulename),
+                    body: getString('observation:delete:confirm', modulename),
                     type: ModalFactory.types.SAVE_CANCEL,
                     large: true
                 }).then((modal) => {
@@ -115,6 +176,7 @@ export const initDelete = (modulename) => {
                                     // Close the modal.
                                     modal.hide();
                                     // Reload the page.
+                                    window.location.assign(event.target.dataset.returnurl);
                                     window.location.reload();
                                 } else {
                                     Notification.exception({message: data.error});

@@ -59,8 +59,18 @@ class planning extends base {
                 if ($usertype == 'students') {
                     $userinfo->viewurl = (new moodle_url($this->viewstudent, ['studentid' => $user['userinfo']['id']]))->out(false);
                 }
-                $userinfo->pictureurl = $user['userinfo']['userpictureurl'];
+                $userinfo->userpictureurl = $user['userinfo']['userpictureurl'];
                 $userinfo->fullname = $user['userinfo']['fullname'];
+                $userinfo->id = $user['userinfo']['id'];
+                if (!empty($user['userinfo']['role'])) {
+                    global $DB;
+                    $role = $DB->get_record('role', ['shortname' => $user['userinfo']['role']]);
+                    $rolename = $user['userinfo']['role'];
+                    if ($role) {
+                        $rolename = role_get_name($role);
+                    }
+                    $userinfo->rolename = $rolename;
+                }
                 $userplanninginfo = $user['planninginfo'] ?? [];
                 if (!empty($userplanninginfo)) {
                     $userplanninginfo = array_combine(array_column($userplanninginfo, 'type'), $userplanninginfo);
@@ -105,8 +115,10 @@ class planning extends base {
             $context = $PAGE->context;
             $competvet = competvet::get_from_context($context);
             $viewstudenturl =
-                new moodle_url($this->baseurl,
-                    ['pagetype' => 'student_evaluations', 'id' => $competvet->get_course_module_id(), 'planningid' => $planningid]);
+                new moodle_url(
+                    $this->baseurl,
+                    ['pagetype' => 'student_evaluations', 'id' => $competvet->get_course_module_id(), 'planningid' => $planningid]
+                );
             $planning = plannings_entity::get_record(['id' => $planningid]);
             $currentgroupname = groups_get_group_name($planning->get('groupid'));
             $data = [$userswithinfo, $currentgroupname, $viewstudenturl];

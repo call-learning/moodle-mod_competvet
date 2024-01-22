@@ -20,9 +20,11 @@ use context;
 use core_form\dynamic_form;
 use mod_competvet\competvet;
 use mod_competvet\local\api\observations;
+use mod_competvet\local\api\plannings;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
+use mod_competvet\reportbuilder\local\entities\todo;
 use moodle_url;
 
 /**
@@ -34,20 +36,20 @@ use moodle_url;
 class eval_observation_ask extends dynamic_form {
 
     public function process_dynamic_submission() {
-        global $USER;
         $data = $this->get_data();
-        $observationid = observations::create_observation(observation::CATEGORY_EVAL_OBSERVATION, $data->studentid, $data->planningid, 0, $data->context);
         return [
-            'result' => true,
+            'context' => $data->context,
+            'planningid' => $data->planningid,
+            'studentid' => $data->studentid,
+            'observers' => array_column(plannings::get_observers_infos_for_planning_id($data->planningid), 'userinfo'),
         ];
     }
 
     public function set_data_for_dynamic_submission(): void {
         $data = [
             'cmid' => $this->optional_param('cmid', null, PARAM_INT),
-
             'planningid' => $this->optional_param('planningid', null, PARAM_INT),
-            'studentid' => $this->optional_param('studentid', null, PARAM_INT)
+            'studentid' => $this->optional_param('studentid', null, PARAM_INT),
         ];
         parent::set_data((object) $data);
     }
@@ -68,7 +70,7 @@ class eval_observation_ask extends dynamic_form {
         $mform->addElement('hidden', 'studentid', $this->optional_param('studentid', null, PARAM_INT));
         $mform->setType('studentid', PARAM_INT);
 
-        $mform->addElement('textarea', 'context', get_string('observation:context', 'mod_competvet'));
+        $mform->addElement('textarea', 'context', get_string('observation:comment:context', 'mod_competvet'));
         $mform->setType('context', PARAM_TEXT);
     }
 

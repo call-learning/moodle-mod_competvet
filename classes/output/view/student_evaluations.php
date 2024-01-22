@@ -67,7 +67,7 @@ class student_evaluations extends base {
                 array_reduce($this->observations, function($carry, $item) use ($output) {
                     $observer = $item['observerinfo'];
                     $evaluationinfo = [
-                        'pictureurl' => $observer['userpictureurl'],
+                        'userpictureurl' => $observer['userpictureurl'],
                         'fullname' => $observer['fullname'],
                         'evaluationtime' => $item['time'],
                         'viewurl' => (new moodle_url(
