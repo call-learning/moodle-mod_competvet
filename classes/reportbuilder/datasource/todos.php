@@ -47,7 +47,7 @@ class todos extends datasource {
     public function get_default_columns(): array {
         return [
             'todo:status',
-            'todo:type',
+            'todo:action',
             'todo:data',
         ];
     }
@@ -60,7 +60,7 @@ class todos extends datasource {
     public function get_default_filters(): array {
         return [
             'todo:status',
-            'todo:type',
+            'todo:action',
         ];
     }
 

@@ -58,8 +58,10 @@
     {{/isstudent}}
 </div>
 {{#js}}
-require(['mod_competvet/local/forms/observation_forms'], function(Form) {
-    Form.initAsk('mod_competvet');
-    Form.initAdd('mod_competvet');
+require(['mod_competvet/local/forms/eval_observation_ask'], function(Form) {
+    Form.init('{{modulename}}');
+});
+require(['mod_competvet/local/forms/eval_observation_add'], function(Form) {
+    Form.init('{{modulename}}');
 });
 {{/js}}

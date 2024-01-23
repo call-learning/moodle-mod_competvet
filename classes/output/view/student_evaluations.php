@@ -59,11 +59,10 @@ class student_evaluations extends base {
      * @return array|array[]|stdClass
      */
     public function export_for_template(renderer_base $output) {
-        $results = [
-            'observations' => [],
-        ];
+        $data = parent::export_for_template($output);
+        $data['observations'] = [];
         if ($this->currenttab == 'eval') {
-            $results['observations'] = array_values(
+            $data['observations'] = array_values(
                 array_reduce($this->observations, function($carry, $item) use ($output) {
                     $observer = $item['observerinfo'];
                     $evaluationinfo = [
@@ -89,7 +88,7 @@ class student_evaluations extends base {
                 )
             );
         }
-        $results['tabs'] = [];
+        $data['tabs'] = [];
         // Concatenate stats for autoeval and eval.
 
         if (!empty($this->planninginfo['info'])) {
@@ -118,20 +117,20 @@ class student_evaluations extends base {
                         'required' => $userinfovalue['nbrequired'] ?? 0,
                     ]),
                 ];
-                $results['tabs'][] = $tab;
+                $data['tabs'][] = $tab;
             }
         }
         // Find planning, module infos.
         $planning = \mod_competvet\local\persistent\planning::get_record(['id' => $this->planninginfo['planningid']]);
         $situation = situation::get_record(['id' => $planning->get('situationid')]);
         $competvet = competvet::get_from_situation($situation);
-        $results['cmid'] = $competvet->get_course_module_id();
-        $results['planningid'] = $this->planninginfo['planningid'];
-        $results['studentid'] = $this->planninginfo['id'];
+        $data['cmid'] = $competvet->get_course_module_id();
+        $data['planningid'] = $this->planninginfo['planningid'];
+        $data['studentid'] = $this->planninginfo['id'];
         $userrole = user_role::get_top($this->currentuserid, $situation->get('id'));
-        $results['isstudent'] = $userrole == 'student';
+        $data['isstudent'] = $userrole == 'student';
 
-        return $results;
+        return $data;
     }
 
     /**

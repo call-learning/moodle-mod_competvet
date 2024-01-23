@@ -54,9 +54,9 @@ class student_eval extends base {
      * @return array|array[]|stdClass
      */
     public function export_for_template(renderer_base $output) {
-        $results = [];
-        $results['context'] = $this->evaluation['context'];
-        $results['comments'] = $this->evaluation['comments'];
+        $data = parent::export_for_template($output);
+        $data['context'] = $this->evaluation['context'];
+        $data['comments'] = $this->evaluation['comments'];
         foreach ($this->evaluation['criteria'] as $evalcriterion) {
             $info = ['label' => $evalcriterion['criterioninfo']['label']];
             $level = $evalcriterion['level'];
@@ -71,15 +71,15 @@ class student_eval extends base {
             $info['viewurl'] =
                 (new moodle_url($this->subcriteriaurl, ['criterionid' => $evalcriterion['criterioninfo']['id']]))->out(false);
             $info['level'] = $level;
-            $results['criteria'][] = $info;
+            $data['criteria'][] = $info;
         }
-        $results['canedit'] = $this->evaluation['canedit'];
-        $results['candelete'] = $this->evaluation['candelete'];
-        $results['id'] = $this->evaluation['id'];
+        $data['canedit'] = $this->evaluation['canedit'];
+        $data['candelete'] = $this->evaluation['candelete'];
+        $data['id'] = $this->evaluation['id'];
         $observation  = observation::get_record(['id' => $this->evaluation['id']]);
         $competvet = competvet::get_from_situation($observation->get_situation());
-        $results['cmid'] = $competvet->get_course_module_id();
-        return $results;
+        $data['cmid'] = $competvet->get_course_module_id();
+        return $data;
     }
 
     /**

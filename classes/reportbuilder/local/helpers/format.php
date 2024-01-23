@@ -18,6 +18,10 @@ declare(strict_types=1);
 
 namespace mod_competvet\reportbuilder\local\helpers;
 
+use html_writer;
+use mod_competvet\local\persistent\todo;
+use stdClass;
+
 /**
  * Class containing helper methods for formatting column data via callbacks
  *
@@ -26,4 +30,21 @@ namespace mod_competvet\reportbuilder\local\helpers;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format {
+    public static function format_todo_data(?string $value, stdClass $row): string {
+        if ($value === null) {
+            return '';
+        }
+        $data = json_decode($value);
+        switch ($row->action) {
+            case todo::ACTION_EVAL_OBSERVATION_ASKED:
+                $planning = \mod_competvet\local\persistent\planning::get_record(['id' => $row->planningid]);
+                $student = \core_user::get_user($row->targetuserid);
+                $situation = \mod_competvet\local\persistent\situation::get_record(['id' => $planning->get('situationid')]);
+                $competvet = \mod_competvet\competvet::get_from_situation($situation);
+                $label = $competvet->get_course_module()->name;
+                return "Observation demandée par " . fullname($student) . " pour la situation '{$label}'";
+            default:
+                return '';
+        }
+    }
 }

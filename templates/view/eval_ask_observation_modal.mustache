@@ -36,7 +36,7 @@
     {{/observers}}
 </div>
 {{#js}}
-require(['mod_competvet/local/forms/observation_forms'], function(Form) {
-    Form.initUserAsk('mod_competvet', {{planningid}}, {{studentid}}, "{{context}}");
+require(['mod_competvet/local/forms/eval_observation_ask'], function(Form) {
+    Form.initUsersAction('{{modulename}}', {{planningid}}, {{studentid}}, "{{context}}");
 });
 {{/js}}

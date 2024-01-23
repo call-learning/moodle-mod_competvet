@@ -23,27 +23,21 @@ use renderer_base;
 use stdClass;
 
 /**
- * Generic renderable for the view.
+ * Render the todo list.
  *
  * @package    mod_competvet
  * @copyright  2023 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class plannings extends base {
+class todos extends base {
     /**
-     * @var array $plannings The plannings to display.
+     * @var array $todos The todo to display.
      */
-    protected array $plannings;
-
+    protected array $todos;
     /**
-     * @var array $planningstats The plannings to display.
+     * @var array $actions for the Todo List.
      */
-    protected array $planningstats;
-
-    /**
-     * @var moodle_url $viewplanning The url to view a planning.
-     */
-    protected moodle_url $viewplanning;
+    protected array $actions;
 
     /**
      * Export this data so it can be used in a mustache template.
@@ -52,8 +46,6 @@ class plannings extends base {
      * @return array|array[]|stdClass
      */
     public function export_for_template(renderer_base $output) {
-        $data = parent::export_for_template($output);
-
         $planningids = array_map(function($planning) {
             return $planning['id'];
         }, $this->plannings);
@@ -62,7 +54,9 @@ class plannings extends base {
             $carry[$item['categorytext']][] = $item;
             return $carry;
         }, []);
-        $data['categories'] = [];
+        $results = [
+            'categories' => [],
+        ];
 
         foreach ($planningstatsbycategory as $categorytext => $planningstats) {
             $category = new stdClass();
@@ -83,9 +77,9 @@ class plannings extends base {
                 ))->out(false);
                 $category->plannings[] = $planningresult;
             }
-            $data['categories'][] = $category;
+            $results['categories'][] = $category;
         }
-        return $data;
+        return $results;
     }
 
     /**
@@ -105,14 +99,15 @@ class plannings extends base {
             $context = $PAGE->context;
             $competvet = competvet::get_from_context($context);
             $currentplannings = plannings_api::get_plannings_for_situation_id($competvet->get_situation()->get('id'), $USER->id);
-            $planningids = array_map(function($planning) {
-                return $planning['id'];
-            }, $currentplannings);
-            $planningstats = plannings_api::get_planning_infos($planningids, $USER->id);
-            $viewplanning =
-                new moodle_url($this->baseurl, ['pagetype' => 'planning', 'id' => $competvet->get_course_module_id()]);
-            $data = [$currentplannings, $planningstats, $viewplanning];
+            $data = [
+                $todos,
+                [
+                    [
+                        'action' => 'Planning',
+                    ]
+                ]
+            ];
         }
-        [$this->plannings, $this->planningstats, $this->viewplanning] = $data;
+        [$this->todos, $this->actions] = $data;
     }
 }

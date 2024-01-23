@@ -16,12 +16,10 @@
 namespace mod_competvet\output\view;
 
 use core\output\named_templatable;
-use mod_competvet\competvet;
 use renderable;
 use renderer_base;
 use single_button;
 use stdClass;
-use templatable;
 
 /**
  * Generic renderable for the view.
@@ -35,6 +33,7 @@ abstract class base implements renderable, named_templatable {
      * @var \moodle_url
      */
     protected \moodle_url $backurl;
+
     /**
      * Constructor for this renderable.
      *
@@ -47,6 +46,7 @@ abstract class base implements renderable, named_templatable {
         protected string $pagetype,
         protected \moodle_url $baseurl,
         protected int $currentuserid = 0,
+        protected string $currentmodule = 'mod_competvet'
     ) {
         global $PAGE;
         $backurl = optional_param('backurl', null, PARAM_URL);
@@ -67,7 +67,12 @@ abstract class base implements renderable, named_templatable {
      * @param string|null $pagetype
      * @return renderable
      */
-    public static function factory(int $userid, ?string $pagetype = null): renderable {
+    public static function factory(
+        int $userid,
+        ?string $pagetype = null,
+        int $currentuserid = 0,
+        string $currentmodule = 'mod_competvet'
+    ): renderable {
         global $FULLME;
         $baseurl = new \moodle_url($FULLME);
         $baseurl->remove_all_params();
@@ -80,7 +85,7 @@ abstract class base implements renderable, named_templatable {
         if (!class_exists($class)) {
             $class = __CLASS__;
         }
-        return new $class($userid, $pagetype, $baseurl);
+        return new $class($userid, $pagetype, $baseurl, $currentuserid, $currentmodule);
     }
 
     /**
@@ -125,5 +130,17 @@ abstract class base implements renderable, named_templatable {
      * @return void
      */
     public function check_access(): void {
+    }
+
+    /**
+     * Export this data so it can be used in a mustache template.
+     *
+     * @param renderer_base $output
+     * @return array|array[]|stdClass
+     */
+    public function export_for_template(renderer_base $output) {
+        return [
+            'modulename' => $this->currentmodule
+        ];
     }
 }

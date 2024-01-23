@@ -31,7 +31,7 @@ class todo extends persistent {
      * Current table
      */
     const TABLE = 'competvet_todo';
-    const TYPE_EVAL_OBSERVATION_ASKED = 1;
+    const ACTION_EVAL_OBSERVATION_ASKED = 1;
     const STATUS_PENDING = 1;
 
     /**
@@ -44,8 +44,8 @@ class todo extends persistent {
     /**
      * Type definition
      */
-    const TYPES = [
-        self::TYPE_EVAL_OBSERVATION_ASKED => 'eval:asked',
+    const ACTIONS = [
+        self::ACTION_EVAL_OBSERVATION_ASKED => 'eval:asked',
     ];
 
     /**
@@ -62,22 +62,33 @@ class todo extends persistent {
                 'type' => PARAM_INT,
                 'message' => new lang_string('invaliddata', 'competvet', 'todo:userid'),
             ],
+            'targetuserid' => [
+                'null' => NULL_NOT_ALLOWED,
+                'type' => PARAM_INT,
+                'message' => new lang_string('invaliddata', 'competvet', 'todo:targetuserid'),
+            ],
+            'planningid' => [
+                'null' => NULL_NOT_ALLOWED,
+                'type' => PARAM_INT,
+                'message' => new lang_string('invaliddata', 'competvet', 'todo:planningid'),
+            ],
             'status' => [
                 'null' => NULL_NOT_ALLOWED,
                 'type' => PARAM_INT,
                 'message' => new lang_string('invaliddata', 'competvet', 'todo:status'),
                 'choices' => array_keys(self::STATUS),
             ],
-            'type' => [
+            'action' => [
                 'null' => NULL_NOT_ALLOWED,
                 'type' => PARAM_INT,
                 'message' => new lang_string('invaliddata', 'competvet', 'todo:type'),
-                'choices' => array_keys(self::TYPES),
+                'choices' => array_keys(self::ACTIONS),
             ],
             'data' => [
                 'null' => NULL_ALLOWED,
                 'type' => PARAM_RAW,
-                'message' => new lang_string('invaliddata', 'competvet', 'todo:text'),
+                'default' => '{}',
+                'message' => new lang_string('invaliddata', 'competvet', 'todo:data'),
             ],
         ];
     }

@@ -94,7 +94,11 @@ switch($currenttab) {
             '',
             '',
             0,
+            [
+                'onlyforusersid' => "$userid",
+            ],
         );
+        $PAGE->requires->js_call_amd('mod_competvet/local/forms/eval_observation_ask', 'initUserAsk', ['mod_competvet']);
         break;
 }
 echo $report->output();

@@ -1,5 +1,4 @@
-<?php
-// This file is part of Moodle - https://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,20 +11,18 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * Javascript adding a new observation.
  *
- * @package   mod_competvet
- * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @module     mod_competvet/local/forms/observation_add_form
+ * @copyright  2023 Laurent David <laurent@call-learning.fr>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+import {genericForm} from './generic_form_helper';
 
-$plugin->component = 'mod_competvet';
-$plugin->release = '0.4.0';
-$plugin->version = 2024011618;
-$plugin->requires = 2022112800;
-$plugin->maturity = MATURITY_ALPHA;
+export const init = (modulename) => {
+    genericForm('add', modulename);
+};

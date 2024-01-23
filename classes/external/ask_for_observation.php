@@ -35,9 +35,9 @@ class ask_for_observation extends external_api {
     /**
      * Returns description of method return value
      *
-     * @return external_description
+     * @return \external_single_structure
      */
-    public static function execute_returns(): ?external_description {
+    public static function execute_returns(): \external_single_structure {
         return new \external_single_structure(
             [
                 'todoid' => new external_value(PARAM_INT, 'Observation instance id'),
@@ -70,7 +70,7 @@ class ask_for_observation extends external_api {
         $competvet = competvet::get_from_situation($situation);
         self::validate_context($competvet->get_context());
         return [
-            'todoid' => todos::ask_for_observation($context, $planningid, $observerid, $studentid)
+            'todoid' => todos::ask_for_observation($context, $planningid, $observerid, $studentid),
         ];
     }
 

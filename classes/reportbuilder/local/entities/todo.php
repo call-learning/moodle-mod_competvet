@@ -23,6 +23,7 @@ use core_reportbuilder\local\filters\{autocomplete, number};
 use core_reportbuilder\local\report\{column, filter};
 use lang_string;
 use mod_competvet\local\persistent\todo as todo_entity;
+use mod_competvet\reportbuilder\local\helpers\format;
 
 /**
  * Todo entity
@@ -77,20 +78,20 @@ class todo extends base {
             ->set_is_sortable(true)
             ->set_callback(fn($status) => $statusstring[$status] ?? $status);
 
-        $typesstring = array_map(
-            fn($type) => get_string("todo:type:{$type}", 'mod_competvet'),
-            todo_entity::TYPES
+        $actionsstring = array_map(
+            fn($action) => get_string("todo:action:{$action}", 'mod_competvet'),
+            todo_entity::ACTIONS
         );
         $columns[] = (new column(
-            'type',
-            new lang_string('todo:type', 'mod_competvet'),
+            'action',
+            new lang_string('todo:action', 'mod_competvet'),
             $this->get_entity_name()
         ))
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_TEXT)
-            ->add_fields("{$todoalias}.type")
+            ->add_fields("{$todoalias}.action")
             ->set_is_sortable(true)
-            ->set_callback(fn($type) => $typesstring[$type] ?? $type);
+            ->set_callback(fn($action) => $actionsstring[$action] ?? $action);
 
         $columns[] = (new column(
             'data',
@@ -99,9 +100,9 @@ class todo extends base {
         ))
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_LONGTEXT)
-            ->add_fields("{$todoalias}.data")
+            ->add_fields("{$todoalias}.data, {$todoalias}.action, {$todoalias}.status, {$todoalias}.planningid, {$todoalias}.targetuserid")
             ->set_is_sortable(false)
-            ->set_callback(fn($data) => json_encode(json_decode($data), JSON_PRETTY_PRINT));
+            ->set_callback([format::class, 'format_todo_data']);
         return $columns;
     }
 
@@ -128,15 +129,15 @@ class todo extends base {
             );
         $filters[] = (new filter(
             autocomplete::class,
-            'type',
-            new lang_string('todo:type', 'mod_competvet'),
+            'action',
+            new lang_string('todo:action', 'mod_competvet'),
             $this->get_entity_name(),
-            "{$obsalias}.type"
+            "{$obsalias}.action"
         ))->add_joins($this->get_joins())
             ->set_options(
                 array_map(
-                    fn($status) => get_string("todo:type:{$status}", 'mod_competvet'),
-                    todo_entity::TYPES
+                    fn($status) => get_string("todo:action:{$status}", 'mod_competvet'),
+                    todo_entity::ACTIONS
                 )
             );
         return $filters;

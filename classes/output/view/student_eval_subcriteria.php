@@ -42,14 +42,14 @@ class student_eval_subcriteria extends base {
      * @return array|array[]|stdClass
      */
     public function export_for_template(renderer_base $output) {
-        $results = [];
+        $data = parent::export_for_template($output);
         foreach ($this->subcriteria as $criterion) {
-            $results['subcriteria'][] = [
+            $data['subcriteria'][] = [
                 'label' => $criterion['criterioninfo']['label'],
                 'comment' => format_text($criterion['comment']),
             ];
         }
-        return $results;
+        return $data;
     }
 
     /**

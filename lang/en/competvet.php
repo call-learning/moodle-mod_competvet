@@ -175,6 +175,7 @@ $string['observation:comment:improvement'] = 'Improvement';
 $string['observation:comment:missing'] = 'Missing';
 $string['observation:add'] = 'Add an observation';
 $string['observation:ask'] = 'Ask for an observation';
+$string['observation:ask:save'] = 'Select observer';
 $string['observation:edit'] = 'Edit observation';
 $string['observation:delete'] = 'Delete the observation';
 $string['observation:delete:confirm'] = 'Confirm you want to delete the observation';
@@ -189,7 +190,8 @@ $string['todo:status:pending'] = 'Pending';
 $string['todo:status'] = 'Status';
 $string['todo:user'] = 'User';
 $string['todo:user:fullname'] = 'User full name';
-$string['todo:type:eval:asked'] = 'Observation Asked';
-$string['todo:type'] = 'Type';
+$string['todo:action:eval:asked'] = 'Observation Asked';
+$string['todo:action'] = 'Action';
 $string['todo:data'] = 'Data';
+
 

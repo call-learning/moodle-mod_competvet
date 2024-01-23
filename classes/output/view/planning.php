@@ -51,6 +51,7 @@ class planning extends base {
      * @return array|array[]|stdClass
      */
     public function export_for_template(renderer_base $output) {
+        $data = parent::export_for_template($output);
         $results = [];
 
         foreach ($this->userswithinfo as $usertype => $userlist) {
@@ -93,7 +94,8 @@ class planning extends base {
                 $results[$usertype]['users'][] = $userinfo;
             }
         }
-        return ['usersbytype' => array_values($results)];
+        $data['usersbytype'] = array_values($results);
+        return $data;
     }
 
     /**

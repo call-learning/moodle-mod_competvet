@@ -41,26 +41,27 @@ class todos {
         // First check that the same user has not yet asked for an observation.
         $existingtodos = todo::get_records([
             'userid' => $observerid,
-            'type' => todo::TYPE_EVAL_OBSERVATION_ASKED,
+            'targetuserid' => $studentid,
+            'planningid' => $planningid,
+            'action' => todo::ACTION_EVAL_OBSERVATION_ASKED,
             'status' => todo::STATUS_PENDING,
         ]);
-        foreach ($existingtodos as $existingtodo) {
-            $existingdata = json_decode($existingtodo->get('data'));
-            if ($existingdata->planningid == $planningid && $existingdata->studentid == $studentid) {
-                return $existingtodo->get('id');
-            }
-        }
-        $todo = new todo(0, (object) [
-            'userid' => $observerid,
-            'status' => todo::STATUS_PENDING,
-            'type' => todo::TYPE_EVAL_OBSERVATION_ASKED,
-            'data' => json_encode((object) [
+        if ($existingtodos) {
+            $todo = reset($existingtodos);
+        } else {
+            $todo = new todo(0, (object) [
+                'userid' => $observerid,
+                'status' => todo::STATUS_PENDING,
+                'targetuserid' => $studentid,
                 'planningid' => $planningid,
-                'studentid' => $studentid,
-                'context' => $context,
-            ]),
-        ]);
-        $todo->create();
+                'action' => todo::ACTION_EVAL_OBSERVATION_ASKED,
+            ]);
+            $todo->create();
+        }
+        $todo->set('data', json_encode((object) [
+            'context' => $context,
+        ]));
+        $todo->update();
         return $todo->get('id');
     }
 }
