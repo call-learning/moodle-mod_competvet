@@ -29,24 +29,25 @@ import Template from "core/templates";
 import {genericForm} from './generic_form_helper';
 
 export const init = (modulename) => {
-    const handleAskSubmit = (event) => {
-        getString('observation:ask', modulename).then((title) => {
-            ModalFactory.create({
-                title: title,
-                body: Template.render('mod_competvet/view/eval_ask_observation_modal', {
-                    'planningid': event.detail.planningid,
-                    'studentid': event.detail.studentid,
-                    'observers': event.detail.observers,
-                    'context': event.detail.context,
+    const handleAskSubmit = async (event) => {
+        const askObservationTitle = await getString('observation:ask', modulename);
+        try {
+            const modal = await ModalFactory.create({
+                title: askObservationTitle,
+                body: Template.render(`${modulename}/view/eval_ask_observation_modal`, {
                     'modulename': modulename,
+                    ...event.detail
                 }),
                 type: ModalFactory.types.CANCEL,
                 large: true
-            }).then((modal) => {
-                modal.show();
-                return modal;
-            }).catch(Notification.exception);
-        });
+            });
+
+            // Show the modal.
+            modal.show();
+            return modal;
+        } catch (error) {
+            await Notification.exception(error);
+        }
     };
     genericForm('ask', modulename, handleAskSubmit);
 };
@@ -57,25 +58,46 @@ export const initUsersAction = (modulename, planningId, studentId, context) => {
         return;
     }
     selectedElements.forEach((element) => {
-        element.addEventListener('click', (event) => {
+        element.addEventListener('click', async (event) => {
             event.preventDefault();
-            Ajax.call([{
-                methodname: 'mod_competvet_eval_ask_for_observation',
-                args: {
-                    context: context,
-                    planningid: planningId,
-                    observerid: element.dataset.userId,
-                    studentid: studentId,
-                },
-                done: (data) => {
-                    if (data.todoid) {
+            const observationAskedTitle = await getString('observation:asked', modulename);
+            const askEvalPayload = {
+                context: context,
+                planningid: planningId,
+                observerid: element.dataset.userId,
+                studentid: studentId,
+            };
+            try {
+                const askObservationReturn = await Ajax.call(
+                    [{methodname: `${modulename}_ask_eval_observation`, args: askEvalPayload}]
+                )[0];
+                if (askObservationReturn.todoid) {
+                    try {
+                        const userInfo = await Ajax.call([
+                            {
+                                methodname: `${modulename}_get_user_profile`,
+                                args: {
+                                    userid: element.dataset.userId,
+                                },
+                            }
+                        ])[0];
+                        const modal = await ModalFactory.create({
+                            title: observationAskedTitle,
+                            body: getString('observation:asked:body', modulename, userInfo.fullname),
+                            type: ModalFactory.types.CANCEL,
+                            large: true
+                        });
                         element.classList.add('text-success');
-                    } else {
-                        getString('todo:cannotadd').then((message) => Notification.exception({message}));
+                        modal.show();
+                        return modal;
+                    } catch (error) {
+                        await Notification.exception(error);
                     }
-                },
-                fail: Notification.exception
-            }]);
+                }
+            } catch (error) {
+                const cannotAddString = await getString('todo:cannotadd', modulename);
+                await Notification.exception({message: cannotAddString});
+            }
         });
     });
 };

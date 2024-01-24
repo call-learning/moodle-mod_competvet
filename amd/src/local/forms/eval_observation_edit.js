@@ -23,6 +23,6 @@
 
 import {genericForm} from './generic_form_helper';
 
-export const init = (modulename) => {
-    genericForm('edit', modulename);
+export const init = (modulename, submitEventHandler) => {
+    genericForm('edit', modulename, submitEventHandler);
 };

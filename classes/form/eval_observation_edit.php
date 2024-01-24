@@ -33,6 +33,13 @@ class eval_observation_edit extends dynamic_form {
     public function set_data_for_dynamic_submission(): void {
         $observationid = $this->optional_param('id', null, PARAM_INT);
         $data = observations::get_observation_information($observationid);
+        $this->set_data_for_dynamic_submission_helper($data);
+    }
+
+    /**
+     * Set form data from observation information
+     */
+    protected function set_data_for_dynamic_submission_helper($data) {
         if (empty($data['context'])) {
             $data['context'] = '';
             $data['context_id'] = 0;
@@ -74,7 +81,6 @@ class eval_observation_edit extends dynamic_form {
         $this->_customdata['comments_repeat'] = $data['comments_repeat'];
         parent::set_data((object) $data);
     }
-
     public function process_dynamic_submission() {
         try {
             $data = $this->get_data();

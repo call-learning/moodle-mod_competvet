@@ -56,11 +56,19 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/competvet:editobservation',
     ],
-    'mod_competvet_eval_ask_for_observation' => [
-        'classname' => 'mod_competvet\\external\\ask_for_observation',
+    'mod_competvet_ask_eval_observation' => [
+        'classname' => \mod_competvet\external\ask_eval_observation::class,
         'methodname' => 'execute',
         'description' => 'Ask for an observation and add it to the list of TODOs',
         'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:view',
+    ],
+    'mod_competvet_get_user_profile' => [
+        'classname' => \mod_competvet\external\user_info::class,
+        'methodname' => 'execute',
+        'description' => 'Get user profile information',
+        'type' => 'read',
         'ajax' => true,
         'capabilities' => 'mod/competvet:view',
     ],

@@ -48,20 +48,20 @@
     </div>
     {{#isstudent}}
     <div>
-        <a href="#" data-cmid="{{cmid}}" data-planning-id="{{planningid}}" data-student-id="{{studentid}}" data-action="eval-observation-ask">{{#str}}observation:ask, mod_competvet{{/str}}</a>
+        <button class="btn btn-outline-secondary my-3" data-cmid="{{cmid}}" data-planning-id="{{planningid}}" data-student-id="{{studentid}}" data-action="eval-observation-ask">{{#str}}observation:ask, mod_competvet{{/str}}</button>
     </div>
     {{/isstudent}}
     {{^isstudent}}
     <div>
-        <a href="#" data-cmid="{{cmid}}" data-planning-id="{{planningid}}" data-student-id="{{studentid}}" data-action="eval-observation-add">{{#str}}observation:add, mod_competvet{{/str}}</a>
+        <button class="btn btn-outline-secondary my-3" data-cmid="{{cmid}}" data-planning-id="{{planningid}}" data-student-id="{{studentid}}" data-action="eval-observation-add">{{#str}}observation:add, mod_competvet{{/str}}</button>
     </div>
     {{/isstudent}}
 </div>
 {{#js}}
-require(['mod_competvet/local/forms/eval_observation_ask'], function(Form) {
+require(['{{modulename}}/local/forms/eval_observation_ask'], function(Form) {
     Form.init('{{modulename}}');
 });
-require(['mod_competvet/local/forms/eval_observation_add'], function(Form) {
+require(['{{modulename}}/local/forms/eval_observation_add'], function(Form) {
     Form.init('{{modulename}}');
 });
 {{/js}}

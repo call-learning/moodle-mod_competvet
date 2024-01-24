@@ -59,8 +59,8 @@ class eval_observation_ask extends dynamic_form {
      */
     protected function definition() {
         $mform = $this->_form;
-        $mform->addElement('header', 'eval_observation_create', get_string('observation:add', 'mod_competvet'));
-        $mform->setExpanded('eval_observation_create');
+        $mform->addElement('header', 'eval_observation_ask', get_string('observation:ask', 'mod_competvet'));
+        $mform->setExpanded('eval_observation_ask');
 
         $planningid = $this->optional_param('planningid', null, PARAM_INT);
         $mform->addElement('hidden', 'planningid', $planningid);

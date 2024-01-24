@@ -46,40 +46,56 @@ const defaultSubmitEventHandler = (event) => {
  * @param {string} modulename
  * @param {function} submitEventHandler
  */
-export const genericForm = async (action, modulename, submitEventHandler) => {
+export const genericForm = (action, modulename, submitEventHandler) => {
     const selectedElements = getSelectedElement(action);
     if (!selectedElements) {
         return;
     }
-    if (typeof submitEventHandler === undefined) {
+    if (typeof submitEventHandler === "undefined") {
         submitEventHandler = defaultSubmitEventHandler;
     }
     selectedElements.forEach((element) => {
         element.addEventListener('click', (event) => {
             event.preventDefault();
-            const dataset = event.target.closest('[data-action]').dataset; // Event can be sent by subelements.
-            const datasetLowercase = Object.entries(dataset).reduce((acc, [key, value]) => {
-                acc[key.toLowerCase()] = value; // Convert key to lowercase
-                return acc;
-            }, {});
-
-            const modalForm = new ModalForm({
-                modalConfig: {
-                    title: getString(`observation:${action}`, modulename),
-                },
-                formClass: `${modulename}\\form\\eval_observation_${action}`,
-                args: {
-                    ...datasetLowercase,
-                    currenturl: window.location.href,
-                },
-                saveButtonText: getString(`observation:${action}:save`, modulename),
-            });
-            modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, submitEventHandler);
-            modalForm.show();
+            const data = event.target.closest('[data-action]').dataset; // Event can be sent by subelements.
+            genericFormCreate(data, action, modulename, submitEventHandler);
         });
     });
 };
+/**
+ * Create the form and show it.
+ *
+ * @param {object} data
+ * @param {string} action
+ * @param {string} modulename
+ * @param {callback} submitEventHandler
+ */
+export const genericFormCreate = (data, action, modulename, submitEventHandler) => {
+    const datasetLowercase = Object.entries(data).reduce((acc, [key, value]) => {
+        acc[key.toLowerCase()] = value; // Convert key to lowercase
+        return acc;
+    }, {});
 
+    const modalForm = new ModalForm({
+        modalConfig: {
+            title: getString(`observation:${action}`, modulename),
+        },
+        formClass: `${modulename}\\form\\eval_observation_${action}`,
+        args: {
+            ...datasetLowercase,
+            currenturl: window.location.href,
+        },
+        saveButtonText: getString(`observation:${action}:save`, modulename),
+    });
+    modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, submitEventHandler);
+    modalForm.show();
+};
+
+/**
+ * Get selected element
+ * @param {string} actionName
+ * @return {*}
+ */
 export const getSelectedElement = (actionName) => {
     return document.querySelectorAll(`[data-action="eval-observation-${actionName}"]`);
 };

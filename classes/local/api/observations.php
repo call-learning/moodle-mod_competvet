@@ -162,7 +162,7 @@ class observations {
         ?int $observerid = 0,
         ?object $context = null,
         ?array $comments = [],
-        array $criteria = []
+        ?array $criteria = []
     ): int {
         global $USER;
         $observation = new observation(0);

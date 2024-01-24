@@ -16,7 +16,6 @@
 
 namespace mod_competvet\form;
 
-use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\situation;
 
 /**
@@ -120,14 +119,15 @@ class eval_observation_helper {
             $criterioninfo = [
                 'criterioninfo' => ['id' => $criterion->id],
                 'level' => $data->criterion_levels[$criterion->id],
-                'id' => $data->criterion_levels_id[$criterion->id] ?? 0,
+                'id' => empty($data->criterion_levels_id[$criterion->id]) ? 0 : $data->criterion_levels_id[$criterion->id],
             ];
             $subcriteria = [];
             foreach ($criterion->subcriteria as $subcriterion) {
                 $subcriterioninfo = [
                     'criterioninfo' => ['id' => $subcriterion->id],
                     'comment' => $data->criterion_comments[$subcriterion->id],
-                    'id' => $data->criterion_comments_id[$subcriterion->id] ?? 0,
+                    'id' => empty($data->criterion_comments_id[$subcriterion->id]) ? 0 :
+                        $data->criterion_comments_id[$subcriterion->id],
                 ];
                 $subcriteria[] = $subcriterioninfo;
             }
@@ -145,7 +145,7 @@ class eval_observation_helper {
      */
     public static function process_form_data_context(object $data): object {
         $context = (object) [
-            'id' => $data->context_id ?? 0,
+            'id' => empty($data->context_id) ? 0 : $data->context_id,
             'comment' => $data->context,
         ];
         return $context;
@@ -153,6 +153,7 @@ class eval_observation_helper {
 
     /**
      * Comments
+     *
      * @param object $data
      * @return array
      */
@@ -160,7 +161,7 @@ class eval_observation_helper {
         $comments = [];
         foreach ($data->comments as $commentindex => $comment) {
             $comments[] = [
-                'id' => $data->comments_id[$commentindex] ?? 0,
+                'id' => empty($data->comments_id[$commentindex]) ? 0 : $data->comments_id[$commentindex],
                 'comment' => $comment,
             ];
         }

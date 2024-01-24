@@ -31,7 +31,7 @@ use mod_competvet\local\persistent\situation;
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class ask_for_observation extends external_api {
+class ask_eval_observation extends external_api {
     /**
      * Returns description of method return value
      *

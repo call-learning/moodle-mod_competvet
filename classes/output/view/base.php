@@ -121,7 +121,22 @@ abstract class base implements renderable, named_templatable {
      * @return string
      */
     public function get_template_name(\renderer_base $renderer): string {
-        return 'mod_competvet/view/' . $this->pagetype;
+        global $CFG;
+        [$plugin, $component] = explode('_', $this->currentmodule);
+        $defaultview = "mod_competvet/view/{$this->pagetype}";
+        if (empty($plugin) || empty($component)) {
+            return $defaultview;
+        }
+        $potentialtemplates = [
+            "$this->currentmodule/view/$this->pagetype" => "/$plugin/$component/templates/view/{$this->pagetype}.mustache",
+            $defaultview => "/mod/competvet/templates/view/{$this->pagetype}.mustache",
+        ];
+        foreach ($potentialtemplates as $templatename => $templatepath) {
+            if (file_exists($CFG->dirroot .  $templatepath)) {
+                return $templatename;
+            }
+        }
+        return "mod_competvet/view/{$this->pagetype}";;
     }
 
     /**

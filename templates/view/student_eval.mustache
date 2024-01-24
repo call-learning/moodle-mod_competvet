@@ -77,10 +77,10 @@
     </div>
 </div>
 {{#js}}
-    require(['mod_competvet/local/forms/eval_observation_delete'], function(Form) {
+    require(['{{modulename}}/local/forms/eval_observation_delete'], function(Form) {
         Form.init('{{modulename}}');
     });
-    require(['mod_competvet/local/forms/eval_observation_edit'], function(Form) {
+    require(['{{modulename}}/local/forms/eval_observation_edit'], function(Form) {
         Form.init('{{modulename}}');
     });
 {{/js}}

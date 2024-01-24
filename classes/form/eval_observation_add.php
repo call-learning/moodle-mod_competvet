@@ -36,7 +36,6 @@ class eval_observation_add extends dynamic_form {
         global $USER;
         try {
             $data = $this->get_data();
-
             $planning = planning::get_record(['id' => $data->planningid]);
             $situation = situation::get_record(['id' => $planning->get('situationid')]);
             $context = eval_observation_helper::process_form_data_context($data);
