@@ -61,7 +61,7 @@ class student_eval extends base {
             $info = ['label' => $evalcriterion['criterioninfo']['label']];
             $level = $evalcriterion['level'];
             // Find the key in BADGELEVEL that is the closest from the level.
-            $roundedlevel = array_reduce(array_keys(self::BADGELEVEL), function($carry, $item) use ($level) {
+            $roundedlevel = array_reduce(array_keys(self::BADGELEVEL), function ($carry, $item) use ($level) {
                 if (abs($item - $level) < abs($carry - $level)) {
                     return $item;
                 }
@@ -75,6 +75,7 @@ class student_eval extends base {
         }
         $data['canedit'] = $this->evaluation['canedit'];
         $data['candelete'] = $this->evaluation['candelete'];
+        $data['editreturnurl'] = (new moodle_url($this->baseurl, ['evalid' => $this->evaluation['id']]))->out(true);
         $data['id'] = $this->evaluation['id'];
         $observation  = observation::get_record(['id' => $this->evaluation['id']]);
         $competvet = competvet::get_from_situation($observation->get_situation());
@@ -113,16 +114,17 @@ class student_eval extends base {
             $observation = observation::get_record(['id' => $evaluationid]);
             $planningid = $observation->get('planningid');
             $studentid = $observation->get('studentid');
-            $this->backurl =
+            $this->set_backurl(
                 new moodle_url(
                     $this->baseurl,
                     [
                         'pagetype' => 'student_evaluations',
                         'id' => $competvet->get_course_module_id(),
                         'planningid' => $planningid,
-                        'studentid' => $studentid
+                        'studentid' => $studentid,
                     ]
-                );
+                )
+            );
         }
         [$this->evaluation, $this->subcriteriaurl] = $data;
     }

@@ -81,6 +81,7 @@ class eval_observation_edit extends dynamic_form {
         $this->_customdata['comments_repeat'] = $data['comments_repeat'];
         parent::set_data((object) $data);
     }
+
     public function process_dynamic_submission() {
         try {
             $data = $this->get_data();
@@ -97,7 +98,7 @@ class eval_observation_edit extends dynamic_form {
             );
             return [
                 'result' => true,
-                'returnurl' => $this->get_page_url_for_dynamic_submission(),
+                'returnurl' => ($this->get_page_url_for_dynamic_submission())->out_as_local_url(),
             ];
         } catch (\Exception $e) {
             return [
@@ -108,10 +109,14 @@ class eval_observation_edit extends dynamic_form {
     }
 
     protected function get_page_url_for_dynamic_submission(): moodle_url {
-        $observationid = $this->optional_param('id', null, PARAM_INT);
-        $observation = observation::get_record(['id' => $observationid]);
-        $competvet = competvet::get_from_situation($observation->get_situation());
-        return new moodle_url('/course/view.php', ['id' => $competvet->get_course_module_id()]);
+        $returnurl = $this->optional_param('returnurl', null, PARAM_URL);
+        if (empty($returnurl)) {
+            $observationid = $this->optional_param('id', null, PARAM_INT);
+            $observation = observation::get_record(['id' => $observationid]);
+            $competvet = competvet::get_from_situation($observation->get_situation());
+            return new moodle_url('/mod/competvet/view.php', ['id' => $competvet->get_course_module_id()]);
+        }
+        return new moodle_url($returnurl);
     }
 
     public function definition_after_data() {
@@ -135,6 +140,9 @@ class eval_observation_edit extends dynamic_form {
         $mform->setType('context', PARAM_TEXT);
         $mform->addElement('hidden', 'context_id');
         $mform->setType('id', PARAM_INT);
+        $returnurl = $this->optional_param('returnurl', null, PARAM_URL);
+        $mform->addElement('hidden', 'returnurl', $returnurl);
+        $mform->setType('returnurl', PARAM_URL);
 
         $observation = observation::get_record(['id' => $observationid]);
         eval_observation_helper::add_criteria_to_form($observation->get_situation(), $this, $mform);

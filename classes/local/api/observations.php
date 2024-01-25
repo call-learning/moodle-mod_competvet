@@ -160,7 +160,7 @@ class observations {
         int $planningid,
         int $studentid,
         ?int $observerid = 0,
-        ?object $context = null,
+        ?string $context = null,
         ?array $comments = [],
         ?array $criteria = []
     ): int {
@@ -172,15 +172,13 @@ class observations {
         $observation->set('observerid', $observerid);
         $observation->set('status', observation::STATUS_NOTSTARTED);
         $observation->create();
-        if ($context) {
-            $contextcomment = new observation_comment(0);
-            $contextcomment->set('observationid', $observation->get('id'));
-            $contextcomment->set('type', observation_comment::OBSERVATION_CONTEXT);
-            $contextcomment->set('comment', $context->comment);
-            $contextcomment->set('commentformat', FORMAT_HTML);
-            $contextcomment->set('usercreated', $context->userinfo['id'] ?? $studentid);
-            $contextcomment->create();
-        }
+        $contextcomment = new observation_comment(0);
+        $contextcomment->set('observationid', $observation->get('id'));
+        $contextcomment->set('type', observation_comment::OBSERVATION_CONTEXT);
+        $contextcomment->set('comment', $context ?? '');
+        $contextcomment->set('commentformat', FORMAT_HTML);
+        $contextcomment->set('usercreated', $studentid);
+        $contextcomment->create();
         foreach ($comments as $comment) {
             if (!empty($comment['id'])) {
                 $obscomment = observation_comment::get_record(['id' => $comment['id']]);

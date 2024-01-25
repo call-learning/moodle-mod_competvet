@@ -82,10 +82,10 @@ class student_eval_subcriteria extends base {
             $context = $PAGE->context;
             $competvet = competvet::get_from_context($context);
             $cmid = $competvet->get_course_module_id();
-            $this->backurl = new moodle_url(
+            $this->set_backurl(new moodle_url(
                 $this->baseurl,
                 ['pagetype' => 'student_eval', 'id' => $cmid, 'evalid' => $evaluationid]
-            );
+            ));
         }
         [$this->subcriteria] = $data;
     }

@@ -16,7 +16,8 @@
 namespace mod_competvet\output\view;
 
 use mod_competvet\competvet;
-use mod_competvet\local\api\plannings as plannings_api;
+use mod_competvet\local\api\todos as todos_api;
+use mod_competvet\local\persistent\todo;
 use mod_competvet\local\persistent\planning;
 use moodle_url;
 use renderer_base;
@@ -34,10 +35,7 @@ class todos extends base {
      * @var array $todos The todo to display.
      */
     protected array $todos;
-    /**
-     * @var array $actions for the Todo List.
-     */
-    protected array $actions;
+    private array $actionsurls;
 
     /**
      * Export this data so it can be used in a mustache template.
@@ -46,40 +44,39 @@ class todos extends base {
      * @return array|array[]|stdClass
      */
     public function export_for_template(renderer_base $output) {
-        $planningids = array_map(function($planning) {
-            return $planning['id'];
-        }, $this->plannings);
-        $planningwithids = array_combine($planningids, $this->plannings);
-        $planningstatsbycategory = array_reduce($this->planningstats, function($carry, $item) {
-            $carry[$item['categorytext']][] = $item;
-            return $carry;
-        }, []);
-        $results = [
-            'categories' => [],
-        ];
+        $data = parent::export_for_template($output);
+        $data['todos'] = [];
+        foreach ($this->todos as $todo) {
+            $currentaction = $todo['action'];
+            $planning = planning::get_record(['id' => $todo['planning']['id']]);
+            $competvet = competvet::get_from_situation_id($planning->get('situationid'));
 
-        foreach ($planningstatsbycategory as $categorytext => $planningstats) {
-            $category = new stdClass();
-            $category->categorytext = $categorytext;
-            $category->categoryid = $planningstats[0]['category']; // All plannings in the same category have the same category id.
-            $category->plannings = [];
-            foreach ($planningstats as $planningstat) {
-                $planning = $planningwithids[$planningstat['id']];
-                $planningresult = new stdClass();
-                $planningresult->id = $planningstat['id'];
-                $planningresult->startdate = planning::get_planning_date_string($planning['startdate']);
-                $planningresult->enddate = planning::get_planning_date_string($planning['enddate']);
-                $planningresult->groupname = $planning['groupname'];
-                $planningresult->nbstudents = $planningstat['groupstats']['nbstudents'];
-                $planningresult->viewurl = (new moodle_url(
-                    $this->viewplanning,
-                    ['planningid' => $planningstat['id']]
-                ))->out(false);
-                $category->plannings[] = $planningresult;
+            if ($currentaction == todo::ACTION_EVAL_OBSERVATION_ASKED) {
+                $tododata = json_decode($todo['data']);
+                $todo['action'] = \html_writer::tag(
+                    'button',
+                    get_string('todo:action:cta:' . todo::ACTIONS[$currentaction], 'mod_competvet'),
+                    [
+                        'class' => 'btn btn-primary',
+                        'data-action' => 'eval-observation-addfromtodo',
+                        'data-planning-id' => $todo['planning']['id'],
+                        'data-student-id' => $todo['targetuser']['id'],
+                        'data-observer-id' => $todo['user']['id'],
+                        'data-todo-id' => $todo['id'],
+                        'data-cmid' => $competvet->get_course_module_id(),
+                        'data-context' => $tododata->context ?? '',
+                        'data-returnurl' => (new moodle_url($this->actionsurls[$currentaction]))->out_as_local_url(),
+                    ]
+                );
+            } else {
+                $todo['action'] = \html_writer::link(
+                    new moodle_url($this->actions[$todo->get_action()], ['todoid' => $todo['id']]),
+                    get_string('todo:action:' . todo::ACTIONS[$currentaction], 'mod_competvet')
+                );
             }
-            $results['categories'][] = $category;
+            $data['todos'][] = $todo;
         }
-        return $results;
+        return $data;
     }
 
     /**
@@ -95,19 +92,16 @@ class todos extends base {
      */
     public function set_data(...$data) {
         if (empty($data)) {
-            global $USER, $PAGE;
-            $context = $PAGE->context;
-            $competvet = competvet::get_from_context($context);
-            $currentplannings = plannings_api::get_plannings_for_situation_id($competvet->get_situation()->get('id'), $USER->id);
+            global $USER;
+            $todos = todos_api::get_todos_for_user($USER->id);
             $data = [
                 $todos,
                 [
-                    [
-                        'action' => 'Planning',
-                    ]
-                ]
+                    todo::ACTION_EVAL_OBSERVATION_ASKED =>
+                        new moodle_url($this->baseurl, ['pagetype' => 'student_eval', 'id' => 'OBSERVATIONID']),
+                ],
             ];
         }
-        [$this->todos, $this->actions] = $data;
+        [$this->todos, $this->actionsurls] = $data;
     }
 }

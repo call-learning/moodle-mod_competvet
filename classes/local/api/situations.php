@@ -35,6 +35,9 @@ use mod_competvet\utils;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class situations {
+    /**
+     * Situation fields
+     */
     const SITUATION_FIELDS = [
         'situation:shortname' => 'shortname',
         'situation:name' => 'name',

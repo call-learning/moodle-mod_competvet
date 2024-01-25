@@ -42,6 +42,7 @@ class eval_observation_ask extends dynamic_form {
             'planningid' => $data->planningid,
             'studentid' => $data->studentid,
             'observers' => array_column(plannings::get_observers_infos_for_planning_id($data->planningid), 'userinfo'),
+            'returnurl' => ($this->get_page_url_for_dynamic_submission())->out_as_local_url(),
         ];
     }
 
@@ -69,6 +70,8 @@ class eval_observation_ask extends dynamic_form {
         $mform->setType('cmid', PARAM_INT);
         $mform->addElement('hidden', 'studentid', $this->optional_param('studentid', null, PARAM_INT));
         $mform->setType('studentid', PARAM_INT);
+        $mform->addElement('hidden', 'returnurl');
+        $mform->setType('returnurl', PARAM_URL);
 
         $mform->addElement('textarea', 'context', get_string('observation:comment:context', 'mod_competvet'));
         $mform->setType('context', PARAM_TEXT);

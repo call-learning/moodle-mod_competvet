@@ -212,9 +212,11 @@ class plannings {
     public static function get_planning_info(int $planningid): array {
         $planning = planning::get_record(['id' => $planningid]);
         $planningarray = (array) $planning->to_record();
+        $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         $planningarray = array_intersect_key($planningarray,
             array_fill_keys(['id', 'startdate', 'enddate', 'session', 'groupid', 'situationid'], 0));
         $planningarray['groupname'] = groups_get_group_name($planning->get('groupid'));
+        $planningarray['situationname'] = $competvet->get_course_module()->name;
         return $planningarray;
     }
 

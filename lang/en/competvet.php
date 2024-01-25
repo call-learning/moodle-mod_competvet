@@ -191,8 +191,11 @@ $string['entity:competvet_todo'] = 'ToDo';
 $string['todo:status:pending'] = 'Pending';
 $string['todo:status'] = 'Status';
 $string['todo:user'] = 'User';
+$string['todo:targetuser'] = 'Target User';
+$string['todo:type'] = 'Type';
+$string['todo:planning'] = 'Planning';
 $string['todo:user:fullname'] = 'User full name';
 $string['todo:action:eval:asked'] = 'Observation Asked';
+$string['todo:action:cta:eval:asked'] = 'Create Observation';
 $string['todo:action'] = 'Action';
 $string['todo:data'] = 'Data';
-

@@ -16,11 +16,7 @@
 namespace mod_competvet;
 
 use context_module;
-use context_user;
-use core_tag_collection;
 use core_user;
-use moodle_url;
-use tabobject;
 use user_picture;
 
 /**
@@ -87,7 +83,10 @@ class utils {
      * @return object [persistent, otherproperties ]
      */
     public static function split_properties_from_persistent($persistentclass, $record): array {
-        $persistentfields = static::get_persistent_fields_without_standards($persistentclass);
+        $persistentfields = static::get_persistent_fields_without_standards(
+            $persistentclass,
+            ['timecreated', 'id', 'timemodified', 'usermodified']
+        );
         // Extract values for persitent that are in property definition (keys).
         $persistent = array_intersect_key((array) $record, $persistentfields);
         $otherproperties = array_diff_key((array) $record, $persistent);
@@ -99,30 +98,17 @@ class utils {
 
     /**
      * Get persistent field without some standard fields.
+     *
      * @param $persistentclass
      * @return array
      */
-    public static function get_persistent_fields_without_standards($persistentclass): array {
+    public static function get_persistent_fields_without_standards($persistentclass, ?array $fieldstoremove = []): array {
         $persistentfields = $persistentclass::properties_definition();
-        $fieldstoremove = ['timecreated', 'id', 'timemodified', 'usermodified'];
+        if (empty($fieldstoremove)) {
+            $fieldstoremove = ['timecreated', 'timemodified', 'usermodified'];
+        }
         // Remove persistent fields from definition.
         return array_diff_key($persistentfields, array_flip($fieldstoremove));
-    }
-
-    /**
-     * Get IDs for student Role.
-     *
-     * @return array
-     */
-    public static function get_student_roles_id(): array {
-        static $studentrolesid = null;
-        if (is_null($studentrolesid)) {
-            $roles = get_all_roles(\context_system::instance());
-            $studentrolesid = array_filter(array_column($roles, 'shortname', 'id'), function ($shortname) {
-                return $shortname === 'student';
-            });
-        }
-        return array_keys($studentrolesid);
     }
 
     /**
@@ -137,6 +123,22 @@ class utils {
             $isstudent = $isstudent || user_has_role_assignment($userid, $studentroleid, $contextid);
         }
         return $isstudent;
+    }
+
+    /**
+     * Get IDs for student Role.
+     *
+     * @return array
+     */
+    public static function get_student_roles_id(): array {
+        static $studentrolesid = null;
+        if (is_null($studentrolesid)) {
+            $roles = get_all_roles(\context_system::instance());
+            $studentrolesid = array_filter(array_column($roles, 'shortname', 'id'), function($shortname) {
+                return $shortname === 'student';
+            });
+        }
+        return array_keys($studentrolesid);
     }
 
     /**

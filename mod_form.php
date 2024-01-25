@@ -94,6 +94,7 @@ class mod_competvet_mod_form extends moodleform_mod {
         $mform->setExpanded('situationdef');
 
         $situationfields = utils::get_persistent_fields_without_standards(situation::class);
+        unset($situationfields['id']);  // Also remove id from fields.
         foreach ($situationfields as $situationfield => $situationfielddefinition) {
             $elementtype = $situationfielddefinition['formtype'] ?? 'text';
             $elementoptions = $situationfielddefinition['formoptions'] ?? [];
@@ -200,6 +201,7 @@ class mod_competvet_mod_form extends moodleform_mod {
             $competvetidel = $mform->getElement('competvetid');
             $competvetidel->setValue($this->get_current()->id);
             $situationfields = utils::get_persistent_fields_without_standards(situation::class);
+            unset($situationfields['id']);  // Remove id from fields.
             $situation = situation::get_record(['competvetid' => $this->get_current()->id]);
             $situationrecord = array_intersect_key((array)$situation->to_record(), $situationfields);
             $mform->setDefaults($situationrecord);

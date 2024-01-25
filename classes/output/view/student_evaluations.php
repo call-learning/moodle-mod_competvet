@@ -172,10 +172,10 @@ class student_evaluations extends base {
                 ],
                 $userobservations,
             ];
-            $this->backurl = new moodle_url(
+            $this->set_backurl(new moodle_url(
                 $this->baseurl,
                 ['pagetype' => 'planning', 'id' => $competvet->get_course_module_id(), 'planningid' => $planningid]
-            );
+            ));
         }
         [$this->planninginfo, $this->views, $this->observations] = $data;
     }

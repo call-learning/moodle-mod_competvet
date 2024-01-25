@@ -33,12 +33,13 @@ class todo extends persistent {
     const TABLE = 'competvet_todo';
     const ACTION_EVAL_OBSERVATION_ASKED = 1;
     const STATUS_PENDING = 1;
-
+    const STATUS_DONE = 2;
     /**
      * Status definition
      */
     const STATUS = [
         self::STATUS_PENDING => 'pending',
+        self::STATUS_DONE => 'done',
     ];
 
     /**
@@ -81,7 +82,7 @@ class todo extends persistent {
             'action' => [
                 'null' => NULL_NOT_ALLOWED,
                 'type' => PARAM_INT,
-                'message' => new lang_string('invaliddata', 'competvet', 'todo:type'),
+                'message' => new lang_string('invaliddata', 'competvet', 'todo:action'),
                 'choices' => array_keys(self::ACTIONS),
             ],
             'data' => [

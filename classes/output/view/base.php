@@ -30,11 +30,6 @@ use stdClass;
  */
 abstract class base implements renderable, named_templatable {
     /**
-     * @var \moodle_url
-     */
-    protected \moodle_url $backurl;
-
-    /**
      * Constructor for this renderable.
      *
      * @param int $userid The user we will open the grading app too.
@@ -46,14 +41,9 @@ abstract class base implements renderable, named_templatable {
         protected string $pagetype,
         protected \moodle_url $baseurl,
         protected int $currentuserid = 0,
-        protected string $currentmodule = 'mod_competvet'
+        protected string $currentmodule = 'mod_competvet',
+        protected ?\moodle_url $backurl = null
     ) {
-        global $PAGE;
-        $backurl = optional_param('backurl', null, PARAM_URL);
-        if (!empty($backurl)) {
-            $this->backurl = new \moodle_url($backurl);
-        }
-        $this->baseurl->param('backurl', $PAGE->url->out(false));
         if ($this->currentuserid == 0) {
             global $USER;
             $this->currentuserid = $USER->id;
@@ -71,7 +61,8 @@ abstract class base implements renderable, named_templatable {
         int $userid,
         ?string $pagetype = null,
         int $currentuserid = 0,
-        string $currentmodule = 'mod_competvet'
+        string $currentmodule = 'mod_competvet',
+        ?\moodle_url $backurl = null
     ): renderable {
         global $FULLME;
         $baseurl = new \moodle_url($FULLME);
@@ -85,7 +76,7 @@ abstract class base implements renderable, named_templatable {
         if (!class_exists($class)) {
             $class = __CLASS__;
         }
-        return new $class($userid, $pagetype, $baseurl, $currentuserid, $currentmodule);
+        return new $class($userid, $pagetype, $baseurl, $currentuserid, $currentmodule, $backurl);
     }
 
     /**
@@ -101,6 +92,14 @@ abstract class base implements renderable, named_templatable {
      */
     abstract public function set_data(...$data);
 
+    /**
+     * Set back URL.
+     * @param \moodle_url $backurl
+     * @return void
+     */
+    public function set_backurl(\moodle_url $backurl): void {
+        $this->backurl = $backurl;
+    }
     /**
      * Get back button navigation.
      * We assume here that the back button will be on a single page (view.php)

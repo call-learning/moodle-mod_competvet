@@ -28,21 +28,25 @@
         <thead>
         <tr>
             <th scope="col">{{#str}}todo:targetuser, mod_competvet{{/str}}</th>
-            <th scope="col">{{#str}}todo:situation, mod_competvet{{/str}}</th>
             <th scope="col">{{#str}}todo:planning, mod_competvet{{/str}}</th>
             <th scope="col">{{#str}}todo:type, mod_competvet{{/str}}</th>
-            <th scope="col">{{#str}}todo:viewaction, mod_competvet{{/str}}</th>
+            <th scope="col">{{#str}}todo:action, mod_competvet{{/str}}</th>
         </tr>
         </thead>
         <tbody>
         {{#todos}}
             <tr>
-                <td>{{targetuser}}</td>
-                <td>{{planning}}</td>
+                <td>{{targetuser.fullname}}</td>
+                <td>{{planning.situationname}}</td>
                 <td>{{type}}</td>
-                <td><a href="{{viewactionurl}}">{{#str}}view{{/str}}</a></td>
+                <td>{{{action}}}</td>
             </tr>
         {{/todos}}
         </tbody>
     </table>
 </div>
+{{#js}}
+require(['{{modulename}}/local/forms/eval_observation_add_from_todo'], function(Form) {
+    Form.init('{{modulename}}');
+});
+{{/js}}

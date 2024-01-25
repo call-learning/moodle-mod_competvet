@@ -38,7 +38,6 @@ class eval_observation_add extends dynamic_form {
             $data = $this->get_data();
             $planning = planning::get_record(['id' => $data->planningid]);
             $situation = situation::get_record(['id' => $planning->get('situationid')]);
-            $context = eval_observation_helper::process_form_data_context($data);
             $comments = eval_observation_helper::process_form_data_comments($data);
             $criteria = eval_observation_helper::process_form_data_criteria($data, $situation);
             observations::create_observation(
@@ -46,13 +45,13 @@ class eval_observation_add extends dynamic_form {
                 $data->planningid,
                 $data->studentid,
                 $USER->id,
-                $context,
+                $data->context,
                 $comments,
                 $criteria
             );
             return [
                 'result' => true,
-                'returnurl' => $this->get_page_url_for_dynamic_submission(),
+                'returnurl' => ($this->get_page_url_for_dynamic_submission())->out_as_local_url(),
             ];
         } catch (\Exception $e) {
             return [
@@ -63,8 +62,12 @@ class eval_observation_add extends dynamic_form {
     }
 
     protected function get_page_url_for_dynamic_submission(): moodle_url {
-        $currenturl = $this->optional_param('currenturl', '/', PARAM_URL);
-        return new moodle_url($currenturl);
+        $returnurl = $this->optional_param('returnurl', null, PARAM_URL);
+        if (empty($returnurl)) {
+            $currenturl = $this->optional_param('currenturl', '/', PARAM_URL);
+            return new moodle_url($currenturl);
+        }
+        return new moodle_url($returnurl);
     }
 
     public function set_data_for_dynamic_submission(): void {
@@ -76,10 +79,12 @@ class eval_observation_add extends dynamic_form {
         ];
         parent::set_data((object) $data);
     }
+
     public function definition_after_data() {
         $mform = $this->_form;
         eval_observation_helper::add_comments_to_form($this, $mform, $this->_customdata['comments_repeat'] ?? 1);
     }
+
     /**
      * Define form
      */
@@ -95,6 +100,8 @@ class eval_observation_add extends dynamic_form {
         $mform->setType('cmid', PARAM_INT);
         $mform->addElement('hidden', 'studentid', $this->optional_param('studentid', null, PARAM_INT));
         $mform->setType('studentid', PARAM_INT);
+        $mform->addElement('hidden', 'returnurl');
+        $mform->setType('returnurl', PARAM_URL);
 
         $mform->addElement('textarea', 'context', get_string('observation:comment:context', 'mod_competvet'));
         $mform->setType('context', PARAM_TEXT);
