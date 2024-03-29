@@ -1,0 +1,190 @@
+// stylelint-disable
+.gradingapp {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    .usernavigation {
+        .userimage img {
+            width: 50px;
+        }
+        .userinfo {
+            width: 170px;
+            min-width: 170px;
+            display: flex;
+            flex-direction: column;
+        }
+    }
+    .userheader {
+        .userimage img {
+            width: 100px;
+            height: 100px;
+        }
+    }
+    .grade-panel {
+        flex: 1 0 auto;
+        display: flex;
+        flex-direction: column;
+    }
+    .grade-header {
+        background-color: #f5f5f5;
+        box-shadow: 2px 4px 9px rgba(0, 0, 0, 0.2);
+        display: flex;
+        padding: 1rem;
+        .user-header {
+            display: flex;
+            flex: 0 1 20%;
+            max-width: 20%;
+            margin-right: 2rem;
+            .userinfo {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            .userimage {
+                display: flex;
+                align-items: center;
+            }
+        }
+        .user-grade {
+            flex: 1 1 auto;
+            form {
+                display: flex;
+                .form-group {
+                    flex: 1 1 25%;
+                    max-width: 25%;
+                    padding: 0 0.25rem;
+                }
+            }
+        }
+    }
+    .tab-content {
+        flex: 1 0 auto;
+        display: flex;
+        &>.active {
+            display: flex;
+            flex-direction: column;
+            flex: 1 0 auto;
+        }
+    }
+    .globalcomment {
+        border-bottom-left-radius: 0;
+    }
+    .commentsubmit {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+    .grade-tabs {
+        flex: 1 0 auto;
+        display: flex;
+        flex-direction: column;
+        .nav-container,
+        .tab-inner {
+            display: flex;
+            .nav-tabs {
+                flex: 1 1 100%;
+            }
+            .tab-main {
+                flex: 1 1 65%;
+                max-width: 65%;;
+            }
+            .tab-aside {
+                flex: 1 1 35%;
+                max-width: 35%;
+            }
+            .tab-aside {
+                background-color: #f1f1f1;
+            }
+        }
+        .tab-inner {
+            display: flex;
+            flex: 1 0 auto;
+        }
+    }
+    .tab-main {
+        padding: 1rem;
+    }
+    svg {
+        .svg-fill {
+            fill: #1d2125;
+        }
+        .svg-stroke {
+            stroke: #1d2125;
+        }
+    }
+    .nav-link {
+        border-width: 3px;
+        font-size: 1.2rem;
+        &.active,
+        &:hover {
+            border-color: transparent transparent var(--primary);
+            svg {
+                .svg-fill {
+                    fill: var(--primary);
+                }
+                .svg-stroke {
+                    stroke: var(--primary);
+                }
+            }
+        }
+    }
+    .comment {
+        margin-top: 0.25rem;
+        margin-bottom: 0.25remrem;
+        background-color: #f5f5f5;
+        padding: 0.5rem 0.7rem;
+        border-radius: 0.5rem;
+        margin-left: 2.5rem;
+    }
+    .commentsection {
+        margin-bottom: 1rem;
+        .userimage img {
+            width: 35px;
+            height: 35px;
+        }
+    }
+    .commentuserinfo {
+        .note {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #666;
+        }
+    }
+    .form-control:focus {
+        box-shadow: none;
+    }
+    .statusmessage {
+        transition: opacity 0.5s ease-in-out;
+        background-color: #fff;
+    }
+    .certification {
+        .heading,
+        .certif {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+        .col1 {
+            flex: 1 1 50%;
+            max-width: 50%;
+        }
+        .col2 {
+            flex: 1 1 26%;
+            max-width: 26%;
+        }
+        .col3 {
+            flex: 1 1 12%;
+            max-width: 12%;
+            text-align: center;
+        }
+        .col4 {
+            flex: 1 1 12%;
+            max-width: 12%;
+            text-align: center;
+        }
+        .progress {
+            height: 3px;
+        }
+    }
+    .opacity-0 {
+        opacity: 0;
+    }
+}

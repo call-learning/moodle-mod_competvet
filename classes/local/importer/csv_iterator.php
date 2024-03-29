@@ -53,9 +53,10 @@ class csv_iterator implements Iterator {
         private readonly string $delimiter = 'semicolon',
         private readonly string $encoding = 'utf-8'
     ) {
+        global $CFG;
         $iid = csv_import_reader::get_new_iid(self::class);
         $csvimport = new csv_import_reader($iid, self::class);
-        $content = file_get_contents($this->filename);
+        $content = file_get_contents($CFG->dirroot . '/mod/competvet/data/default_evaluation_grid.csv');
         $rowcount = $csvimport->load_csv_content($content, $this->encoding, $this->delimiter);
         if ($csvimport->get_error()) {
             throw new \moodle_exception('csvfileerror', 'tool_uploadcourse', $csvimport->get_error());

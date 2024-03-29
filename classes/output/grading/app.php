@@ -32,6 +32,12 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class app implements named_templatable, renderable {
+
+    /**
+     * @var array $participants The participants to display.
+     */
+    protected array $participants;
+
     /**
      * Constructor for this renderable.
      *
@@ -88,7 +94,7 @@ class app implements named_templatable, renderable {
         $export->viewgrading = get_string('viewgrading', 'mod_assign');
 
         $export->count = count($export->participants);
-        $export->coursename = $this->competvet->get_course_context()->get_context_name(true, false, false);
+        $export->coursename = 'DOMMYDUMMY';
         $export->caneditsettings = has_capability('mod/competvet:addinstance', $this->competvet->get_context());
 
         $export->rarrow = $output->rarrow();
@@ -122,6 +128,6 @@ class app implements named_templatable, renderable {
     }
 
     public function get_template_name(\renderer_base $renderer): string {
-        return 'mod_competvet/grading/app';
+        return 'mod_competvet/grading2/app';
     }
 }

@@ -1,0 +1,154 @@
+{
+    "criteria": [
+        {
+            "id": 1,
+            "name": "Compétences liées à la démarche clinique",
+            "grades": [
+                {
+                    "id": 1,
+                    "graderid": 1,
+                    "gradername": "Sylvain Bellier",
+                    "value": 90
+                },
+                {
+                    "id": 2,
+                    "graderid": 2,
+                    "gradername": "Camille Moulin",
+                    "value": 85
+                },
+                {
+                    "id": 3,
+                    "graderid": 3,
+                    "gradername": "Pierre Deshuillers",
+                    "value": 95
+                },
+                {
+                    "id": 4,
+                    "graderid": 4,
+                    "gradername": "Marine Le-Dudal",
+                    "value": 92
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "name": "Compétences techniques et activités de soins",
+            "grades": [
+                {
+                    "id": 1,
+                    "graderid": 1,
+                    "gradername": "Sylvain Bellier",
+                    "value": 80
+                },
+                {
+                    "id": 2,
+                    "graderid": 2,
+                    "gradername": "Camille Moulin",
+                    "value": 75
+                },
+                {
+                    "id": 3,
+                    "graderid": 3,
+                    "gradername": "Pierre Deshuillers",
+                    "value": 85
+                },
+                {
+                    "id": 4,
+                    "graderid": 4,
+                    "gradername": "Marine Le-Dudal",
+                    "value": 82
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "name": "Compétences liées à la mobilisation des acquis",
+            "grades": [
+                {
+                    "id": 1,
+                    "graderid": 1,
+                    "gradername": "Sylvain Bellier",
+                    "value": 95
+                },
+                {
+                    "id": 2,
+                    "graderid": 2,
+                    "gradername": "Camille Moulin",
+                    "value": 90
+                },
+                {
+                    "id": 3,
+                    "graderid": 3,
+                    "gradername": "Pierre Deshuillers",
+                    "value": 92
+                },
+                {
+                    "id": 4,
+                    "graderid": 4,
+                    "gradername": "Marine Le-Dudal",
+                    "value": 88
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "name": "Qualité d’organisation et de travail en équipe",
+            "grades": [
+                {
+                    "id": 1,
+                    "graderid": 1,
+                    "gradername": "Sylvain Bellier",
+                    "value": 88
+                },
+                {
+                    "id": 2,
+                    "graderid": 2,
+                    "gradername": "Camille Moulin",
+                    "value": 90
+                },
+                {
+                    "id": 3,
+                    "graderid": 3,
+                    "gradername": "Pierre Deshuillers",
+                    "value": 85
+                },
+                {
+                    "id": 4,
+                    "graderid": 4,
+                    "gradername": "Marine Le-Dudal",
+                    "value": 92
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "name": "Motivation et implication personnelle",
+            "grades": [
+                {
+                    "id": 1,
+                    "graderid": 1,
+                    "gradername": "Sylvain Bellier",
+                    "value": 92
+                },
+                {
+                    "id": 2,
+                    "graderid": 2,
+                    "gradername": "Camille Moulin",
+                    "value": 88
+                },
+                {
+                    "id": 3,
+                    "graderid": 3,
+                    "gradername": "Pierre Deshuillers",
+                    "value": 90
+                },
+                {
+                    "id": 4,
+                    "graderid": 4,
+                    "gradername": "Marine Le-Dudal",
+                    "value": 95
+                }
+            ]
+        }
+    ]
+}

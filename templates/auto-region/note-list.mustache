@@ -1,0 +1,46 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_competvet/auto-region/note-list
+
+    Creates the list of criteria for the note tab. For each criterium, it will
+    display the title and the options.
+    The options are radio buttons, and the user can select one of them for each criterium.
+
+    Example context (json):
+    {
+    }
+}}
+{{#note-list}}
+    {{#criteria}}
+        <section>
+            <h4 class="criterion-title h6">{{name}}</h4>
+            <div class="criterion-options">
+                {{#options}}
+                    <div class="custom-control custom-checkbox">
+                        <input type="radio" class="custom-control-input" id="option-{{optionid}}" name="criterion-{{id}}" value="{{value}}" {{#selected}}checked{{/selected}}>
+                        <label class="custom-control-label" for="option-{{optionid}}">{{name}} (<strong>{{#str}}points, mod_competvet, {{value}}{{/str}}</strong>)</label>
+                    </div>
+                {{/options}}
+            </div>
+            <div class="mb-3">
+                <label class="mt-2 mb-0" for="criterion-{{id}}-comment">{{#str}}comment, mod_competvet{{/str}}</label>
+                <textarea class="form-control" id="criterion-{{id}}-comment" name="criterion-{{id}}-comment" rows="1">{{comment}}</textarea>
+            </div>
+        </section>
+    {{/criteria}}
+{{/note-list}}

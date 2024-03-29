@@ -82,7 +82,7 @@ class get_planning_info extends external_api {
         foreach ($groups as $g) {
             $planningentries =
                 $DB->get_records(
-                    'competvet_plan',
+                    'competvet_planning',
                     ['situationid' => $cm->instance, 'groupid' => $g->id],
                     'groupid, startdate, enddate ASC'
                 );

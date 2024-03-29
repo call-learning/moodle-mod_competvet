@@ -50,10 +50,13 @@ $renderer = $PAGE->get_renderer('mod_competvet');
 echo $OUTPUT->header();
 echo $OUTPUT->heading($moduleinstance->name);
 
+// Get the original page params
+parse_str(parse_url($_SERVER['REQUEST_URI'])['query'], $query);
+$query['returnurl'] = $_SERVER['REQUEST_URI'];
 $gradebutton = new single_button(
     new moodle_url(
-        '/mod/competvet/grading.php',
-        ['id' => $cm->id]
+        '/mod/competvet/grading2.php',
+        $query
     ),
     get_string('gradeverb')
 );

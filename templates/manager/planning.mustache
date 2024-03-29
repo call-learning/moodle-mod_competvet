@@ -1,0 +1,95 @@
+{{!
+    This file is part of Moodle Workplace https://moodle.com/workplace based on Moodle
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+    Moodle Workplace Code is dual-licensed under the terms of both the
+    single GNU General Public Licence version 3.0, dated 29 June 2007
+    and the terms of the proprietary Moodle Workplace Licence strictly
+    controlled by Moodle Pty Ltd and its certified premium partners.
+    Wherever conflicting terms exist, the terms of the MWL are binding
+    and shall prevail.
+}}
+{{!
+    @template mod_competvet/manager/planning
+
+    Template for showing list of criteria
+
+    Example context (json):
+    {
+        "categories": [
+            {
+                "categoryid": 1,
+                "categorytext": "Category 1",
+                "plannings": [
+                    {
+                        "startdate": "01/01/2019",
+                        "enddate": "01/01/2019",
+                        "groupname": "Group 1",
+                        "nbstudents": 1,
+                        "planningurl": "http://localhost/moodle/mod/competvet/view.php?id=1&planningid=1"
+                    },
+                    {
+                        "startdate": "01/01/2019",
+                        "enddate": "01/01/2019",
+                        "groupname": "Group 2",
+                        "nbstudents": 2,
+                        "planningurl": "http://localhost/moodle/mod/competvet/view.php?id=1&planningid=2"
+                    }
+                ]
+            },
+            {
+                "categoryid": 2,
+                "categorytext": "Category 2",
+                "plannings": [
+                    {
+                        "startdate": "01/01/2019",
+                        "enddate": "01/01/2019",
+                        "groupname": "Group 1",
+                        "nbstudents": 1,
+                        "planningurl": "http://localhost/moodle/mod/competvet/view.php?id=1&planningid=1"
+                    },
+                    {
+                        "startdate": "01/01/2019",
+                        "enddate": "01/01/2019",
+                        "groupname": "Group 2",
+                        "nbstudents": 2,
+                        "planningurl": "http://localhost/moodle/mod/competvet/view.php?id=1&planningid=2"
+                    }
+                ]
+            }
+        ]
+    }
+}}
+<link rel="stylesheet" href="{{config.wwwroot}}/mod/competvet/scss/styles.css?v={{version}}" />
+<div id="manageplanning" data-locked="{{locked}}" class="manageplanning manage" data-region="planning" data-cm-id="{{cmid}}">
+    {{#inuse}}
+        <div class="alert alert-warning">
+            {{#str}}inuse, mod_competvet{{/str}}
+        </div>
+    {{/inuse}}
+    <div data-region="plannings">
+        {{> mod_competvet/manager/planning/plannings}}
+    </div>
+    <div class="d-flex justify-content-end align-items-center mb-3">
+        <a class="btn btn-link jsbutton" href="#" data-action="add" data-type="planning">
+            {{#str}}addplanning, mod_competvet{{/str}}
+        </a>
+    </div>
+</div>
+{{#js}}
+require(['mod_competvet/local/manager/manager_app_planning'], function(manager) {
+    manager.init();
+});
+{{/js}}

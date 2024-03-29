@@ -30,7 +30,7 @@ require(__DIR__ . '/../../config.php');
 
 global $DB, $PAGE, $OUTPUT, $USER;
 
-[$cm, $course, $moduleinstance, $tabs, $currenttype] = utils::page_requirements('view');
+[$cm, $course, $moduleinstance] = utils::page_requirements('view');
 
 $modulecontext = context_module::instance($cm->id);
 

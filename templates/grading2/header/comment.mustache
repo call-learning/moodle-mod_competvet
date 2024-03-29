@@ -1,0 +1,35 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_competvet/header/comment
+
+    TODO describe template comment
+
+    Example context (json):
+    {
+    }
+}}
+<div class="certifsection">
+    <h3 class="certifheading h6">{{#str}}globalcomment, mod_competvet{{/str}}</h3>
+    <div data-region="commentwrapper">
+        <textarea class="form-control globalcomment" name="globalcomment" data-action="globalcomment" rows="2" cols="4" data-region="comment" data-comment-id="0" value="{{globalcomment}}" /></textarea>
+        <div class="d-flex justify-content-between">
+            <button class="btn btn-primary btn-sm mb-2 commentsubmit" data-action="savecomment" data-comment-id="0" data-action="savecomment">{{#str}}submit, mod_competvet{{/str}}</button>
+            <div class="statusmessage text-success d-flex justify-content-center align-items-center px-3 opacity-0" data-region="commentsaved">{{#str}}commentsaved, mod_competvet{{/str}}</div>
+        </div>
+    </div>
+</div>

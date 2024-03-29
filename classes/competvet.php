@@ -384,7 +384,7 @@ class competvet {
         $item = grade_item::fetch([
             'itemtype' => 'mod',
             'itemmodule' => self::MODULE_NAME,
-            'iteminstance' => $this->instance->get('id'),
+            'iteminstance' => $this->instance->id,
             'courseid' => $this->course->id,
             'itemnumber' => $itemnumber,
         ]);

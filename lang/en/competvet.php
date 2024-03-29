@@ -199,3 +199,47 @@ $string['todo:action:eval:asked'] = 'Observation Asked';
 $string['todo:action:cta:eval:asked'] = 'Create Observation';
 $string['todo:action'] = 'Action';
 $string['todo:data'] = 'Data';
+
+// Grading interface
+$string['modulename_help'] = 'The Compet Eval Grading interface.';
+$string['modulename_link'] = 'mod/competgrade/view';
+$string['privacy:metadata'] = 'The Compet grade plugin does not store any personal data.';
+$string['closeevaluation'] = 'Close evaluation';
+$string['previoususer'] = 'Previous user';
+$string['nextuser'] = 'Next user';
+$string['competgrade:grade'] = 'Receive a grade';
+$string['competgrade:viewallgrades'] = 'View all user grades';
+$string['evaluate'] = 'Global Evaluation';
+$string['certify'] = 'Certify';
+$string['list'] = 'List';
+$string['globalgrade'] = 'Global grade';
+$string['globalcomment'] = 'Global comment';
+$string['globalcomment_info'] = 'This comment will be shared with the student';
+$string['commentsaved'] = 'Comment saved';
+$string['enterskillassesment'] = 'enter your skills assessments here';
+$string['entercertificationassesment'] = 'enter your certification assessments here';
+$string['more'] = 'more';
+$string['less'] = 'less';
+$string['points'] = '{$a} points';
+
+$string['evaluation'] = 'Global Evaluation';
+$string['suggestedgrade'] = 'Suggested grade';
+$string['suggestedgrade_help'] = 'Suggested grade';
+$string['finalgrade'] = 'Final grade';
+$string['commment'] = 'Comment';
+$string['submit'] = 'Submit';
+
+$string['inuse'] = 'In use';
+$string['move'] = 'Move';
+$string['saving'] = 'Saving';
+$string['planning'] = 'Planning';
+$string['addplanning'] = 'Add a planning';
+
+$string['addgrid'] = 'Add a grid';
+$string['addgrade'] = 'Add a grade';
+$string['grading'] = 'Grading';
+$string['gradeid'] = 'Grade ID';
+$string['gradeorder'] = 'Grade Order';
+$string['gradename'] = 'Grade Name';
+$string['gradevalue'] = 'Grade Value';
+$string['addoption'] = 'Add an option';

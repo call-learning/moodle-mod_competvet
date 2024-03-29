@@ -380,4 +380,26 @@ function competvet_extend_navigation($competvetnode, $course, $module, $cm) {
  * @param navigation_node $competvetnode {@see navigation_node}
  */
 function competvet_extend_settings_navigation($settingsnav, $competvetnode = null) {
+    global $PAGE;
+
+    $keys = $competvetnode->get_children_key_list();
+    $beforekey = null;
+    $i = array_search('modedit', $keys);
+    if ($i === false && array_key_exists(0, $keys)) {
+        $beforekey = $keys[0];
+    } else if (array_key_exists($i + 1, $keys)) {
+        $beforekey = $keys[$i + 1];
+    }
+
+    if (has_capability('mod/competvet:editplanning', $PAGE->cm->context)) {
+        $url = new moodle_url('/mod/competvet/view.php', ['pagetype' => 'manageplanning', 'id' => $PAGE->cm->id]);
+        $node = navigation_node::create(get_string('entity:planning', 'mod_competvet'), $url, navigation_node::TYPE_SETTING);
+        $competvetnode->add_node($node, $beforekey);
+    }
+
+    if (has_capability('mod/competvet:candoeverything', $PAGE->cm->context)) {
+        $url = new moodle_url('/mod/competvet/view.php', ['pagetype' => 'managegrading', 'id' => $PAGE->cm->id]);
+        $node = navigation_node::create(get_string('grading', 'mod_competvet'), $url, navigation_node::TYPE_SETTING);
+        $competvetnode->add_node($node, $beforekey);
+    }
 }

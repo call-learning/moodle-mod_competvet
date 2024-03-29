@@ -1,0 +1,50 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_competvet/manager/planning/plannings
+
+    TODO describe template script
+
+    Example context (json):
+    {
+        "categoryid": 1,
+        "categorytext": "Situation 1",
+        "collapsed": false,
+        "sortorder": 1,
+        "criteria": [
+            {
+                "id": 1,
+                "name": "Criteria 1",
+                "description": "Description 1",
+                "sortorder": 1
+            },
+            {
+                "id": 2,
+                "name": "Criteria 2",
+                "description": "Description 2",
+                "sortorder": 2
+            }
+        ]
+    }
+}}
+
+{{> mod_competvet/manager/planning/planning_header}}
+<div class="plannings container-fluid" data-region="crit">
+    {{#plannings}}
+        {{> mod_competvet/manager/planning/planning_item}}
+    {{/plannings}}
+</div>
