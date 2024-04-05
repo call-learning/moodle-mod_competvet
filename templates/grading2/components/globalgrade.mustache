@@ -24,41 +24,41 @@
     }
 }}
 {{#globalgrade}}
-<div class="user-grade">
-    <div class="h4 text-center border-bottom pb-2">{{#str}}evaluation, mod_competvet{{/str}}</div>
-    <div class="d-flex">
-        <div class="form-group">
-            <label >
-                {{#str}}suggestedgrade, mod_competvet{{/str}} :
-            </label>
-            <div class="font-weight-bold">{{suggestedgrade}}</div>
-        </div>
-        <div class="form-group">
-            <label for="finalgrade">
-                {{#str}}finalgrade, mod_competvet{{/str}} :
-            </label>
-            <div>
-                <select class="custom-select ml-auto" id="finalgrade" name="finalgrade" data-field="finalgrade">
-                    {{#finalgradeoptions}}
-                        <option value="{{key}}" {{#selected}}selected{{/selected}}>{{value}}</option>
-                    {{/finalgradeoptions}}
-                </select>
+    <div class="user-grade">
+        <div class="h4 text-center border-bottom pb-2">{{#str}}evaluation, mod_competvet{{/str}}</div>
+        <div class="d-flex">
+            <div class="form-group">
+                <label >
+                    {{#str}}suggestedgrade, mod_competvet{{/str}} :
+                </label>
+                <div class="font-weight-bold">{{suggestedgrade}}</div>
             </div>
-        </div>
-        <div class="form-group">
-            <label>
-                {{#str}}comment, mod_competvet{{/str}} :
-            </label>
-            <textarea class="form-control" name="comment" data-action="comment" data-grade-id="0" data-criterium-id="4">{{comment}}</textarea>
-        </div>
-        <div class="form-group">
-            <label>&nbsp;</label>
-            <div>
-                <button type="submit" class="btn btn-primary" data-action="save" data-grade-id="0">
-                    {{#str}}submit, mod_competvet{{/str}}
-                </button>
+            <div class="form-group">
+                <label for="finalgrade">
+                    {{#str}}finalgrade, mod_competvet{{/str}} :
+                </label>
+                <div>
+                    <select class="custom-select ml-auto" id="finalgrade" name="finalgrade" data-field="finalgrade">
+                        {{#finalgradeoptions}}
+                            <option value="{{key}}" {{#selected}}selected{{/selected}}>{{value}}</option>
+                        {{/finalgradeoptions}}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>
+                    {{#str}}comment, mod_competvet{{/str}} :
+                </label>
+                <textarea class="form-control" name="comment" data-action="comment" data-grade-id="0" data-criterium-id="4">{{comment}}</textarea>
+            </div>
+            <div class="form-group">
+                <label>&nbsp;</label>
+                <div>
+                    <button type="submit" class="btn btn-primary" data-action="save" data-grade-id="0">
+                        {{#str}}submit, mod_competvet{{/str}}
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 {{/globalgrade}}

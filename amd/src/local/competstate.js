@@ -45,6 +45,21 @@ class CompetState {
     }
 
     /**
+     * Set a single value.
+     * @param {String} key The key.
+     * @param {String} value The value.
+     */
+    setValue(key, value) {
+        // Check if the key exists.
+        if (!this.data[key]) {
+            window.console.log('The key does not exist');
+        }
+        this.data[key] = value;
+        this.notifySubscriber(key);
+        this.debug();
+    }
+
+    /**
      * Get the data.
      * @return {Object} The data.
      */
@@ -65,12 +80,12 @@ class CompetState {
             throw new Error('The callback must be a function');
         }
 
-        // Check if the key is already subscribed.
-        const existingSubscriber = this.subscribers.find(subscriber => subscriber.key === key);
-        if (existingSubscriber) {
+        // Check if the key is already subscribed, with the same callback.
+        const exists = this.subscribers.find(subscriber => subscriber.key === key && subscriber.callback === callback);
+        if (exists) {
             window.console.log('The key is already subscribed');
+            return;
         }
-
         this.subscribers.push({key, callback});
     }
 
@@ -83,10 +98,27 @@ class CompetState {
     }
 
     /**
-     * Notify the subscribers.
+     * Notify the subscribers, but only if the data key exists or has changed.
      */
     notifySubscribers() {
-        this.subscribers.forEach(subscriber => subscriber.callback(this.data));
+        this.subscribers.forEach(subscriber => {
+            if (this.data[subscriber.key] !== undefined) {
+                subscriber.callback(this.data);
+            }
+        });
+    }
+
+    /**
+     * Notify a single subscriber.
+     * @param {String} key The key.
+     */
+    notifySubscriber(key) {
+        const subscriber = this.subscribers.find(subscriber => subscriber.key === key);
+        if (subscriber) {
+            subscriber.callback(this.data);
+        } else {
+            window.console.log('The key is not subscribed');
+        }
     }
 
     /**

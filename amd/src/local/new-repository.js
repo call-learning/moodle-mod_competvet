@@ -279,12 +279,19 @@ class Repository {
     /**
      * Save the global grade.
      * @param {Object} data The data to save.
+     * @returns {Promise} The promise.
      */
     async saveGlobalGrade(data) {
         if (!data.userid) {
             return;
         }
         localStorage.setItem('global-grade-' + data.userid, JSON.stringify(data));
+        // Return a promise with a 500ms delay.
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve();
+            }, 500);
+        });
     }
 
     /**
@@ -301,6 +308,11 @@ class Repository {
             criterion.options = criterion.options.filter((option) => !option.deleted);
         });
         localStorage.setItem('list-criteria', JSON.stringify(data));
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve();
+            }, 500);
+        });
     }
 
     /**
@@ -317,12 +329,18 @@ class Repository {
     /**
      * Save the evaluation grading.
      * @param {Object} data The data to save.
+     * @returns {Promise} The promise.
      */
     async saveEvaluationGrading(data) {
         if (!data.userid) {
             return;
         }
         localStorage.setItem('evaluation-grading-' + data.userid, JSON.stringify(data));
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve();
+            }, 500);
+        });
     }
 
     /**

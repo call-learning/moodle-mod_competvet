@@ -22,6 +22,7 @@
  */
 import Repository from '../new-repository';
 import CompetState from '../competstate';
+import '../helpers';
 import './components/auto_regions';
 import './components/user_navigation';
 import './components/evaluations_observations';
@@ -77,7 +78,7 @@ class Competvet {
      * @param {Object} user The user to set as current.
      */
     setCurrentUser(user) {
-        CompetState.setData({user: user});
+        CompetState.setValue('user', user);
         this.currentUser = user;
         this.setEvalObservations();
         this.setEvalGrading();
@@ -116,9 +117,8 @@ class Competvet {
             'observations': response.evaluations,
             'comments': response.comments
         };
-        let stateData = CompetState.getData();
-        stateData['evaluations-observations'] = context;
-        CompetState.setData(stateData);
+        CompetState.setValue('evaluations-observations', context);
+        CompetState.setValue('evaluations-comments', context);
     }
 
     /**
@@ -136,11 +136,8 @@ class Competvet {
         const context = {
             'grading': response.evaluationsgrading
         };
-        let stateData = CompetState.getData();
-        stateData['evaluations-grading'] = context;
-        CompetState.setData(stateData);
+        CompetState.setValue('evaluations-grading', context);
     }
-
 
     /**
      * Get the list criteria.
@@ -157,9 +154,7 @@ class Competvet {
         const context = {
             'criteria': response.criteria
         };
-        let stateData = CompetState.getData();
-        stateData['list-criteria'] = context;
-        CompetState.setData(stateData);
+        CompetState.setValue('list-criteria', context);
     }
 
     /**
@@ -174,9 +169,7 @@ class Competvet {
         if (!response.globalgrade) {
             return;
         }
-        let stateData = CompetState.getData();
-        stateData.globalgrade = response.globalgrade;
-        CompetState.setData(stateData);
+        CompetState.setValue('globalgrade', response.globalgrade);
     }
 
     /**

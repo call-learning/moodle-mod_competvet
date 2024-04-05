@@ -39,10 +39,10 @@ const stateTemplate = () => {
     const region = gradingApp.querySelector(`[data-region="${templateName}"]`);
     const template = `mod_competvet/grading2/components/${templateName}`;
     const regionRenderer = (context) => {
-        if (context.evaluations === undefined) {
+        if (context[templateName] === undefined) {
             return;
         }
-        Templates.render(template, context.evaluations).then((html) => {
+        Templates.render(template, context).then((html) => {
             region.innerHTML = html;
             return;
         }).catch(Notification.exception);

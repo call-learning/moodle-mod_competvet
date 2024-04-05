@@ -78,23 +78,21 @@ const formCalculation = () => {
     const context = {
         'grading': grading
     };
-    state['evaluations-grading'] = context;
-    CompetState.setData(state);
+    return context;
 };
 
 const formEvents = () => {
     const form = document.querySelector('[data-region="evaluations-grading"]');
     form.addEventListener('change', async(e) => {
         e.preventDefault();
-        formCalculation();
+        const context = formCalculation();
+        CompetState.setValue('evaluations-grading', context);
     });
     form.addEventListener('submit', async(e) => {
         e.preventDefault();
-        formCalculation();
-        const state = CompetState.getData();
-        const evaluationsGrading = state['evaluations-grading'];
-        const grading = evaluationsGrading.grading;
-        Repository.saveEvaluationGrading(grading);
+        const context = formCalculation();
+        await Repository.saveEvaluationGrading(context.grading);
+        CompetState.setValue('evaluations-grading', context);
     });
 };
 

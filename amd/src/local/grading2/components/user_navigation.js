@@ -32,9 +32,10 @@ const gradingApp = document.querySelector('[data-region="grading-app"]');
  * Define the user navigation.
  */
 const stateTemplate = () => {
-    const templateName = 'user-navigation';
-    const region = gradingApp.querySelector(`[data-region="${templateName}"]`);
-    const template = `mod_competvet/grading2/components/${templateName}`;
+    const region = gradingApp.querySelector(`[data-region="user-navigation"]`);
+    const template = `mod_competvet/grading2/components/user-navigation`;
+    const region2 = gradingApp.querySelector(`[data-region="user-header"]`);
+    const template2 = `mod_competvet/grading2/components/user-header`;
     const regionRenderer = (context) => {
         if (context.user === undefined) {
             return;
@@ -43,28 +44,12 @@ const stateTemplate = () => {
             region.innerHTML = html;
             return;
         }).catch(Notification.exception);
-    };
-    CompetState.subscribe(templateName, regionRenderer);
-};
-
-/**
- * Define the user header.
- */
-const stateTemplate2 = () => {
-    const templateName = 'user-header';
-    const region = gradingApp.querySelector(`[data-region="${templateName}"]`);
-    const template = `mod_competvet/grading2/components/${templateName}`;
-    const regionRenderer = (context) => {
-        if (context.user === undefined) {
-            return;
-        }
-        Templates.render(template, context).then((html) => {
-            region.innerHTML = html;
+        Templates.render(template2, context).then((html) => {
+            region2.innerHTML = html;
             return;
         }).catch(Notification.exception);
     };
-    CompetState.subscribe(templateName, regionRenderer);
+    CompetState.subscribe('user', regionRenderer);
 };
 
 stateTemplate();
-stateTemplate2();

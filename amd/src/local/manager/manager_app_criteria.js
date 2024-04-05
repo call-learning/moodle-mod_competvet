@@ -212,7 +212,7 @@ class Manager {
     /**
      * Save the state to the server.
      */
-    save() {
+    async save() {
         const state = CompetState.getData();
         state.grids.forEach((element) => {
             if (element.edit) {
@@ -235,8 +235,8 @@ class Manager {
                 }
             });
         });
+        await Repository.saveListCriteria(state);
         CompetState.setData(state);
-        Repository.saveListCriteria(state);
     }
 
     /**

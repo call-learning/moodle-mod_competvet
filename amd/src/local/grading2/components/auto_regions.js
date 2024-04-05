@@ -52,7 +52,6 @@ const getAutoRegions = () => {
 
 const updateAutoRegions = () => {
     const autoRegions = gradingApp.querySelectorAll('[data-auto-region]');
-    let stateData = CompetState.getData();
     autoRegions.forEach((region) => {
         const regionName = region.dataset.autoRegion;
         const args = {
@@ -60,8 +59,7 @@ const updateAutoRegions = () => {
         };
         Repository.getJsonData(args).then((response) => {
             const context = JSON.parse(response.data);
-            stateData[regionName] = context;
-            CompetState.setData(stateData);
+            CompetState.setValue(regionName, context);
             return;
         }).catch(Notification.exception);
     });

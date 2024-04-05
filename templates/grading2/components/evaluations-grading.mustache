@@ -24,86 +24,86 @@
     }
 }}
 {{#evaluations-grading}}
-{{#grading}}
-    <div class="mb-5">
-        <div class="d-flex justify-content-between mb-2">
-            {{#str}}evalscore, mod_competvet{{/str}}
-            <div class="ml-auto">
-                <span class="calculatedgrade" data-field="evalscore">{{evalscore}}</span>/
-                <span class="maxgrade" data-field="maxevalscore">{{maxevalscore}}</span>
-            </div>
-        </div>
-        <div class="d-flex justify-content-between mb-2">
-            {{#str}}numberofobservations, mod_competvet{{/str}}
-            <div class="ml-auto">
-                <span class="calculatedgrade" data-field="numberofobservations">{{numberofobservations}}</span>/
-                <span class="maxgrade" data-field="maxobservations">{{maxobservations}}</span>
-            </div>
-        </div>
-        <div class="d-flex justify-content-between">
-            <div class="d-flex flex-column">
-                <div>{{#str}}penalty, mod_competvet{{/str}}</div>
-                <div class="text-muted">
-                    {{#str}}penalty_help, mod_competvet{{/str}}
+    {{#grading}}
+        <div class="mb-5">
+            <div class="d-flex justify-content-between mb-2">
+                {{#str}}evalscore, mod_competvet{{/str}}
+                <div class="ml-auto">
+                    <span class="calculatedgrade" data-field="evalscore">{{evalscore}}</span>/
+                    <span class="maxgrade" data-field="maxevalscore">{{maxevalscore}}</span>
                 </div>
             </div>
-            <span class="calculatedgrade" data-field="penalty">{{penalty}}</span>
-        </div>
+            <div class="d-flex justify-content-between mb-2">
+                {{#str}}numberofobservations, mod_competvet{{/str}}
+                <div class="ml-auto">
+                    <span class="calculatedgrade" data-field="numberofobservations">{{numberofobservations}}</span>/
+                    <span class="maxgrade" data-field="maxobservations">{{maxobservations}}</span>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div class="d-flex flex-column">
+                    <div>{{#str}}penalty, mod_competvet{{/str}}</div>
+                    <div class="text-muted">
+                        {{#str}}penalty_help, mod_competvet{{/str}}
+                    </div>
+                </div>
+                <span class="calculatedgrade" data-field="penalty">{{penalty}}</span>
+            </div>
 
-        <div class="form-group mb-2">
-            <div class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input" id="deactivatepenalty" name="deactivatepenalty" data-field="deactivatepenalty" {{#deactivatepenalty}}checked{{/deactivatepenalty}} />
-                <label class="custom-control-label" for="deactivatepenalty">
-                    {{#str}}deactivatepenalty, mod_competvet{{/str}}
-                </label>
-            </div>
-        </div>
-        <div class="form-group d-flex align-items-center mb-2">
-            <label for="selfevaluation">
-                {{#str}}selfevaluation, mod_competvet{{/str}}
-            </label>
-            <select class="custom-select ml-auto" id="selfevaluation" name="selfevaluation" data-field="selfevaluation">
-                {{#selfevalselectoptions}}
-                <option value="{{key}}" {{#isselected}}selected{{/isselected}}>{{#str}}selfevalbonus, mod_competvet, {{value}}{{/str}}</option>
-                {{/selfevalselectoptions}}
-            </select>
-        </div>
-        <hr>
-        <div class="d-flex justify-content-between mb-2">
-            {{#str}}finalscore, mod_competvet{{/str}}
-            <div class="ml-auto">
-            <span class="calculatedgrade" data-field="finalscore">{{finalscore}}</span>
-            /<span class="maxgrade" data-field="maxfinalscore">{{maxfinalscore}}</span>
-            </div>
-        </div>
-    </div>
-    <div class="mb-5">
-        <div class="form-group d-flex">
-            <div class="d-flex flex-column">
-                <label for="scoreevaluator">
-                    {{#str}}scoreevaluator, mod_competvet{{/str}}
-                </label>
-                <div class="text-muted">
-                    {{#str}}scoreevaluator_help, mod_competvet{{/str}}
+            <div class="form-group mb-2">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="deactivatepenalty" name="deactivatepenalty" data-field="deactivatepenalty" {{#deactivatepenalty}}checked{{/deactivatepenalty}} />
+                    <label class="custom-control-label" for="deactivatepenalty">
+                        {{#str}}deactivatepenalty, mod_competvet{{/str}}
+                    </label>
                 </div>
             </div>
-            <div class="col-3 pr-0">
-                <input type="number" data-field="scoreevaluator" class="form-control" id="scoreevaluator" name="scoreevaluator" value="{{scoreevaluator}}" min="0" max="{{maxfinalscore}}" step="1" />
+            <div class="form-group d-flex align-items-center mb-2">
+                <label for="selfevaluation">
+                    {{#str}}selfevaluation, mod_competvet{{/str}}
+                </label>
+                <select class="custom-select ml-auto" id="selfevaluation" name="selfevaluation" data-field="selfevaluation">
+                    {{#selfevalselectoptions}}
+                    <option value="{{key}}" {{#isselected}}selected{{/isselected}}>{{#str}}selfevalbonus, mod_competvet, {{value}}{{/str}}</option>
+                    {{/selfevalselectoptions}}
+                </select>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between mb-2">
+                {{#str}}finalscore, mod_competvet{{/str}}
+                <div class="ml-auto">
+                <span class="calculatedgrade" data-field="finalscore">{{finalscore}}</span>
+                /<span class="maxgrade" data-field="maxfinalscore">{{maxfinalscore}}</span>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="mb-5">
-        <div class="form-group">
-            <label for="freecommenteval">
-                {{#str}}freecommenteval, mod_competvet{{/str}}
-            </label>
-            <textarea data-field="comment" class="form-control" id="comment" name="comment" rows="3">{{comment}}</textarea>
+        <div class="mb-5">
+            <div class="form-group d-flex">
+                <div class="d-flex flex-column">
+                    <label for="scoreevaluator">
+                        {{#str}}scoreevaluator, mod_competvet{{/str}}
+                    </label>
+                    <div class="text-muted">
+                        {{#str}}scoreevaluator_help, mod_competvet{{/str}}
+                    </div>
+                </div>
+                <div class="col-3 pr-0">
+                    <input type="number" data-field="scoreevaluator" class="form-control" id="scoreevaluator" name="scoreevaluator" value="{{scoreevaluator}}" min="0" max="{{maxfinalscore}}" step="1" />
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="d-flex justify-content-center">
-        <button type="submit" class="btn btn-primary">
-            {{#str}}savechanges{{/str}}
-        </button>
-    </div>
-{{/grading}}
+        <div class="mb-5">
+            <div class="form-group">
+                <label for="freecommenteval">
+                    {{#str}}freecommenteval, mod_competvet{{/str}}
+                </label>
+                <textarea data-field="comment" class="form-control" id="comment" name="comment" rows="3">{{comment}}</textarea>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center">
+            <button type="submit" class="btn btn-primary">
+                {{#str}}savechanges{{/str}}
+            </button>
+        </div>
+    {{/grading}}
 {{/evaluations-grading}}

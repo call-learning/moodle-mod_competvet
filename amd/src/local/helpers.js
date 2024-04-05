@@ -22,6 +22,7 @@
  */
 
 const gradingApp = document.querySelector('[data-region="grading-app"]');
+import {get_string as getString} from 'core/str';
 /**
  * Activate show more / less for comments.
  */
@@ -52,4 +53,23 @@ const activateShowMoreLess = () => {
     });
 };
 
+/**
+ * Add loading icon to submit button.
+ */
+const submitLoading = () => {
+    gradingApp.addEventListener('click', async(e) => {
+        if (!e.target.matches('button[type="submit"]')) {
+            return;
+        }
+        const submit = e.target;
+        submit.classList.add('disabled');
+        submit.dataset.originalText = submit.innerHTML;
+        const loadingIcon = '<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span>';
+        submit.innerHTML = loadingIcon;
+        submit.innerHTML += await getString('processing', 'mod_competvet');
+    });
+};
+
+submitLoading();
 activateShowMoreLess();
+

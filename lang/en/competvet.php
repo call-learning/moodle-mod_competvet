@@ -243,6 +243,7 @@ $string['suggestedgrade_help'] = 'Suggested grade';
 $string['finalgrade'] = 'Final grade';
 $string['commment'] = 'Comment';
 $string['submit'] = 'Submit';
+$string['processing'] = 'Processing';
 
 $string['inuse'] = 'In use';
 $string['move'] = 'Move';
