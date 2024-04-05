@@ -1,12 +1,4 @@
-.path-mod-competvet [data-region="grading-navigation-panel"] {
-}
-
-.path-mod-competvet [data-region="main-grading-panel"] {
-    min-height: 80vh;
-}
-
-.path-mod-competvet [data-region="review-panel"],
-.path-mod-competvet [data-region="grade-panel"] {
+.path-mod-competvet [data-region="review-panel"] {
     transition: opacity 0.5s ease, min-width 0.5s ease;
     overflow: hidden;
 }
@@ -17,29 +9,8 @@
     opacity:0;
 }
 
-.path-mod-competvet [data-region="grade-panel"].collapsed {
-    min-width: 0;
-    width:0;
-    opacity:0;
-}
-
 .path-mod-competvet [data-region="review-panel"].expanded {
     width:100%;
-}
-.path-mod-competvet [data-region="grade-panel"].expanded {
-    width:100%;
-}
-
-.path-mod-competvet [data-region="grade-panel"].collapsed {
-    min-width: 0;
-    width:0;
-    opacity:0;
-}
-
-.path-mod-competvet [data-region="grade-panel"] {
-    min-width: 20%;
-    background-color: #eee;
-    width:auto;
 }
 
 .path-mod-competvet [data-region="review-panel"] {
