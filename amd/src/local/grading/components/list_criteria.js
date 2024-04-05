@@ -29,9 +29,6 @@ import Repository from '../../new-repository';
 
 const gradingApp = document.querySelector('[data-region="grading-app"]');
 
-const regions = [
-    'list-criteria',
-];
 /**
  * Define the user navigation.
  */
@@ -88,5 +85,3 @@ const formEvents = () => {
 
 stateTemplate();
 formEvents();
-
-export default regions;

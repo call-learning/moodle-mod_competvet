@@ -44,23 +44,29 @@ const stateTemplate = () => {
     CompetState.subscribe(templateName, regionRenderer);
 };
 
+const formCalculation = () => {
+    const form = document.querySelector('[data-region="globalgrade"]');
+    const formData = new FormData(form);
+    const formObject = Object.fromEntries(formData);
+    const {globalgrade, user} = CompetState.getData();
+    globalgrade.userid = user.id;
+    globalgrade.finalgrade = formObject.finalgrade;
+    globalgrade.finalgradeoptions.forEach(element => {
+        if (element.value === formObject.finalgrade) {
+            element.selected = true;
+        } else {
+            element.selected = false;
+        }
+    });
+    globalgrade.comment = formObject.comment;
+    return globalgrade;
+};
+
 const formEvents = () => {
     const form = document.querySelector('[data-region="globalgrade"]');
     form.addEventListener('submit', async(e) => {
         e.preventDefault();
-        const {globalgrade, user} = CompetState.getData();
-        const formData = new FormData(form);
-        const formObject = {};
-        for (const [name, value] of formData.entries()) {
-          formObject[name] = value;
-        }
-        globalgrade.userid = user.id;
-        globalgrade.finalgrade = formObject.finalgrade;
-        const selectedOption = globalgrade.finalgradeoptions.find(element => element.value === formObject.finalgrade);
-        if (selectedOption) {
-            selectedOption.selected = true;
-        }
-        globalgrade.comment = formObject.comment;
+        const globalgrade = formCalculation();
         await Repository.saveGlobalGrade(globalgrade);
         CompetState.setValue('globalgrade', globalgrade);
     });

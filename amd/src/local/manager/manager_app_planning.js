@@ -46,7 +46,7 @@ class Manager {
      * Get the data for this manager.
      */
     async getData() {
-        const response = await Repository.getData(this.cmId);
+        const response = await Repository.getPlannings(this.cmId);
         if (!response) {
             return;
         }

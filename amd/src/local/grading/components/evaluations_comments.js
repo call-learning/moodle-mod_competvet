@@ -28,9 +28,6 @@ import Templates from 'core/templates';
 
 const gradingApp = document.querySelector('[data-region="grading-app"]');
 
-const regions = [
-    'evaluations-comments',
-];
 /**
  * Define the user navigation.
  */
@@ -51,5 +48,3 @@ const stateTemplate = () => {
 };
 
 stateTemplate();
-
-export default regions;

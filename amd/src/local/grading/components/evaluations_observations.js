@@ -29,9 +29,6 @@ import Charts from '../charts';
 
 const gradingApp = document.querySelector('[data-region="grading-app"]');
 
-const regions = [
-    'evaluations-observations',
-];
 /**
  * Define the user navigation.
  */
@@ -64,5 +61,3 @@ const stateTemplate = () => {
 };
 
 stateTemplate();
-
-export default regions;

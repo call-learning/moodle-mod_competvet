@@ -28,10 +28,6 @@ import Repository from '../../new-repository';
 
 const gradingApp = document.querySelector('[data-region="grading-app"]');
 
-const regions = [
-    'evaluations-grading',
-];
-
 /**
  * Define the user navigation.
  */
@@ -96,5 +92,3 @@ const formEvents = () => {
 };
 
 formEvents();
-
-export default regions;
