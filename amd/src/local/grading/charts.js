@@ -249,11 +249,7 @@ class CompetCharts {
      * @param {Object} chartData The chart data.
      */
     evaluationChart(chartData) {
-        const region = document.querySelector('[data-region="evaluation-chart"]');
-        region.innerHTML = '';
-        const canvas = document.createElement('canvas');
-        canvas.id = 'evaluationChart';
-        region.appendChild(canvas);
+
         const transFormed = this.transformData(chartData);
         const data = {
             type: 'radar',

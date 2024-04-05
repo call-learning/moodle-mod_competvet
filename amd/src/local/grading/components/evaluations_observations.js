@@ -38,15 +38,26 @@ const regions = [
 const stateTemplate = () => {
     const templateName = 'evaluations-observations';
     const region = gradingApp.querySelector(`[data-region="${templateName}"]`);
+    const chartRegion = document.querySelector('[data-region="evaluation-chart"]');
     const template = `mod_competvet/grading/components/${templateName}`;
     const regionRenderer = (context) => {
         if (context[templateName] === undefined) {
+            return;
+        }
+        chartRegion.innerHTML = '';
+        const {observations} = context[templateName];
+        if (observations.length === 0) {
+            region.innerHTML = 'No observations';
             return;
         }
         Templates.render(template, context).then((html) => {
             region.innerHTML = html;
             return;
         }).catch(Notification.exception);
+
+        const canvas = document.createElement('canvas');
+        canvas.id = 'evaluationChart';
+        chartRegion.appendChild(canvas);
         Charts.evaluationChart(context[templateName]);
     };
     CompetState.subscribe(templateName, regionRenderer);

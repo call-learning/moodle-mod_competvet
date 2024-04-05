@@ -210,7 +210,6 @@ $string['nextuser'] = 'Next user';
 $string['competgrade:grade'] = 'Receive a grade';
 $string['competgrade:viewallgrades'] = 'View all user grades';
 $string['evaluate'] = 'Global Evaluation';
-$string['evalevaluation'] = 'Eval evaluation';
 $string['certify'] = 'Certify';
 $string['list'] = 'List';
 $string['globalgrade'] = 'Global grade';
@@ -224,6 +223,7 @@ $string['less'] = 'less';
 $string['points'] = '{$a} points';
 
 // Eval
+$string['evalevaluation'] = 'Eval evaluation';
 $string['evalscore'] = 'Average evaluation score';
 $string['numberofobservations'] = 'Number of observations';
 $string['penalty'] = 'Penalty';
@@ -236,6 +236,14 @@ $string['scoreevaluator_help'] = 'This grade will be the one taken into account 
 $string['freecommenteval'] = 'Free comment for the Eval part';
 $string['selfevalnone'] = '+ 0 No relevant self-evaluation';
 $string['selfevalbonus'] = '+{$a} realised and relevant';
+
+// Certif
+$string['certifevaluation'] = 'Certif evaluation';
+$string['numcertifvalidated'] = 'Number of essentials validated';
+$string['statusproposed'] = 'Status proposed by CompetVet';
+$string['evaluatordecision'] = 'Evaluator decision';
+$string['evaluatordecision_help'] = 'Non-validation being a deal breaker, you can manually change this grade. If you force the validation, please comment.';
+$string['evalcomment'] = 'Free commentary on the essential clinical aspects';
 
 $string['evaluation'] = 'Global Evaluation';
 $string['suggestedgrade'] = 'Suggested grade';

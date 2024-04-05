@@ -138,6 +138,29 @@ class Repository {
     }
 
     /**
+     * Get the Certification Grading
+     * @param {Object} args The grading to get.
+     * @return {Promise} The promise.
+     */
+    async getCertificationGrading(args) {
+        const file = await this.getJsonData({filename: 'certification-grading'});
+        const storage = localStorage.getItem('certification-grading');
+        const data = JSON.parse(storage) || JSON.parse(file.data);
+        if (args.userid) {
+            data.userid = args.userid;
+            const storage = localStorage.getItem('certification-grading-' + args.userid);
+            if (!storage) {
+                return data;
+            }
+            const userdata = JSON.parse(storage);
+            return {
+                certifgrading: userdata,
+            };
+        }
+        return data;
+    }
+
+    /**
      * Get the global grade for a user.
      * @param {Object} args The arguments.
      * @return {Promise} The promise.
@@ -163,7 +186,7 @@ class Repository {
     /**
      * Save the global grade.
      * @param {Object} data The data to save.
-     * @returns {Promise} The promise.
+     * @return {Promise} The promise.
      */
     async saveGlobalGrade(data) {
         if (!data.userid) {
@@ -182,7 +205,7 @@ class Repository {
      * Save the bare list criteria, not the user's grades.
      *
      * @param {Object} data The data to save.
-     * @returns {Promise}
+     * @return {Promise}
      */
     async saveListCriteria(data) {
         // Temporary, remove all elements with a deleted flag.
@@ -202,24 +225,48 @@ class Repository {
     /**
      * Save the user grades for the list criteria.
      * @param {Object} data The data to save.
+     * @return {Promise} The promise.
      */
     async saveListGrades(data) {
         if (!data.userid) {
             return;
         }
         localStorage.setItem('list-criteria-' + data.userid, JSON.stringify(data));
+        const promise = new Promise((resolve) => {
+            setTimeout(() => {
+                resolve();
+            }, 500);
+        });
+        return promise;
     }
 
     /**
      * Save the evaluation grading.
      * @param {Object} data The data to save.
-     * @returns {Promise} The promise.
+     * @return {Promise} The promise.
      */
     async saveEvaluationGrading(data) {
         if (!data.userid) {
             return;
         }
         localStorage.setItem('evaluation-grading-' + data.userid, JSON.stringify(data));
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve();
+            }, 500);
+        });
+    }
+
+    /**
+     * Save the certification grading.
+     * @param {Object} data The data to save.
+     * @return {Promise} The promise.
+     */
+    async saveCertificationGrading(data) {
+        if (!data.userid) {
+            return;
+        }
+        localStorage.setItem('certification-grading-' + data.userid, JSON.stringify(data));
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve();

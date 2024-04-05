@@ -30,6 +30,7 @@ import './components/evaluations_comments';
 import './components/evaluations_grading';
 import './components/list_criteria';
 import './components/globalgrade';
+import './components/certification_grading';
 
 class Competvet {
     /*
@@ -84,6 +85,7 @@ class Competvet {
         this.setEvalGrading();
         this.setListCriteria();
         this.setGlobalGrade();
+        this.setCertifGrading();
     }
 
     /**
@@ -137,6 +139,24 @@ class Competvet {
             'grading': response.evaluationsgrading
         };
         CompetState.setValue('evaluations-grading', context);
+    }
+
+    /**
+     * Set the Certification grading.
+     */
+    async setCertifGrading() {
+        const args = {
+            userid: this.currentUser.id,
+            planningid: this.planningId
+        };
+        const response = await Repository.getCertificationGrading(args);
+        if (!response.certifgrading) {
+            return;
+        }
+        const context = {
+            'grading': response.certifgrading
+        };
+        CompetState.setValue('certification-grading', context);
     }
 
     /**

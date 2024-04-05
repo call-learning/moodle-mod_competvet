@@ -14,13 +14,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * TODO describe module grading_app_usernavigation
+ * The grading component of the Evaluations tab.
  *
- * @module     mod_competvet/local/grading/components/list_criteria
+ * @module     mod_competvet/local/grading/components/evaluations_grading
  * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 import CompetState from '../../competstate';
 import Notification from 'core/notification';
@@ -30,13 +29,14 @@ import Repository from '../../new-repository';
 const gradingApp = document.querySelector('[data-region="grading-app"]');
 
 const regions = [
-    'list-criteria',
+    'certification-grading',
 ];
+
 /**
  * Define the user navigation.
  */
 const stateTemplate = () => {
-    const templateName = 'list-criteria';
+    const templateName = 'certification-grading';
     const region = gradingApp.querySelector(`[data-region="${templateName}"]`);
     const template = `mod_competvet/grading/components/${templateName}`;
     const regionRenderer = (context) => {
@@ -52,41 +52,44 @@ const stateTemplate = () => {
     CompetState.subscribe(templateName, regionRenderer);
 };
 
+stateTemplate();
+
 const formCalculation = () => {
-    const form = document.querySelector('[data-region="list-criteria"]');
+    const {'certification-grading': grade, user} = CompetState.getData();
+    const grading = grade.grading;
+    grading.userid = user.id;
+    const form = document.querySelector('[data-region="certification-grading"]');
     const formData = new FormData(form);
     const formObject = Object.fromEntries(formData);
-    const {'list-criteria': criteria, user} = CompetState.getData();
-    criteria.userid = user.id;
-    criteria.criteria.forEach((criterium) => {
-        const criteriumId = criterium.criteriumid;
-        criterium.grade = formObject[`criterium-${criteriumId}`];
-        criterium.comment = formObject[`criterium-${criteriumId}-comment`];
-        criterium.options.forEach((option) => {
-            if (option.grade == criterium.grade) {
-                option.selected = true;
-            } else {
-                option.selected = false;
-            }
-        });
+    grading.comment = formObject.comment;
+    grading.evaloptions.forEach((option) => {
+        if (option.key == Number(formObject.evaluatordecision)) {
+            option.selected = true;
+        } else {
+            option.selected = false;
+        }
     });
     const context = {
-        'list-criteria': criteria,
+        'grading': grading
     };
     return context;
 };
 
 const formEvents = () => {
-    const form = document.querySelector('[data-region="list-criteria"]');
+    const form = document.querySelector('[data-region="certification-grading"]');
+    form.addEventListener('change', async(e) => {
+        e.preventDefault();
+        const context = formCalculation();
+        CompetState.setValue('certification-grading', context);
+    });
     form.addEventListener('submit', async(e) => {
         e.preventDefault();
         const context = formCalculation();
-        await Repository.saveListGrades(context['list-criteria']);
-        CompetState.setValue('list-criteria', context['list-criteria']);
+        await Repository.saveCertificationGrading(context.grading);
+        CompetState.setValue('certification-grading', context);
     });
 };
 
-stateTemplate();
 formEvents();
 
 export default regions;

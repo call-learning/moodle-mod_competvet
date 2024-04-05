@@ -57,23 +57,22 @@ stateTemplate();
 const formCalculation = () => {
     const form = document.querySelector('[data-region="evaluations-grading"]');
     const formData = new FormData(form);
-    const formObject = {};
-    for (const [name, value] of formData.entries()) {
-      formObject[name] = value;
-    }
-    const state = CompetState.getData();
-    const evaluationsGrading = state['evaluations-grading'];
+    const formObject = Object.fromEntries(formData);
+    const {'evaluations-grading': evaluationsGrading, user} = CompetState.getData();
     const grading = evaluationsGrading.grading;
-    grading.userid = state.user.id;
-    let penalty = 1;
-    grading.deactivatepenalty = 0;
-    if (formObject.deactivatepenalty == 'on') {
-        penalty = 0;
-        grading.deactivatepenalty = 1;
-    }
+    grading.userid = user.id;
+    grading.deactivatepenalty = formObject.deactivatepenalty === 'on' ? 1 : 0;
+    const penalty = grading.deactivatepenalty ? 0 : 1;
     grading.selfevaluation = formObject.selfevaluation;
-    grading.finalscore = grading.evalscore + (grading.penalty * penalty) + parseInt(grading.selfevaluation);
-    grading.scoreevaluator = parseInt(formObject.scoreevaluator);
+    grading.selfevalselectoptions.forEach((option) => {
+        if (option.value == Number(formObject.selfevaluation)) {
+            option.selected = true;
+        } else {
+            option.selected = false;
+        }
+    });
+    grading.finalscore = grading.evalscore + (grading.penalty * penalty) + Number(grading.selfevaluation);
+    grading.scoreevaluator = Number(formObject.scoreevaluator);
     grading.comment = formObject.comment;
     const context = {
         'grading': grading

@@ -1,0 +1,75 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_competvet/grading/components/certification-grading
+
+    Form to grade the evaluation part of the activity.
+
+    Example context (json):
+    {
+    }
+}}
+{{#certification-grading}}
+    {{#grading}}
+        <div class="mb-5">
+            <div class="d-flex justify-content-between mb-2">
+                {{#str}}numcertifvalidated, mod_competvet{{/str}}
+                <div class="ml-auto">
+                    <span class="calculatedgrade" data-field="numcertifvalidated">{{numcertifvalidated}}</span>/
+                    <span class="maxgrade" data-field="maxcertifvalidated">{{maxcertifvalidated}}</span>
+                </div>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between mb-5">
+                {{#str}}statusproposed, mod_competvet{{/str}}
+                <div class="ml-auto">
+                    <span data-field="statusproposed">{{statusproposed}}</span>
+                </div>
+            </div>
+
+            <div class="form-group d-flex align-items-center mb-2">
+                <div class="d-flex flex-column">
+                    <label for="evaluatordecision">
+                        {{#str}}evaluatordecision, mod_competvet{{/str}}
+                    </label>
+                    <div class="text-muted">
+                        {{#str}}evaluatordecision_help, mod_competvet{{/str}}
+                    </div>
+                </div>
+                <select class="custom-select ml-auto" id="evaluatordecision" name="evaluatordecision" data-field="evaluatordecision">
+                    {{#evaloptions}}
+                        <option value="{{key}}" {{#selected}}selected{{/selected}}>{{value}}</option>
+                    {{/evaloptions}}
+                </select>
+            </div>
+        </div>
+        <div class="mb-5">
+            <div class="form-group">
+                <label for="evalcomment">
+                    {{#str}}evalcomment, mod_competvet{{/str}}
+                </label>
+                <textarea data-field="comment" class="form-control" id="comment" name="comment" rows="3">{{comment}}</textarea>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center">
+            <button type="submit" class="btn btn-primary">
+                {{#str}}savechanges{{/str}}
+            </button>
+        </div>
+    {{/grading}}
+{{/certification-grading}}
+
