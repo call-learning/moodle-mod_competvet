@@ -20,17 +20,17 @@
  * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-import Repository from './repository';
-import CompetState from './competstate';
-// import CompetCharts from './charts';
-import './grading_app_autoregions';
-import UserNavRegions from './grading_app_usernavigation';
-import './grading_app_evaluations';
-import './grading_app_comments';
+import Repository from '../new-repository';
+import CompetState from '../competstate';
+import './components/auto_regions';
+import './components/user_navigation';
+import './components/evaluations_observations';
+import './components/evaluations_comments';
+import './components/evaluations_grading';
+import './components/list_criteria';
+import './components/globalgrade';
 
-// import './helpers';
-
-class competvet {
+class Competvet {
     /*
      * The Grading App Element.
      */
@@ -55,17 +55,34 @@ class competvet {
         this.planningId = this.gradingApp.dataset.planningid;
         this.userlist = [];
         this.currentUser = 0;
-        this.render();
+        this.setup();
         this.addEventListeners();
     }
 
     /**
      * Main render call.
      */
-    async render() {
+    async setup() {
         await this.getUsers();
-        this.renderUserNavigation();
-        await this.getEvaluations();
+        const currentUserId = this.gradingApp.dataset.studentid;
+        if (currentUserId && currentUserId !== '0') {
+            this.setCurrentUser(this.userlist.find(user => user.id === parseInt(currentUserId)));
+        } else {
+            this.setCurrentUser(this.userlist[0]);
+        }
+    }
+
+    /**
+     * Set the current user.
+     * @param {Object} user The user to set as current.
+     */
+    setCurrentUser(user) {
+        CompetState.setData({user: user});
+        this.currentUser = user;
+        this.setEvalObservations();
+        this.setEvalGrading();
+        this.setListCriteria();
+        this.setGlobalGrade();
     }
 
     /**
@@ -81,32 +98,12 @@ class competvet {
             return;
         }
         this.userlist = response.users;
-        const currentUserId = this.gradingApp.dataset.studentid;
-        if (currentUserId && currentUserId !== '0') {
-            this.setCurrentUser(this.userlist.find(user => user.id === parseInt(currentUserId)));
-        } else {
-            this.setCurrentUser(this.userlist[0]);
-        }
-    }
-
-    /**
-     * Render the user navigation.
-     */
-    renderUserNavigation() {
-        const context = {
-            'user': this.currentUser,
-        };
-        let stateData = CompetState.getData();
-        UserNavRegions.forEach(regionName => {
-            stateData[regionName] = context;
-            CompetState.setData(stateData);
-        });
     }
 
     /**
      * Get the Evaluations.
      */
-    async getEvaluations() {
+    async setEvalObservations() {
         const args = {
             userid: this.currentUser.id,
             planningid: this.planningId
@@ -116,11 +113,69 @@ class competvet {
             return;
         }
         const context = {
-            'eval': response.evaluations,
+            'observations': response.evaluations,
             'comments': response.comments
         };
         let stateData = CompetState.getData();
-        stateData.evaluations = context;
+        stateData['evaluations-observations'] = context;
+        CompetState.setData(stateData);
+    }
+
+    /**
+     * Set the Evaluation grading.
+     */
+    async setEvalGrading() {
+        const args = {
+            userid: this.currentUser.id,
+            planningid: this.planningId
+        };
+        const response = await Repository.getEvaluationGrading(args);
+        if (!response.evaluationsgrading) {
+            return;
+        }
+        const context = {
+            'grading': response.evaluationsgrading
+        };
+        let stateData = CompetState.getData();
+        stateData['evaluations-grading'] = context;
+        CompetState.setData(stateData);
+    }
+
+
+    /**
+     * Get the list criteria.
+     */
+    async setListCriteria() {
+        const args = {
+            cmid: this.cmId,
+            userid: this.currentUser.id
+        };
+        const response = await Repository.getListCriteria(args);
+        if (!response.criteria) {
+            return;
+        }
+        const context = {
+            'criteria': response.criteria
+        };
+        let stateData = CompetState.getData();
+        stateData['list-criteria'] = context;
+        CompetState.setData(stateData);
+    }
+
+    /**
+     * Set the global grade.
+     */
+    async setGlobalGrade() {
+        const args = {
+            cmid: this.cmId,
+            userid: this.currentUser.id
+        };
+        const response = await Repository.getGlobalGrade(args);
+        if (!response.globalgrade) {
+            return;
+        }
+        let stateData = CompetState.getData();
+        stateData.globalgrade = response.globalgrade;
         CompetState.setData(stateData);
     }
 
@@ -135,16 +190,6 @@ class competvet {
         } else if (direction === 'next' && index < this.userlist.length - 1) {
             this.setCurrentUser(this.userlist[index + 1]);
         }
-        this.renderUserNavigation();
-        this.getEvaluations();
-    }
-
-    /**
-     * Set the current user.
-     * @param {Object} user The user to set as current.
-     */
-    setCurrentUser(user) {
-        this.currentUser = user;
     }
 
     /**
@@ -170,7 +215,7 @@ class competvet {
  *
  */
 const init = () => {
-    new competvet();
+    new Competvet();
 };
 
 export default {

@@ -1,0 +1,29 @@
+{
+    "globalgrade": {
+        "suggestedgrade": "A",
+        "comment": "",
+        "finalgradeoptions": [
+            {
+                "key": "A",
+                "value": "A"
+            },
+            {
+                "key": "B",
+                "value": "B"
+            },
+            {
+                "key": "C",
+                "value": "C",
+                "selected": true
+            },
+            {
+                "key": "D",
+                "value": "D"
+            },
+            {
+                "key": "F",
+                "value": "F"
+            }
+        ]
+    }
+}

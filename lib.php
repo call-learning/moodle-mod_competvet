@@ -398,7 +398,7 @@ function competvet_extend_settings_navigation($settingsnav, $competvetnode = nul
     }
 
     if (has_capability('mod/competvet:candoeverything', $PAGE->cm->context)) {
-        $url = new moodle_url('/mod/competvet/view.php', ['pagetype' => 'managegrading', 'id' => $PAGE->cm->id]);
+        $url = new moodle_url('/mod/competvet/view.php', ['pagetype' => 'managecriteria', 'id' => $PAGE->cm->id]);
         $node = navigation_node::create(get_string('grading', 'mod_competvet'), $url, navigation_node::TYPE_SETTING);
         $competvetnode->add_node($node, $beforekey);
     }

@@ -32,13 +32,20 @@
         <a class="nav-link" href="{{config.wwwroot}}/course/view.php?id={{courseid}}">
             {{{coursename}}}
         </a>
+        {{> mod_competvet/grading2/debugmodal}}
         <div data-region="user-navigation">
-            {{> mod_competvet/grading2/navigation/user-navigation }}
+            {{> mod_competvet/grading2/components/user-navigation }}
         </div>
     </nav>
     <div class="grade-panel">
-        <div class="grade-header" data-region="user-header">
-            {{> mod_competvet/grading2/navigation/user-header }}
+        <div class="grade-header">
+            <div data-region="user-header">
+                {{> mod_competvet/grading2/components/user-header }}
+            </div>
+            <div class="user-grade">
+                <form data-region="globalgrade">
+                </form>
+            </div>
         </div>
         <div class="grade-tabs" data-region="grade-tabs">
             {{> mod_competvet/grading2/tabs/gradetabs }}

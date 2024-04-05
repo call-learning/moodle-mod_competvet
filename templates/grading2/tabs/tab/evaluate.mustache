@@ -27,7 +27,7 @@
 
 <div class="tab-main">
     <div class="container-fluid">
-        <div data-region="evaluations">
+        <div data-region="evaluations-observations">
         </div>
     </div>
     <div class="container-fluid">
@@ -52,18 +52,10 @@
 </div>
 <div class="tab-aside">
     <div class="p-3" data-region="tab-side">
-        <div class="certifheading d-flex align-items-center">
-          <span class="mr-2">{{> mod_competvet/svg/chat}}</span>
-          {{#str}}evaluate, mod_competvet{{/str}}
+        <div class="certifheading d-flex justify-content-center mb-5">
+          <h4>{{#str}}evalevaluation, mod_competvet{{/str}}</h4>
         </div>
-        <div class="mb-2">{{#str}}enterskillassesment, mod_competvet{{/str}}</div>
-        <form class="form-inline">
-            <div class="form-group">
-                <input type="number" class="form-control" name="globalgrade" data-action="globalgrade" data-grade-id="0" data-criterium-id="1" value="{{globalgrade}}" min="0" max="100" step="1" />
-                <label class="certifheading ml-2">
-                    / 100
-                </label>
-            </div>
+        <form data-region="evaluations-grading">
         </form>
     </div>
 </div>

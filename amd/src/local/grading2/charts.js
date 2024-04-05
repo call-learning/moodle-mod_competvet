@@ -214,11 +214,11 @@ class CompetCharts {
     }
 
     transformData(originalData) {
-        const labels = originalData.eval.map(criterion => criterion.name);
+        const labels = originalData.observations.map(criterion => criterion.name);
         const graders = {};
         const colors = this.colors();
 
-        originalData.eval.forEach(criterion => {
+        originalData.observations.forEach(criterion => {
             criterion.grades.forEach(grade => {
                 if (!graders[grade.userid]) {
                     const color = colors.shift();
@@ -230,7 +230,6 @@ class CompetCharts {
                         // add other properties as needed
                     };
                 }
-
                 graders[grade.userid].data.push(grade.value);
             });
         });

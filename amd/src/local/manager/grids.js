@@ -25,7 +25,7 @@ import Notification from 'core/notification';
 import Templates from 'core/templates';
 import Sort from './sortable';
 
-const App = document.querySelector('[data-region="grading"]');
+const App = document.querySelector('[data-region="criteria"]');
 
 const regions = [
     'grids',
@@ -36,7 +36,7 @@ const regions = [
 const situations = () => {
     const regionName = 'grids';
     const region = App.querySelector(`[data-region="${regionName}"]`);
-    const template = `mod_competvet/manager/grading/${regionName}`;
+    const template = `mod_competvet/manager/criteria/${regionName}`;
     const regionRenderer = (context) => {
         Templates.render(template, context).then((html) => {
             region.innerHTML = html;

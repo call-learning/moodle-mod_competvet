@@ -210,6 +210,7 @@ $string['nextuser'] = 'Next user';
 $string['competgrade:grade'] = 'Receive a grade';
 $string['competgrade:viewallgrades'] = 'View all user grades';
 $string['evaluate'] = 'Global Evaluation';
+$string['evalevaluation'] = 'Eval evaluation';
 $string['certify'] = 'Certify';
 $string['list'] = 'List';
 $string['globalgrade'] = 'Global grade';
@@ -221,6 +222,20 @@ $string['entercertificationassesment'] = 'enter your certification assessments h
 $string['more'] = 'more';
 $string['less'] = 'less';
 $string['points'] = '{$a} points';
+
+// Eval
+$string['evalscore'] = 'Average evaluation score';
+$string['numberofobservations'] = 'Number of observations';
+$string['penalty'] = 'Penalty';
+$string['penalty_help'] = 'The number of observations obtained is insufficient. A penalty of -20 points is applied.';
+$string['deactivatepenalty'] = 'Deactivate penalty';
+$string['selfevaluation'] = 'Self evaluation';
+$string['finalscore'] = 'Proposed final score';
+$string['scoreevaluator'] = 'Score validated by the evaluator';
+$string['scoreevaluator_help'] = 'This grade will be the one taken into account for the calculation of the overall grade.';
+$string['freecommenteval'] = 'Free comment for the Eval part';
+$string['selfevalnone'] = '+ 0 No relevant self-evaluation';
+$string['selfevalbonus'] = '+{$a} realised and relevant';
 
 $string['evaluation'] = 'Global Evaluation';
 $string['suggestedgrade'] = 'Suggested grade';
@@ -236,10 +251,9 @@ $string['planning'] = 'Planning';
 $string['addplanning'] = 'Add a planning';
 
 $string['addgrid'] = 'Add a grid';
-$string['addgrade'] = 'Add a grade';
+$string['addcriterium'] = 'Add a criterium';
 $string['grading'] = 'Grading';
-$string['gradeid'] = 'Grade ID';
-$string['gradeorder'] = 'Grade Order';
-$string['gradename'] = 'Grade Name';
-$string['gradevalue'] = 'Grade Value';
 $string['addoption'] = 'Add an option';
+$string['newcriterium'] = 'New criterium';
+$string['newoption'] = 'New option';
+$string['newgrid'] = 'New grid';
