@@ -16,7 +16,7 @@
 /**
  * A reactive state class that stores the data for the competvet module.
  *
- * @module     mod_competvet/local/grading2/competstate
+ * @module     mod_competvet/local/grading/competstate
  * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -50,10 +50,6 @@ class CompetState {
      * @param {String} value The value.
      */
     setValue(key, value) {
-        // Check if the key exists.
-        if (!this.data[key]) {
-            window.console.log('The key does not exist');
-        }
         this.data[key] = value;
         this.notifySubscriber(key);
         this.debug();

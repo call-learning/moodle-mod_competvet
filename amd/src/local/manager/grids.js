@@ -20,7 +20,7 @@
  * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-import CompetState from 'mod_competvet/local/grading2/competstate';
+import CompetState from 'mod_competvet/local/competstate';
 import Notification from 'core/notification';
 import Templates from 'core/templates';
 import Sort from './sortable';

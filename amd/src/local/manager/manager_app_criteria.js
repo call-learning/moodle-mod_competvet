@@ -23,8 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import CompetState from 'mod_competvet/local/grading2/competstate';
-import Repository from 'mod_competvet/local/grading2/repository';
+import CompetState from 'mod_competvet/local/competstate';
+import Repository from 'mod_competvet/local/new-repository';
 import {get_string as getString} from 'core/str';
 import './grids';
 /*

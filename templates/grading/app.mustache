@@ -1,0 +1,60 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_competvet/grading/app
+
+    TODO describe template app
+
+    Example context (json):
+    {
+    }
+}}
+<link rel="stylesheet" href="{{config.wwwroot}}/mod/competvet/scss/styles.css?v={{version}}" />
+<div class="gradingapp" data-region="grading-app" data-cm-id="{{cmid}}" data-studentid="{{studentid}}" data-planningid="{{planningid}}">
+    <nav class="navbar navbar-light">
+        <a href="{{{returnurl}}}" class="btn btn-outline-primary">
+            {{#str}}closeevaluation, mod_competvet{{/str}}
+        </a>
+        <a class="nav-link" href="{{config.wwwroot}}/course/view.php?id={{courseid}}">
+            {{{coursename}}}
+        </a>
+        {{> mod_competvet/grading/debugmodal}}
+        <div data-region="user-navigation">
+            {{> mod_competvet/grading/components/user-navigation }}
+        </div>
+    </nav>
+    <div class="grade-panel">
+        <div class="grade-header">
+            <div class="user-header" data-region="user-header">
+                {{> mod_competvet/grading/components/user-header }}
+            </div>
+            <div class="user-grade">
+                <form data-region="globalgrade">
+                </form>
+            </div>
+        </div>
+        <div class="grade-tabs" data-region="grade-tabs">
+            {{> mod_competvet/grading/tabs/gradetabs }}
+        </div>
+    </div>
+    <div class="tool_usertours-resettourcontainer"></div>
+</div>
+{{#js}}
+    require(['mod_competvet/local/grading/grading_app_component'], function(component) {
+        component.init();
+    });
+{{/js}}

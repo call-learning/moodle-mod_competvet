@@ -100,6 +100,16 @@ abstract class base implements renderable, named_templatable {
     public function set_backurl(\moodle_url $backurl): void {
         $this->backurl = $backurl;
     }
+
+    /**
+     * Get the widget action button.
+     *
+     * @return single_button|null
+     */
+    public function get_button(): ?single_button {
+        return null;
+    }
+
     /**
      * Get back button navigation.
      * We assume here that the back button will be on a single page (view.php)

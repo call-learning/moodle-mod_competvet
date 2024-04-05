@@ -23,7 +23,7 @@
 
 import $ from 'jquery';
 import "jqueryui";
-import CompetState from 'mod_competvet/local/grading2/competstate';
+import CompetState from 'mod_competvet/local/competstate';
 
 const reOrderState = (type, gridId, gradeId, order) => {
     let state = CompetState.getData();

@@ -16,7 +16,7 @@
 /**
  * Small helper functions for the UI.
  *
- * @module     mod_competvet/local/grading2/helpers
+ * @module     mod_competvet/local/grading/helpers
  * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

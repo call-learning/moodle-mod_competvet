@@ -16,7 +16,7 @@
 /**
  * competvet repository.
  *
- * @module     mod_competvet/local/grading2/repository
+ * @module     mod_competvet/local/grading/repository
  * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

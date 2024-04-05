@@ -21,6 +21,7 @@ use mod_competvet\local\persistent\planning as plannings_entity;
 use moodle_url;
 use renderer_base;
 use stdClass;
+use single_button;
 
 /**
  * Generic renderable for the view.
@@ -128,5 +129,18 @@ class planning extends base {
                 new moodle_url($this->baseurl, ['pagetype' => 'plannings', 'id' => $competvet->get_course_module_id()]);
         }
         [$this->userswithinfo, $this->currentgroupname, $this->viewstudent] = $data;
+    }
+
+    public function get_button(): ?single_button {
+        $query = [];
+        parse_str(parse_url($_SERVER['REQUEST_URI'])['query'], $query);
+        $query['returnurl'] = $_SERVER['REQUEST_URI'];
+        return new single_button(
+            new moodle_url(
+                '/mod/competvet/grading.php',
+                $query
+            ),
+            get_string('gradeverb')
+        );
     }
 }

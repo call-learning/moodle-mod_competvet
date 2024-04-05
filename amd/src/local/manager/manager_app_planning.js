@@ -23,8 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import CompetState from 'mod_competvet/local/grading2/competstate';
-import Repository from 'mod_competvet/local/manager/repository';
+import CompetState from 'mod_competvet/local/competstate';
+import Repository from 'mod_competvet/local/new-repository';
 import './plannings';
 /*
 * A CRUD manager for data.
