@@ -27,6 +27,12 @@ $results['student1results'] = [
                     'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
+                [
+                    'startdate' => '1901973463',
+                    'enddate' => '1902578263',
+                    'session' => '2030',
+                    'groupname' => 'group 8.1',
+                ],
             ],
         'tags' => '["y:1"]',
         'translatedtags' => '[{"y:1":"First year"}]',
@@ -202,6 +208,12 @@ $results['observer1results'] = [
                     'session' => '2023',
                     'groupname' => 'group 8.2',
                 ],
+                [
+                    'startdate' => '1901973463',
+                    'enddate' => '1902578263',
+                    'session' => '2030',
+                    'groupname' => 'group 8.1',
+                ],
             ],
         'tags' => '["y:1"]',
         'translatedtags' => '[{"y:1":"First year"}]',
@@ -256,7 +268,6 @@ $results['observer1results'] = [
     ],
 ];
 $results['observer2results'] = [
-    0 =>
         [
             'plannings' =>
                 [
@@ -282,7 +293,6 @@ $results['observer2results'] = [
             'evalnum' => 1,
             'autoevalnum' => 1,
         ],
-    1 =>
         [
             'plannings' =>
                 [
@@ -308,7 +318,6 @@ $results['observer2results'] = [
             'evalnum' => 1,
             'autoevalnum' => 1,
         ],
-    2 =>
         [
             'plannings' =>
                 [
@@ -327,7 +336,6 @@ $results['observer2results'] = [
             'evalnum' => 1,
             'autoevalnum' => 1,
         ],
-    3 =>
         [
             'plannings' =>
                 [
@@ -346,7 +354,6 @@ $results['observer2results'] = [
             'evalnum' => 1,
             'autoevalnum' => 1,
         ],
-    4 =>
         [
             'plannings' =>
                 [
@@ -357,6 +364,12 @@ $results['observer2results'] = [
                         'session' => '2023',
                         'groupname' => 'group 8.3',
                     ],
+                    [
+                        'startdate' => '1901973463',
+                        'enddate' => '1902578263',
+                        'session' => '2030',
+                        'groupname' => 'group 8.3',
+                    ],
                 ],
             'tags' => '["y:2"]',
             'translatedtags' => '[{"y:2":"Second year"}]',
@@ -365,15 +378,19 @@ $results['observer2results'] = [
             'evalnum' => 1,
             'autoevalnum' => 1,
         ],
-    5 =>
         [
             'plannings' =>
                 [
-
                     [
                         'startdate' => '1719529200',
                         'enddate' => '1704582000',
                         'session' => '2023',
+                        'groupname' => 'group 8.4',
+                    ],
+                    [
+                        'startdate' => '1901973463',
+                        'enddate' => '1902578263',
+                        'session' => '2030',
                         'groupname' => 'group 8.4',
                     ],
                 ],
@@ -400,6 +417,12 @@ $results['teacher1results'] = [
                     'enddate' => '1700002800',
                     'session' => '2023',
                     'groupname' => 'group 8.2',
+                ],
+                [
+                    'startdate' => '1901973463', // Future time.
+                    'enddate' => '1902578263',
+                    'session' => '2030',
+                    'groupname' => 'group 8.1',
                 ],
             ],
         'tags' => '["y:1"]',

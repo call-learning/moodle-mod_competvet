@@ -64,6 +64,7 @@ trait test_data_definition {
                         'enddate' => $planning['enddate'],
                         'groupid' => $groupid,
                         'situationid' => $situation->get('id'),
+                        'session' => $planning['session'],
                     ]);
                 }
             }
@@ -107,11 +108,19 @@ trait test_data_definition {
                                 'startdate' => $startdate,
                                 'enddate' => $startdate + $oneweek,
                                 'groupname' => 'group 8.1',
+                                'session' => '2023',
                             ],
                             [
                                 'startdate' => $startdate + $oneweek,
                                 'enddate' => $startdate + $oneweek * 2,
                                 'groupname' => 'group 8.2',
+                                'session' => '2023',
+                            ],
+                            [
+                                'startdate' => '1901973463', // Future time.
+                                'enddate' => '1902578263',
+                                'groupname' => 'group 8.1',
+                                'session' => '2030',
                             ],
                         ],
                     ],
@@ -122,6 +131,7 @@ trait test_data_definition {
                                 'startdate' => $startdate + $onemonth,
                                 'enddate' => $startdate + $onemonth + $oneweek,
                                 'groupname' => 'group 8.1',
+                                'session' => '2023',
                             ],
                         ],
                     ],
@@ -132,11 +142,13 @@ trait test_data_definition {
                                 'startdate' => $startdate + $onemonth * 2,
                                 'enddate' => $startdate + $onemonth * 2 + $oneweek,
                                 'groupname' => 'group 8.1',
+                                'session' => '2023',
                             ],
                             [
                                 'startdate' => $startdate + $onemonth * 2 + $oneweek,
                                 'enddate' => $startdate + $onemonth * 2 + $oneweek * 2,
                                 'groupname' => 'group 8.2',
+                                'session' => '2023',
                             ],
                         ],
                     ],
@@ -168,11 +180,13 @@ trait test_data_definition {
                                 'startdate' => $startdate + $onemonth * 3,
                                 'enddate' => $startdate + $onemonth * 2 + $oneweek,
                                 'groupname' => 'group 8.1',
+                                'session' => '2023',
                             ],
                             [
                                 'startdate' => $startdate + $onemonth * 3 + $oneweek,
                                 'enddate' => $startdate + $onemonth * 3 + $oneweek * 2,
                                 'groupname' => 'group 8.3',
+                                'session' => '2023',
                             ],
                         ],
                     ],
@@ -183,11 +197,13 @@ trait test_data_definition {
                                 'startdate' => $startdate + $onemonth * 4,
                                 'enddate' => $startdate + $onemonth * 2 + $oneweek,
                                 'groupname' => 'group 8.2',
+                                'session' => '2023',
                             ],
                             [
                                 'startdate' => $startdate + $onemonth * 4 + $oneweek,
                                 'enddate' => $startdate + $onemonth * 4 + $oneweek * 2,
                                 'groupname' => 'group 8.3',
+                                'session' => '2023',
                             ],
                         ],
                     ],
@@ -198,6 +214,7 @@ trait test_data_definition {
                                 'startdate' => $startdate + $onemonth * 5,
                                 'enddate' => $startdate + $onemonth * 2 + $oneweek,
                                 'groupname' => 'group 8.3',
+                                'session' => '2023',
                             ],
                         ],
                     ],
@@ -228,6 +245,7 @@ trait test_data_definition {
                                 'startdate' => $startdate + $onemonth * 6,
                                 'enddate' => $startdate + $onemonth * 2 + $oneweek,
                                 'groupname' => 'group 8.1',
+                                'session' => '2023',
                             ],
                         ],
                     ],
@@ -238,7 +256,15 @@ trait test_data_definition {
                                 'startdate' => $startdate + $onemonth * 7,
                                 'enddate' => $startdate + $onemonth * 2 + $oneweek,
                                 'groupname' => 'group 8.3',
+                                'session' => '2023',
                             ],
+                            [
+                                'startdate' => '1901973463', // Future time.
+                                'enddate' => '1902578263',
+                                'session' => '2030',
+                                'groupname' => 'group 8.3',
+                            ],
+
                         ],
                     ],
                     'SIT9' => [
@@ -248,7 +274,15 @@ trait test_data_definition {
                                 'startdate' => $startdate + $onemonth * 8,
                                 'enddate' => $startdate + $onemonth * 2 + $oneweek,
                                 'groupname' => 'group 8.4',
+                                'session' => '2023',
                             ],
+                            [
+                                'startdate' => '1901973463', // Future time.
+                                'enddate' => '1902578263',
+                                'groupname' => 'group 8.4',
+                                'session' => '2030',
+                            ],
+
                         ],
                     ],
                 ],
