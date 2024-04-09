@@ -337,7 +337,6 @@ function xmldb_competvet_upgrade($oldversion) {
             $dbman->create_table($table);
         }
 
-
         upgrade_mod_savepoint(true, 2024022000, 'competvet');
     }
 

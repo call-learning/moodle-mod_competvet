@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\local\generator;
-global $CFG;
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
 require_once($CFG->dirroot . '/lib/phpunit/classes/util.php');
 require_once($CFG->dirroot . '/admin/tool/generator/classes/course_backend.php');
 
@@ -258,7 +258,7 @@ class generator_course_backend extends tool_generator_course_backend {
             $record =
                 ['course' => $this->course,
                     'autoevalnum' => $this->fixeddataset ? self::EVAL_AUTOEVAL : random_int(1, self::EVAL_AUTOEVAL),
-                    'evalnum' => $this->fixeddataset ? self::EVAL_COUNT : random_int(1, self::EVAL_COUNT),];
+                    'evalnum' => $this->fixeddataset ? self::EVAL_COUNT : random_int(1, self::EVAL_COUNT), ];
             $options = ['section' => $generatoreflection->getMethod('get_target_section')->invoke($this)];
             $instance = $competvetgenerator->create_instance($record, $options);
             $this->situations[] = situation::get_record(['id' => $instance->id]);
@@ -309,7 +309,7 @@ class generator_course_backend extends tool_generator_course_backend {
 
         // Work out total number of users.
         $paramcount = 'param' . $rolename;
-        $count = self::$$paramcount[$this->size];
+        $count = self::${$paramcount}[$this->size];
 
         // Get existing users in order. We will 'fill up holes' in this up to
         // the required number.

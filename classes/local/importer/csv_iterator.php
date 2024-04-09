@@ -49,9 +49,9 @@ class csv_iterator implements Iterator {
      * @param string $encoding
      */
     public function __construct(
-        private readonly string $filename,
-        private readonly string $delimiter = 'semicolon',
-        private readonly string $encoding = 'utf-8'
+        private string $filename,
+        private string $delimiter = 'semicolon',
+        private string $encoding = 'utf-8'
     ) {
         global $CFG;
         $iid = csv_import_reader::get_new_iid(self::class);

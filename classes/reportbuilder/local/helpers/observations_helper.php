@@ -22,7 +22,7 @@ use mod_competvet\reportbuilder\local\entities\observation;
 use mod_competvet\reportbuilder\local\entities\observation_comment;
 use mod_competvet\reportbuilder\local\entities\planning;
 use mod_competvet\reportbuilder\local\entities\situation;
-use \mod_competvet\local\persistent\observation_comment as observation_comment_entity;
+use mod_competvet\local\persistent\observation_comment as observation_comment_entity;
 /**
  * Report builder helper : common code for datasource and system report
  *

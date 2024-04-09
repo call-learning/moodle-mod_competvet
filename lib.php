@@ -270,7 +270,7 @@ function competvet_grade_item_update($moduleinstance, $grades = false) {
     $itemnames = component_gradeitems::get_itemname_mapping_for_component(competvet::COMPONENT_NAME);
     $categoryname = clean_param($moduleinstance->name, PARAM_NOTAGS);
     $category = grade_category::fetch(['courseid' => $moduleinstance->course,
-        'fullname' => clean_param($moduleinstance->name, PARAM_NOTAGS),]);
+        'fullname' => clean_param($moduleinstance->name, PARAM_NOTAGS), ]);
     if (!$category) {
         $category = new grade_category(['courseid' => $moduleinstance->course, 'fullname' => $categoryname]);
         $category->insert();

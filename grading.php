@@ -25,10 +25,9 @@
 use mod_competvet\competvet;
 use mod_competvet\output\grading\app;
 use mod_competvet\utils;
-
 require(__DIR__ . '/../../config.php');
-
 global $DB, $PAGE, $OUTPUT, $USER;
+require_login();
 
 [$cm, $course, $moduleinstance] = utils::page_requirements('view');
 

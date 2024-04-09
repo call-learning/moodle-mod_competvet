@@ -75,7 +75,7 @@ class competvet {
                     'mod/competvet:canobserve' => CAP_ALLOW,
                     'mod/competvet:editplanning' => CAP_ALLOW,
                     'mod/competvet:view' => CAP_ALLOW,
-                ]
+                ],
             ],
         ],
         'evaluator' => [

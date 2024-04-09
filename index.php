@@ -48,11 +48,11 @@ $tabs = [
         'label' => get_string('allmysituations', 'mod_competvet'),
     ],
     'todo' => [
-        'url' => new moodle_url('/mod/competvet/index.php', ['id' => $id,  'currenttab' => 'todo']),
+        'url' => new moodle_url('/mod/competvet/index.php', ['id' => $id, 'currenttab' => 'todo']),
         'label' => get_string('todos', 'mod_competvet'),
     ],
 ];
-foreach($tabs as $id => $tab) {
+foreach ($tabs as $id => $tab) {
     $tabtree[] = new tabobject(
         $id,
         $tab['url'],
@@ -69,7 +69,7 @@ $PAGE->set_title($pagetitle);
 echo $OUTPUT->header();
 echo $OUTPUT->heading($pagetitle);
 echo $OUTPUT->tabtree($tabtree, $currenttab);
-switch($currenttab) {
+switch ($currenttab) {
     case 'situations':
         if ($id != SITEID) {
             $situationsid = situation::get_all_situations_in_course_id_for($userid, $course->id);

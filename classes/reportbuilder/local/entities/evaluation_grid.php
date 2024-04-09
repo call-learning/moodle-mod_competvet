@@ -129,7 +129,6 @@ class evaluation_grid extends base {
             "{$evalgridalias}.idnumber"
         ))->add_joins($this->get_joins());
 
-
         return $filters;
     }
 }

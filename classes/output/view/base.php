@@ -164,7 +164,7 @@ abstract class base implements renderable, named_templatable {
      */
     public function export_for_template(renderer_base $output) {
         return [
-            'modulename' => $this->currentmodule
+            'modulename' => $this->currentmodule,
         ];
     }
 }

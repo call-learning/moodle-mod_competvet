@@ -268,7 +268,7 @@ class observations {
         $contextcomment->set('commentformat', FORMAT_HTML);
         $contextcomment->update();
         $commentstodelete = observation_comment::get_records(['observationid' => $observationid,
-            'type' => observation_comment::OBSERVATION_COMMENT,]);
+            'type' => observation_comment::OBSERVATION_COMMENT, ]);
         $commentstodelete = array_combine(
             array_map(fn($comment) => $comment->get('id'), $commentstodelete),
             $commentstodelete
