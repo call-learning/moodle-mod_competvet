@@ -44,7 +44,7 @@ class criterion_importer extends base_persistent_importer {
      */
     public function __construct(string $persistenclass, ?array $options = []) {
         parent::__construct($persistenclass, $options);
-        $this->options['uniquekeys'] = ['idnumber'];
+        $this->options['uniquekeys'] = ['idnumber', 'evalgridid'];
     }
 
     /**
@@ -69,7 +69,7 @@ class criterion_importer extends base_persistent_importer {
         $data->evalgridid = $evalgridnametoid[$data->evalgridid];
         $parentcriterionid = 0;
         if (!empty(trim($data->parentid))) {
-            $parentcriterion = criterion::get_record(['idnumber' => $data->parentid]);
+            $parentcriterion = criterion::get_record(['idnumber' => $data->parentid, 'evalgridid' => $data->evalgridid]);
             if (empty($parentcriterion)) {
                 throw new \moodle_exception('criterionnotfound', 'mod_competvet', '', $data->parentid);
             }

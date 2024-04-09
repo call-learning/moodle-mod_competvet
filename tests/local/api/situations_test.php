@@ -20,8 +20,6 @@ require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
 
 use advanced_testcase;
 use core_user;
-use mod_competvet\local\api\situations;
-use mod_competvet\task\post_install;
 use mod_competvet\tests\test_helpers;
 use stdClass;
 use test_data_definition;

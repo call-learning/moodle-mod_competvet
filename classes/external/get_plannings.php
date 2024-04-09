@@ -57,7 +57,7 @@ class get_plannings extends external_api {
 
         return [
             'plannings' => $plannings,
-            'version' => time()
+            'version' => time(),
         ];
     }
 

@@ -16,12 +16,8 @@
 namespace mod_competvet\local\importer;
 
 use advanced_testcase;
-use context_course;
-use context_module;
-use context_system;
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\evaluation_grid;
-use mod_competvet\task\post_install;
 
 /**
  * Evaluation Grid Test
@@ -51,7 +47,7 @@ class evaluation_grid_test extends advanced_testcase {
         $evalgrid->create();
         $criterionimporter = new criterion_importer(criterion::class);
         $criterionimporter->import($CFG->dirroot . self::SAMPLE_FILE_PATH);
-        $this->assertEquals(40, criterion::count_records(['evalgridid' => $evalgrid->get('id')]));
+        $this->assertEquals(40, criterion::count_records(['evalgridid' => intval($evalgrid->get('id'))]));
         foreach (['Q001', 'Q035'] as $critname) {
             $crit = criterion::get_record(['evalgridid' => $evalgrid->get('id'), 'idnumber' => $critname]);
             $this->assertEquals(

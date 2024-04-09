@@ -23,7 +23,7 @@ use external_multiple_structure;
 use mod_competvet\competvet;
 use mod_competvet\local\api\plannings as plannings_api;
 
-$example_json = '{
+$examplejson = '{
     "categories": [
         {
             "categorytext": "Late",
@@ -113,9 +113,9 @@ class save_plannings extends external_api {
                     'startdate' => new external_value(PARAM_TEXT, 'Start date', VALUE_REQUIRED),
                     'enddate' => new external_value(PARAM_TEXT, 'End date', VALUE_REQUIRED),
                     'groupname' => new external_value(PARAM_TEXT, 'Group name', VALUE_REQUIRED),
-                    'nbstudents' => new external_value(PARAM_INT, 'Number of students', VALUE_REQUIRED)
-                ]))
-            ]))
+                    'nbstudents' => new external_value(PARAM_INT, 'Number of students', VALUE_REQUIRED),
+                ])),
+            ])),
         ]);
     }
 
@@ -147,9 +147,9 @@ class save_plannings extends external_api {
                     'startdate' => new external_value(PARAM_TEXT, 'Start date', VALUE_REQUIRED),
                     'enddate' => new external_value(PARAM_TEXT, 'End date', VALUE_REQUIRED),
                     'groupname' => new external_value(PARAM_TEXT, 'Group name', VALUE_REQUIRED),
-                    'nbstudents' => new external_value(PARAM_INT, 'Number of students', VALUE_REQUIRED)
-                ]))
-            ]))
+                    'nbstudents' => new external_value(PARAM_INT, 'Number of students', VALUE_REQUIRED),
+                ])),
+            ])),
         ]);
     }
 }

@@ -152,7 +152,7 @@ class setup_test extends advanced_testcase {
                             $context = context_course::instance($course->id);
                             break;
                         case CONTEXT_MODULE:
-                            $context = context_module::instance($coursemodule->id);
+                            $context = context_module::instance($coursemodule->cmid);
                             break;
                         case CONTEXT_SYSTEM:
                         default:

@@ -17,6 +17,7 @@ namespace mod_competvet;
 
 use cache;
 use context_system;
+use core\check\performance\debugging;
 use core_reportbuilder\datasource;
 use core_reportbuilder\local\helpers\report as helper;
 use core_reportbuilder\local\models\report as report_model;
@@ -91,17 +92,19 @@ class setup {
             }
         }
         update_capabilities(competvet::COMPONENT_NAME);
+        $contextsystemid = context_system::instance()->id;
         // Then we assign capabilities to roles.
         foreach ($roles as $currentrole) {
             $roledef = $roledefinitions[$currentrole->shortname] ?? [];
-            foreach ($roledef['permissions'] as $permissions) {
+            foreach ($roledef['permissions'] as $contextlevel => $permissions) {
                 foreach ($permissions as $permissionname => $permissionvalue) {
-                    // Strange thing here at first: we assign this at the context system level but it will be then
-                    // inherited by all the contexts where the role is assigned.
-                    assign_capability($permissionname, $permissionvalue, $currentrole->id, context_system::instance()->id, true);
+                    // Assign the capability to the role at context level and then this will be replicated to the children. This is mainly
+                    // for later assignments.
+                    assign_capability($permissionname, $permissionvalue, $currentrole->id, $contextsystemid, true);
                 }
             }
         }
+        accesslib_clear_all_caches(true);
     }
 
     /**

@@ -166,15 +166,15 @@ class get_evaluations extends external_api {
                     'grades' => [
                         [
                             'userid' => '4',
-                            'grade' => '8'
+                            'grade' => '8',
                         ],
                         [
                             'userid' => '5',
-                            'grade' => '7'
+                            'grade' => '7',
                         ],
                         [
                             'userid' => '6',
-                            'grade' => '6'
+                            'grade' => '6',
                         ],
                     ],
                 ],
@@ -184,15 +184,15 @@ class get_evaluations extends external_api {
                     'grades' => [
                         [
                             'userid' => '4',
-                            'grade' => '15'
+                            'grade' => '15',
                         ],
                         [
                             'userid' => '5',
-                            'grade' => '7'
+                            'grade' => '7',
                         ],
                         [
                             'userid' => '6',
-                            'grade' => '6'
+                            'grade' => '6',
                         ],
                     ],
                 ],
@@ -254,7 +254,7 @@ class get_evaluations extends external_api {
         $comments = [];
         foreach ($userevals as $usereval) {
             foreach ($usereval['comments'] as $comment) {
-                $userid =$comment['userinfo']['id'];
+                $userid = $comment['userinfo']['id'];
                 $fullname = $comment['userinfo']['fullname'];
                 $userpictureurl = $comment['userinfo']['userpictureurl'];
                 $commentid = $comment['id'];

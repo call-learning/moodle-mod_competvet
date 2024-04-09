@@ -44,19 +44,18 @@ class csv_iterator implements Iterator {
     /**
      * Constructor. Import the file.
      *
-     * @param string $filename
+     * @param string $filepath
      * @param string $delimiter
      * @param string $encoding
      */
     public function __construct(
-        private string $filename,
+        private string $filepath,
         private string $delimiter = 'semicolon',
         private string $encoding = 'utf-8'
     ) {
-        global $CFG;
         $iid = csv_import_reader::get_new_iid(self::class);
         $csvimport = new csv_import_reader($iid, self::class);
-        $content = file_get_contents($CFG->dirroot . '/mod/competvet/data/default_evaluation_grid.csv');
+        $content = file_get_contents($this->filepath);
         $rowcount = $csvimport->load_csv_content($content, $this->encoding, $this->delimiter);
         if ($csvimport->get_error()) {
             throw new \moodle_exception('csvfileerror', 'tool_uploadcourse', $csvimport->get_error());

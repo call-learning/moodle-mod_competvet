@@ -41,13 +41,13 @@ abstract class base_persistent_importer {
      * Generic way to import a CSV file into a persistent class
      * This needs to be a simple CSV file with one table per file.
      *
-     * @param string $filename
+     * @param string $filepath
      * @param string $delimiter
      * @param string $encoding
      * @return void
      */
-    public function import(string $filename, string $delimiter = 'semicolon', string $encoding = 'utf-8') {
-        $csvreader = new csv_iterator($filename, $delimiter, $encoding);
+    public function import(string $filepath, string $delimiter = 'semicolon', string $encoding = 'utf-8') {
+        $csvreader = new csv_iterator($filepath, $delimiter, $encoding);
         foreach ($csvreader as $row) {
             $data = $this->to_persistent_data($row, $csvreader);
             $this->persist_data($data);
