@@ -15,24 +15,36 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_competvet/grading/tabs/tab/certify
+    @template mod_competvet/grading/components/certification-results
 
-    TODO describe template certify
+    TODO describe template certification-results
 
     Example context (json):
     {
     }
 }}
-<div class="tab-main">
-    <div class="p-3 certification" data-region="certification-results">
-    </div>
-</div>
-<div class="tab-aside">
-    <div class="p-3" data-region="tab-side">
-        <div class="certifheading d-flex justify-content-center mb-5">
-          <h4>{{#str}}certifevaluation, mod_competvet{{/str}}</h4>
+{{#evaluation-results}}
+    <div class="eval header">
+        <div class="col1">
         </div>
-        <form data-region="certification-grading">
-        </form>
+        {{#criteria.0}}
+            {{#observer}}
+                <span class="col3">
+                    {{{fullname}}}
+                </span>
+            {{/observer}}
+        {{/criteria.0}}
     </div>
-</div>
+    {{#criteria}}
+        <div class="eval">
+            <div class="col1">
+                <div class="description mb-2"><strong>{{title}}</strong></div>
+            </div>
+            {{#observer}}
+                <div class="col3">
+                    {{grade}}
+                </div>
+            {{/observer}}
+        </div>
+    {{/criteria}}
+{{/evaluation-results}}

@@ -1,0 +1,431 @@
+
+{
+    "gridname": "YEAR2024",
+    "gridid": 1,
+    "criteria": [
+        {
+            "criteriumid": 1,
+            "idnumber": "Q001",
+            "title": "Savoir être",
+            "sortorder": 1,
+            "edit": false,
+            "haschanged": false,
+            "hasoptions": true,
+            "options": [
+                {
+                    "optionid": 1,
+                    "idnumber": "Q002",
+                    "title": "Respect des horaires de travail",
+                    "sortorder": 1
+                },
+                {
+                    "optionid": 2,
+                    "idnumber": "Q003",
+                    "title": "Respect des interlocuteurs (clients, personnels, encadrants, pairs, ...)",
+                    "sortorder": 2,
+                    "grade": 12.5
+                },
+                {
+                    "optionid": 3,
+                    "idnumber": "Q004",
+                    "title": "Respect du bien-être des animaux",
+                    "sortorder": 3
+                },
+                {
+                    "optionid": 4,
+                    "idnumber": "Q005",
+                    "title": "Respect des consignes vestimentaires, d’hygiène et de de biosécurité",
+                    "sortorder": 4
+                },
+                {
+                    "optionid": 5,
+                    "idnumber": "Q006",
+                    "title": "Respect du matériel mis à disposition",
+                    "sortorder": 5
+                }
+            ],
+            "observer": [
+                {
+                    "fullname": "Jean Dupont",
+                    "grade": 12.5
+                },
+                {
+                    "fullname": "Camille Martin",
+                    "grade": 10
+                },
+                {
+                    "fullname": "Henriette Dupuis",
+                    "grade": 20
+                },
+                {
+                    "fullname": "Jeanne Martin",
+                    "grade": 15
+                },
+                {
+                    "fullname": "Sloerie Lepetit",
+                    "grade": 8
+                }
+            ]
+        },
+        {
+            "criteriumid": 2,
+            "idnumber": "Q007",
+            "title": "Motivation et implication personnelle",
+            "sortorder": 2,
+            "edit": false,
+            "haschanged": false,
+            "hasoptions": true,
+            "options": [
+                {
+                    "optionid": 6,
+                    "idnumber": "Q008",
+                    "title": "Motivation à apprendre (cherche à approfondir et à discuter des cas, à améliorer ses compétences techniques)",
+                    "sortorder": 1
+                },
+                {
+                    "optionid": 7,
+                    "idnumber": "Q009",
+                    "title": "Capacité à prendre des initiatives et à être pro-actif",
+                    "sortorder": 2
+                },
+                {
+                    "optionid": 8,
+                    "idnumber": "Q010",
+                    "title": "Capacité à s’impliquer dans le suivi des animaux pendant l’ensemble du parcours de soin",
+                    "sortorder": 3
+                }
+            ],
+            "observer": [
+                {
+                    "fullname": "Jean Dupont",
+                    "grade": 4
+                },
+                {
+                    "fullname": "Camille Martin",
+                    "grade": 6
+                },
+                {
+                    "fullname": "Henriette Dupuis",
+                    "grade": 7
+                },
+                {
+                    "fullname": "Jeanne Martin",
+                    "grade": 12
+                },
+                {
+                    "fullname": "Sloerie Lepetit",
+                    "grade": 3
+                }
+            ]
+        },
+        {
+            "criteriumid": 3,
+            "idnumber": "Q011",
+            "title": "Qualités d’organisation et de travail en équipe",
+            "sortorder": 3,
+            "edit": false,
+            "haschanged": false,
+            "hasoptions": true,
+            "options": [
+                {
+                    "optionid": 9,
+                    "idnumber": "Q012",
+                    "title": "Capacité à s’organiser et le cas échéant à organiser le travail collectif",
+                    "sortorder": 1
+                },
+                {
+                    "optionid": 10,
+                    "idnumber": "Q013",
+                    "title": "Capacité à travailler en équipe et à s’impliquer dans un collectif",
+                    "sortorder": 2
+                },
+                {
+                    "optionid": 11,
+                    "idnumber": "Q014",
+                    "title": "Capacité à prendre des décisions, à les faire valider et à les assumer (sens des responsabilités)",
+                    "sortorder": 3
+                },
+                {
+                    "optionid": 12,
+                    "idnumber": "Q015",
+                    "title": "Capacité à demander de l’aide en cas de besoin",
+                    "sortorder": 4
+                }
+            ],
+            "observer": [
+                {
+                    "fullname": "Jean Dupont",
+                    "grade": 25
+                },
+                {
+                    "fullname": "Camille Martin",
+                    "grade": 26
+                },
+                {
+                    "fullname": "Henriette Dupuis",
+                    "grade": 17
+                },
+                {
+                    "fullname": "Jeanne Martin",
+                    "grade": 29
+                },
+                {
+                    "fullname": "Sloerie Lepetit",
+                    "grade": 30
+                }
+            ]
+        },
+        {
+            "criteriumid": 4,
+            "idnumber": "Q016",
+            "title": "Compétences liées à la mobilisation des acquis",
+            "sortorder": 4,
+            "edit": false,
+            "haschanged": false,
+            "hasoptions": true,
+            "options": [
+                {
+                    "optionid": 13,
+                    "idnumber": "Q017",
+                    "title": "Capacité à mobiliser les notions théoriques en situation clinique",
+                    "sortorder": 1
+                },
+                {
+                    "optionid": 14,
+                    "idnumber": "Q018",
+                    "title": "Capacité à utiliser les ressources documentaires de façon raisonnée et rationnelle",
+                    "sortorder": 2
+                },
+                {
+                    "optionid": 15,
+                    "idnumber": "Q019",
+                    "title": "Capacité à utiliser correctement le vocabulaire scientifique et clinique",
+                    "sortorder": 3
+                },
+                {
+                    "optionid": 16,
+                    "idnumber": "Q020",
+                    "title": "Capacité à mobiliser les connaissances pharmacologiques relatives aux médicaments qu’il utilise",
+                    "sortorder": 4
+                }
+            ],
+            "observer": [
+                {
+                    "fullname": "Jean Dupont",
+                    "grade": 6
+                },
+                {
+                    "fullname": "Camille Martin",
+                    "grade": 1
+                },
+                {
+                    "fullname": "Henriette Dupuis",
+                    "grade": 19
+                },
+                {
+                    "fullname": "Jeanne Martin",
+                    "grade": 4
+                },
+                {
+                    "fullname": "Sloerie Lepetit",
+                    "grade": 20
+                }
+            ]
+        },
+        {
+            "criteriumid": 5,
+            "idnumber": "Q021",
+            "title": "Compétences techniques et activités de soins",
+            "sortorder": 5,
+            "edit": false,
+            "haschanged": false,
+            "hasoptions": true,
+            "options": [
+                {
+                    "optionid": 17,
+                    "idnumber": "Q022",
+                    "title": "Capacité à assurer ou diriger la contention de l’animal examiné",
+                    "sortorder": 1
+                },
+                {
+                    "optionid": 18,
+                    "idnumber": "Q023",
+                    "title": "Capacité à faire un examen clinique complet",
+                    "sortorder": 2
+                },
+                {
+                    "optionid": 19,
+                    "idnumber": "Q024",
+                    "title": "Capacité à préparer l’ensemble du matériel nécessaire pour les gestes techniques",
+                    "sortorder": 3
+                },
+                {
+                    "optionid": 20,
+                    "idnumber": "Q025",
+                    "title": "Capacité à faire les gestes techniques correspondant à son niveau, en respectant les bonnes pratiques et avec une habileté technique suffisante",
+                    "sortorder": 4
+                }
+            ],
+            "observer": [
+                {
+                    "fullname": "Jean Dupont",
+                    "grade": 10
+                },
+                {
+                    "fullname": "Camille Martin",
+                    "grade": 11
+                },
+                {
+                    "fullname": "Henriette Dupuis",
+                    "grade": 10
+                },
+                {
+                    "fullname": "Jeanne Martin",
+                    "grade": 9
+                },
+                {
+                    "fullname": "Sloerie Lepetit",
+                    "grade": 1
+                }
+            ]
+        },
+        {
+            "criteriumid": 6,
+            "idnumber": "Q027",
+            "title": "Compétences liées à la démarche clinique",
+            "sortorder": 6,
+            "edit": false,
+            "haschanged": false,
+            "hasoptions": true,
+            "options": [
+                {
+                    "optionid": 21,
+                    "idnumber": "Q028",
+                    "title": "Capacité à identifier un motif de consultation (animal ou groupe d’animaux) et à recueillir une anamnèse",
+                    "sortorder": 1
+                },
+                {
+                    "optionid": 22,
+                    "idnumber": "Q029",
+                    "title": "Capacité à synthétiser un bilan clinique en intégrant les données de l’anamnèse et de l'examen clinique",
+                    "sortorder": 2
+                },
+                {
+                    "optionid": 23,
+                    "idnumber": "Q030",
+                    "title": "Capacité à proposer des hypothèses diagnostiques hiérarchisées",
+                    "sortorder": 3
+                },
+                {
+                    "optionid": 24,
+                    "idnumber": "Q031",
+                    "title": "Capacité à choisir, justifier et interpréter des examens complémentaires",
+                    "sortorder": 4
+                },
+                {
+                    "optionid": 25,
+                    "idnumber": "Q032",
+                    "title": "Capacité à proposer un pronostic",
+                    "sortorder": 5
+                },
+                {
+                    "optionid": 26,
+                    "idnumber": "Q033",
+                    "title": "Capacité à proposer et justifier une stratégie thérapeutique",
+                    "sortorder": 6
+                },
+                {
+                    "optionid": 27,
+                    "idnumber": "Q034",
+                    "title": "Capacité à identifier une situation clinique pouvant conduire à la propagation d’une maladie contagieuse et/ ou d’une zoonose (mesures de biosécurité)",
+                    "sortorder": 7
+                }
+            ],
+            "observer": [
+                {
+                    "fullname": "Jean Dupont",
+                    "grade": 30
+                },
+                {
+                    "fullname": "Camille Martin",
+                    "grade": 30
+                },
+                {
+                    "fullname": "Henriette Dupuis",
+                    "grade": 27
+                },
+                {
+                    "fullname": "Jeanne Martin",
+                    "grade": 3
+                },
+                {
+                    "fullname": "Sloerie Lepetit",
+                    "grade": 31
+                }
+            ]
+        },
+        {
+            "criteriumid": 7,
+            "idnumber": "Q035",
+            "title": "Communication écrite et orale",
+            "sortorder": 7,
+            "edit": false,
+            "haschanged": false,
+            "hasoptions": true,
+            "options": [
+                {
+                    "optionid": 28,
+                    "idnumber": "Q036",
+                    "title": "Capacité à tenir un dossier clinique bien présenté, complet et documenté",
+                    "sortorder": 1
+                },
+                {
+                    "optionid": 29,
+                    "idnumber": "Q037",
+                    "title": "Capacité à rédiger des comptes rendus clairs, concis et précis dans un français approprié",
+                    "sortorder": 2
+                },
+                {
+                    "optionid": 30,
+                    "idnumber": "Q038",
+                    "title": "Capacité à présenter à l’oral de façon claire, concise et précise des informations médicales avec un vocabulaire scientifique approprié",
+                    "sortorder": 3
+                },
+                {
+                    "optionid": 31,
+                    "idnumber": "Q039",
+                    "title": "Capacité à expliquer avec les termes appropriés et en adaptant son discours en fonction du public (clients, personnel, enseignants, autres étudiants, …)",
+                    "sortorder": 4
+                },
+                {
+                    "optionid": 32,
+                    "idnumber": "Q040",
+                    "title": "Capacité à expliquer avec les termes appropriés et en adaptant son discours en fonction du public (clients, personnel, enseignants, autres étudiants, …)",
+                    "sortorder": 5
+                }
+            ],
+            "observer": [
+                {
+                    "fullname": "Jean Dupont",
+                    "grade": 18
+                },
+                {
+                    "fullname": "Camille Martin",
+                    "grade": 17
+                },
+                {
+                    "fullname": "Henriette Dupuis",
+                    "grade": 19
+                },
+                {
+                    "fullname": "Jeanne Martin",
+                    "grade": 14
+                },
+                {
+                    "fullname": "Sloerie Lepetit",
+                    "grade": 20
+                }
+            ]
+        }
+    ]
+}

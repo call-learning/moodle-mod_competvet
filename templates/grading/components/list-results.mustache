@@ -1,0 +1,129 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_competvet/grading/components/list-results
+
+    Render the clinical cases, start with a heading with date icon, date, paw icon, title
+    Render subtitle under the title.
+
+    Before heading render collapse / expand button.
+
+    Start with secion with the animal detail, listing species, race, sex, age.
+
+    Then render the extions with title and content.
+
+    Clicking the collapse / expand button collapses the entire case.
+
+    Example context (json):
+    {
+        "list-results":
+        {
+            "reports": [
+                {
+                    "id": 1,
+                    "timestamp": "1611152400",
+                    "title": "Garoupa",
+                    "subtitle": "Lymphangite membre postérieur droit",
+                    "animal": "Équidé",
+                    "race": false,
+                    "age": 17,
+                    "sex": "Mâle stérilisé",
+                    "sections": [
+                        {
+                            "title": "Cas clinique",
+                            "content": "Garoupa, un cheval de 17 ans, est présenté pour une boiterie du membre postérieur droit. Le propriétaire rapporte que la boiterie est apparue brutalement il y a 3 jours. Le cheval est habituellement en bonne santé et n’a pas d’antécédents de boiterie. Il est utilisé pour des balades en forêt et des cours d’équitation pour débutants. Il est vacciné et vermifugé régulièrement. Il vit au pré avec un autre cheval et est nourri avec du foin et des granulés. Il n’a pas voyagé récemment. À l’examen clinique, Garoupa est en bonne condition corporelle. Il est alerte et réactif. Il présente une boiterie modérée du membre postérieur droit. L’examen du membre révèle une augmentation de température et un gonflement du membre. La palpation de la région inguinale est douloureuse. Le reste de l’examen clinique est normal.",
+                        },
+                        {
+                            "title": "Questions",
+                            "content": "Quelles sont les hypothèses diagnostiques pour cette boiterie ? Quels examens complémentaires proposez-vous pour confirmer le diagnostic ? Quel est votre diagnostic ? Quel est le traitement recommandé pour cette affection ?"
+                        },
+                        {
+                            "title": "Prise en charge",
+                            "content": "Garoupa est hospitalisé pour une prise en charge médicale. Il est mis sous anti-inflammatoires non stéroïdiens et sous antibiotiques. Un pansement est réalisé pour protéger la plaie. Le cheval est placé en boxe de repos. Il est nourri avec du foin et des granulés. Il est surveillé régulièrement pour évaluer l’évolution de sa boiterie. Après 3 jours de traitement, Garoupa présente une amélioration de sa boiterie. Il est sorti en paddock pour une reprise progressive de l’exercice. Après 10 jours de traitement, Garoupa est en bonne condition physique et ne présente plus de boiterie. Il est renvoyé à la maison avec des recommandations pour une reprise progressive de l’activité physique.",
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}}
+{{#list-results}}
+    {{#reports}}
+        <div class="report mb-3">
+            <div class="report-header position-relative">
+                {{> mod_competvet/expandcollapse}}
+                <div class="report-title">
+                    <div class="d-flex align-items-center icon-no-margin">
+                        <div class="date mr-2">
+                            {{#pix}}i/calendar, core{{/pix}}
+                            {{#userdate}}{{timestamp}}, {{#str}} strftimedatetime, core_langconfig {{/str}} {{/userdate}}
+                        </div>
+                        <div class="title">
+                            {{#pix}}i/bullhorn, core{{/pix}}
+                            {{title}}
+                        </div>
+                    </div>
+                    <div class="subtitle">{{subtitle}}</div>
+                 </div>
+            </div>
+            <div class="collapse show" id="reportcollapse{{id}}">
+                <div class="report-content">
+                    <div class="section">
+                        <h5 class="section-header">
+                            {{> mod_competvet/grading/svg/paw}}
+                            {{#str}}animal, mod_competvet{{/str}}
+                        </h5>
+                        <div class="section-content">
+                            <div class="animal-details">
+                                <div class="animal-detail">
+                                    <span class="animal-detail-label">{{#str}}animalspecies, mod_competvet{{/str}}</span>
+                                    <span class="animal-detail-value">{{animal}}</span>
+                                </div>
+                                <div class="animal-detail">
+                                    <span class="animal-detail-label">{{#str}}animalbreed, mod_competvet{{/str}}</span>
+                                    <span class="animal-detail-value">{{{breed}}}{{^breed}}{{#str}}animalbreedunknown, mod_competvet{{/str}}{{/breed}}</span>
+                                </div>
+                                <div class="animal-detail">
+                                    <span class="animal-detail-label">{{#str}}animalsex, mod_competvet{{/str}}</span>
+                                    <span class="animal-detail-value">{{{sex}}}{{^sex}}{{#str}}animalsexunknown, mod_competvet{{/str}}{{/sex}}</span>
+                                </div>
+                                <div class="animal-detail">
+                                    <span class="animal-detail-label">{{#str}}animalage, mod_competvet{{/str}}</span>
+                                    <span class="animal-detail-value">{{age}}{{^age}}{{#str}}animalageunknown, mod_competvet{{/str}}{{/age}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{#sections}}
+                        <div class="section">
+                            <h5 class="section-header">
+                                {{#info}}
+                                    {{> mod_competvet/grading/svg/star}}
+                                {{/info}}
+                                {{#result}}
+                                    {{> mod_competvet/grading/svg/reader}}
+                                {{/result}}
+                                {{title}}
+                            </h5>
+                            <div class="section-content">{{{content}}}</div>
+                        </div>
+                    {{/sections}}
+                </div>
+            </div>
+        </div>
+    {{/reports}}
+{{/list-results}}

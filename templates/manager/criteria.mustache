@@ -79,8 +79,11 @@
             {{#str}}inuse, mod_competvet{{/str}}
         </div>
     {{/inuse}}
-    <div class="d-flex justify-content-end align-items-center mb-3">
-        <a class="btn btn-link addsituation jsbutton" href="#" data-action="add" data-type="grid">
+    <div class="d-flex align-items-center mb-3">
+        <div class="navigation" data-region="navigation">
+            {{> mod_competvet/manager/criteria/navigation}}
+        </div>
+        <a class="btn btn-link addsituation jsbutton ml-auto" href="#" data-action="add" data-type="grid">
             {{#str}}addgrid, mod_competvet{{/str}}
         </a>
     </div>

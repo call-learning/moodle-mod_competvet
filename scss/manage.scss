@@ -1,4 +1,12 @@
 .manage {
+    svg {
+        .svg-fill {
+            fill: #1d2125;
+        }
+        .svg-stroke {
+            stroke: #1d2125;
+        }
+    }
     .tcell {
         padding: 0.5rem;
         border-bottom: 1px solid #dee2e6;

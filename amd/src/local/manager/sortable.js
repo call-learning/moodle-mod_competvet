@@ -25,18 +25,18 @@ import $ from 'jquery';
 import "jqueryui";
 import CompetState from 'mod_competvet/local/competstate';
 
-const reOrderState = (type, gridId, gradeId, order) => {
+const reOrderState = (type, gridId, criteriumId, order) => {
     let state = CompetState.getData();
-    if (type === 'grade') {
+    if (type === 'criterium') {
         state.grids.forEach((grid) => {
             if (grid.gridid == gridId) {
-                order.forEach((gradeId, index) => {
-                    grid.grades.forEach((grade) => {
-                        if (grade.gradeid == gradeId) {
-                            grade.sortorder = index;
+                order.forEach((criteriumId, index) => {
+                    grid.criteria.forEach((criterium) => {
+                        if (criterium.criteriumid == criteriumId) {
+                            criterium.sortorder = index;
                         }
                     });
-                    grid.grades.sort((a, b) => {
+                    grid.criteria.sort((a, b) => {
                         return a.sortorder - b.sortorder;
                     });
                 });
@@ -45,17 +45,17 @@ const reOrderState = (type, gridId, gradeId, order) => {
     }
     if (type === 'option') {
         state.grids.forEach((grid) => {
-            grid.grades.forEach((grade) => {
-                if (grade.gradeid == gradeId) {
+            grid.criteria.forEach((criterium) => {
+                if (criterium.criteriumid == criteriumId) {
                     order.forEach((optionId, index) => {
-                        grade.options.forEach((option) => {
+                        criterium.options.forEach((option) => {
                             if (option.optionid == optionId) {
                                 option.sortorder = index;
                             }
                         });
                     });
                     // Now sort the options.
-                    grade.options.sort((a, b) => {
+                    criterium.options.sort((a, b) => {
                         return a.sortorder - b.sortorder;
                     });
                 }
@@ -71,9 +71,9 @@ const sortable = (selector) => {
         update: (event) => {
             const type = $(event.target).data('type');
             const gridId = $(event.target).data('gridId');
-            const gradeId = $(event.target).data('gradeId');
+            const criteriumId = $(event.target).data('criteriumId');
             const order = $(event.target).sortable('toArray', {attribute: 'data-id'});
-            reOrderState(type, gridId, gradeId, order);
+            reOrderState(type, gridId, criteriumId, order);
         },
     });
 };

@@ -1,24 +1,480 @@
-.path-mod-competvet [data-region="review-panel"] {
-    transition: opacity 0.5s ease, min-width 0.5s ease;
+.gradingapp {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.gradingapp .usernavigation .userimage img {
+    width: 50px;
+}
+
+.gradingapp .usernavigation .userinfo {
+    width: 170px;
+    min-width: 170px;
+    display: flex;
+    flex-direction: column;
+}
+
+.gradingapp .userheader .userimage img {
+    width: 100px;
+    height: 100px;
+}
+
+.gradingapp .grade-panel {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.gradingapp .grade-header {
+    background-color: #f5f5f5;
+    box-shadow: 2px 4px 9px rgba(0, 0, 0, 0.2);
+    display: flex;
+    padding: 1rem;
+}
+
+.gradingapp .grade-header .user-header {
+    display: flex;
+    flex: 0 1 20%;
+    max-width: 20%;
+    margin-right: 2rem;
+}
+
+.gradingapp .grade-header .user-header .userinfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.gradingapp .grade-header .user-header .userimage {
+    display: flex;
+    align-items: center;
+}
+
+.gradingapp .grade-header .user-grade {
+    flex: 1 1 auto;
+}
+
+.gradingapp .grade-header .user-grade form {
+    display: flex;
+}
+
+.gradingapp .grade-header .user-grade form .form-group {
+    flex: 1 1 25%;
+    max-width: 25%;
+    padding: 0 0.25rem;
+}
+
+.gradingapp .tab-content {
+    flex: 1 0 auto;
+    display: flex;
+}
+
+.gradingapp .tab-content > .active {
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 auto;
+}
+
+.gradingapp .globalcomment {
+    border-bottom-left-radius: 0;
+}
+
+.gradingapp .commentsubmit {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.gradingapp .grade-tabs {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.gradingapp .grade-tabs .nav-container,
+.gradingapp .grade-tabs .tab-inner {
+    display: flex;
+}
+
+.gradingapp .grade-tabs .nav-container .nav-tabs,
+.gradingapp .grade-tabs .tab-inner .nav-tabs {
+    flex: 1 1 100%;
+}
+
+.gradingapp .grade-tabs .nav-container .tab-main,
+.gradingapp .grade-tabs .tab-inner .tab-main {
+    flex: 1 1 65%;
+    max-width: 65%;
+}
+
+.gradingapp .grade-tabs .nav-container .tab-aside,
+.gradingapp .grade-tabs .tab-inner .tab-aside {
+    flex: 1 1 35%;
+    max-width: 35%;
+}
+
+.gradingapp .grade-tabs .nav-container .tab-aside,
+.gradingapp .grade-tabs .tab-inner .tab-aside {
+    background-color: #f1f1f1;
+}
+
+.gradingapp .grade-tabs .tab-inner {
+    display: flex;
+    flex: 1 0 auto;
+}
+
+.gradingapp .tab-main {
+    padding: 1rem;
+}
+
+.gradingapp svg .svg-fill {
+    fill: #1d2125;
+}
+
+.gradingapp svg .svg-stroke {
+    stroke: #1d2125;
+}
+
+.gradingapp .nav-link {
+    border-width: 3px;
+    font-size: 1.2rem;
+}
+
+.gradingapp .nav-link.active, .gradingapp .nav-link:hover {
+    border-color: transparent transparent var(--primary);
+}
+
+.gradingapp .nav-link.active svg .svg-fill, .gradingapp .nav-link:hover svg .svg-fill {
+    fill: var(--primary);
+}
+
+.gradingapp .nav-link.active svg .svg-stroke, .gradingapp .nav-link:hover svg .svg-stroke {
+    stroke: var(--primary);
+}
+
+.gradingapp .comment {
+    margin-top: 0.25rem;
+    margin-bottom: 0.25remrem;
+    background-color: #f5f5f5;
+    padding: 0.5rem 0.7rem;
+    border-radius: 0.5rem;
+    margin-left: 2.5rem;
+}
+
+.gradingapp .commentsection {
+    margin-bottom: 1rem;
+}
+
+.gradingapp .commentsection .userimage img {
+    width: 35px;
+    height: 35px;
+}
+
+.gradingapp .commentuserinfo .note {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #666;
+}
+
+.gradingapp .form-control:focus {
+    box-shadow: none;
+}
+
+.gradingapp .statusmessage {
+    transition: opacity 0.5s ease-in-out;
+    background-color: #fff;
+}
+
+.gradingapp .certification .heading,
+.gradingapp .certification .certif {
+    display: flex;
+    margin-bottom: 1rem;
+}
+
+.gradingapp .certification .col1 {
+    flex: 1 1 50%;
+    max-width: 50%;
+}
+
+.gradingapp .certification .col2 {
+    flex: 1 1 26%;
+    max-width: 26%;
+}
+
+.gradingapp .certification .col3 {
+    flex: 1 1 12%;
+    max-width: 12%;
+    text-align: center;
+}
+
+.gradingapp .certification .col4 {
+    flex: 1 1 12%;
+    max-width: 12%;
+    text-align: center;
+}
+
+.gradingapp .certification .progress {
+    height: 3px;
+}
+
+.gradingapp .evaluation .header {
+    font-weight: 700;
+}
+
+.gradingapp .evaluation .eval {
+    display: flex;
+    margin-bottom: 1rem;
+}
+
+.gradingapp .evaluation .col1 {
+    flex: 1 1 50%;
+    max-width: 50%;
+}
+
+.gradingapp .evaluation .col3 {
+    flex: 1 1 12%;
+    max-width: 12%;
+    text-align: center;
+}
+
+.gradingapp .opacity-0 {
+    opacity: 0;
+}
+
+.gradingapp .report .report-header {
+    display: flex;
+    align-items: start;
+}
+
+.gradingapp .report .subtitle {
+    color: #666;
+}
+
+.gradingapp .report .section {
+    margin-left: 38px;
+    margin-top: 1rem;
+}
+
+.gradingapp .report .section .section-header {
+    font-size: 1rem;
+}
+
+.gradingapp .report .section .section-content {
+    margin-left: 1rem;
+}
+
+.gradingapp .report .animal-detail-label {
+    width: 100px;
+    display: inline-block;
+}
+
+.manage svg .svg-fill {
+    fill: #1d2125;
+}
+
+.manage svg .svg-stroke {
+    stroke: #1d2125;
+}
+
+.manage .tcell {
+    padding: 0.5rem;
+    border-bottom: 1px solid #dee2e6;
+    border-right: 1px solid #dee2e6;
+    display: flex;
+    align-items: center;
+}
+
+.manage .tcell.editable {
+    padding: 0;
+}
+
+.manage .tcell.editable input {
+    height: 100%;
+    border-radius: 0;
+}
+
+.manage .tcell.editable input:focus {
+    border: 1px solid #007bff;
+    box-shadow: none;
+}
+
+.manage .tcell.move {
+    width: 3rem;
+    display: flex;
+    justify-content: center;
+}
+
+.manage .subitem {
+    padding-left: 1.5rem;
+}
+
+.manage .questioncolumn {
+    border-top: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    width: 260px;
+    min-width: 260px;
+    padding: 0.5rem;
+    flex: 0 0 160px;
+}
+
+.manage .grader-cell.green {
+    background-color: #dae8db;
+}
+
+.manage .roundgrade {
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    border: 2px solid #398439;
+    margin-left: auto;
+}
+
+.manage .roundgrade.average {
+    border: 2px solid #5bc0de;
+}
+
+.manage .questionname {
+    display: flex;
+}
+
+.manage .csstransforms .questionname {
+    display: none;
+}
+
+.manage .grader-cell {
+    flex: 0 0 100px;
+    max-width: 100px;
+    border: 1px solid transparent;
+    border-right: 1px dotted silver;
     overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    z-index: 1;
+    padding: 1px 2px 2px 1px;
+    margin: 0;
+    white-space: nowrap;
+    cursor: default;
+    padding-left: 4px;
+    padding-right: 4px;
 }
 
-.path-mod-competvet [data-region="review-panel"].collapsed {
-    min-width: 0;
-    width:0;
-    opacity:0;
+.manage .grader-cell.large {
+    height: 4rem;
+    white-space: initial;
 }
 
-.path-mod-competvet [data-region="review-panel"].expanded {
-    width:100%;
+.manage .grader-cell.user {
+    flex: 0 0 20%;
+    max-width: 20%;
 }
 
-.path-mod-competvet [data-region="review-panel"] {
-    min-width: 80%;
-    width:auto;
+.manage .singlemarker .inputclick + input {
+    border-width: 0px;
 }
 
-.path-mod-competvet [data-region="grade-panel"] {
-    min-width: 20%;
-    background-color: #eee;
+.manage .singlemarker .inputclick {
+    border-width: 1px;
+}
+
+.manage .singlemarker .inputtext {
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    display: block;
+    width: calc(100% + 2px);
+}
+
+.manage .singlemarker .grader-cell.green {
+    background-color: #dae8db;
+}
+
+.manage .singlemarker .roundgrade {
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    border: 2px solid #398439;
+    margin-left: auto;
+}
+
+.manage .singlemarker .roundgrade.average {
+    border: 2px solid #5bc0de;
+}
+
+.manage .inputclick::focus {
+    border: 1px dotted silver;
+}
+
+.manage .greenbg .grader-cell {
+    background-color: #dae8db;
+}
+
+.manage .btn.jsbutton {
+    opacity: 0;
+}
+
+.manage .btn .savingicon {
+    display: none;
+}
+
+.manage .btn.saved .defaulticon {
+    display: none;
+}
+
+.manage .btn.saved .savingicon {
+    display: inline-block;
+}
+
+.manage.jsenabled .btn.jsbutton {
+    opacity: 1;
+}
+
+.manage .error::after {
+    content: "!";
+    color: red;
+    font-weight: bold;
+    font-size: 1.5rem;
+    position: absolute;
+    top: 0;
+    right: 5px;
+    display: flex;
+    align-items: center;
+    z-index: 1;
+}
+
+.manage .editable {
+    background-color: aliceblue;
+}
+
+.manage .sortable-list-is-dragged {
+    background-color: aliceblue;
+}
+
+.manage .scriptchecked {
+    opacity: 0;
+}
+
+.manage .scriptchecked.ok {
+    opacity: 1;
+}
+
+.manage .scriptname {
+    min-width: 10rem;
+}
+
+.manage .nav-tabs button.nav-link {
+    padding: 0.25rem;
+    border: 1px solid #909090;
+}
+
+.manage .scrollable {
+    overflow-y: hidden;
+    overflow-x: auto;
 }

@@ -1,0 +1,74 @@
+{
+    "gridname": "YEAR2024",
+    "gridid": 1,
+    "criteria": [
+        {
+            "criteriumid": 1,
+            "title": "Réaliser un examen clinique complet (comprenant entre autres une palpation des thyroïdes et un toucher rectal)",
+            "sortorder": 1,
+            "niveau": 1,
+            "total": 5,
+            "notrealised": true,
+            "realised": false,
+            "notverified": true,
+            "verified": false,
+            "feedback": [
+                {
+                    "fullname": "Dr. Freddy",
+                    "picture": "./dummy/fred.jpg",
+                    "comments": [
+                        {
+                            "commentid": 1,
+                            "commenttext": "Il manque la palpation des thyroïdes",
+                            "date": "2020-01-01"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "criteriumid": 2,
+            "title": "Formuler un bilan anamnestique et clinique en retenant et en hiérarchisant les signes cliniques pertinents",
+            "sortorder": 2,
+            "niveau": 4,
+            "total": 5,
+            "notrealised": false,
+            "realised": true,
+            "notverified": false,
+            "verified": true
+        },
+        {
+            "criteriumid": 3,
+            "title": "Formuler des hypothèses diagnostiques hiérarchisées à la lumière du contexte anamnestique et clinique",
+            "sortorder": 3,
+            "niveau": 3,
+            "total": 5,
+            "notrealised": false,
+            "realised": true,
+            "notverified": false,
+            "verified": true
+        },
+        {
+            "criteriumid": 4,
+            "title": "Décider de la nécessité d'une hospitalisation sur la base d'anomalies cliniques ou biologiques",
+            "sortorder": 4,
+            "niveau": 4,
+            "total": 5,
+            "notrealised": false,
+            "realised": true,
+            "notverified": false,
+            "verified": true
+        },
+        {
+            "criteriumid": 5,
+            "title": "Prescrire et administrer un protocole de fluidothérapie adapté pour un animal hospitalisé",
+            "sortorder": 5,
+            "niveau": 2,
+            "total": 5,
+            "notrealised": true,
+            "realised": false,
+            "notverified": true,
+            "verified": false
+        }
+    ]
+}

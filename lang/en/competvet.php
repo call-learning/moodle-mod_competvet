@@ -222,6 +222,11 @@ $string['more'] = 'more';
 $string['less'] = 'less';
 $string['points'] = '{$a} points';
 
+$string['managecriteria'] = 'Manage criteria';
+$string['list_criteria'] = 'List criteria';
+$string['certif_criteria'] = 'Certification criteria';
+$string['eval_criteria'] = 'Evaluation criteria';
+
 // Eval
 $string['evalevaluation'] = 'Eval evaluation';
 $string['evalscore'] = 'Average evaluation score';
@@ -244,6 +249,10 @@ $string['statusproposed'] = 'Status proposed by CompetVet';
 $string['evaluatordecision'] = 'Evaluator decision';
 $string['evaluatordecision_help'] = 'Non-validation being a deal breaker, you can manually change this grade. If you force the validation, please comment.';
 $string['evalcomment'] = 'Free commentary on the essential clinical aspects';
+$string['realised'] = 'Realised';
+$string['verified'] = 'Verified';
+$string['notrealised'] = 'Not realised';
+$string['notverified'] = 'Not verified';
 
 $string['evaluation'] = 'Global Evaluation';
 $string['suggestedgrade'] = 'Suggested grade';
@@ -266,3 +275,13 @@ $string['addoption'] = 'Add an option';
 $string['newcriterium'] = 'New criterium';
 $string['newoption'] = 'New option';
 $string['newgrid'] = 'New grid';
+
+// English list
+$string['animal'] = 'Animal';
+$string['animalspecies'] = 'Species';
+$string['animalbreed'] = 'Breed';
+$string['animalbreedunknown'] = 'Unknown Breed';
+$string['animalsex'] = 'Sex';
+$string['animalsexunknown'] = 'Unknown Sex';
+$string['animalage'] = 'Age';
+$string['animalageunknown'] = 'Unknown Age';

@@ -115,6 +115,51 @@ class Repository {
     }
 
     /**
+     * Get the Evaluation Criteria
+     * @param {Object} args The criteria to get.
+     * @return {Promise} The promise.
+     */
+    async getEvaluationCriteria(args) {
+        const file = await this.getJsonData({filename: 'evaluation-criteria'});
+        const storage = localStorage.getItem('evaluation-criteria');
+        const data = JSON.parse(storage) || JSON.parse(file.data);
+        if (args.userid && args.cmid) {
+            data.userid = args.userid;
+            const storage = await this.getJsonData({filename: 'evaluation-criteria-' + args.userid + '-' + args.cmid});
+            if (!storage.data) {
+                return data.grids[0];
+            }
+            const userdata = JSON.parse(storage.data);
+            return userdata;
+        }
+        return data;
+    }
+
+    /**
+     * Get Certification Criteria
+     * @param {Object} args The criteria to get.
+     * @return {Promise} The promise.
+     */
+    async getCertificationCriteria(args) {
+        const file = await this.getJsonData({filename: 'certification-criteria'});
+        const storage = localStorage.getItem('certification-criteria');
+        const data = JSON.parse(storage) || JSON.parse(file.data);
+        if (args.userid && args.cmid) {
+            data.userid = args.userid;
+            // Here the backend should return the current grid including the user's grades.
+            // const storage = localStorage.getItem('certification-criteria-' + args.userid + '-' + args.cmid);
+            const storage = await this.getJsonData({filename: 'certification-criteria-' + args.userid + '-' + args.cmid});
+            if (!storage.data) {
+                return data.grids[0];
+            }
+            const userdata = JSON.parse(storage.data);
+
+            return userdata;
+        }
+        return data;
+    }
+
+    /**
      * Get the Evaluation Grading
      * @param {Object} args The grading to get.
      * @return {Promise} The promise.
@@ -223,6 +268,36 @@ class Repository {
     }
 
     /**
+     * Save the evaluation criteria.
+     *
+     * @param {Object} data The data to save.
+     * @return {Promise}
+     */
+    async saveEvaluationCriteria(data) {
+        localStorage.setItem('evaluation-criteria', JSON.stringify(data));
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve();
+            }, 500);
+        });
+    }
+
+    /**
+     * Save the certification criteria.
+     *
+     * @param {Object} data The data to save.
+     * @return {Promise}
+     */
+    async saveCertificationCriteria(data) {
+        localStorage.setItem('certification-criteria', JSON.stringify(data));
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve();
+            }, 500);
+        });
+    }
+
+    /**
      * Save the user grades for the list criteria.
      * @param {Object} data The data to save.
      * @return {Promise} The promise.
@@ -287,6 +362,18 @@ class Repository {
         if (storage) {
             return JSON.parse(storage);
         }
+    }
+
+    /**
+     * Get the Cases for the List Results.
+     * @param {Object} args The arguments.
+     * @return {Promise} The promise.
+     */
+    async getListResults(args) {
+        window.console.log('getListResults', args);
+        const file = await this.getJsonData({filename: 'list-results'});
+        const data = JSON.parse(file.data);
+        return data;
     }
 
     /**

@@ -184,7 +184,48 @@
             height: 3px;
         }
     }
+    .evaluation {
+        .header {
+            font-weight: 700;
+        }
+        .eval {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+        .col1 {
+            flex: 1 1 50%;
+            max-width: 50%;
+        }
+        .col3 {
+            flex: 1 1 12%;
+            max-width: 12%;
+            text-align: center;
+        }
+    }
     .opacity-0 {
         opacity: 0;
+    }
+    .report {
+        .report-header {
+            display: flex;
+            align-items: start;
+        }
+        .subtitle {
+            color: #666;
+        }
+        .section {
+            margin-left: 38px;
+            margin-top: 1rem;
+            .section-header {
+                font-size: 1rem;
+            }
+            .section-content {
+                margin-left: 1rem;
+            }
+        }
+        .animal-detail-label {
+            width: 100px;
+            display: inline-block;
+        }
     }
 }

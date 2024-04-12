@@ -31,6 +31,9 @@ import './components/evaluations_grading';
 import './components/list_criteria';
 import './components/globalgrade';
 import './components/certification_grading';
+import './components/certification_results';
+import './components/list_results';
+import './components/evaluation_results';
 
 class Competvet {
     /*
@@ -54,7 +57,6 @@ class Competvet {
     constructor() {
         this.gradingApp = document.querySelector('[data-region="grading-app"]');
         this.cmId = this.gradingApp.dataset.cmId;
-        this.planningId = this.gradingApp.dataset.planningid;
         this.userlist = [];
         this.currentUser = 0;
         this.setup();
@@ -81,11 +83,14 @@ class Competvet {
     setCurrentUser(user) {
         CompetState.setValue('user', user);
         this.currentUser = user;
-        this.setEvalObservations();
+        //this.setEvalObservations();
         this.setEvalGrading();
         this.setListCriteria();
         this.setGlobalGrade();
         this.setCertifGrading();
+        this.setCertifResults();
+        this.setListResults();
+        this.setEvalResults();
     }
 
     /**
@@ -109,7 +114,7 @@ class Competvet {
     async setEvalObservations() {
         const args = {
             userid: this.currentUser.id,
-            planningid: this.planningId
+            cmid: this.cmId
         };
         const response = await Repository.getEvaluations(args);
         if (!response.evaluations) {
@@ -129,7 +134,7 @@ class Competvet {
     async setEvalGrading() {
         const args = {
             userid: this.currentUser.id,
-            planningid: this.planningId
+            cmid: this.cmId
         };
         const response = await Repository.getEvaluationGrading(args);
         if (!response.evaluationsgrading) {
@@ -141,13 +146,39 @@ class Competvet {
         CompetState.setValue('evaluations-grading', context);
     }
 
+    async setCertifResults() {
+        const args = {
+            userid: this.currentUser.id,
+            cmid: this.cmId
+        };
+        const response = await Repository.getCertificationCriteria(args);
+        CompetState.setValue('certification-results', response);
+    }
+
+    async setListResults() {
+        const args = {
+            userid: this.currentUser.id,
+            cmid: this.cmId
+        };
+        const response = await Repository.getListResults(args);
+        CompetState.setValue('list-results', response);
+    }
+
+    async setEvalResults() {
+        const args = {
+            userid: this.currentUser.id,
+            cmid: this.cmId
+        };
+        const response = await Repository.getEvaluationCriteria(args);
+        CompetState.setValue('evaluation-results', response);
+    }
     /**
      * Set the Certification grading.
      */
     async setCertifGrading() {
         const args = {
             userid: this.currentUser.id,
-            planningid: this.planningId
+            cmid: this.cmId
         };
         const response = await Repository.getCertificationGrading(args);
         if (!response.certifgrading) {

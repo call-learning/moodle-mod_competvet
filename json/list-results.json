@@ -1,0 +1,58 @@
+{
+    "reports": [
+        {
+            "id": 1,
+            "timestamp": "1611152400",
+            "title": "Garoupa",
+            "subtitle": "Lymphangite membre postérieur droit",
+            "animal": "Équidé",
+            "breed": false,
+            "age": 17,
+            "sex": "Mâle stérilisé",
+            "sections": [
+                {
+                    "title": "Cas clinique",
+                    "info": true,
+                    "content": "Garoupa, un cheval de 17 ans, est présenté pour une boiterie du membre postérieur droit. Le propriétaire rapporte que la boiterie est apparue brutalement il y a 3 jours. Le cheval est habituellement en bonne santé et n’a pas d’antécédents de boiterie. Il est utilisé pour des balades en forêt et des cours d’équitation pour débutants. Il est vacciné et vermifugé régulièrement. Il vit au pré avec un autre cheval et est nourri avec du foin et des granulés. Il n’a pas voyagé récemment. À l’examen clinique, Garoupa est en bonne condition corporelle. Il est alerte et réactif. Il présente une boiterie modérée du membre postérieur droit. L’examen du membre révèle une augmentation de température et un gonflement du membre. La palpation de la région inguinale est douloureuse. Le reste de l’examen clinique est normal."
+                },
+                {
+                    "title": "Questions",
+                    "info": true,
+                    "content": "Quelles sont les hypothèses diagnostiques pour cette boiterie ? Quels examens complémentaires proposez-vous pour confirmer le diagnostic ? Quel est votre diagnostic ? Quel est le traitement recommandé pour cette affection ?"
+                },
+                {
+                    "title": "Prise en charge",
+                    "result": true,
+                    "content": "Garoupa est hospitalisé pour une prise en charge médicale. Il est mis sous anti-inflammatoires non stéroïdiens et sous antibiotiques. Un pansement est réalisé pour protéger la plaie. Le cheval est placé en boxe de repos. Il est nourri avec du foin et des granulés. Il est surveillé régulièrement pour évaluer l’évolution de sa boiterie. Après 3 jours de traitement, Garoupa présente une amélioration de sa boiterie. Il est sorti en paddock pour une reprise progressive de l’exercice. Après 10 jours de traitement, Garoupa est en bonne condition physique et ne présente plus de boiterie. Il est renvoyé à la maison avec des recommandations pour une reprise progressive de l’activité physique."
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "timestamp": "1611152400",
+            "title": "Léon",
+            "subtitle": "Dermatite allergique",
+            "animal": "Chien",
+            "breed": "Labrador",
+            "age": 5,
+            "sex": "Mâle entier",
+            "sections": [
+                {
+                    "title": "Cas clinique",
+                    "info": true,
+                    "content": "Léon, un chien Labrador de 5 ans, est présenté pour des démangeaisons intenses et des lésions cutanées. Le propriétaire rapporte que Léon se gratte beaucoup depuis quelques semaines. Il a remarqué des rougeurs et des croûtes sur la peau de Léon. Le chien est habituellement en bonne santé et n’a pas d’antécédents de dermatite. Il est vacciné et vermifugé régulièrement. Il vit en maison avec un jardin et est nourri avec des croquettes. Il n’a pas voyagé récemment. À l’examen clinique, Léon est en bonne condition corporelle. Il présente des lésions cutanées érythémateuses, croûteuses et ulcérées sur le dos, le cou et les flancs. Il se gratte fréquemment et a des poils cassés. Le reste de l’examen clinique est normal."
+                },
+                {
+                    "title": "Questions",
+                    "info": true,
+                    "content": "Quelles sont les hypothèses diagnostiques pour ces démangeaisons et ces lésions cutanées ? Quels examens complémentaires proposez-vous pour confirmer le diagnostic ? Quel est votre diagnostic ? Quel est le traitement recommandé pour cette affection ?"
+                },
+                {
+                    "title": "Prise en charge",
+                    "result": true,
+                    "content": "Léon est hospitalisé pour une prise en charge médicale. Il est mis sous anti-inflammatoires et sous antibiotiques. Un shampooing antiseptique est réalisé pour nettoyer les lésions cutanées. Le chien est placé en boxe de repos. Il est nourri avec des croquettes hypoallergéniques. Il est surveillé régulièrement pour évaluer l’évolution de ses lésions cutanées. Après 3 jours de traitement, Léon présente une amélioration de ses démangeaisons et de ses lésions cutanées. Il est sorti en promenade pour une reprise progressive de l’exercice. Après 10 jours de traitement, Léon est en bonne condition physique et ne présente plus de démangeaisons ni de lésions cutanées. Il est renvoyé à la maison avec des recommandations pour une alimentation hypoallergénique."
+                }
+            ]
+        }
+    ]
+}

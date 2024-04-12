@@ -16,7 +16,7 @@
 /**
  * Moves wrapping navigation items into a more menu.
  *
- * @module     mod_competvet/local/manager/manager_app_grading
+ * @module     mod_competvet/local/manager/manager_app_criteria
  * @class      competvet
  * @copyright  2024 Bas Brands
  * @author     Bas Brands <bas@sonsbeekmedia.nl>
@@ -27,6 +27,7 @@ import CompetState from 'mod_competvet/local/competstate';
 import Repository from 'mod_competvet/local/new-repository';
 import {get_string as getString} from 'core/str';
 import './grids';
+import './navigation';
 /*
 * A CRUD manager for data.
 */
@@ -38,20 +39,43 @@ class Manager {
     constructor() {
         this.app = document.querySelector('[data-region="criteria"]');
         this.cmId = this.app.dataset.cmId;
-        this.dataset = this.app.region;
+        this.sets = ['eval', 'list', 'certif'];
+        this.dataset = this.sets[0];
         this.addEventListeners();
         this.getData();
+        this.setNavigation();
     }
 
     /**
      * Get the data for this manager.
      */
     async getData() {
-        const response = await Repository.getListCriteria(this.cmId);
+        let response = false;
+        if (this.dataset === 'eval') {
+            response = await Repository.getEvaluationCriteria(this.cmId);
+        }
+        if (this.dataset === 'list') {
+            response = await Repository.getListCriteria(this.cmId);
+        }
+        if (this.dataset === 'certif') {
+            response = await Repository.getCertificationCriteria(this.cmId);
+        }
         if (!response) {
             return;
         }
         CompetState.setData(response);
+    }
+
+    /**
+     * Set the current navigation set.
+     */
+    setNavigation() {
+        const context = {
+            "eval": this.dataset === 'eval',
+            "list": this.dataset === 'list',
+            "certif": this.dataset === 'certif',
+        };
+        CompetState.setValue('navigation', context);
     }
 
     /**
@@ -81,11 +105,16 @@ class Manager {
             this.edit(btn);
         }
         if (btn.dataset.action === 'save') {
-            this.stopEdit();
             this.save();
+            this.stopEdit();
         }
         if (btn.dataset.action === 'delete') {
             this.delete(btn);
+        }
+        if (btn.dataset.action === 'changedataset') {
+            this.dataset = btn.dataset.dataset;
+            this.setNavigation();
+            this.getData();
         }
     }
 
@@ -107,10 +136,18 @@ class Manager {
         let state = CompetState.getData();
 
         if (btn.dataset.type === 'grid') {
+            let newGridId = 1;
+            let newSortOrder = 1;
+            if (state.grids.length > 0) {
+                newGridId = Math.max(...state.grids.map((element) => element.gridid)) + 1;
+                newSortOrder = Math.max(...state.grids.map((element) => element.sortorder)) + 1;
+            }
             state.grids.push({
-                categorytext: '',
+                gridname: '',
+                edit: true,
                 placeholder: await getString('newgrid', 'mod_competvet'),
-                gridid: 0,
+                gridid: newGridId,
+                sortorder: newSortOrder,
                 criteria: [],
             });
         }
@@ -123,31 +160,41 @@ class Manager {
                 newGradeID = Math.max(...index.criteria.map((element) => element.criteriumid)) + 1;
                 newSortOrder = Math.max(...index.criteria.map((element) => element.sortorder)) + 1;
             }
-            index.criteria.push({
+            const newCriterium = {
                 criteriumid: newGradeID,
                 sortorder: newSortOrder,
                 title: '',
                 placeholder: await getString('newcriterium', 'mod_competvet'),
                 edit: true,
-                options: [],
-            });
+            };
+            // Add an empty options array if the dataset is list.
+            if (this.dataset === 'list') {
+                newCriterium.hasoptions = true;
+                newCriterium.options = [];
+            }
+            index.criteria.push(newCriterium);
         }
         if (btn.dataset.type === 'option') {
             const index = state.grids.find((element) => element.gridid === parseInt(btn.dataset.gridId));
             const criterium = index.criteria.find((element) => element.criteriumid === parseInt(btn.dataset.criteriumId));
+            criterium.edit = true;
             let newOptionId = 1;
             let newSortOrder = 1;
             if (criterium.options.length > 0) {
                 newOptionId = Math.max(...criterium.options.map((element) => element.optionid)) + 1;
                 newSortOrder = Math.max(...criterium.options.map((element) => element.sortorder)) + 1;
             }
-            criterium.options.push({
+            const newOption = {
                 optionid: newOptionId,
                 sortorder: newSortOrder,
                 title: '',
                 placeholder: await getString('newoption', 'mod_competvet'),
-                grade: 0,
-            });
+            };
+            if (this.dataset === 'list') {
+                newOption.hasgrade = true;
+                newOption.grade = 0;
+            }
+            criterium.options.push(newOption);
         }
         CompetState.setData(state);
     }
@@ -225,17 +272,42 @@ class Manager {
                     // Update the criterium with the new values from the UI.
                     element.haschanged = true;
                     element.title = this.getValue('criterium', 'title', element.criteriumid);
+                    if (!element.hasoptions) {
+                        return;
+                    }
                     element.options.forEach((element) => {
                         if (element.deleted) {
                             return;
                         }
                         element.title = this.getValue('option', 'title', element.optionid);
-                        element.grade = this.getValue('option', 'grade', element.optionid);
+                        if (this.dataset === 'list') {
+                            element.grade = this.getValue('option', 'grade', element.optionid);
+                        }
                     });
                 }
             });
         });
-        await Repository.saveListCriteria(state);
+        // Clone the state, remove the edit flags.
+        const saveState = {...state};
+        saveState.grids.forEach((element) => {
+            element.criteria.forEach((element) => {
+                element.edit = false;
+                delete element.placeholder;
+                if (!element.hasoptions) {
+                    return;
+                }
+                element.options.forEach((element) => {
+                    delete element.placeholder;
+                });
+            });
+        });
+        if (this.dataset === 'eval') {
+            await Repository.saveEvaluationCriteria(state);
+        } else if (this.dataset === 'list') {
+            await Repository.saveListCriteria(state);
+        } else if (this.dataset === 'certif') {
+            await Repository.saveCertificationCriteria(state);
+        }
         CompetState.setData(state);
     }
 

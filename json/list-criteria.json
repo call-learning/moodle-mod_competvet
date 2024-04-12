@@ -1,32 +1,36 @@
 {
-    "grids": [
-        {
-            "gridname": "YEAR2024",
-            "gridid": 1,
-            "criteria": [
+"grids": [
+    {
+        "gridname": "YEAR2024",
+        "gridid": 1,
+        "criteria": [
                 {
                     "criteriumid": 1,
                     "title": "Nombre et diversité des cas",
                     "sortorder": 1,
                     "edit": false,
                     "haschanged": false,
+                    "hasoptions": true,
                     "options": [
                         {
                             "optionid": 1,
                             "title": "Le nombre de saisis par l'étudiant est insuffisant",
                             "sortorder": 1,
+                            "hasgrade": true,
                             "grade": 0
                         },
                         {
                             "optionid": 2,
                             "title": "Le nombre de cas saisis par l'étudiant est suffisant",
                             "sortorder": 2,
+                            "hasgrade": true,
                             "grade": 12.5
                         },
                         {
                             "optionid": 3,
                             "title": "Le nombre de cas saisis par l'étudiant est très satisfaisant",
                             "sortorder": 3,
+                            "hasgrade": true,
                             "grade": 25
                         }
                     ]
@@ -35,23 +39,27 @@
                     "criteriumid": 2,
                     "title": "Qualité des cas",
                     "sortorder": 2,
+                    "hasoptions": true,
                     "options": [
                         {
                             "optionid": 4,
                             "title": "La qualité des cas saisis par l'étudiant est insuffisante",
                             "sortorder": 1,
+                            "hasgrade": true,
                             "grade": 0
                         },
                         {
                             "optionid": 5,
                             "title": "La qualité des cas saisis par l'étudiant est suffisante",
                             "sortorder": 2,
+                            "hasgrade": true,
                             "grade": 12.5
                         },
                         {
                             "optionid": 6,
                             "title": "La qualité des cas saisis par l'étudiant est très satisfaisante",
                             "sortorder": 3,
+                            "hasgrade": true,
                             "grade": 25
                         }
                     ]

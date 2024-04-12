@@ -133,8 +133,41 @@
     text-align: center; }
   .gradingapp .certification .progress {
     height: 3px; }
+  .gradingapp .evaluation .header {
+    font-weight: 700; }
+  .gradingapp .evaluation .eval {
+    display: flex;
+    margin-bottom: 1rem; }
+  .gradingapp .evaluation .col1 {
+    flex: 1 1 50%;
+    max-width: 50%; }
+  .gradingapp .evaluation .col3 {
+    flex: 1 1 12%;
+    max-width: 12%;
+    text-align: center; }
   .gradingapp .opacity-0 {
     opacity: 0; }
+  .gradingapp .report .report-header {
+    display: flex;
+    align-items: start; }
+  .gradingapp .report .subtitle {
+    color: #666; }
+  .gradingapp .report .section {
+    margin-left: 38px;
+    margin-top: 1rem; }
+    .gradingapp .report .section .section-header {
+      font-size: 1rem; }
+    .gradingapp .report .section .section-content {
+      margin-left: 1rem; }
+  .gradingapp .report .animal-detail-label {
+    width: 100px;
+    display: inline-block; }
+
+.manage svg .svg-fill {
+  fill: #1d2125; }
+
+.manage svg .svg-stroke {
+  stroke: #1d2125; }
 
 .manage .tcell {
   padding: 0.5rem;
