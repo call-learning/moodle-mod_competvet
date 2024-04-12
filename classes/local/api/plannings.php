@@ -20,8 +20,6 @@ use mod_competvet\competvet;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
-use mod_competvet\reportbuilder\local\helpers\data_retriever_helper;
-use mod_competvet\reportbuilder\local\systemreports\planning_per_situation;
 use mod_competvet\utils;
 
 /**
@@ -34,14 +32,10 @@ use mod_competvet\utils;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class plannings {
-    const PLANNING_FIELDS = [
-        'planning:startdateraw' => 'startdate',
-        'planning:enddateraw' => 'enddate',
-        'planning:session' => 'session',
-        'group:name' => 'groupname',
-        'planning:groupid' => 'groupid',
-        'id' => 'id',
-    ];
+    /**
+     * Planning fields managed in the API
+     */
+    const API_PLANNING_FIELDS = ['id', 'situationid', 'startdate', 'enddate', 'session', 'session', 'groupid', 'groupname'];
 
     /**
      * Get planning for a given situation ID
@@ -58,43 +52,36 @@ class plannings {
         bool $nofuture = true
     ): array {
         // Check if user has access to this situation, else throw an error.
-        $parameters = [
-            'situationid' => $situationid,
-        ];
         $competvet = competvet::get_from_situation_id($situationid);
         if (!$competvet->has_view_access($userid)) {
             return [];
         }
         $situationcontext = $competvet->get_context();
 
-        $filters = null;
-        if ($nofuture) {
-            $filters = [
-                'planning:startdate_operator' => date::DATE_PAST,
-                'planning:startdate_value' => null,
-                'planning:startdate_unit' => '-1 hour',
-            ];
-        }
-        $allplannings = data_retriever_helper::get_data_from_system_report(
-            planning_per_situation::class,
-            $situationcontext,
-            $parameters,
-            $filters,
-        );
-        $plannings = [];
-        $allusergroups = groups_get_all_groups($situationcontext->get_course_context()->instanceid, $userid);
-        $allusergroupsid = array_keys($allusergroups);
         $isstudent = utils::is_student($userid, $situationcontext->id);
+        $planningfilters = [
+            'situationid' => $situationid,
+        ];
+        $planninngssql = 'situationid = :situationid';
+        if ($isstudent) {
+            global $DB;
+            // Remove planning for which this user is not involved.
+            $allusergroups = groups_get_all_groups($situationcontext->get_course_context()->instanceid, $userid);
+            $allusergroupsid = array_keys($allusergroups);
+            [$sql, $params] = $DB->get_in_or_equal($allusergroupsid, SQL_PARAMS_NAMED, 'allusergroupsid');
+            $planninngssql .= " AND groupid $sql";
+            $planningfilters = array_merge($planningfilters, $params);
+        }
+        if ($nofuture) {
+            $planningfilters['startdate'] = (new \DateTime('-1 hour'))->getTimestamp();
+            $planninngssql .= " AND startdate < :startdate";
+        }
+        $allplannings = planning::get_records_select($planninngssql, $planningfilters);
+        $plannings = [];
         foreach ($allplannings as $planning) {
-            if ($isstudent && !in_array($planning['planning:groupid'], $allusergroupsid)) {
-                // Remove planning for which this user is not involved.
-                continue;
-            }
-            $newplanning = [];
-            foreach (self::PLANNING_FIELDS as $originalname => $targetfieldname) {
-                $newplanning[$targetfieldname] = $planning[$originalname];
-            }
-            $newplanning['situationid'] = $situationid;
+            $newplanning = (array) $planning->to_record();
+            $newplanning['groupname'] = groups_get_group_name($planning->get('groupid'));
+            $newplanning = array_intersect_key($newplanning, array_fill_keys(self::API_PLANNING_FIELDS, 0));
             $plannings[] = $newplanning;
         }
         return $plannings;
