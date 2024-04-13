@@ -20,6 +20,7 @@ require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
 
 use advanced_testcase;
 use core_user;
+use mod_competvet\local\persistent\situation;
 use mod_competvet\tests\test_helpers;
 use stdClass;
 use test_data_definition;
@@ -98,13 +99,37 @@ class situations_test extends advanced_testcase {
     public function test_get_all_situations_with_planning_for(string $username, array $expected) {
         $user = core_user::get_user_by_username($username);
         $situations = situations::get_all_situations_with_planning_for($user->id);
-        usort($situations, function ($sit1, $sit2) {
+        usort($situations, function($sit1, $sit2) {
             return $sit1['shortname'] <=> $sit2['shortname'];
         });
-        usort($expected, function ($sit1, $sit2) {
+        usort($expected, function($sit1, $sit2) {
             return $sit1['shortname'] <=> $sit2['shortname'];
         });
         test_helpers::remove_elements_for_assertions($situations, ['id', 'intro', 'roles']);
         $this->assertSame($expected, $situations);
+    }
+
+    public function test_get_all_criteria() {
+        $situation = situation::get_record(['shortname' => 'SIT1']);
+        $criteria = situations::get_all_criteria($situation->get('id'));
+        $this->assertCount(40, $criteria);
+        $this->assertEquals([
+            'id' => 1,
+            'label' => 'Savoir être',
+            'idnumber' => 'Q001',
+            'sort' => 1,
+            'parentid' => 0,
+            'parentlabel' => null,
+            'parentidnumber' => null,
+        ], $criteria[0]);
+        $this->assertEquals([
+            'id' => 3,
+            'label' => 'Respect des interlocuteurs (clients, personnels, encadrants, pairs, ...)',
+            'idnumber' => 'Q003',
+            'sort' => 2,
+            'parentid' => 1,
+            'parentlabel' => 'Savoir être',
+            'parentidnumber' => 'Q001',
+        ], $criteria[8]);
     }
 }

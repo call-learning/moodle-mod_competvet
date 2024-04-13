@@ -15,15 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\local\api;
 
-use context_module;
 use context_system;
-use mod_competvet\competvet;
+use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\reportbuilder\local\helpers\data_retriever_helper;
-use mod_competvet\reportbuilder\local\systemreports\criteria;
-use mod_competvet\reportbuilder\local\systemreports\planning_per_situation;
 use mod_competvet\reportbuilder\local\systemreports\situations as situations_report;
-use mod_competvet\utils;
 
 /**
  * Situations API
@@ -111,27 +107,34 @@ class situations {
      * @return array|array[]
      */
     public static function get_all_criteria(int $situationid) {
-        $context = context_system::instance();
-        $criteria = data_retriever_helper::get_data_from_system_report(
-            criteria::class,
-            $context,
-            [
-                'situationid' => $situationid,
-            ],
-        );
-        $criteria = array_map(function ($criterion) {
-            return [
-                'id' => $criterion['id'],
-                'label' => $criterion['criterion:label'],
-                'idnumber' => $criterion['criterion:idnumber'],
-                'sort' => $criterion['criterion:sort'],
-                'parentid' => $criterion['criterion:parentid'],
-                'parentlabel' => $criterion['criterion:parentlabel'],
-                'parentidnumber' => $criterion['criterion:parentidnumber'],
-            ];
-        }, $criteria);
-        return $criteria;
+        $situation = situation::get_record(['id' => $situationid]);
+        if (empty($situation)) {
+            return [];
+        }
+        $criteria = $situation->get_eval_criteria();
 
+        $criteria = array_map(function ($criterion) {
+            $record = $criterion->to_record();
+            self::unset_persistent_records($record);
+            unset($record->evalgridid);
+            return (array) $record;
+        }, $criteria);
+        $parentlabels = array_column($criteria, 'label', 'id');
+        $parentidnumber = array_column($criteria, 'idnumber', 'id');
+        foreach ($criteria as &$criterion) {
+            if (!empty($criterion['parentid'])) {
+                $criterion['parentlabel'] = $parentlabels[$criterion['parentid']];
+                $criterion['parentidnumber'] = $parentidnumber[$criterion['parentid']];
+            } else {
+                $criterion['parentlabel'] = null;
+                $criterion['parentid'] = null;
+                $criterion['parentidnumber'] = null;
+            }
+            $criterion['id'] = intval($criterion['id']);
+            $criterion['parentid'] = intval($criterion['parentid']);
+            $criterion['sort'] = intval($criterion['sort']);
+        }
+        return $criteria;
     }
 
     /**
@@ -142,7 +145,12 @@ class situations {
      */
     private static function unset_persistent_records($record) {
         foreach (['usermodified', 'timemodified', 'timecreated'] as $field) {
-            unset($record->$field);
+            if (is_object($record) && isset($record->$field)) {
+                unset($record->$field);
+            }
+            if (is_array($record) && isset($record[$field])) {
+                unset($record[$field]);
+            }
         }
     }
 }

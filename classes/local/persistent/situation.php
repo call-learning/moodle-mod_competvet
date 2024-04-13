@@ -145,8 +145,9 @@ class situation extends persistent {
         if (empty($evalgridid)) {
             $evalgridid = evaluation_grid::get_default_grid()->get('id');
         }
-        return criterion::get_records(['evalgridid' => $evalgridid], 'sort') ?:
-            [];
+        // Here we tweak slightly the get_recording sorted by parent id then by sort order.  This might change
+        // if the API change as it is not an "official" use.
+        return criterion::get_records(['evalgridid' => $evalgridid], 'parentid ASC, sort ASC', '') ?: [];
     }
 
     /**
