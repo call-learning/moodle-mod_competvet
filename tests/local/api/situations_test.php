@@ -106,7 +106,7 @@ class situations_test extends advanced_testcase {
             return $sit1['shortname'] <=> $sit2['shortname'];
         });
         test_helpers::remove_elements_for_assertions($situations, ['id', 'intro', 'roles']);
-        $this->assertSame($expected, $situations);
+        $this->assertJsonStringEqualsJsonString(json_encode($expected), json_encode($situations));
     }
 
     public function test_get_all_criteria() {

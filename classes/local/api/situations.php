@@ -16,6 +16,7 @@
 namespace mod_competvet\local\api;
 
 use context_system;
+use mod_competvet\competvet;
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\reportbuilder\local\helpers\data_retriever_helper;
@@ -51,20 +52,14 @@ class situations {
      * @return array[] array of situations
      */
     public static function get_all_situations_with_planning_for(int $userid, bool $nofuture = false): array {
+        global $DB;
         $situationsid = situation::get_all_situations_id_for($userid);
-        $context = context_system::instance();
-
-        $allsituations = data_retriever_helper::get_data_from_system_report(
-            situations_report::class,
-            $context,
-            [
-                'onlyforsituationsid' => join(",", $situationsid),
-            ],
-        );
-
+        [$insql, $params] = $DB->get_in_or_equal($situationsid);
+        $allsituations = situation::get_records_select("id $insql", $params);
         $situations = [];
         foreach ($allsituations as $situation) {
-            $situationid = $situation['id'];
+            $situationid = $situation->get('id');
+            $competvet = competvet::get_from_situation_id($situationid);
             $allplannings = plannings::get_plannings_for_situation_id($situationid, $userid, $nofuture);
             if (empty($allplannings)) {
                 continue; // Do not add situations with empty plannings as user is not involved.
@@ -72,10 +67,24 @@ class situations {
             if (empty($allplannings)) {
                 continue; // Do not add situations with empty plannings as user is not involved.
             }
-            $newsituation = [];
+            $competvetinstance = $competvet->get_instance();
+            $newsituation = [
+                    'shortname' => $situation->get('shortname'),
+                    'name' => format_string($competvetinstance->name),
+                    'evalnum' => $situation->get('evalnum'),
+                    'autoevalnum' => $situation->get('autoevalnum'),
+                    'intro' => format_text($competvetinstance->intro, $competvetinstance->introformat),
+                    'id' => $situationid,
+                ];
             $newsituation['plannings'] = $allplannings;
-            $tags = explode(",", $situation['situation:tagnames'] ?? "");
-            $tags = array_map('trim', $tags);
+            $newsituation['evalnum'] = intval($newsituation['evalnum']);
+            $newsituation['autoevalnum'] = intval($newsituation['autoevalnum']);
+            $tagsobjects = \core_tag_tag::get_item_tags('mod_competvet', 'competvet_situation', $competvetinstance->id);
+            $tags = array_map(function ($tag) {
+                return $tag->name;
+            }, $tagsobjects);
+
+
             sort($tags);
             $newsituation['tags'] = json_encode($tags);
             $newsituation['translatedtags'] = json_encode(array_map(
@@ -86,12 +95,7 @@ class situations {
                 ],
                 $tags
             ));
-            foreach (self::SITUATION_FIELDS as $originalname => $targetfieldname) {
-                $newsituation[$targetfieldname] = $situation[$originalname];
-            }
-            $newsituation['roles'] = json_encode(user_role::get_all($userid, $situationid)); // We don't fetch it through
-            // Do not go through report builder as it is too complicated.
-            // TODO: Cache this information too.
+            $newsituation['roles'] = json_encode(user_role::get_all($userid, $situationid));
             $situations[$situationid] = $newsituation;
         }
         usort($situations, function ($a, $b) use ($situations) {
