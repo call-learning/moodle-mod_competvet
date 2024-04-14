@@ -45,29 +45,22 @@ class situation extends persistent {
      * @return array|int[]
      */
     public static function get_all_situations_id_for(int $userid): array {
+        global $DB;
         // If there is nothing cached for this user, then we build the situation list for this user.
         $situationcache = cache::make('mod_competvet', 'usersituations');
 
         if ($situationcache->has($userid)) {
             return $situationcache->get($userid);
         }
-        // First get all course the user is enrolled in.
-        $courses = enrol_get_users_courses($userid);
-        // Get all situations for this user in this course.
+        $rs = $DB->get_recordset('competvet');
         $situationsid = [];
-        foreach ($courses as $course) {
-            $coursemodinfo = get_fast_modinfo($course->id, $userid);
-            foreach ($coursemodinfo->get_instances_of(competvet::MODULE_NAME) as $cm) {
-                if ($cm->get_user_visible()) {
-                    $competvet = competvet::get_from_instance_id($cm->instance);
-                    // First case: this is a student, let's look into plannings.
-                    if ($competvet->has_view_access($userid)) {
-                        // If not a student, if you see the activity, you will also see the situation.
-                        $situationsid[] = $competvet->get_situation()->get('id');
-                    }
-                }
+        foreach ($rs as $competvetmodule) {
+            $competvet = competvet::get_from_instance_id($competvetmodule->id);
+            if ($competvet->has_view_access($userid)) {
+                $situationsid[] = $competvet->get_situation()->get('id');
             }
         }
+        $rs->close();
         $situationcache->set($userid, $situationsid);
         return $situationsid;
     }
@@ -96,6 +89,7 @@ class situation extends persistent {
         }
         return $situationsid;
     }
+
     /**
      * Usual properties definition for a persistent
      *
@@ -138,6 +132,7 @@ class situation extends persistent {
      * Get evaluation criteria for this situation
      *
      * The array is sorted by sort field.
+     *
      * @return array
      */
     public function get_eval_criteria(): array {
@@ -154,6 +149,7 @@ class situation extends persistent {
      * Get evaluation criteria for this situation, as a tree (array of arrays)
      *
      * The array is sorted by sort field.
+     *
      * @return array of objects (criterion with additional field subcriteria)
      */
     public function get_eval_criteria_tree(): array {

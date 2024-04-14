@@ -60,6 +60,8 @@ class planning extends base {
                 $userinfo = new stdClass();
                 if ($usertype == 'students') {
                     $userinfo->viewurl = (new moodle_url($this->viewstudent, ['studentid' => $user['userinfo']['id']]))->out(false);
+                } else {
+                    $userinfo->viewurl = (new moodle_url('/user/profile.php', ['id' => $user['userinfo']['id']]))->out(false);
                 }
                 $userinfo->userpictureurl = $user['userinfo']['userpictureurl'];
                 $userinfo->fullname = $user['userinfo']['fullname'];

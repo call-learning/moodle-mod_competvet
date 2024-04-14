@@ -15,7 +15,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\local\api;
 
-use core_reportbuilder\local\filters\date;
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\planning;
@@ -333,10 +332,15 @@ class plannings {
         $allenrolled = enrol_get_course_users_roles($situationcontext->get_course_context()->instanceid);
         $observers = [];
         foreach ($allenrolled as $userid => $roles) {
-            $toprole = user_role::get_top($userid, $competvet->get_situation()->get('id'));
-            if ($toprole != 'student' && $toprole != 'unknown') {
-                $observers[$userid] = $toprole;
+            try {
+                $toprole = user_role::get_top($userid, $competvet->get_situation()->get('id'));
+                if ($toprole != 'student' && $toprole != 'unknown') {
+                    $observers[$userid] = $toprole;
+                }
+            } catch (\Exception $e) {
+                debugging("Roles issue with $userid :" . $e->getMessage());
             }
+
         }
         return $observers;
     }

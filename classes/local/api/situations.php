@@ -54,6 +54,9 @@ class situations {
     public static function get_all_situations_with_planning_for(int $userid, bool $nofuture = false): array {
         global $DB;
         $situationsid = situation::get_all_situations_id_for($userid);
+        if ($situationsid === []) {
+            return [];
+        }
         [$insql, $params] = $DB->get_in_or_equal($situationsid);
         $allsituations = situation::get_records_select("id $insql", $params);
         $situations = [];

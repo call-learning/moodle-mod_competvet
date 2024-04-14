@@ -83,18 +83,24 @@ class observations {
         $context = end($contexts);
         $othercomments = array_filter($comments, fn($comment) => $comment->get('type') != observation_comment::OBSERVATION_CONTEXT);
         $contextrecord = [];
+        $result = [
+            'id' => $observation->get('id'),
+            'category' => $observation->get_observation_type(),
+        ];
         if (!empty($context)) {
             $contextrecord = $context->to_record();
             $contextrecord->userinfo = utils::get_user_info($context->get('usercreated'));
             $contextrecord->comment = format_text($contextrecord->comment, $contextrecord->commentformat);
             unset($contextrecord->commentformat);
             $contextrecord = (array) $contextrecord;
+            $result['context'] = $contextrecord;
+        } else {
+            $result['context'] = [
+                'comment' => '',
+                'commentformat' => FORMAT_HTML,
+                'userinfo' => utils::get_user_info($observation->get('studentid')),
+            ];
         }
-        $result = [
-            'id' => $observation->get('id'),
-            'category' => $observation->get_observation_type(),
-        ];
-        $result['context'] = $contextrecord;
         $result['comments'] =
             array_values(
                 array_map(function($obscrit) {
