@@ -427,5 +427,61 @@
                 }
             ]
         }
+    ],
+    "observercomments": [
+        {
+            "picture": "./dummy/martha.jpg",
+            "fullname": "Lefeuvre Jean",
+            "comments": [
+                {
+                    "commenttitle": "Toutes bien",
+                    "commenttext": "Vous avez bien travaillé"
+                },
+                {
+                    "commenttitle": "Je suis content",
+                    "commenttext": "Je suis content de vous"
+                }
+            ]
+        },
+        {
+            "picture": "./dummy/nico.jpg",
+            "fullname": "Nicoletti LaSoitForte",
+            "comments": [
+                {
+                    "commenttitle": "Un problème avec le respect des horaires",
+                    "commenttext": "Vous avez un problème avec le respect des horaires, il faut vous améliorer"
+                }
+            ]
+        },
+        {
+            "picture": "./dummy/irene.jpg",
+            "fullname": "Irene Bien Fauteille",
+            "comments": [
+                {
+                    "commenttitle": "Dansant avec les animaux",
+                    "commenttext": "Vous avez dansé avec les animaux, c'est bien, continuez"
+                },
+                {
+                    "commenttitle": "Croquant les animaux",
+                    "commenttext": "Vous avez croqué les animaux, c'est bien, continuez"
+                }
+            ]
+        }
+    ],
+    "usercomments": [
+        {
+            "picture": "./dummy/andre.jpg",
+            "fullname": "Andre Appel",
+            "comments": [
+                {
+                    "commenttitle": "J'ai bien travaillé",
+                    "commenttext": "J'ai bien travaillé, je suis content de moi"
+                },
+                {
+                    "commenttitle": "J'aimerais croquer les animaux petit",
+                    "commenttext": "J'aimerais croquer les animaux petit, c'est mon rêve depuis tout petit. C'est ne pas normal de ne pas croquer les animaux petit. Isabelle est un fou, elle ne veut pas que je croque les animaux petit. C'est pas normal, je vais lui dire"
+                }
+            ]
+        }
     ]
 }
