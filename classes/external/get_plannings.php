@@ -73,6 +73,7 @@ class get_plannings extends external_api {
                 'startdate' => new external_value(PARAM_TEXT, 'Start date', VALUE_REQUIRED),
                 'enddate' => new external_value(PARAM_TEXT, 'End date', VALUE_REQUIRED),
                 'groupname' => new external_value(PARAM_TEXT, 'Group name', VALUE_REQUIRED),
+                'sessionname' => new external_value(PARAM_TEXT, 'Session name', VALUE_REQUIRED),
             ])),
             'version' => new external_value(PARAM_INT, 'Version', VALUE_REQUIRED),
         ]);

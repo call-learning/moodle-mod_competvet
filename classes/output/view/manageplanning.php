@@ -58,7 +58,7 @@ class manageplanning extends base {
      */
     public function set_data(...$data) {
         if (empty($data)) {
-            global $USER, $PAGE;
+            global $PAGE;
             $context = $PAGE->context;
             $competvet = competvet::get_from_context($context);
             $data = [$competvet];

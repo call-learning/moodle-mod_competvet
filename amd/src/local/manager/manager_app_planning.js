@@ -104,6 +104,7 @@ class Manager {
                 startdate: '',
                 enddate: '',
                 groupname: '',
+                sessionname: '',
                 edit: true,
             });
         }

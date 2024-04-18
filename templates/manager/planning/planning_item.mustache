@@ -25,6 +25,7 @@
         "startdate": "10 January 2024",
         "enddate": "18 January 2024",
         "groupname": "Group 1",
+        "sessionname": "Session 2023",
         "nbstudents": 10,
         "viewurl": "http://localhost/moodle/mod/competvet/view.php?id=1",
     }
@@ -33,16 +34,19 @@
     <div class="col-1 tcell">
         {{{id}}}
     </div>
-    <div class="col-3 tcell {{#edit}}editable{{/edit}}" data-field="startdate" data-fieldtype="date">
+    <div class="col-2 tcell {{#edit}}editable{{/edit}}" data-field="startdate" data-fieldtype="date">
         <input type="date" name="startdate" value="{{startdate}}" class="form-control" {{^edit}}disabled{{/edit}}>
     </div>
-    <div class="col-3 tcell {{#edit}}editable{{/edit}}" data-field="enddate" data-fieldtype="date">
+    <div class="col-2 tcell {{#edit}}editable{{/edit}}" data-field="enddate" data-fieldtype="date">
         <input type="date" name="enddate" value="{{enddate}}" class="form-control" {{^edit}}disabled{{/edit}}>
     </div>
-    <div class="col-3 tcell {{#edit}}editable{{/edit}}" {{#edit}}contenteditable="true"{{/edit}} data-field="groupname" data-fieldtype="text">
+    <div class="col-2 tcell {{#edit}}editable{{/edit}}" {{#edit}}contenteditable="true"{{/edit}} data-field="groupname" data-fieldtype="text">
         {{{groupname}}}
     </div>
-    <div class="col-2 tcell">
+    <div class="col-2 tcell {{#edit}}editable{{/edit}}" {{#edit}}contenteditable="true"{{/edit}} data-field="groupname" data-fieldtype="text">
+        {{{sessionname}}}
+    </div>
+    <div class="col-3 tcell">
         <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-id="{{id}}" data-action="edit" data-type="planning">{{#pix}}i/edit, core, {{#str}}edit{{/str}}{{/pix}}</button>
         <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-id="{{id}}" data-action="save" data-type="planning">
             <span class="defaulticon">{{#pix}}e/save, core, {{#str}}save{{/str}}{{/pix}}</span>
