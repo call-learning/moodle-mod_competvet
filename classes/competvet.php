@@ -42,6 +42,12 @@ class competvet {
      * Module name
      */
     const MODULE_NAME = 'competvet';
+
+    /**
+     * Component name
+     */
+    const FULL_MODULE_NAME = 'mod/competvet';
+
     /**
      * CompetVet roles
      *

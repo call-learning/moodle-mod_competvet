@@ -15,8 +15,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet;
 
-use context_system;
-
 /**
  * Setup routines
  *

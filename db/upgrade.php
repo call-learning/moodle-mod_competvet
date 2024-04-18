@@ -416,5 +416,39 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2024041702, 'competvet');
     }
 
+    if ($oldversion < 2024032904) {
+
+        // Define field id to be dropped from competvet.
+        $table = new xmldb_table('competvet');
+        $field = new xmldb_field('listgrade');
+
+        // Conditionally launch drop field id.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $field = new xmldb_field('caseloggrade');
+
+        // Conditionally launch drop field id.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Define table competvet_grades to be dropped.
+        $table = new xmldb_table('competvet_grades');
+
+        // Conditionally launch drop table for competvet_grades.
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Delete previous modules attempts as we completely change the way we store them.
+        $DB->delete_records('grade_items', ['itemmodule' => 'competvet', 'itemtype' => 'mod']);
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024032904, 'competvet');
+    }
+
+
     return true;
 }
