@@ -94,21 +94,17 @@ class criteria {
         $criterion = criterion::get_record(['id' => $criterionid]);
         if (!$criterion) {
             $criterion = new criterion(0);
-            $criterion->set('label' , $criterionname);
-            $criterion->set('idnumber', $idnumber);
-            $criterion->set('sort', $sortorder);
-            $criterion->set('evalgridid', $gridid);
-            $criterion->set('parentid', $parentid);
-            $criterion->set('grade', $grade);
-            $criterion->create();
-        } else {
-            $criterion->set('label' , $criterionname);
-            $criterion->set('idnumber', $idnumber);
-            $criterion->set('sort', $sortorder);
-            $criterion->set('evalgridid', $gridid);
-            $criterion->set('parentid', $parentid);
-            $criterion->set('grade', $grade);
+        }
+        $criterion->set('label' , $criterionname);
+        $criterion->set('idnumber', $idnumber);
+        $criterion->set('sort', $sortorder);
+        $criterion->set('evalgridid', $gridid);
+        $criterion->set('parentid', $parentid);
+        $criterion->set('grade', $grade);
+        if ($criterion->get('id')) {
             $criterion->update();
+        } else {
+            $criterion->create();
         }
         return $criterion->get('id');
     }

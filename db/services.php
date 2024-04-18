@@ -120,4 +120,12 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/competvet:view',
     ],
+    'mod_competvet_manage_plannings' => [
+        'classname' => \mod_competvet\external\manage_plannings::class,
+        'methodname' => 'update',
+        'description' => 'Update the plannings',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:editplanning',
+    ],
 ];

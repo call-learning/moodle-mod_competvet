@@ -30,28 +30,32 @@
         "viewurl": "http://localhost/moodle/mod/competvet/view.php?id=1",
     }
 }}
-<div class="row" data-region="planning" data-id="{{id}}">
+<div class="row" data-region="planitem" data-id="{{id}}">
     <div class="col-1 tcell">
         {{{id}}}
     </div>
-    <div class="col-2 tcell {{#edit}}editable{{/edit}}" data-field="startdate" data-fieldtype="date">
-        <input type="date" name="startdate" value="{{startdate}}" class="form-control" {{^edit}}disabled{{/edit}}>
+    <div class="col-2 tcell {{#edit}}editable{{/edit}}">
+        <input type="date" name="startdate" value="{{startdate}}" data-field="startdate" class="form-control" {{^edit}}disabled{{/edit}}>
     </div>
-    <div class="col-2 tcell {{#edit}}editable{{/edit}}" data-field="enddate" data-fieldtype="date">
-        <input type="date" name="enddate" value="{{enddate}}" class="form-control" {{^edit}}disabled{{/edit}}>
+    <div class="col-2 tcell {{#edit}}editable{{/edit}}">
+        <input type="date" name="enddate" value="{{enddate}}" data-field="enddate" class="form-control" {{^edit}}disabled{{/edit}}>
     </div>
-    <div class="col-2 tcell {{#edit}}editable{{/edit}}" {{#edit}}contenteditable="true"{{/edit}} data-field="groupname" data-fieldtype="text">
-        {{{groupname}}}
+    <div class="col-2 tcell {{#edit}}editable{{/edit}}">
+        {{#edit}}<input type="text" class="form-control" value="{{{groupname}}}" placeholder="{{{placeholder}}}" data-field="groupname">{{/edit}}{{^edit}}{{{groupname}}}{{/edit}}
     </div>
-    <div class="col-2 tcell {{#edit}}editable{{/edit}}" {{#edit}}contenteditable="true"{{/edit}} data-field="groupname" data-fieldtype="text">
-        {{{sessionname}}}
+    <div class="col-2 tcell {{#edit}}editable{{/edit}}">
+        {{#edit}}<input type="text" class="form-control" value="{{{session}}}" placeholder="{{{placeholder}}}" data-field="session">{{/edit}}{{^edit}}{{{session}}}{{/edit}}
     </div>
     <div class="col-3 tcell">
+        {{^edit}}
         <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-id="{{id}}" data-action="edit" data-type="planning">{{#pix}}i/edit, core, {{#str}}edit{{/str}}{{/pix}}</button>
+        {{/edit}}
+        {{#edit}}
         <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-id="{{id}}" data-action="save" data-type="planning">
             <span class="defaulticon">{{#pix}}e/save, core, {{#str}}save{{/str}}{{/pix}}</span>
             <span class="savingicon">{{#pix}}i/loading, core, {{#str}}saving, mod_competvet{{/str}}{{/pix}}</span>
         </button>
+        {{/edit}}
         <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-id="{{id}}" data-action="delete" data-type="planning">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
     </div>
 </div>

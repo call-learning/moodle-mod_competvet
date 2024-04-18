@@ -54,6 +54,11 @@ class get_plannings extends external_api {
         ['cmid' => $cmid] = self::validate_parameters(self::execute_parameters(), ['cmid' => $cmid]);
         $competvet = competvet::get_from_cmid($cmid);
         $plannings = plannings_api::get_plannings_for_situation_id($competvet->get_situation()->get('id'), $USER->id);
+        // Covert the startdate and enddate to a human readable format using yyyy-MM-dd
+        foreach ($plannings as $key => $planning) {
+            $plannings[$key]['startdate'] = userdate($planning['startdate'], '%Y-%m-%d');
+            $plannings[$key]['enddate'] = userdate($planning['enddate'], '%Y-%m-%d');
+        }
 
         return [
             'plannings' => $plannings,
@@ -73,7 +78,7 @@ class get_plannings extends external_api {
                 'startdate' => new external_value(PARAM_TEXT, 'Start date', VALUE_REQUIRED),
                 'enddate' => new external_value(PARAM_TEXT, 'End date', VALUE_REQUIRED),
                 'groupname' => new external_value(PARAM_TEXT, 'Group name', VALUE_REQUIRED),
-                'sessionname' => new external_value(PARAM_TEXT, 'Session name', VALUE_REQUIRED),
+                'session' => new external_value(PARAM_TEXT, 'Session name', VALUE_REQUIRED),
             ])),
             'version' => new external_value(PARAM_INT, 'Version', VALUE_REQUIRED),
         ]);

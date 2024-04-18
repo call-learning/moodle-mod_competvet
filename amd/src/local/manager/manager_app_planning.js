@@ -81,6 +81,7 @@ class Manager {
         }
         if (btn.dataset.action === 'save') {
             this.save();
+            this.stopEdit();
         }
         if (btn.dataset.action === 'delete') {
             this.delete(btn);
@@ -104,7 +105,7 @@ class Manager {
                 startdate: '',
                 enddate: '',
                 groupname: '',
-                sessionname: '',
+                session: '',
                 edit: true,
             });
         }
@@ -142,11 +143,71 @@ class Manager {
     }
 
     /**
+     * Stop editing, remove the edit flag from the state elements.
+     */
+    stopEdit() {
+        const state = CompetState.getData();
+        // Remove edit from all fields.
+        state.plannings.forEach((element) => {
+            element.edit = false;
+        });
+        CompetState.setData(state);
+    }
+
+    update() {
+        const state = CompetState.getData();
+        state.plannings.forEach((element) => {
+            element.haschanged = false;
+            if (element.edit) {
+                // Update the grid with the new values from the UI.
+                element.haschanged = true;
+                element.startdate = this.getValue('planitem', 'startdate', element.id);
+                element.enddate = this.getValue('planitem', 'enddate', element.id);
+                element.groupname = this.getValue('planitem', 'groupname', element.id);
+                element.session = this.getValue('planitem', 'session', element.id);
+            }
+        });
+        CompetState.setData(state);
+    }
+
+    /**
      * Save the state to the server.
      */
-    save() {
+    async save() {
+        this.update();
         const state = CompetState.getData();
-        Repository.saveData(state);
+        const saveState = {
+            plannings: [],
+        };
+        if (state.plannings.length > 0) {
+            saveState.plannings = [...state.plannings];
+        }
+        saveState.plannings.forEach((element) => {
+            delete element.edit;
+            delete element.placeholder;
+        });
+        await Repository.savePlannings(saveState);
+        this.getData();
+    }
+
+    /**
+     * Get the field value from the UI.
+     * @param {String} element The element to get the value from.
+     * @param {String} property The element property.
+     * @param {String} id The element id.
+     * @return {String} The value of the element.
+     */
+    getValue(element, property, id) {
+        const domNode = this.app.querySelector(`[data-region="${element}"][data-id="${id}"] [data-field="${property}"]`);
+        if (!domNode) {
+            window.console.log(`Element not found: ${element} ${property} ${id}`);
+            const element = this.app.querySelector(`[data-region="${element}"][data-id="${id}"]`);
+            if (!element) {
+                window.console.log(`Element not found: ${element} ${id}`);
+                return '';
+            }
+        }
+        return domNode.value;
     }
 }
 

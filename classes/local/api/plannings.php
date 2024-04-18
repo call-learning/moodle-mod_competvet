@@ -344,4 +344,45 @@ class plannings {
         }
         return $observers;
     }
+
+    /**
+     * Update the planning
+     *
+     * @param int $planningid - The planning id
+     * @param string $startdate - The start date
+     * @param string $enddate - The end date
+     * @param string $groupname - The group name
+     * @param string $session - The session name
+     * @return void
+     */
+    public static function update_planning(
+        int $planningid,
+        string $startdate,
+        string $enddate,
+        string $session
+    ): void {
+        $planning = planning::get_record(['id' => $planningid]);
+        if (!$planning) {
+            $planning = new planning(0);
+        }
+        $planning->set('startdate', strtotime($startdate));
+        $planning->set('enddate', strtotime($enddate));
+        $planning->set('session', $session);
+        if ($planning->get('id')) {
+            $planning->update();
+        } else {
+            $planning->create();
+        }
+    }
+
+    /**
+     * Delete the planning
+     * @param int $planningid - The planning id
+     */
+    public static function delete_planning(int $planningid): void {
+        $planning = planning::get_record(['id' => $planningid]);
+        if ($planning) {
+            $planning->delete();
+        }
+    }
 }

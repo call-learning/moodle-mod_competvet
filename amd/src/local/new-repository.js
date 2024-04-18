@@ -205,9 +205,19 @@ class Repository {
     /**
      * Save the criteria.
      * @param {Object} data The data to save.
+     * @return {Promise} The promise.
      */
     async saveCriteria(data) {
         return Ajax.call([{methodname: 'mod_competvet_manage_criteria', args: data}])[0];
+    }
+
+    /**
+     * Save the plannings.
+     * @param {Object} data The data to save.
+     * @return {Promise} The promise.
+     */
+    async savePlannings(data) {
+        return Ajax.call([{methodname: 'mod_competvet_manage_plannings', args: data}])[0];
     }
 
     /**
