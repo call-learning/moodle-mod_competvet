@@ -3,9 +3,11 @@
     {
         "gridname": "YEAR2024",
         "gridid": 1,
+        "sortorder": 1,
         "criteria": [
                 {
                     "criteriumid": 1,
+                    "idnumber": "CRITERE1",
                     "title": "Nombre et diversité des cas",
                     "sortorder": 1,
                     "edit": false,
@@ -14,6 +16,7 @@
                     "options": [
                         {
                             "optionid": 1,
+                            "idnumber": "CR1OPT1",
                             "title": "Le nombre de saisis par l'étudiant est insuffisant",
                             "sortorder": 1,
                             "hasgrade": true,
@@ -21,6 +24,7 @@
                         },
                         {
                             "optionid": 2,
+                            "idnumber": "CR1OPT2",
                             "title": "Le nombre de cas saisis par l'étudiant est suffisant",
                             "sortorder": 2,
                             "hasgrade": true,
@@ -28,6 +32,7 @@
                         },
                         {
                             "optionid": 3,
+                            "idnumber": "CR1OPT3",
                             "title": "Le nombre de cas saisis par l'étudiant est très satisfaisant",
                             "sortorder": 3,
                             "hasgrade": true,
@@ -37,12 +42,14 @@
                 },
                 {
                     "criteriumid": 2,
+                    "idnumber": "CRITERE2",
                     "title": "Qualité des cas",
                     "sortorder": 2,
                     "hasoptions": true,
                     "options": [
                         {
                             "optionid": 4,
+                            "idnumber": "CR2OPT1",
                             "title": "La qualité des cas saisis par l'étudiant est insuffisante",
                             "sortorder": 1,
                             "hasgrade": true,
@@ -50,6 +57,7 @@
                         },
                         {
                             "optionid": 5,
+                            "idnumber": "CR2OPT2",
                             "title": "La qualité des cas saisis par l'étudiant est suffisante",
                             "sortorder": 2,
                             "hasgrade": true,
@@ -57,6 +65,7 @@
                         },
                         {
                             "optionid": 6,
+                            "idnumber": "CR2OPT3",
                             "title": "La qualité des cas saisis par l'étudiant est très satisfaisante",
                             "sortorder": 3,
                             "hasgrade": true,

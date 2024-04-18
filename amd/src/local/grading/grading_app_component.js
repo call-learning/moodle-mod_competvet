@@ -111,22 +111,22 @@ class Competvet {
     /**
      * Get the Evaluations.
      */
-    async setEvalObservations() {
-        const args = {
-            userid: this.currentUser.id,
-            cmid: this.cmId
-        };
-        const response = await Repository.getEvaluations(args);
-        if (!response.evaluations) {
-            return;
-        }
-        const context = {
-            'observations': response.evaluations,
-            'comments': response.comments
-        };
-        CompetState.setValue('evaluations-observations', context);
-        CompetState.setValue('evaluations-comments', context);
-    }
+    // async setEvalObservations() {
+    //     const args = {
+    //         userid: this.currentUser.id,
+    //         cmid: this.cmId
+    //     };
+    //     const response = await Repository.getEvaluations(args);
+    //     if (!response.evaluations) {
+    //         return;
+    //     }
+    //     const context = {
+    //         'observations': response.evaluations,
+    //         'comments': response.comments
+    //     };
+    //     CompetState.setValue('evaluations-observations', context);
+    //     CompetState.setValue('evaluations-comments', context);
+    // }
 
     /**
      * Set the Evaluation grading.
@@ -172,6 +172,7 @@ class Competvet {
         const response = await Repository.getEvaluationCriteria(args);
         CompetState.setValue('evaluation-results', response);
     }
+
     /**
      * Set the Certification grading.
      */

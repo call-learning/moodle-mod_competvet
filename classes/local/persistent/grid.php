@@ -19,17 +19,37 @@ use core\persistent;
 use lang_string;
 
 /**
- * Criterion template entity
+ * Evaluation grid entity
  *
  * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class criterion extends persistent {
+class grid extends persistent {
+
     /**
-     * Current table
+     * TABLE
      */
-    const TABLE = 'competvet_criterion';
+    const TABLE = 'competvet_grid';
+
+    /**
+     * DEFAULT GRID SHORTNAME
+     */
+    const DEFAULT_GRID_SHORTNAME = 'DEFAULTGRID';
+
+    const COMPETVET_CRITERIA_EVALUATION = 1;
+    const COMPETVET_CRITERIA_CERTIFICATION = 2;
+    const COMPETVET_CRITERIA_LIST = 3;
+
+    /**
+     * Get default grid and create it if it does not exist.
+     *
+     * @return evaluation_grid
+     */
+    public static function get_default_grid(): ?evaluation_grid {
+        $evalgrid = self::get_record(['idnumber' => self::DEFAULT_GRID_SHORTNAME]);
+        return $evalgrid ?: null;
+    }
 
     /**
      * Return the custom definition of the properties of this model.
@@ -40,35 +60,26 @@ class criterion extends persistent {
      */
     protected static function define_properties() {
         return [
-            'label' => [
+            'name' => [
                 'null' => NULL_NOT_ALLOWED,
                 'type' => PARAM_TEXT,
-                'message' => new lang_string('invaliddata', 'competvet', 'label'),
+                'message' => new lang_string('invaliddata', 'competvet', 'name'),
             ],
-            'idnumber' => [
-                'null' => NULL_NOT_ALLOWED,
-                'type' => PARAM_ALPHANUMEXT,
-                'message' => new lang_string('invaliddata', 'competvet', 'idnumber'),
-            ],
-            'parentid' => [
-                'null' => NULL_NOT_ALLOWED,
-                'type' => PARAM_INT,
-                'message' => new lang_string('invaliddata', 'competvet', 'label'),
-            ],
-            'sort' => [
+            'sortorder' => [
                 'null' => NULL_ALLOWED,
                 'type' => PARAM_INT,
             ],
-            'evalgridid' => [
-                'null' => NULL_NOT_ALLOWED,
+            'type' => [
                 'type' => PARAM_INT,
-                'message' => new lang_string('invaliddata', 'competvet', 'evalgridid'),
-            ],
-            'grade' => [
-                'null' => NULL_NOT_ALLOWED,
-                'type' => PARAM_FLOAT,
-                'message' => new lang_string('invaliddata', 'competvet', 'grade'),
+                'default' => 0,
+                'message' => new lang_string('invaliddata', 'competvet', 'type'),
+                'choices' => [
+                    self::COMPETVET_CRITERIA_EVALUATION,
+                    self::COMPETVET_CRITERIA_CERTIFICATION,
+                    self::COMPETVET_CRITERIA_LIST,
+                ]
             ],
         ];
     }
 }
+

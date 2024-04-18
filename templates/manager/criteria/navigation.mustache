@@ -25,15 +25,15 @@
 }}
 {{#navigation}}
 <div class="d-flex align-items-center">
-    <button class="btn {{#eval}}btn-outline-primary{{/eval}}{{^eval}}btn-outline-secondary{{/eval}} jsbutton mr-1" data-action="changedataset" data-dataset="eval">
+    <button class="btn {{#eval}}btn-outline-primary{{/eval}}{{^eval}}btn-outline-secondary{{/eval}} jsbutton mr-1" data-action="changedataset" data-dataset="{{evalconst}}">
         {{> mod_competvet/grading/svg/chat}}
         {{#str}}eval_criteria, mod_competvet{{/str}}
     </button>
-    <button class="btn {{#certif}}btn-outline-primary{{/certif}}{{^certif}}btn-outline-secondary{{/certif}} jsbutton mr-1" data-action="changedataset" data-dataset="certif">
+    <button class="btn {{#certif}}btn-outline-primary{{/certif}}{{^certif}}btn-outline-secondary{{/certif}} jsbutton mr-1" data-action="changedataset" data-dataset="{{certifconst}}">
         {{> mod_competvet/grading/svg/certif}}
         {{#str}}certif_criteria, mod_competvet{{/str}}
     </button>
-    <button class="btn {{#list}}btn-outline-primary{{/list}}{{^list}}btn-outline-secondary{{/list}} jsbutton mr-1" data-action="changedataset" data-dataset="list">
+    <button class="btn {{#list}}btn-outline-primary{{/list}}{{^list}}btn-outline-secondary{{/list}} jsbutton mr-1" data-action="changedataset" data-dataset="{{listconst}}">
         {{> mod_competvet/grading/svg/list}}
         {{#str}}list_criteria, mod_competvet{{/str}}
     </button>

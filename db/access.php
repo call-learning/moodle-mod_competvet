@@ -101,4 +101,13 @@ $capabilities = [
             'teacher' => CAP_ALLOW,
         ],
     ],
+    'mod/competvet:editcriteria' => [
+        'riskbitmask' => RISK_XSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => [
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ],
+    ],
 ];

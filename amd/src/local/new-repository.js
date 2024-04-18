@@ -16,7 +16,7 @@
 /**
  * competvet repository.
  *
- * @module     mod_competvet/local/grading/repository
+ * @module     mod_competvet/local/new-repository
  * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -25,7 +25,7 @@ import Ajax from 'core/ajax';
 import Notification from 'core/notification';
 
 /**
- * competvet repository class.
+ * Competvet repository class.
  */
 class Repository {
 
@@ -37,21 +37,6 @@ class Repository {
     getUserList(args) {
         const request = {
             methodname: 'mod_competvet_get_user_list',
-            args: args
-        };
-        const promise = Ajax.call([request])[0];
-        promise.fail(Notification.exception);
-        return promise;
-    }
-
-    /**
-     * Get the Evaluations for a user.
-     * @param {Object} args The arguments.
-     * @return {Promise} The promise.
-     */
-    getEvaluations(args) {
-        const request = {
-            methodname: 'mod_competvet_get_evaluations',
             args: args
         };
         const promise = Ajax.call([request])[0];
@@ -77,41 +62,12 @@ class Repository {
     }
 
     /**
-     * Get the List Criteria
+     * Get the Competvet Criteria
      * @param {Object} args The criteria to get.
      * @return {Promise} The promise.
      */
-    async getListCriteria(args) {
-        const file = await this.getJsonData({filename: 'list-criteria'});
-        const storage = localStorage.getItem('list-criteria');
-        const data = JSON.parse(storage) || JSON.parse(file.data);
-        if (args.userid) {
-
-            // Now get the user's grades.
-            const userGrades = await this.getListGrades(args);
-            if (userGrades) {
-                userGrades.criteria.forEach((grade) => {
-                    const criterion = data.grids[0].criteria.find((c) => c.criteriumid === grade.criteriumid);
-                    if (criterion) {
-                        criterion.grade = grade.grade;
-                        criterion.comment = grade.comment;
-                        criterion.options.forEach((option) => {
-                            option.selected = option.grade == grade.grade;
-                        });
-                    }
-                });
-            } else {
-                // Tag each criteria with the user's grade.
-                data.grids[0].criteria.forEach((criterion) => {
-                    criterion.userid = args.userid;
-                    criterion.grade = 0;
-                    criterion.options[0].selected = true;
-                    criterion.comment = '';
-                });
-            }
-            return data.grids[0];
-        }
-        return data;
+    async getCriteria(args) {
+        return Ajax.call([{methodname: 'mod_competvet_get_criteria', args: args}])[0];
     }
 
     /**
@@ -247,54 +203,11 @@ class Repository {
     }
 
     /**
-     * Save the bare list criteria, not the user's grades.
-     *
+     * Save the criteria.
      * @param {Object} data The data to save.
-     * @return {Promise}
      */
-    async saveListCriteria(data) {
-        // Temporary, remove all elements with a deleted flag.
-        data.grids[0].criteria = data.grids[0].criteria.filter((criterion) => !criterion.deleted);
-        // Also remove all options with a deleted flag.
-        data.grids[0].criteria.forEach((criterion) => {
-            criterion.options = criterion.options.filter((option) => !option.deleted);
-        });
-        localStorage.setItem('list-criteria', JSON.stringify(data));
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve();
-            }, 500);
-        });
-    }
-
-    /**
-     * Save the evaluation criteria.
-     *
-     * @param {Object} data The data to save.
-     * @return {Promise}
-     */
-    async saveEvaluationCriteria(data) {
-        localStorage.setItem('evaluation-criteria', JSON.stringify(data));
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve();
-            }, 500);
-        });
-    }
-
-    /**
-     * Save the certification criteria.
-     *
-     * @param {Object} data The data to save.
-     * @return {Promise}
-     */
-    async saveCertificationCriteria(data) {
-        localStorage.setItem('certification-criteria', JSON.stringify(data));
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve();
-            }, 500);
-        });
+    async saveCriteria(data) {
+        return Ajax.call([{methodname: 'mod_competvet_manage_criteria', args: data}])[0];
     }
 
     /**

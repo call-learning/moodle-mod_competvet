@@ -42,6 +42,7 @@
     }
 }}
 {{#grids}}
+{{^deleted}}
 <div class="p-2 border mb-3" data-region="grid" data-id="{{gridid}}" data-sortorder="{{sortorder}}">
     <div class="position-relative d-flex ftoggler align-items-center position-relative mr-2 pb-2" data-region="scripts-item" data-script-id="{{gridid}}">
         <a data-toggle="collapse"
@@ -98,4 +99,5 @@
         </div>
     </div>
 </div>
+{{/deleted}}
 {{/grids}}

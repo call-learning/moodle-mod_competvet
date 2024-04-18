@@ -46,6 +46,7 @@ $string['competvet:viewother'] = 'Can view other\'s situations and planning';
 $string['competvet:managecompetencies'] = 'Manage CompetVet competencies';
 $string['competvet:managecompetencyframeworks'] = 'Manage CompetVet competency frameworks';
 $string['competvet:managesituationtemplates'] = 'Manage CompetVet situation templates';
+$string['competvet:editcriteria'] = 'Edit CompetVet criteria';
 $string['criterion:label'] = 'Criterion label';
 $string['criterion:sort'] = 'Criterion sort';
 $string['criterion:evalgrid'] = 'Criterion evaluation grid';
@@ -285,3 +286,6 @@ $string['animalsex'] = 'Sex';
 $string['animalsexunknown'] = 'Unknown Sex';
 $string['animalage'] = 'Age';
 $string['animalageunknown'] = 'Unknown Age';
+
+// Webservice warnings
+$string['gridnotfound'] = 'The grid with id {$a} was not found';

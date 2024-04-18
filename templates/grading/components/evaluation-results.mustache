@@ -47,4 +47,16 @@
             {{/observer}}
         </div>
     {{/criteria}}
+    <div class="evalcomments d-flex row">
+        <div class="col-md-6">
+            {{#observercomments}}
+                {{>mod_competvet/comment}}
+            {{/observercomments}}
+        </div>
+        <div class="col-md-6">
+            {{#usercomments}}
+                {{>mod_competvet/comment}}
+            {{/usercomments}}
+        </div>
+    </div>
 {{/evaluation-results}}

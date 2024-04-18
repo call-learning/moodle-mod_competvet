@@ -104,4 +104,20 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/competvet:view',
     ],
+    'mod_competvet_manage_criteria' => [
+        'classname' => \mod_competvet\external\manage_criteria::class,
+        'methodname' => 'update',
+        'description' => 'Update the criteria',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:editcriteria',
+    ],
+    'mod_competvet_get_criteria' => [
+        'classname' => \mod_competvet\external\manage_criteria::class,
+        'methodname' => 'get',
+        'description' => 'get the criteria',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:view',
+    ],
 ];

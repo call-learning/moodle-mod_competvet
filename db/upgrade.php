@@ -340,5 +340,81 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2024022000, 'competvet');
     }
 
+    if ($oldversion < 2024041700) {
+
+        // Define field type to be added to competvet_evalgrid.
+        $table = new xmldb_table('competvet_evalgrid');
+        $field = new xmldb_field('type', XMLDB_TYPE_CHAR, '10', null, null, null, null, 'idnumber');
+
+        // Conditionally launch add field type.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field grade to be added to competvet_criterion.
+        $table = new xmldb_table('competvet_criterion');
+        $field = new xmldb_field('grade', XMLDB_TYPE_NUMBER, '10, 2', null, null, null, null, 'label');
+
+        // Conditionally launch add field grade.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024041700, 'competvet');
+    }
+
+    if ($oldversion < 2024041701) {
+
+        // Define field name to be dropped from competvet_evalgrid.
+        $table = new xmldb_table('competvet_evalgrid');
+        $field = new xmldb_field('name');
+
+        // Conditionally launch drop field name.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024041701, 'competvet');
+
+        // Define table competvet_grid to be created.
+        $table = new xmldb_table('competvet_grid');
+
+        // Adding fields to table competvet_grid.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '254', null, null, null, null);
+        $table->add_field('idnumber', XMLDB_TYPE_CHAR, '254', null, null, null, null);
+        $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '4', null, null, null, null);
+        $table->add_field('type', XMLDB_TYPE_INTEGER, '4', null, null, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table competvet_grid.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+
+        // Conditionally launch create table for competvet_grid.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        // Competvet savepoint reached.
+    }
+    if ($oldversion < 2024041702) {
+
+        // Define field idnumber to be dropped from competvet_grid.
+        $table = new xmldb_table('competvet_grid');
+        $field = new xmldb_field('idnumber');
+
+        // Conditionally launch drop field idnumber.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024041702, 'competvet');
+    }
+
     return true;
 }
