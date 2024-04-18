@@ -207,7 +207,7 @@ class mod_competvet_mod_form extends moodleform_mod {
             $mform->setDefaults($situationrecord);
         }
         // Populate tags for situation.
-        if (core_tag_tag::is_enabled('mod_competvet', 'competvet_situation')) {
+        if (core_tag_tag::is_enabled('mod_competvet', 'competvet_situation') && !empty($this->get_current()->id)) {
             $tags = core_tag_tag::get_item_tags_array('mod_competvet', 'competvet_situation', $this->get_current()->id);
             $mform->setDefault('situationtags', $tags);
         }
