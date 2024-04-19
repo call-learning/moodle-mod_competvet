@@ -123,4 +123,18 @@ class criteria {
             $option->delete();
         }
     }
+
+    /**
+     * Update the criteria sort order
+     * @param array $criteria - The criterias
+     */
+    public static function update_criteria_sortorder(array $criteria): void {
+        $sortorder = 1;
+        foreach ($criteria as $criteriumid) {
+            $criterion = criterion::get_record(['id' => $criteriumid]);
+            $criterion->set('sort', $sortorder);
+            $criterion->update();
+            $sortorder++;
+        }
+    }
 }

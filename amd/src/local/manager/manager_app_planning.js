@@ -26,6 +26,7 @@
 import CompetState from 'mod_competvet/local/competstate';
 import Repository from 'mod_competvet/local/new-repository';
 import './plannings';
+
 /*
 * A CRUD manager for data.
 */

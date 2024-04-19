@@ -27,26 +27,20 @@ import Sort from './sortable';
 
 const App = document.querySelector('[data-region="criteria"]');
 
-const regions = [
-    'grids',
-];
 /**
  * Define the situation renderer and subscribe to the state.
  */
-const situations = () => {
-    const regionName = 'grids';
-    const region = App.querySelector(`[data-region="${regionName}"]`);
-    const template = `mod_competvet/manager/criteria/${regionName}`;
+const stateTemplate = () => {
+    const region = App.querySelector(`[data-region="grids"]`);
+    const template = `mod_competvet/manager/criteria/grids`;
     const regionRenderer = (context) => {
-        Templates.render(template, context).then((html) => {
+        Templates.render(template, context.datatree).then((html) => {
             region.innerHTML = html;
             Sort.sortable('.sortable');
             return;
         }).catch(Notification.exception);
     };
-    CompetState.subscribe(regionName, regionRenderer);
+    CompetState.subscribe('datatree', regionRenderer);
 };
 
-situations();
-
-export default regions;
+stateTemplate();

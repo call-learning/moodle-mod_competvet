@@ -63,7 +63,7 @@ class Manager {
             type: this.dataset,
         };
         const response = await Repository.getCriteria(args);
-        CompetState.setData(response);
+        CompetState.setValue('datatree', response);
     }
 
     /**
@@ -79,6 +79,7 @@ class Manager {
             "certifconst": COMPETVET_CRITERIA_CERTIFICATION,
         };
         CompetState.setValue('navigation', context);
+        CompetState.setValue('type', this.dataset);
     }
 
     /**
@@ -122,7 +123,7 @@ class Manager {
     }
 
     removeEdit() {
-        let state = CompetState.getData();
+        let state = CompetState.getValue('datatree');
         state.grids.forEach((element) => {
             element.criteria.forEach((element) => {
                 element.edit = false;
@@ -136,7 +137,7 @@ class Manager {
      */
     async add(btn) {
         this.update();
-        let state = CompetState.getData();
+        let state = CompetState.getValue('datatree');
 
         if (btn.dataset.type === 'grid') {
             let newGridId = 1;
@@ -172,7 +173,7 @@ class Manager {
                 options: [],
                 edit: true,
             };
-            // Add an empty options array if the dataset is list.
+
             if (this.dataset == COMPETVET_CRITERIA_LIST || this.dataset == COMPETVET_CRITERIA_EVALUATION) {
                 newCriterium.hasoptions = true;
             }
@@ -201,7 +202,7 @@ class Manager {
             }
             criterium.options.push(newOption);
         }
-        CompetState.setData(state);
+        CompetState.setValue('datatree', state);
     }
 
     /**
@@ -209,7 +210,7 @@ class Manager {
      * @param {object} btn The button that was clicked.
      */
     delete(btn) {
-        let state = CompetState.getData();
+        let state = CompetState.getValue('datatree');
         if (btn.dataset.type === 'grid') {
             state.grids.find((element) => element.gridid === parseInt(btn.dataset.id)).deleted = true;
         }
@@ -222,7 +223,7 @@ class Manager {
             const criterium = index.criteria.find((element) => element.criteriumid === parseInt(btn.dataset.criteriumId));
             criterium.options.find((element) => element.optionid === parseInt(btn.dataset.id)).deleted = true;
         }
-        CompetState.setData(state);
+        CompetState.setValue('datatree', state);
     }
 
     /**
@@ -231,7 +232,7 @@ class Manager {
      * @param {object} btn The button that was clicked.
      */
     edit(btn) {
-        const state = CompetState.getData();
+        const state = CompetState.getValue('datatree');
         // Remove edit from all fields.
         this.stopEdit(state);
         if (btn.dataset.type === 'grid') {
@@ -242,15 +243,18 @@ class Manager {
             const index = state.grids.find((element) => element.gridid === parseInt(btn.dataset.gridId));
             const criterium = index.criteria.find((element) => element.criteriumid === parseInt(btn.dataset.id));
             criterium.edit = true;
+            if (this.dataset == COMPETVET_CRITERIA_LIST || this.dataset == COMPETVET_CRITERIA_EVALUATION) {
+                criterium.hasoptions = true;
+            }
         }
-        CompetState.setData(state);
+        CompetState.setValue('datatree', state);
     }
 
     /**
      * Stop editing, remove the edit flag from the state elements.
      */
     stopEdit() {
-        const state = CompetState.getData();
+        const state = CompetState.getValue('datatree');
         // Remove edit from all fields.
         state.grids.forEach((element) => {
             element.edit = false;
@@ -258,11 +262,11 @@ class Manager {
                 element.edit = false;
             });
         });
-        CompetState.setData(state);
+        CompetState.setValue('datatree', state);
     }
 
     update() {
-        const state = CompetState.getData();
+        const state = CompetState.getValue('datatree');
         state.grids.forEach((element) => {
             if (element.edit) {
                 // Update the grid with the new values from the UI.
@@ -290,7 +294,7 @@ class Manager {
                 }
             });
         });
-        CompetState.setData(state);
+        CompetState.setValue('datatree', state);
     }
 
     /**
@@ -298,7 +302,7 @@ class Manager {
      */
     async save() {
         this.update();
-        const state = CompetState.getData();
+        const state = CompetState.getValue('datatree');
         // Clone the state, remove the edit flags.
         const saveState = {
             grids: [],

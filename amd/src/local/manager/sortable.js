@@ -24,12 +24,14 @@
 import $ from 'jquery';
 import "jqueryui";
 import CompetState from 'mod_competvet/local/competstate';
+import Repository from 'mod_competvet/local/new-repository';
 
-const reOrderState = (type, gridId, criteriumId, order) => {
-    let state = CompetState.getData();
+const reOrderState = async(type, gridId, criteriumId, order) => {
+    let state = CompetState.getValue('datatree');
     if (type === 'criterium') {
         state.grids.forEach((grid) => {
             if (grid.gridid == gridId) {
+                grid.updatesortorder = true;
                 order.forEach((criteriumId, index) => {
                     grid.criteria.forEach((criterium) => {
                         if (criterium.criteriumid == criteriumId) {
@@ -47,6 +49,7 @@ const reOrderState = (type, gridId, criteriumId, order) => {
         state.grids.forEach((grid) => {
             grid.criteria.forEach((criterium) => {
                 if (criterium.criteriumid == criteriumId) {
+                    criterium.updatesortorder = true;
                     order.forEach((optionId, index) => {
                         criterium.options.forEach((option) => {
                             if (option.optionid == optionId) {
@@ -62,7 +65,12 @@ const reOrderState = (type, gridId, criteriumId, order) => {
             });
         });
     }
-    CompetState.setData(state);
+    CompetState.setValue('datatree', state);
+    const saveState = {
+        grids: [...state.grids],
+        type: CompetState.getValue('type'),
+    };
+    await Repository.saveCriteria(saveState);
 };
 
 const sortable = (selector) => {

@@ -56,6 +56,15 @@ class CompetState {
     }
 
     /**
+     * Get a single value.
+     * @param {String} key The key.
+     * @return {String} The value.
+     */
+    getValue(key) {
+        return this.data[key];
+    }
+
+    /**
      * Get the data.
      * @return {Object} The data.
      */

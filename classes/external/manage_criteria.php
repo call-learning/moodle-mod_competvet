@@ -53,6 +53,7 @@ class manage_criteria extends external_api {
                     'gridname' => new external_value(PARAM_TEXT, 'The name of the grid', VALUE_OPTIONAL),
                     'sortorder' => new external_value(PARAM_INT, 'The sort order of the grid', VALUE_OPTIONAL),
                     'haschanged' => new external_value(PARAM_BOOL, 'Has the grid changed', VALUE_OPTIONAL),
+                    'updatesortorder' => new external_value(PARAM_BOOL, 'Update the sort order of the criteria', VALUE_OPTIONAL),
                     'deleted' => new external_value(PARAM_BOOL, 'Is the grid deleted', VALUE_OPTIONAL),
                     'criteria' => new external_multiple_structure(
                         new external_single_structure([
@@ -60,7 +61,8 @@ class manage_criteria extends external_api {
                             'title' => new external_value(PARAM_TEXT, 'The title of the criterium', VALUE_REQUIRED),
                             'idnumber' => new external_value(PARAM_TEXT, 'The id number of the criterium', VALUE_REQUIRED),
                             'sortorder' => new external_value(PARAM_INT, 'The sort order of the criterium', VALUE_REQUIRED),
-                            'haschanged' => new external_value(PARAM_BOOL, 'Has the criterium changed', VALUE_REQUIRED),
+                            'haschanged' => new external_value(PARAM_BOOL, 'Has the criterium changed', VALUE_OPTIONAL),
+                            'updatesortorder' => new external_value(PARAM_BOOL, 'Update the sort order of the options', VALUE_OPTIONAL),
                             'deleted' => new external_value(PARAM_BOOL, 'Is the criterium deleted', VALUE_OPTIONAL),
                             'hasoptions' => new external_value(PARAM_BOOL, 'Does the criterium have options', VALUE_OPTIONAL),
                             'options' => new external_multiple_structure(
@@ -114,13 +116,22 @@ class manage_criteria extends external_api {
                     $type
                 );
             }
+            if ($grid['updatesortorder']) {
+                $criteriaorder = array_map(function ($criterium) {
+                    return $criterium['criteriumid'];
+                }, $grid['criteria']);
+                criteria::update_criteria_sortorder($criteriaorder);
+            }
             foreach ($grid['criteria'] as $criterium) {
                 if ($criterium['deleted']) {
-                    $result = criteria::delete_criterium($criterium['criteriumid']);
-                    if ($result) {
-                        $results[] = $result;
-                    }
+                    criteria::delete_criterium($criterium['criteriumid']);
                     continue;
+                }
+                if ($criterium['updatesortorder']) {
+                    $citeriaorder = array_map(function ($option) {
+                        return $option['optionid'];
+                    }, $criterium['options']);
+                    criteria::update_criteria_sortorder($criteriaorder);
                 }
                 if ($criterium['haschanged']) {
                     $criteriumid = criteria::update_criterium(
@@ -135,25 +146,18 @@ class manage_criteria extends external_api {
                     if ($criterium['hasoptions']) {
                         foreach ($criterium['options'] as $option) {
                             if ($option['deleted']) {
-                                $result = criteria::delete_criterium($option['optionid']);
-                                if ($result) {
-                                    $results[] = $result;
-                                    $result = false;
-                                }
+                                criteria::delete_criterium($option['optionid']);
                             }
-                            $result = criteria::update_criterium(
+                            $grade = isset($option['grade']) ? $option['grade'] : 0;
+                            criteria::update_criterium(
                                 $option['optionid'],
                                 $option['title'],
                                 $option['idnumber'],
                                 $option['sortorder'],
                                 $gridid,
                                 $criteriumid,
-                                $option['grade'],
+                                $grade,
                             );
-                            if ($result) {
-                                $results[] = $result;
-                                $result = false;
-                            }
                         }
                     }
                 }
@@ -230,7 +234,7 @@ class manage_criteria extends external_api {
                         'title' => $criterium->label,
                         'idnumber' => $criterium->idnumber,
                         'sortorder' => $criterium->sort,
-                        'hasoptions' => $grid->type == COMPETVET_CRITERIA_LIST ? true : false,
+                        'hasoptions' => $grid->type == COMPETVET_CRITERIA_LIST||COMPETVET_CRITERIA_EVALUATION ? true : false,
                         'options' => []
                     ];
                     foreach ($criteria as $option) {
@@ -246,6 +250,10 @@ class manage_criteria extends external_api {
                             $newCriterium->options[] = $newOption;
                         }
                     }
+                    // Sort the options
+                    usort($newCriterium->options, function ($a, $b) {
+                        return $a->sortorder <=> $b->sortorder;
+                    });
                     $gridCriteria[] = $newCriterium;
                 }
             }

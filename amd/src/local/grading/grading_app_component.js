@@ -26,7 +26,6 @@ import '../helpers';
 import './components/auto_regions';
 import './components/user_navigation';
 import './components/evaluations_observations';
-import './components/evaluations_comments';
 import './components/evaluations_grading';
 import './components/list_criteria';
 import './components/globalgrade';
@@ -34,6 +33,13 @@ import './components/certification_grading';
 import './components/certification_results';
 import './components/list_results';
 import './components/evaluation_results';
+
+/**
+ * Constants for eval certif and list.
+ */
+//const COMPETVET_CRITERIA_EVALUATION = 1;
+const COMPETVET_CRITERIA_CERTIFICATION = 2;
+const COMPETVET_CRITERIA_LIST = 3;
 
 class Competvet {
     /*
@@ -83,50 +89,42 @@ class Competvet {
     setCurrentUser(user) {
         CompetState.setValue('user', user);
         this.currentUser = user;
-        //this.setEvalObservations();
-        this.setEvalGrading();
-        this.setListCriteria();
-        this.setGlobalGrade();
-        this.setCertifGrading();
-        this.setCertifResults();
-        this.setListResults();
+
         this.setEvalResults();
+        this.setEvalGrading();
+
+        this.setCertifResults();
+        this.setCertifGrading();
+
+        this.setListResults();
+        this.setListGrading();
+
+        this.setGlobalGrade();
+
     }
 
-    /**
-     * Get the list of users for grading.
-     */
-    async getUsers() {
+    async setEvalResults() {
+        // THIS GETS THE RESULTS FROM THE JSON FILE.
         const args = {
-            cmid: this.cmId,
-            roletype: 'student'
+            userid: this.currentUser.id,
+            cmid: this.cmId
         };
-        const response = await Repository.getUserList(args);
-        if (!response.users) {
-            return;
-        }
-        this.userlist = response.users;
-    }
+        const response = await Repository.getEvaluationCriteria(args);
+        CompetState.setValue('evaluation-results', response);
 
-    /**
-     * Get the Evaluations.
-     */
-    // async setEvalObservations() {
-    //     const args = {
-    //         userid: this.currentUser.id,
-    //         cmid: this.cmId
-    //     };
-    //     const response = await Repository.getEvaluations(args);
-    //     if (!response.evaluations) {
-    //         return;
-    //     }
-    //     const context = {
-    //         'observations': response.evaluations,
-    //         'comments': response.comments
-    //     };
-    //     CompetState.setValue('evaluations-observations', context);
-    //     CompetState.setValue('evaluations-comments', context);
-    // }
+        // The COMMENTED OUT CODE IS FOR FUTURE USE.
+        // const args = {
+        //     type: COMPETVET_CRITERIA_EVALUATION
+        // };
+        // const response = await Repository.getCriteria(args);
+        // if (!response.grids) {
+        //     return;
+        // }
+        // const context = {
+        //     'criteria': response.grids[0].criteria
+        // };
+        // CompetState.setValue('evaluation-results', context);
+    }
 
     /**
      * Set the Evaluation grading.
@@ -148,29 +146,16 @@ class Competvet {
 
     async setCertifResults() {
         const args = {
-            userid: this.currentUser.id,
-            cmid: this.cmId
+            type: COMPETVET_CRITERIA_CERTIFICATION
         };
-        const response = await Repository.getCertificationCriteria(args);
-        CompetState.setValue('certification-results', response);
-    }
-
-    async setListResults() {
-        const args = {
-            userid: this.currentUser.id,
-            cmid: this.cmId
+        const response = await Repository.getCriteria(args);
+        if (!response.grids) {
+            return;
+        }
+        const context = {
+            'criteria': response.grids[0].criteria
         };
-        const response = await Repository.getListResults(args);
-        CompetState.setValue('list-results', response);
-    }
-
-    async setEvalResults() {
-        const args = {
-            userid: this.currentUser.id,
-            cmid: this.cmId
-        };
-        const response = await Repository.getEvaluationCriteria(args);
-        CompetState.setValue('evaluation-results', response);
+        CompetState.setValue('certification-results', context);
     }
 
     /**
@@ -191,22 +176,45 @@ class Competvet {
         CompetState.setValue('certification-grading', context);
     }
 
+    async setListResults() {
+        const args = {
+            userid: this.currentUser.id,
+            cmid: this.cmId
+        };
+        const response = await Repository.getListResults(args);
+        CompetState.setValue('list-results', response);
+    }
+
     /**
      * Get the list criteria.
      */
-    async setListCriteria() {
+    async setListGrading() {
         const args = {
-            cmid: this.cmId,
-            userid: this.currentUser.id
+            type: COMPETVET_CRITERIA_LIST
         };
-        const response = await Repository.getListCriteria(args);
-        if (!response.criteria) {
+        const response = await Repository.getCriteria(args);
+        if (!response.grids) {
             return;
         }
         const context = {
-            'criteria': response.criteria
+            'criteria': response.grids[0].criteria
         };
         CompetState.setValue('list-criteria', context);
+    }
+
+    /**
+     * Get the list of users for grading.
+     */
+    async getUsers() {
+        const args = {
+            cmid: this.cmId,
+            roletype: 'student'
+        };
+        const response = await Repository.getUserList(args);
+        if (!response.users) {
+            return;
+        }
+        this.userlist = response.users;
     }
 
     /**
