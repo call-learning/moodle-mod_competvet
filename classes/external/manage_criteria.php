@@ -124,7 +124,7 @@ class manage_criteria extends external_api {
             }
             foreach ($grid['criteria'] as $criterium) {
                 if ($criterium['deleted']) {
-                    criteria::delete_criterium($criterium['criteriumid']);
+                    criteria::delete_criterion($criterium['criteriumid']);
                     continue;
                 }
                 if ($criterium['updatesortorder']) {
@@ -134,7 +134,7 @@ class manage_criteria extends external_api {
                     criteria::update_criteria_sortorder($criteriaorder);
                 }
                 if ($criterium['haschanged']) {
-                    $criteriumid = criteria::update_criterium(
+                    $criteriumid = criteria::update_criterion(
                         $criterium['criteriumid'],
                         $criterium['title'],
                         $criterium['idnumber'],
@@ -146,10 +146,10 @@ class manage_criteria extends external_api {
                     if ($criterium['hasoptions']) {
                         foreach ($criterium['options'] as $option) {
                             if ($option['deleted']) {
-                                criteria::delete_criterium($option['optionid']);
+                                criteria::delete_criterion($option['optionid']);
                             }
                             $grade = isset($option['grade']) ? $option['grade'] : 0;
-                            criteria::update_criterium(
+                            criteria::update_criterion(
                                 $option['optionid'],
                                 $option['title'],
                                 $option['idnumber'],

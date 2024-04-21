@@ -82,7 +82,7 @@ class criteria {
      * @param int $grade - The grade
      * @return int - The criterion id
      */
-    public static function update_criterium(
+    public static function update_criterion(
         int $criterionid,
         string $criterionname,
         string $idnumber,
@@ -113,7 +113,7 @@ class criteria {
      * Delete the criterion
      * @param int $criterionid - The criterion id
      */
-    public static function delete_criterium(int $criterionid): void {
+    public static function delete_criterion(int $criterionid): void {
         $criterion = criterion::get_record(['id' => $criterionid]);
         if ($criterion) {
             $criterion->delete();
