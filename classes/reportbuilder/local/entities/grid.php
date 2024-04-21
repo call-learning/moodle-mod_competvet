@@ -33,7 +33,7 @@ use lang_string;
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class evaluation_grid extends base {
+class grid extends base {
     /**
      * Database tables that this entity uses and their default aliases
      *
@@ -41,7 +41,7 @@ class evaluation_grid extends base {
      */
     protected function get_default_table_aliases(): array {
         return [
-            'competvet_evalgrid' => 'evalgrid',
+            'competvet_grid' => 'grid',
         ];
     }
 
@@ -51,7 +51,7 @@ class evaluation_grid extends base {
      * @return lang_string
      */
     protected function get_default_entity_title(): lang_string {
-        return new lang_string('entity:evaluation_grid', 'mod_competvet');
+        return new lang_string('entity:grid', 'mod_competvet');
     }
 
     /**
@@ -82,25 +82,25 @@ class evaluation_grid extends base {
      * @return column[]
      */
     protected function get_all_columns(): array {
-        $evalgridalias = $this->get_table_alias('competvet_evalgrid');
+        $gridalias = $this->get_table_alias('competvet_grid');
 
         $columns[] = (new column(
             'name',
-            new lang_string('evaluation_grid:name', 'mod_competvet'),
+            new lang_string('grid:name', 'mod_competvet'),
             $this->get_entity_name()
         ))
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_TEXT)
-            ->add_fields("{$evalgridalias}.name")
+            ->add_fields("{$gridalias}.name")
             ->set_is_sortable(true);
         $columns[] = (new column(
             'idnumber',
-            new lang_string('evaluation_grid:idnumber', 'mod_competvet'),
+            new lang_string('grid:idnumber', 'mod_competvet'),
             $this->get_entity_name()
         ))
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_TEXT)
-            ->add_fields("{$evalgridalias}.idnumber")
+            ->add_fields("{$gridalias}.idnumber")
             ->set_is_sortable(true);
         return $columns;
     }
@@ -111,22 +111,22 @@ class evaluation_grid extends base {
      * @return filter[]
      */
     protected function get_all_filters(): array {
-        $evalgridalias = $this->get_table_alias('competvet_evalgrid');
+        $gridalias = $this->get_table_alias('competvet_grid');
 
         $filters[] = (new filter(
             text::class,
             'name',
-            new lang_string('evaluation_grid:name', 'mod_competvet'),
+            new lang_string('grid:name', 'mod_competvet'),
             $this->get_entity_name(),
-            "{$evalgridalias}.name"
+            "{$gridalias}.name"
         ))->add_joins($this->get_joins());
 
         $filters[] = (new filter(
             text::class,
             'idnumber',
-            new lang_string('evaluation_grid:idnumber', 'mod_competvet'),
+            new lang_string('grid:idnumber', 'mod_competvet'),
             $this->get_entity_name(),
-            "{$evalgridalias}.idnumber"
+            "{$gridalias}.idnumber"
         ))->add_joins($this->get_joins());
 
         return $filters;

@@ -65,7 +65,7 @@ class criteria {
         if ($grid) {
             $grid->delete();
         }
-        $criteria = criterion::get_records(['evalgridid' => $gridid]);
+        $criteria = criterion::get_records(['gridid' => $gridid]);
         foreach ($criteria as $criterion) {
             $criterion->delete();
         }
@@ -98,7 +98,7 @@ class criteria {
         $criterion->set('label' , $criterionname);
         $criterion->set('idnumber', $idnumber);
         $criterion->set('sort', $sortorder);
-        $criterion->set('evalgridid', $gridid);
+        $criterion->set('gridid', $gridid);
         $criterion->set('parentid', $parentid);
         $criterion->set('grade', $grade);
         if ($criterion->get('id')) {

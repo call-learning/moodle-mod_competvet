@@ -1,0 +1,17 @@
+"Evaluation Grid Id";"Criterion Id";"Criterion Parent Id";"Criterion Label";"Grade"
+"DEFAULTLISTGRID";"EL01";;"Nombre et diversité des cas";
+"DEFAULTLISTGRID";"EL02";"EL01";"Le nombre de cas saisis par l’étudiant est insuffisant et/ou les cas saisis sont trop peu diversifiés. (0 point)";"0"
+"DEFAULTLISTGRID";"EL03";"EL01";"Le nombre de cas saisis par l’étudiant correspond à ce qui est attendu. Les cas saisis sont suffisamment variés. (12.5 points)";"12,5"
+"DEFAULTLISTGRID";"EL04";"EL01";"Le nombre de cas saisis par l’étudiant est supérieur a ce qui est habituellement fourni et les cas saisis sont diversifiés. (25 points)";"25"
+"DEFAULTLISTGRID";"EL05";;"Clarté, concision";
+"DEFAULTLISTGRID";"EL07";"EL05";"La rédaction des cas est peu documentée et/ou imprécise. Les cas sont mal décrits. (0 point)";"0"
+"DEFAULTLISTGRID";"EL08";"EL05";"La rédaction des cas est fidèle et claire. Les cas sont correctement décrits. (12.5 points)";"12,5"
+"DEFAULTLISTGRID";"EL09";"EL05";"La rédaction des cas est très précise et nuancée. Les cas sont décrits de façon optimale. (25 points)";"25"
+"DEFAULTLISTGRID";"EL10";;"Compréhension et restitution de la démarche";
+"DEFAULTLISTGRID";"EL11";"EL10";"La rédaction des cas ne permet pas de juger de la bonne compréhension par l’étudiant. (0 point)";"0"
+"DEFAULTLISTGRID";"EL12";"EL10";"La rédaction des cas traduit une compréhension de la démarche clinique. (12.5 points)";"12,5"
+"DEFAULTLISTGRID";"EL13";"EL10";"La rédaction des cas traduit une très bonne compréhension de la démarche clinique. (25 points)";"25"
+"DEFAULTLISTGRID";"EL14";;"Capacité de réflexion sur les cas";
+"DEFAULTLISTGRID";"EL15";"EL14";"L’étudiant n’a pas commenté le cas. Il n’a fait que l’exposer. (0 point)";"0"
+"DEFAULTLISTGRID";"EL16";"EL14";"L’étudiant a commenté le cas et fait preuve d’un regard critique. (12.5 points)";"12,5"
+"DEFAULTLISTGRID";"EL17";"EL14";"L’étudiant a commenté le cas en détail et a fait preuve d’une excellente prise de recul. Il démontre qu’il sait en tirer des leçons pour progresser. (25 points)";"25"

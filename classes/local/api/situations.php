@@ -123,7 +123,7 @@ class situations {
         $criteria = array_map(function ($criterion) {
             $record = $criterion->to_record();
             self::unset_persistent_records($record);
-            unset($record->evalgridid);
+            unset($record->gridid);
             return (array) $record;
         }, $criteria);
         $parentlabels = array_column($criteria, 'label', 'id');

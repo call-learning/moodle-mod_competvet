@@ -1,0 +1,6 @@
+"Evaluation Grid Id";"Criterion Id";"Criterion Parent Id";"Criterion Label";"Grade"
+"DEFAULTCERTIFGRID";"CERT1";;"Réaliser un examen clinique complet (comprenant entre autres une palpation des thyroïdes et un toucher rectal)";
+"DEFAULTCERTIFGRID";"CERT2";;"Formuler un bilan anamnestique et clinique en retenant et en hiérarchisant les signes cliniques pertinents";
+"DEFAULTCERTIFGRID";"CERT3";;"Formuler des hypothèses diagnostiques hiérarchisées à la lumière du contexte anamnestique et clinique";
+"DEFAULTCERTIFGRID";"CERT4";;"Décider de la nécessité d'une hospitalisation sur la base d'anomalies cliniques ou biologiques";
+"DEFAULTCERTIFGRID";"CERT5";;"Prescrire et administrer un protocole de fluidothérapie adapté pour un animal hospitalisé";

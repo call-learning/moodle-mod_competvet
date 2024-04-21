@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 namespace mod_competvet\reportbuilder\local\filters;
 
-use mod_competvet\local\persistent\evaluation_grid;
+use mod_competvet\local\persistent\grid;
 
 /**
  * Evaluation Grid selector
@@ -27,19 +27,19 @@ use mod_competvet\local\persistent\evaluation_grid;
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class evaluation_grid_selector extends base_entity_selector {
+class grid_selector extends base_entity_selector {
     /**
      * Get all evaluation grids
      * @return array[]
      */
     protected function get_values(): array {
-        $evaluationgrids = evaluation_grid::get_records();
-        $evaluationgridsid = array_map(function ($evaluationgrid) {
-            return $evaluationgrid->get('id');
-        }, $evaluationgrids);
-        $evaluationgridsnames = array_map(function ($evaluationgrid) {
-            return $evaluationgrid->get('name') . ' - ' . $evaluationgrid->get('idnumber');
-        }, $evaluationgrids);
-        return [$evaluationgridsid, $evaluationgridsnames];
+        $grids = grid::get_records();
+        $gridsid = array_map(function ($grid) {
+            return $grid->get('id');
+        }, $grids);
+        $gridsnames = array_map(function ($grid) {
+            return $grid->get('name') . ' - ' . $grid->get('idnumber');
+        }, $grids);
+        return [$gridsid, $gridsnames];
     }
 }

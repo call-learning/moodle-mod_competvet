@@ -59,13 +59,14 @@ class criterion extends persistent {
                 'null' => NULL_ALLOWED,
                 'type' => PARAM_INT,
             ],
-            'evalgridid' => [
+            'gridid' => [
                 'null' => NULL_NOT_ALLOWED,
                 'type' => PARAM_INT,
-                'message' => new lang_string('invaliddata', 'competvet', 'evalgridid'),
+                'message' => new lang_string('invaliddata', 'competvet', 'gridid'),
             ],
             'grade' => [
-                'null' => NULL_NOT_ALLOWED,
+                'null' => NULL_ALLOWED,
+                'default' => null,
                 'type' => PARAM_FLOAT,
                 'message' => new lang_string('invaliddata', 'competvet', 'grade'),
             ],

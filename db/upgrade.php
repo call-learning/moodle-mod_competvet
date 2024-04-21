@@ -13,6 +13,9 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+use mod_competvet\local\persistent\criterion;
+use mod_competvet\local\persistent\grid;
+
 /**
  * Execute local_cveteval upgrade from the given old version.
  *
@@ -449,6 +452,155 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2024032904, 'competvet');
     }
 
+    if ($oldversion < 2024042100) {
+        global $DB;
 
+        // Situation TABLE.
+        // ########################################################
+        // Define field listgrid to be added to competvet_situation.
+
+        $table = new xmldb_table('competvet_situation');
+        $field = new xmldb_field('listgrid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'certifgrid');
+
+        // Conditionally launch add field listgrid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Now drop old keys.
+        $key = new xmldb_key('evalgrid_fk', XMLDB_KEY_FOREIGN, ['evalgrid'], 'competvet_eval_grid', ['id']);
+        // Launch drop key evalgrid_fk.
+        $dbman->drop_key($table, $key);
+        $key = new xmldb_key('certifgrid_fk', XMLDB_KEY_FOREIGN, ['certifgrid'], 'competvet_eval_grid', ['id']);
+        // Launch drop key evalgrid_fk.
+        $dbman->drop_key($table, $key);
+
+        // Define key listgrid_fk (foreign) to be added to competvet_situation.
+        $key = new xmldb_key('listgrid_fk', XMLDB_KEY_FOREIGN, ['listgrid'], 'competvet_grid', ['id']);
+        // Launch add key listgrid_fk.
+        $dbman->add_key($table, $key);
+        // Define key listgrid_fk (foreign) to be added to competvet_situation.
+        $key = new xmldb_key('evalgrid_fk', XMLDB_KEY_FOREIGN, ['evalgrid'], 'competvet_grid', ['id']);
+        // Launch add key listgrid_fk.
+        $dbman->add_key($table, $key);
+        // Define key listgrid_fk (foreign) to be added to competvet_situation.
+        $key = new xmldb_key('certifgrid_fk', XMLDB_KEY_FOREIGN, ['certifgrid'], 'competvet_grid', ['id']);
+        // Launch add key listgrid_fk.
+        $dbman->add_key($table, $key);
+
+
+        // Criterion TABLE.
+        // ########################################################
+        // First drop the constraints to be readded later.
+        $table = new xmldb_table('competvet_criterion');
+        $key = new xmldb_key('evalgridid_fk', XMLDB_KEY_FOREIGN, ['evalgridid'], 'competvet_evalgrid', ['id']);
+        // Launch drop key evalgridid_fk.
+        $dbman->drop_key($table, $key);
+
+
+        // Define index idnumber_ix (unique) to be dropped form competvet_criterion.
+        $index = new xmldb_index('idnumber_ix', XMLDB_INDEX_UNIQUE, ['idnumber', 'evalgridid']);
+        // Conditionally launch drop index idnumber_ix.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+        $index = new xmldb_index('idnumber-parentid-grid_ix', XMLDB_INDEX_UNIQUE, ['idnumber', 'parentid', 'evalgridid']);
+        // Conditionally launch drop index idnumber-parentid-grid_ix.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Change the name of the field.
+        $field = new xmldb_field('evalgridid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'sort');
+        // Launch rename field gridid.
+        if ($dbman->field_exists('competvet_criterion', $field)) {
+            $dbman->rename_field($table, $field, 'gridid');
+        }
+        // Re-add everything on the grid table.
+        $key = new xmldb_key('gridid_fk', XMLDB_KEY_FOREIGN, ['gridid'], 'competvet_grid', ['id']);
+        // Launch add key gridid_fk.
+        $dbman->add_key($table, $key);
+        $index = new xmldb_index('idnumber_ix', XMLDB_INDEX_UNIQUE, ['idnumber', 'gridid']);
+
+        // Conditionally launch add index idnumber_ix.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        $index = new xmldb_index('idnumber-parentid-grid_ix', XMLDB_INDEX_UNIQUE, ['idnumber', 'parentid', 'gridid']);
+
+        // Conditionally launch add index idnumber-parentid-grid_ix.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Re-add the idnumber field.
+        $table = new xmldb_table('competvet_grid');
+        $field = new xmldb_field('idnumber', XMLDB_TYPE_CHAR, '254', null, null, null, null, 'name');
+
+        // Conditionally launch add field idnumber.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Now make sure to transfer existing grids to the new table.
+        // We store a list of transferred grids to avoid duplicates.
+        $transferredgrids = [];
+        foreach (criterion::get_records() as $criterion) {
+            if (isset($transferredgrids[$criterion->get('gridid')])) {
+                $criterion->set('evalgridid', $transferredgrids[$criterion->get('gridid')]);
+                $criterion->update();
+                continue;
+            }
+            $existinggrid = $DB->get_record('competvet_evalgrid', ['id' => $criterion->get('gridid')],
+                '*', MUST_EXIST);
+
+            $grid = new \stdClass();
+            $grid->name = $existinggrid->idnumber;
+            $grid->idnumber = $existinggrid->idnumber;
+            $grid->sortorder = $existinggrid->sortorder ?? grid::count_records() + 1;
+            $grid->type = grid::COMPETVET_CRITERIA_EVALUATION;
+            if (grid::record_exists_select('idnumber = :idnumber', ['idnumber' => $grid->idnumber])) {
+                $newgrid = grid::get_record(['idnumber' => $grid->idnumber]);
+            } else {
+                $newgrid = new grid(0, $grid);
+                $newgrid->create();
+            }
+            $criterion->set('gridid', $newgrid->get('id'));
+            $criterion->save();
+            $transferredgrids[$criterion->get('gridid')] = $newgrid->get('id');
+        }
+        // Now do the same for situations.
+        foreach (\mod_competvet\local\persistent\situation::get_records() as $situation) {
+            if (empty($situation->get('evalgrid'))) {
+                continue;
+            }
+            $situation->set('evalgrid', $transferredgrids[$situation->get('evalgrid')]);
+            $situation->update();
+        }
+        // Finally remove the old table.
+        // Define table competvet_evalgrid to be dropped.
+        $table = new xmldb_table('competvet_evalgrid');
+
+        // Conditionally launch drop table for competvet_evalgrid.
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024042101, 'competvet');
+    }
+    if ($oldversion < 2024042102) {
+        // Fix grid default name.
+        $grid = grid::get_record(['idnumber' => 'DEFAULTGRID']);
+        $grid->set('idnumber', grid::DEFAULT_GRID_SHORTNAME[$grid->get('type')]);
+        $grid->update();
+        upgrade_mod_savepoint(true, 2024042102, 'competvet');
+    }
+    if ($oldversion < 2024042103) {
+        // Fix grid default name.
+        $postinstall = new mod_competvet\task\post_install();
+        $postinstall->set_custom_data(['create_default_grids']);
+        core\task\manager::queue_adhoc_task($postinstall);
+        upgrade_mod_savepoint(true, 2024042103, 'competvet');
+    }
     return true;
 }

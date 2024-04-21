@@ -20,8 +20,7 @@ use context_course;
 use context_module;
 use context_system;
 use mod_competvet\local\persistent\criterion;
-use mod_competvet\local\persistent\evaluation_grid;
-use mod_competvet\task\post_install;
+use mod_competvet\local\persistent\grid;
 
 /**
  * Setup Tests
@@ -76,17 +75,17 @@ class setup_test extends advanced_testcase {
      * @covers \mod_competvet\setup::crerate_default_grid
      */
     public function test_default_grid_setup() {
-        $evalgrid = evaluation_grid::get_default_grid();
-        $this->assertEquals(40, criterion::count_records(['evalgridid' => $evalgrid->get('id')]));
+        $evalgrid = grid::get_default_grid(grid::COMPETVET_CRITERIA_EVALUATION);
+        $this->assertEquals(40, criterion::count_records(['gridid' => $evalgrid->get('id')]));
         foreach (['Q001', 'Q035'] as $critname) {
-            $crit = criterion::get_record(['evalgridid' => $evalgrid->get('id'), 'idnumber' => $critname]);
+            $crit = criterion::get_record(['gridid' => $evalgrid->get('id'), 'idnumber' => $critname]);
             $this->assertEquals(
                 5,
-                criterion::count_records(['evalgridid' => $evalgrid->get('id'), 'parentid' => $crit->get('id')])
+                criterion::count_records(['gridid' => $evalgrid->get('id'), 'parentid' => $crit->get('id')])
             );
             $this->assertSame([1, 2, 3, 4, 5], array_map(
                 fn($c) => $c->get('sort'),
-                criterion::get_records(['evalgridid' => $evalgrid->get('id'), 'parentid' => $crit->get('id')])
+                criterion::get_records(['gridid' => $evalgrid->get('id'), 'parentid' => $crit->get('id')])
             ));
         }
     }

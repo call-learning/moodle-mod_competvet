@@ -122,8 +122,20 @@ class situation extends persistent {
             'evalgrid' => [
                 'type' => PARAM_INT,
                 'default' => 0,
-                'message' => new lang_string('invaliddatafor', 'competvet', 'evalgridid'),
-                'formtype' => 'hidden',
+                'message' => new lang_string('invaliddatafor', 'competvet', 'evalgrid'),
+                'formtype' => 'skipped',
+            ],
+            'listgrid' => [
+                'type' => PARAM_INT,
+                'default' => 0,
+                'message' => new lang_string('invaliddatafor', 'competvet', 'listgrid'),
+                'formtype' => 'skipped',
+            ],
+            'certifgrid' => [
+                'type' => PARAM_INT,
+                'default' => 0,
+                'message' => new lang_string('invaliddatafor', 'competvet', 'certifgrid'),
+                'formtype' => 'skipped',
             ],
         ];
     }
@@ -138,11 +150,11 @@ class situation extends persistent {
     public function get_eval_criteria(): array {
         $evalgridid = $this->raw_get('evalgrid');
         if (empty($evalgridid)) {
-            $evalgridid = evaluation_grid::get_default_grid()->get('id');
+            $evalgridid = grid::get_default_grid(grid::COMPETVET_CRITERIA_EVALUATION)->get('id');
         }
         // Here we tweak slightly the get_recording sorted by parent id then by sort order.  This might change
         // if the API change as it is not an "official" use.
-        return criterion::get_records(['evalgridid' => $evalgridid], 'parentid ASC, sort ASC', '') ?: [];
+        return criterion::get_records(['gridid' => $evalgridid], 'parentid ASC, sort ASC', '') ?: [];
     }
 
     /**
@@ -155,9 +167,9 @@ class situation extends persistent {
     public function get_eval_criteria_tree(): array {
         $evalgridid = $this->raw_get('evalgrid');
         if (empty($evalgridid)) {
-            $evalgridid = evaluation_grid::get_default_grid()->get('id');
+            $evalgridid = grid::get_default_grid(grid::COMPETVET_CRITERIA_EVALUATION)->get('id');
         }
-        $allcriteria = criterion::get_records(['evalgridid' => $evalgridid], 'parentid');
+        $allcriteria = criterion::get_records(['gridid' => $evalgridid], 'parentid');
         $criteriatree = [];
         foreach ($allcriteria as $criterion) {
             if (empty($criterion->get('parentid'))) {
@@ -179,12 +191,11 @@ class situation extends persistent {
      * @return void
      */
     protected function before_create() {
-        static $defaultgrid = null;
-        if (empty($defaultgrid)) {
-            $defaultgrid = evaluation_grid::get_default_grid();
-        }
-        if ($this->raw_get('evalgrid') === null) {
-            $this->raw_set('evalgrid', $defaultgrid->get('id'));
+        foreach (grid::COMPETVET_GRID_TYPES as $gridtype => $gridtypename) {
+            $defaultgrid = grid::get_default_grid($gridtype);
+            if ($this->raw_get($gridtypename . 'grid') === null) {
+                $this->raw_set($gridtypename . 'grid', $defaultgrid->get('id'));
+            }
         }
     }
 }

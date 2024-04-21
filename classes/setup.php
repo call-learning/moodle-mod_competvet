@@ -15,9 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet;
 
-use cache;
 use context_system;
-use core\check\performance\debugging;
 use core_reportbuilder\datasource;
 use core_reportbuilder\local\helpers\report as helper;
 use core_reportbuilder\local\models\report as report_model;
@@ -26,9 +24,8 @@ use core_tag_area;
 use core_tag_tag;
 use mod_competvet\local\importer\criterion_importer;
 use mod_competvet\local\persistent\criterion;
-use mod_competvet\local\persistent\evaluation_grid;
+use mod_competvet\local\persistent\grid;
 use mod_competvet\reportbuilder\datasource\plannings;
-use mod_competvet\task\create_update_default_grid;
 
 /**
  * Setup routines
@@ -69,7 +66,7 @@ class setup {
             $roledefinitions = \mod_competvet\competvet::COMPETVET_ROLES;
         }
         $existingroles = get_all_roles();
-        $existingrolesshortnames = array_flip(array_map(function ($role) {
+        $existingrolesshortnames = array_flip(array_map(function($role) {
             return $role->shortname;
         }, $existingroles)); // Shortname to ID.
         $roles = [];
@@ -105,6 +102,17 @@ class setup {
             }
         }
         accesslib_clear_all_caches(true);
+    }
+
+    /**
+     * Update all capabilities.
+     *
+     * @return void
+     */
+    public static function update_all_capabilities() {
+        purge_all_caches();
+        capabilities_cleanup(competvet::COMPONENT_NAME);
+        update_capabilities(competvet::COMPONENT_NAME);
     }
 
     /**
@@ -177,32 +185,30 @@ class setup {
     }
 
     /**
-     * Create the default grid.
-     * @return void
-     */
-    public static function create_default_grid() {
-        global $CFG;
-        $evalgrid = evaluation_grid::get_default_grid();
-        if (empty($evalgrid)) {
-            $evalgrid = new evaluation_grid(0, (object) [
-                'name' => get_string('evaluationgrid:default', 'mod_competvet'),
-                'idnumber' => evaluation_grid::DEFAULT_GRID_SHORTNAME,
-            ]);
-            // Create it and upload the criteria.
-            $evalgrid->create();
-        }
-        $criterionimporter = new criterion_importer(criterion::class);
-        $criterionimporter->import($CFG->dirroot . '/mod/competvet/data/default_evaluation_grid.csv');
-    }
-
-    /**
-     * Update all capabilities.
+     * Create or update the default grids (eval, certif and list).
      *
      * @return void
      */
-    public static function update_all_capabilities() {
-        purge_all_caches();
-        capabilities_cleanup(competvet::COMPONENT_NAME);
-        update_capabilities(competvet::COMPONENT_NAME);
+    public static function create_default_grids() {
+        global $CFG;
+        foreach (grid::COMPETVET_GRID_TYPES as $gridtype => $gridtypename) {
+            $evalgrid = grid::get_default_grid($gridtype);
+            if (empty($evalgrid)) {
+                $evalgrid = new grid(0, (object) [
+                    'name' => get_string('grid:default:' . $gridtypename, 'mod_competvet'),
+                    'idnumber' => grid::DEFAULT_GRID_SHORTNAME[$gridtype],
+                    'sortorder' => 0, // We do not care about the order here.
+                    'type' => $gridtype,
+                ]);
+                // Create it and upload the criteria.
+                $evalgrid->create();
+            } else {
+                // We need to update the name.
+                $evalgrid->set('name', get_string('grid:default:' . $gridtypename, 'mod_competvet'));
+                $evalgrid->update();
+            }
+            $criterionimporter = new criterion_importer(criterion::class);
+            $criterionimporter->import($CFG->dirroot . "/mod/competvet/data/default_{$gridtypename}_grid.csv");
+        }
     }
 }

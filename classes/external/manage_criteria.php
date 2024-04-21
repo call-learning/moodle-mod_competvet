@@ -225,7 +225,7 @@ class manage_criteria extends external_api {
 
         $grids = array_map(function ($grid) {
             global $DB;
-            $criteria = $DB->get_records('competvet_criterion', ['evalgridid' => $grid->id], 'sort ASC');
+            $criteria = $DB->get_records('competvet_criterion', ['gridid' => $grid->id], 'sort ASC');
             $gridCriteria = [];
             foreach ($criteria as $criterion) {
                 if ($criterion->parentid == 0) {

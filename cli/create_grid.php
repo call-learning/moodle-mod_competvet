@@ -55,9 +55,4 @@ if ($options['help']) {
     cli_writeln($usage);
     die();
 }
-$records = mod_competvet\local\persistent\criterion::get_records();
-cli_writeln('Deleting ' . count($records) . ' records');
-foreach($records as $record) {
-    $record->delete();
-}
-\mod_competvet\setup::create_default_grid();
+\mod_competvet\setup::create_default_grids();

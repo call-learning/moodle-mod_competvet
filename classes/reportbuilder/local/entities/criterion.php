@@ -23,8 +23,8 @@ use core_reportbuilder\local\filters\number;
 use core_reportbuilder\local\filters\text;
 use core_reportbuilder\local\report\{column, filter};
 use lang_string;
-use mod_competvet\local\persistent\evaluation_grid;
-use mod_competvet\reportbuilder\local\filters\evaluation_grid_selector;
+use mod_competvet\local\persistent\grid;
+use mod_competvet\reportbuilder\local\filters\grid_selector;
 
 /**
  * Criterion entity
@@ -133,16 +133,16 @@ class criterion extends base {
         ))
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_INTEGER)
-            ->add_fields("{$criterionalias}.evalgridid")
+            ->add_fields("{$criterionalias}.gridid")
             ->set_is_sortable(true)
-            ->set_callback(function($evalgridid) {
+            ->set_callback(function($gridid) {
                 static $evalgrids = [];
-                if (!isset($evalgrids[$evalgridid])) {
-                    $evalgrids[$evalgridid] = evaluation_grid::get_record([
-                        'id' => $evalgridid,
+                if (!isset($evalgrids[$gridid])) {
+                    $evalgrids[$gridid] = grid::get_record([
+                        'id' => $gridid,
                     ]);
                 }
-                return $evalgrids[$evalgridid]->get('name');
+                return $evalgrids[$gridid]->get('name');
             });
 
         return $columns;
@@ -181,11 +181,11 @@ class criterion extends base {
         ))->add_joins($this->get_joins());
 
         $filters[] = (new filter(
-            evaluation_grid_selector::class,
+            grid_selector::class,
             'gridselect',
-            new lang_string('evaluation_grid:selector', 'mod_competvet'),
+            new lang_string('grid:selector', 'mod_competvet'),
             $this->get_entity_name(),
-            "{$criterionalias}.evalgridid"
+            "{$criterionalias}.gridid"
         ))->add_joins($this->get_joins());
 
         return $filters;

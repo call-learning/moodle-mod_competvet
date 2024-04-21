@@ -16,7 +16,7 @@
 namespace mod_competvet\local\importer;
 
 use mod_competvet\local\persistent\criterion;
-use mod_competvet\local\persistent\evaluation_grid;
+use mod_competvet\local\persistent\grid;
 
 /**
  * Criterion CSV importer
@@ -33,7 +33,8 @@ class criterion_importer extends base_persistent_importer {
         'Criterion Id' => 'idnumber',
         'Criterion Label' => 'label',
         'Criterion Parent Id' => 'parentid',
-        'Evaluation Grid Id' => 'evalgridid',
+        'Evaluation Grid Id' => 'gridid',
+        'Grade' => 'grade',
     ];
 
     /**
@@ -44,7 +45,7 @@ class criterion_importer extends base_persistent_importer {
      */
     public function __construct(string $persistenclass, ?array $options = []) {
         parent::__construct($persistenclass, $options);
-        $this->options['uniquekeys'] = ['idnumber', 'evalgridid'];
+        $this->options['uniquekeys'] = ['idnumber', 'gridid'];
     }
 
     /**
@@ -59,24 +60,29 @@ class criterion_importer extends base_persistent_importer {
     protected function to_persistent_data(array $row, csv_iterator $reader): object {
         static $evalgridnametoid = [];
         $data = parent::to_persistent_data($row, $reader);
-        if (empty($evalgridnametoid[$data->evalgridid])) {
-            $evalgrid = evaluation_grid::get_record(['idnumber' => $data->evalgridid]);
-            if (empty($evalgrid)) {
-                throw new \moodle_exception('evaluationgridnotfound', 'mod_competvet', '', $data->evalgridid);
-            }
-            $evalgridnametoid[$data->evalgridid] = $evalgrid->get('id');
+        if (empty($data->grade)) {
+            $data->grade = null;
+        } else {
+            $data->grade = floatval(str_replace(',', '.', $data->grade));
         }
-        $data->evalgridid = $evalgridnametoid[$data->evalgridid];
+        if (empty($evalgridnametoid[$data->gridid])) {
+            $evalgrid = grid::get_record(['idnumber' => $data->gridid]);
+            if (empty($evalgrid)) {
+                throw new \moodle_exception('gridnotfound', 'mod_competvet', '', $data->gridid);
+            }
+            $evalgridnametoid[$data->gridid] = $evalgrid->get('id');
+        }
+        $data->gridid = $evalgridnametoid[$data->gridid];
         $parentcriterionid = 0;
         if (!empty(trim($data->parentid))) {
-            $parentcriterion = criterion::get_record(['idnumber' => $data->parentid, 'evalgridid' => $data->evalgridid]);
+            $parentcriterion = criterion::get_record(['idnumber' => $data->parentid, 'gridid' => $data->gridid]);
             if (empty($parentcriterion)) {
-                throw new \moodle_exception('criterionnotfound', 'mod_competvet', '', $data->parentid);
+                throw new \moodle_exception('criterionnotfound', 'mod_competvet', '', $data->gridid);
             }
             $parentcriterionid = $parentcriterion->get('id');
         }
         $data->parentid = $parentcriterionid;
-        $data->sort = criterion::count_records(['evalgridid' => $data->evalgridid, 'parentid' => $data->parentid]) + 1;
+        $data->sort = criterion::count_records(['gridid' => $data->gridid, 'parentid' => $data->parentid]) + 1;
         return $data;
     }
 

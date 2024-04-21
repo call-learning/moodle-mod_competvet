@@ -20,7 +20,6 @@ namespace mod_competvet\reportbuilder\datasource;
 
 use core_reportbuilder\datasource;
 use mod_competvet\reportbuilder\local\entities\criterion;
-use mod_competvet\reportbuilder\local\entities\evaluation_grid;
 
 /**
  * Criterion datasource

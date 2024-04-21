@@ -20,7 +20,7 @@ namespace mod_competvet\reportbuilder\local\systemreports;
 
 use core_reportbuilder\local\helpers\database;
 use core_reportbuilder\system_report;
-use mod_competvet\local\persistent\evaluation_grid;
+use mod_competvet\local\persistent\grid;
 use mod_competvet\reportbuilder\local\entities\criterion;
 use mod_competvet\local\persistent\situation as situation_persistent;
 
@@ -57,11 +57,11 @@ class criteria extends system_report {
                 $situation = new situation_persistent($situationid);
                 $evalgridid = $situation->get('evalgrid');
                 if (empty($evalgridid)) {
-                    $evalgridid = evaluation_grid::get_default_grid()->get('id');
+                    $evalgridid = grid::get_default_grid(grid::COMPETVET_CRITERIA_EVALUATION)->get('id');
                 }
                 $situationevalgridprefix = database::generate_param_name();
                 $this->add_base_condition_sql(
-                    "{$criterionalias}.evalgridid = :{$situationevalgridprefix}",
+                    "{$criterionalias}.gridid = :{$situationevalgridprefix}",
                     [$situationevalgridprefix => $evalgridid]
                 );
             }

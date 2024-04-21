@@ -24,6 +24,7 @@
 
 use core_grades\component_gradeitems;
 use mod_competvet\competvet;
+use mod_competvet\local\persistent\grid;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\reportbuilder\local\systemreports\planning_per_situation;
 use mod_competvet\utils;
@@ -94,6 +95,9 @@ class mod_competvet_mod_form extends moodleform_mod {
         foreach ($situationfields as $situationfield => $situationfielddefinition) {
             $elementtype = $situationfielddefinition['formtype'] ?? 'text';
             $elementoptions = $situationfielddefinition['formoptions'] ?? [];
+            if ($elementtype == 'skipped') {
+                continue;
+            }
             if ($elementtype == 'hidden') {
                 $mform->addElement('hidden', $situationfield);
             } else {
@@ -130,6 +134,27 @@ class mod_competvet_mod_form extends moodleform_mod {
         if ($this->_cm) {
             $tags = core_tag_tag::get_item_tags_array('mod_competvet', 'competvet_situation', $this->_cm->id);
             $mform->setDefault('situationtags', $tags);
+        }
+
+        // Add evalgridid field.
+        foreach (grid::COMPETVET_GRID_TYPES as $gridtype => $gridtypename) {
+            $defaultgrid = grid::get_default_grid($gridtype);
+            $evalgrids = grid::get_records(['type' => $gridtype]);
+            $evalgridscolumns = array_map(function($evalgrid) {
+                return [
+                    'id' => $evalgrid->get('id'),
+                    'name' => $evalgrid->get('name'),
+                ];
+            }, $evalgrids);
+            $evalgridchoices = array_column($evalgridscolumns, 'name', 'id');
+            $fieldname =  $gridtypename . 'gridid';
+            $mform->addElement(
+                'select',
+                $fieldname,
+                get_string('situation:' . $gridtypename . 'grid', 'competvet'),
+                $evalgridchoices,
+                !empty($defaultgrid) ? $defaultgrid->get('id'): null);
+            $mform->setType($fieldname, PARAM_INT);
         }
     }
 

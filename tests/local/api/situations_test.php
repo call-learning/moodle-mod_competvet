@@ -109,6 +109,12 @@ class situations_test extends advanced_testcase {
         $this->assertJsonStringEqualsJsonString(json_encode($expected), json_encode($situations));
     }
 
+    /**
+     * Get all criteria test
+     *
+     * @return void
+     * @covers \mod_competvet\local\api\situations::get_all_criteria
+     */
     public function test_get_all_criteria() {
         $situation = situation::get_record(['shortname' => 'SIT1']);
         $criteria = situations::get_all_criteria($situation->get('id'));
@@ -121,6 +127,7 @@ class situations_test extends advanced_testcase {
             'parentid' => 0,
             'parentlabel' => null,
             'parentidnumber' => null,
+            'grade' => null,
         ], $criteria[0]);
         $this->assertEquals([
             'id' => 3,
@@ -130,6 +137,7 @@ class situations_test extends advanced_testcase {
             'parentid' => 1,
             'parentlabel' => 'Savoir être',
             'parentidnumber' => 'Q001',
+            'grade' => null
         ], $criteria[8]);
     }
 }

@@ -19,7 +19,7 @@ use core\persistent;
 use lang_string;
 
 /**
- * Evaluation grid entity
+ * Grid entity
  *
  * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
@@ -35,19 +35,35 @@ class grid extends persistent {
     /**
      * DEFAULT GRID SHORTNAME
      */
-    const DEFAULT_GRID_SHORTNAME = 'DEFAULTGRID';
+    const DEFAULT_GRID_SHORTNAME = [
+        self::COMPETVET_CRITERIA_EVALUATION => 'DEFAULTEVALGRID',
+        self::COMPETVET_CRITERIA_CERTIFICATION => 'DEFAULTCERTIFGRID',
+        self::COMPETVET_CRITERIA_LIST => 'DEFAULTLISTGRID',
+    ];
 
     const COMPETVET_CRITERIA_EVALUATION = 1;
     const COMPETVET_CRITERIA_CERTIFICATION = 2;
     const COMPETVET_CRITERIA_LIST = 3;
 
     /**
+     * Grid types for competvet
+     * Note that the short name 'eval', 'certif' and 'list' are used in the database
+     * as a prefixof the grid field in the situation table.
+     */
+    const COMPETVET_GRID_TYPES = [
+        self::COMPETVET_CRITERIA_EVALUATION => 'eval',
+        self::COMPETVET_CRITERIA_CERTIFICATION => 'certif',
+        self::COMPETVET_CRITERIA_LIST => 'list',
+    ];
+
+    /**
      * Get default grid and create it if it does not exist.
      *
-     * @return evaluation_grid
+     * @param int $type
+     * @return grid|null
      */
-    public static function get_default_grid(): ?evaluation_grid {
-        $evalgrid = self::get_record(['idnumber' => self::DEFAULT_GRID_SHORTNAME]);
+    public static function get_default_grid(int $type): ?grid {
+        $evalgrid = self::get_record(['idnumber' => self::DEFAULT_GRID_SHORTNAME[$type], 'type' => $type]);
         return $evalgrid ?: null;
     }
 
@@ -65,9 +81,15 @@ class grid extends persistent {
                 'type' => PARAM_TEXT,
                 'message' => new lang_string('invaliddata', 'competvet', 'name'),
             ],
+            'idnumber' => [
+                'null' => NULL_NOT_ALLOWED,
+                'type' => PARAM_TEXT,
+                'message' => new lang_string('invaliddata', 'competvet', 'idnumber'),
+            ],
             'sortorder' => [
                 'null' => NULL_ALLOWED,
                 'type' => PARAM_INT,
+                'default' => 0,
             ],
             'type' => [
                 'type' => PARAM_INT,
@@ -80,6 +102,19 @@ class grid extends persistent {
                 ]
             ],
         ];
+    }
+
+    /**
+     * Hook to execute before a create operation.
+     *
+     * Throws an exception if the grid already exists (by idnumber).
+     *
+     * @return void
+     */
+    protected function before_create() {
+        if (self::get_record(['idnumber' => $this->get('idnumber')])) {
+            throw new \moodle_exception('gridalreadyexists', 'mod_competvet', '', $this->get('idnumber'));
+        }
     }
 }
 

@@ -15,11 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 use mod_competvet\local\persistent\criterion;
-use mod_competvet\local\persistent\evaluation_grid;
+use mod_competvet\local\persistent\grid;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\observation_comment;
 use mod_competvet\local\persistent\observation_criterion_comment;
-use mod_competvet\local\persistent\observation_criterion_grade;
 use mod_competvet\local\persistent\observation_criterion_level;
 use mod_competvet\local\persistent\planning;
 
@@ -198,8 +197,8 @@ class mod_competvet_generator extends testing_module_generator {
      * @param array|stdClass|null $record
      * @return stdClass
      */
-    public function create_evaluation_grid($record = null) {
-        return $this->create_from_entity_name(evaluation_grid::class, $record);
+    public function create_grid($record = null) {
+        return $this->create_from_entity_name(grid::class, $record);
     }
 
     /**

@@ -29,7 +29,7 @@ class post_install extends \core\task\adhoc_task {
     public function execute() {
         $methods = $this->get_custom_data();
         if (empty($methods)) {
-            $methods = ['setup_update_tags', 'create_update_roles', 'create_default_grid'];
+            $methods = ['setup_update_tags', 'create_update_roles', 'create_default_grids'];
         }
         foreach ($methods as $method) {
             \mod_competvet\setup::$method();

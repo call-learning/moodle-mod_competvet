@@ -17,7 +17,7 @@ namespace mod_competvet\local\importer;
 
 use advanced_testcase;
 use mod_competvet\local\persistent\criterion;
-use mod_competvet\local\persistent\evaluation_grid;
+use mod_competvet\local\persistent\grid;
 
 /**
  * Evaluation Grid Test
@@ -26,60 +26,73 @@ use mod_competvet\local\persistent\evaluation_grid;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class evaluation_grid_test extends advanced_testcase {
+class grid_test extends advanced_testcase {
     /**
      * Sample file path
      */
-    const SAMPLE_FILE_PATH = '/mod/competvet/tests/fixtures/importer/sample_evaluation_grid.csv';
+    const SAMPLE_FILE_PATH = '/mod/competvet/tests/fixtures/importer/sample_grid.csv';
     /**
      * Sample file path
      */
-    const SAMPLE_MODIFIED_FILE_PATH = '/mod/competvet/tests/fixtures/importer/sample_evaluation_with_modif.csv';
+    const SAMPLE_MODIFIED_FILE_PATH = '/mod/competvet/tests/fixtures/importer/sample_grid_with_modif.csv';
+
     /**
      * Test import criterion.
+     *
      * @return void
-     * @covers \mod_competvet\local\persistent\evaluation_grid
+     * @covers \mod_competvet\local\persistent\grid
      */
     public function test_import_criterion() {
         global $CFG;
         $this->resetAfterTest();
-        $evalgrid = new evaluation_grid(0, (object) ['name' => 'Test grid', 'idnumber' => 'TESTGRID']);
+        $evalgrid =
+            new grid(
+                0,
+                (object) ['name' => 'Test grid', 'idnumber' => 'TESTGRID', 'type' => grid::COMPETVET_CRITERIA_EVALUATION]
+            );
         $evalgrid->create();
         $criterionimporter = new criterion_importer(criterion::class);
         $criterionimporter->import($CFG->dirroot . self::SAMPLE_FILE_PATH);
-        $this->assertEquals(40, criterion::count_records(['evalgridid' => intval($evalgrid->get('id'))]));
+        $this->assertEquals(40, criterion::count_records(['gridid' => intval($evalgrid->get('id'))]));
         foreach (['Q001', 'Q035'] as $critname) {
-            $crit = criterion::get_record(['evalgridid' => $evalgrid->get('id'), 'idnumber' => $critname]);
+            $crit = criterion::get_record(['gridid' => $evalgrid->get('id'), 'idnumber' => $critname]);
             $this->assertEquals(
                 5,
-                criterion::count_records(['evalgridid' => $evalgrid->get('id'), 'parentid' => $crit->get('id')])
+                criterion::count_records(['gridid' => $evalgrid->get('id'), 'parentid' => $crit->get('id')])
             );
             $this->assertSame([1, 2, 3, 4, 5], array_map(
                 fn($c) => $c->get('sort'),
-                criterion::get_records(['evalgridid' => $evalgrid->get('id'), 'parentid' => $crit->get('id')])
+                criterion::get_records(['gridid' => $evalgrid->get('id'), 'parentid' => $crit->get('id')])
             ));
         }
     }
+
     /**
      * Test import criterion.
+     *
      * @return void
-     * @covers \mod_competvet\local\persistent\evaluation_grid
+     * @covers \mod_competvet\local\persistent\grid
      */
     public function test_import_criterion_update() {
         global $CFG;
         $this->resetAfterTest();
-        $evalgrid = new evaluation_grid(0, (object) ['name' => 'Test grid', 'idnumber' => 'TESTGRID']);
+        $evalgrid = new grid(0, (object) [
+            'name' => 'Test grid',
+            'idnumber' => 'TESTGRID',
+            'type' => grid::COMPETVET_CRITERIA_EVALUATION
+        ]
+        );
         $evalgrid->create();
         $criterionimporter = new criterion_importer(criterion::class);
         $criterionimporter->import($CFG->dirroot . self::SAMPLE_FILE_PATH);
-        $this->assertEquals(40, criterion::count_records(['evalgridid' => $evalgrid->get('id')]));
+        $this->assertEquals(40, criterion::count_records(['gridid' => $evalgrid->get('id')]));
         $criterionimporter = new criterion_importer(criterion::class);
         $criterionimporter->import($CFG->dirroot . self::SAMPLE_FILE_PATH);
-        $this->assertEquals(40, criterion::count_records(['evalgridid' => $evalgrid->get('id')]));
+        $this->assertEquals(40, criterion::count_records(['gridid' => $evalgrid->get('id')]));
         $criterionimporter->import($CFG->dirroot . self::SAMPLE_MODIFIED_FILE_PATH);
-        $this->assertEquals(40, criterion::count_records(['evalgridid' => $evalgrid->get('id')]));
-        $crit01 = criterion::get_record(['evalgridid' => $evalgrid->get('id'), 'idnumber' => 'Q001']);
-        $crit02 = criterion::get_record(['evalgridid' => $evalgrid->get('id'), 'idnumber' => 'Q002']);
+        $this->assertEquals(40, criterion::count_records(['gridid' => $evalgrid->get('id')]));
+        $crit01 = criterion::get_record(['gridid' => $evalgrid->get('id'), 'idnumber' => 'Q001']);
+        $crit02 = criterion::get_record(['gridid' => $evalgrid->get('id'), 'idnumber' => 'Q002']);
         $this->assertEquals('Savoir être bien', $crit01->get('label'));
         $this->assertEquals('Respect des horaires de travail et des consignes de sécurité', $crit02->get('label'));
     }

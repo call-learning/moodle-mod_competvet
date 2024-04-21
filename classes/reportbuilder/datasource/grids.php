@@ -19,7 +19,7 @@ declare(strict_types=1);
 namespace mod_competvet\reportbuilder\datasource;
 
 use core_reportbuilder\datasource;
-use mod_competvet\reportbuilder\local\entities\evaluation_grid;
+use mod_competvet\reportbuilder\local\entities\grid;
 
 /**
  * Evaluation grid datasource
@@ -28,14 +28,14 @@ use mod_competvet\reportbuilder\local\entities\evaluation_grid;
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class evaluation_grids extends datasource {
+class grids extends datasource {
     /**
      * Return user friendly name of the report source
      *
      * @return string
      */
     public static function get_name(): string {
-        return get_string('report:evaluationgrids', 'mod_competvet');
+        return get_string('report:grids', 'mod_competvet');
     }
 
     /**
@@ -45,8 +45,8 @@ class evaluation_grids extends datasource {
      */
     public function get_default_columns(): array {
         return [
-            'evaluation_grid:name',
-            'evaluation_grid:idnumber',
+            'grid:name',
+            'grid:idnumber',
         ];
     }
 
@@ -57,8 +57,8 @@ class evaluation_grids extends datasource {
      */
     public function get_default_filters(): array {
         return [
-            'evaluation_grid:name',
-            'evaluation_grid:idnumber',
+            'grid:name',
+            'grid:idnumber',
         ];
     }
 
@@ -75,10 +75,10 @@ class evaluation_grids extends datasource {
      * Initialise report
      */
     protected function initialise(): void {
-        $evalgridentity = new evaluation_grid();
+        $evalgridentity = new grid();
 
-        $evalgridalias = $evalgridentity->get_table_alias('competvet_evalgrid');
-        $this->set_main_table('competvet_evalgrid', $evalgridalias);
+        $evalgridalias = $evalgridentity->get_table_alias('competvet_grid');
+        $this->set_main_table('competvet_grid', $evalgridalias);
 
         $this->add_entity($evalgridentity);
 
