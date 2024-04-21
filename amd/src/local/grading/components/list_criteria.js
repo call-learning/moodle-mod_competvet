@@ -55,12 +55,12 @@ const formCalculation = () => {
     const formObject = Object.fromEntries(formData);
     const {'list-criteria': criteria, user} = CompetState.getData();
     criteria.userid = user.id;
-    criteria.criteria.forEach((criterium) => {
-        const criteriumId = criterium.criteriumid;
-        criterium.grade = formObject[`criterium-${criteriumId}`];
-        criterium.comment = formObject[`criterium-${criteriumId}-comment`];
-        criterium.options.forEach((option) => {
-            if (option.grade == criterium.grade) {
+    criteria.criteria.forEach((criterion) => {
+        const criterionId = criterion.criterionid;
+        criterion.grade = formObject[`criterion-${criterionId}`];
+        criterion.comment = formObject[`criterion-${criterionId}-comment`];
+        criterion.options.forEach((option) => {
+            if (option.grade == criterion.grade) {
                 option.selected = true;
             } else {
                 option.selected = false;

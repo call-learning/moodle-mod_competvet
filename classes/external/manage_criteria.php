@@ -57,14 +57,14 @@ class manage_criteria extends external_api {
                     'deleted' => new external_value(PARAM_BOOL, 'Is the grid deleted', VALUE_OPTIONAL),
                     'criteria' => new external_multiple_structure(
                         new external_single_structure([
-                            'criteriumid' => new external_value(PARAM_INT, 'The criterium id', VALUE_REQUIRED),
-                            'title' => new external_value(PARAM_TEXT, 'The title of the criterium', VALUE_REQUIRED),
-                            'idnumber' => new external_value(PARAM_TEXT, 'The id number of the criterium', VALUE_REQUIRED),
-                            'sortorder' => new external_value(PARAM_INT, 'The sort order of the criterium', VALUE_REQUIRED),
-                            'haschanged' => new external_value(PARAM_BOOL, 'Has the criterium changed', VALUE_OPTIONAL),
+                            'criterionid' => new external_value(PARAM_INT, 'The criterion id', VALUE_REQUIRED),
+                            'title' => new external_value(PARAM_TEXT, 'The title of the criterion', VALUE_REQUIRED),
+                            'idnumber' => new external_value(PARAM_TEXT, 'The id number of the criterion', VALUE_REQUIRED),
+                            'sortorder' => new external_value(PARAM_INT, 'The sort order of the criterion', VALUE_REQUIRED),
+                            'haschanged' => new external_value(PARAM_BOOL, 'Has the criterion changed', VALUE_OPTIONAL),
                             'updatesortorder' => new external_value(PARAM_BOOL, 'Update the sort order of the options', VALUE_OPTIONAL),
-                            'deleted' => new external_value(PARAM_BOOL, 'Is the criterium deleted', VALUE_OPTIONAL),
-                            'hasoptions' => new external_value(PARAM_BOOL, 'Does the criterium have options', VALUE_OPTIONAL),
+                            'deleted' => new external_value(PARAM_BOOL, 'Is the criterion deleted', VALUE_OPTIONAL),
+                            'hasoptions' => new external_value(PARAM_BOOL, 'Does the criterion have options', VALUE_OPTIONAL),
                             'options' => new external_multiple_structure(
                                 new external_single_structure([
                                     'optionid' => new external_value(PARAM_INT, 'The option id', VALUE_REQUIRED),
@@ -117,34 +117,34 @@ class manage_criteria extends external_api {
                 );
             }
             if ($grid['updatesortorder']) {
-                $criteriaorder = array_map(function ($criterium) {
-                    return $criterium['criteriumid'];
+                $criteriaorder = array_map(function ($criterion) {
+                    return $criterion['criterionid'];
                 }, $grid['criteria']);
                 criteria::update_criteria_sortorder($criteriaorder);
             }
-            foreach ($grid['criteria'] as $criterium) {
-                if ($criterium['deleted']) {
-                    criteria::delete_criterion($criterium['criteriumid']);
+            foreach ($grid['criteria'] as $criterion) {
+                if ($criterion['deleted']) {
+                    criteria::delete_criterion($criterion['criterionid']);
                     continue;
                 }
-                if ($criterium['updatesortorder']) {
+                if ($criterion['updatesortorder']) {
                     $citeriaorder = array_map(function ($option) {
                         return $option['optionid'];
-                    }, $criterium['options']);
+                    }, $criterion['options']);
                     criteria::update_criteria_sortorder($criteriaorder);
                 }
-                if ($criterium['haschanged']) {
-                    $criteriumid = criteria::update_criterion(
-                        $criterium['criteriumid'],
-                        $criterium['title'],
-                        $criterium['idnumber'],
-                        $criterium['sortorder'],
+                if ($criterion['haschanged']) {
+                    $criterionid = criteria::update_criterion(
+                        $criterion['criterionid'],
+                        $criterion['title'],
+                        $criterion['idnumber'],
+                        $criterion['sortorder'],
                         $gridid,
                         0,
                         0,
                     );
-                    if ($criterium['hasoptions']) {
-                        foreach ($criterium['options'] as $option) {
+                    if ($criterion['hasoptions']) {
+                        foreach ($criterion['options'] as $option) {
                             if ($option['deleted']) {
                                 criteria::delete_criterion($option['optionid']);
                             }
@@ -155,7 +155,7 @@ class manage_criteria extends external_api {
                                 $option['idnumber'],
                                 $option['sortorder'],
                                 $gridid,
-                                $criteriumid,
+                                $criterionid,
                                 $grade,
                             );
                         }
@@ -227,18 +227,18 @@ class manage_criteria extends external_api {
             global $DB;
             $criteria = $DB->get_records('competvet_criterion', ['evalgridid' => $grid->id], 'sort ASC');
             $gridCriteria = [];
-            foreach ($criteria as $criterium) {
-                if ($criterium->parentid == 0) {
-                    $newCriterium = (object) [
-                        'criteriumid' => $criterium->id,
-                        'title' => $criterium->label,
-                        'idnumber' => $criterium->idnumber,
-                        'sortorder' => $criterium->sort,
+            foreach ($criteria as $criterion) {
+                if ($criterion->parentid == 0) {
+                    $newcriterion = (object) [
+                        'criterionid' => $criterion->id,
+                        'title' => $criterion->label,
+                        'idnumber' => $criterion->idnumber,
+                        'sortorder' => $criterion->sort,
                         'hasoptions' => $grid->type == COMPETVET_CRITERIA_LIST||COMPETVET_CRITERIA_EVALUATION ? true : false,
                         'options' => []
                     ];
                     foreach ($criteria as $option) {
-                        if ($option->parentid === $criterium->id) {
+                        if ($option->parentid === $criterion->id) {
                             $newOption = (object) [
                                 'optionid' => $option->id,
                                 'idnumber' => $option->idnumber,
@@ -247,14 +247,14 @@ class manage_criteria extends external_api {
                                 'grade' => $option->grade
                             ];
                             $newOption->hasgrade = $grid->type == COMPETVET_CRITERIA_LIST ? true : false;
-                            $newCriterium->options[] = $newOption;
+                            $newcriterion->options[] = $newOption;
                         }
                     }
                     // Sort the options
-                    usort($newCriterium->options, function ($a, $b) {
+                    usort($newcriterion->options, function ($a, $b) {
                         return $a->sortorder <=> $b->sortorder;
                     });
-                    $gridCriteria[] = $newCriterium;
+                    $gridCriteria[] = $newcriterion;
                 }
             }
             $newgrid = (object) [
@@ -285,11 +285,11 @@ class manage_criteria extends external_api {
                     'sortorder' => new external_value(PARAM_INT, 'The sort order of the grid'),
                     'criteria' => new external_multiple_structure(
                         new external_single_structure([
-                            'criteriumid' => new external_value(PARAM_INT, 'The criterium id'),
-                            'title' => new external_value(PARAM_TEXT, 'The title of the criterium'),
-                            'idnumber' => new external_value(PARAM_TEXT, 'The id number of the criterium'),
-                            'sortorder' => new external_value(PARAM_INT, 'The sort order of the criterium'),
-                            'hasoptions' => new external_value(PARAM_BOOL, 'Does the criterium have options'),
+                            'criterionid' => new external_value(PARAM_INT, 'The criterion id'),
+                            'title' => new external_value(PARAM_TEXT, 'The title of the criterion'),
+                            'idnumber' => new external_value(PARAM_TEXT, 'The id number of the criterion'),
+                            'sortorder' => new external_value(PARAM_INT, 'The sort order of the criterion'),
+                            'hasoptions' => new external_value(PARAM_BOOL, 'Does the criterion have options'),
                             'options' => new external_multiple_structure(
                                 new external_single_structure([
                                     'optionid' => new external_value(PARAM_INT, 'The option id'),

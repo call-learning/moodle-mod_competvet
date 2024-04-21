@@ -4,7 +4,7 @@
     "gridid": 1,
     "criteria": [
         {
-            "criteriumid": 1,
+            "criterionid": 1,
             "idnumber": "Q001",
             "title": "Savoir être",
             "sortorder": 1,
@@ -68,7 +68,7 @@
             ]
         },
         {
-            "criteriumid": 2,
+            "criterionid": 2,
             "idnumber": "Q007",
             "title": "Motivation et implication personnelle",
             "sortorder": 2,
@@ -119,7 +119,7 @@
             ]
         },
         {
-            "criteriumid": 3,
+            "criterionid": 3,
             "idnumber": "Q011",
             "title": "Qualités d’organisation et de travail en équipe",
             "sortorder": 3,
@@ -176,7 +176,7 @@
             ]
         },
         {
-            "criteriumid": 4,
+            "criterionid": 4,
             "idnumber": "Q016",
             "title": "Compétences liées à la mobilisation des acquis",
             "sortorder": 4,
@@ -233,7 +233,7 @@
             ]
         },
         {
-            "criteriumid": 5,
+            "criterionid": 5,
             "idnumber": "Q021",
             "title": "Compétences techniques et activités de soins",
             "sortorder": 5,
@@ -290,7 +290,7 @@
             ]
         },
         {
-            "criteriumid": 6,
+            "criterionid": 6,
             "idnumber": "Q027",
             "title": "Compétences liées à la démarche clinique",
             "sortorder": 6,
@@ -365,7 +365,7 @@
             ]
         },
         {
-            "criteriumid": 7,
+            "criterionid": 7,
             "idnumber": "Q035",
             "title": "Communication écrite et orale",
             "sortorder": 7,

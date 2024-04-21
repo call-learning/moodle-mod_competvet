@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_competvet/manager/criteria/criterium
+    @template mod_competvet/manager/criteria/criterion
 
     A single criteria item in the criteria list.
 
@@ -29,8 +29,8 @@
         "viewurl": "http://localhost/moodle/mod/competvet/view.php?id=1",
     }
 }}
-<div data-region="criterium" data-id="{{criteriumid}}">
-    <div class="row criterium-item">
+<div data-region="criterion" data-id="{{criterionid}}">
+    <div class="row criterion-item">
         <div class="tcell move">
             <span class="drag-handle">{{#pix}}i/move_2d, core, {{#str}}move{{/str}}{{/pix}}</span>
         </div>
@@ -39,19 +39,19 @@
         </div>
         <div class="col-2 tcell">
             {{^edit}}
-            <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-grid-id="{{gridid}}" data-id="{{criteriumid}}" data-action="edit" data-type="criterium">{{#pix}}i/edit, core, {{#str}}edit{{/str}}{{/pix}}</button>
+            <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-grid-id="{{gridid}}" data-id="{{criterionid}}" data-action="edit" data-type="criterion">{{#pix}}i/edit, core, {{#str}}edit{{/str}}{{/pix}}</button>
             {{/edit}}
             {{#edit}}
-            <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-grid-id="{{gridid}}" data-id="{{criteriumid}}" data-action="save" data-type="criterium">
+            <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-grid-id="{{gridid}}" data-id="{{criterionid}}" data-action="save" data-type="criterion">
                 <span class="defaulticon">{{#pix}}e/save, core, {{#str}}save{{/str}}{{/pix}}</span>
                 <span class="savingicon">{{#pix}}i/loading, core, {{#str}}saving, mod_competvet{{/str}}{{/pix}}</span>
             </button>
             {{/edit}}
-            <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-grid-id="{{gridid}}" data-id="{{criteriumid}}" data-action="delete" data-type="criterium">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
+            <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-grid-id="{{gridid}}" data-id="{{criterionid}}" data-action="delete" data-type="criterion">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
         </div>
     </div>
     {{#hasoptions}}
-    <div class="sortable" data-type="option" data-grid-id="{{gridid}}" data-criterium-id="{{criteriumid}}">
+    <div class="sortable" data-type="option" data-grid-id="{{gridid}}" data-criterion-id="{{criterionid}}">
         {{#options}}
             {{^deleted}}
                 <div class="row option-item" data-region="option" data-id="{{optionid}}">
@@ -68,7 +68,7 @@
                     {{/hasgrade}}
                     <div class="col-2 tcell">
                         {{#edit}}
-                        <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-grid-id="{{gridid}}" data-criterium-id="{{criteriumid}}" data-id="{{optionid}}" data-action="delete" data-type="option">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
+                        <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-grid-id="{{gridid}}" data-criterion-id="{{criterionid}}" data-id="{{optionid}}" data-action="delete" data-type="option">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
                         {{/edit}}
                     </div>
                 </div>
@@ -80,7 +80,7 @@
         {{#hasoptions}}
             <div class="row justify-content-end">
                 <div class="col-2 ">
-                    <a class="btn btn-link jsbutton" href="#" data-grid-id="{{gridid}}" data-criterium-id="{{criteriumid}}" data-action="add" data-type="option">
+                    <a class="btn btn-link jsbutton" href="#" data-grid-id="{{gridid}}" data-criterion-id="{{criterionid}}" data-action="add" data-type="option">
                         {{#str}}addoption, mod_competvet{{/str}}
                     </a>
                 </div>

@@ -155,43 +155,43 @@ class Manager {
                 criteria: [],
             });
         }
-        if (btn.dataset.type === 'criterium') {
+        if (btn.dataset.type === 'criterion') {
             this.removeEdit();
             const index = state.grids.find((element) => element.gridid === parseInt(btn.dataset.gridId));
             let newCritID = 1;
             let newCritSortOrder = 1;
             if (index.criteria.length > 0) {
-                newCritID = Math.max(...index.criteria.map((element) => element.criteriumid)) + 1;
+                newCritID = Math.max(...index.criteria.map((element) => element.criterionid)) + 1;
                 newCritSortOrder = Math.max(...index.criteria.map((element) => element.sortorder)) + 1;
             }
-            const newCriterium = {
-                criteriumid: newCritID,
+            const newcriterion = {
+                criterionid: newCritID,
                 idnumber: 'G' + index.gridid + '-C' + newCritID,
                 sortorder: newCritSortOrder,
                 title: '',
-                placeholder: await getString('newcriterium', 'mod_competvet'),
+                placeholder: await getString('newcriterion', 'mod_competvet'),
                 options: [],
                 edit: true,
             };
 
             if (this.dataset == COMPETVET_CRITERIA_LIST || this.dataset == COMPETVET_CRITERIA_EVALUATION) {
-                newCriterium.hasoptions = true;
+                newcriterion.hasoptions = true;
             }
-            index.criteria.push(newCriterium);
+            index.criteria.push(newcriterion);
         }
         if (btn.dataset.type === 'option') {
             const index = state.grids.find((element) => element.gridid === parseInt(btn.dataset.gridId));
-            const criterium = index.criteria.find((element) => element.criteriumid === parseInt(btn.dataset.criteriumId));
-            criterium.edit = true;
+            const criterion = index.criteria.find((element) => element.criterionid === parseInt(btn.dataset.criterionId));
+            criterion.edit = true;
             let newOptionId = 1;
             let newOptSortOrder = 1;
-            if (criterium.options.length > 0) {
-                newOptionId = Math.max(...criterium.options.map((element) => element.optionid)) + 1;
-                newOptSortOrder = Math.max(...criterium.options.map((element) => element.sortorder)) + 1;
+            if (criterion.options.length > 0) {
+                newOptionId = Math.max(...criterion.options.map((element) => element.optionid)) + 1;
+                newOptSortOrder = Math.max(...criterion.options.map((element) => element.sortorder)) + 1;
             }
             const newOption = {
                 optionid: newOptionId,
-                idnumber: 'G' + index.gridid + '-C' + criterium.criteriumid + '-O' + newOptionId,
+                idnumber: 'G' + index.gridid + '-C' + criterion.criterionid + '-O' + newOptionId,
                 sortorder: newOptSortOrder,
                 title: '',
                 placeholder: await getString('newoption', 'mod_competvet'),
@@ -200,7 +200,7 @@ class Manager {
                 newOption.hasgrade = true;
                 newOption.grade = 0;
             }
-            criterium.options.push(newOption);
+            criterion.options.push(newOption);
         }
         CompetState.setValue('datatree', state);
     }
@@ -214,14 +214,14 @@ class Manager {
         if (btn.dataset.type === 'grid') {
             state.grids.find((element) => element.gridid === parseInt(btn.dataset.id)).deleted = true;
         }
-        if (btn.dataset.type === 'criterium') {
+        if (btn.dataset.type === 'criterion') {
             const index = state.grids.find((element) => element.gridid === parseInt(btn.dataset.gridId));
-            index.criteria.find((element) => element.criteriumid === parseInt(btn.dataset.id)).deleted = true;
+            index.criteria.find((element) => element.criterionid === parseInt(btn.dataset.id)).deleted = true;
         }
         if (btn.dataset.type === 'option') {
             const index = state.grids.find((element) => element.gridid === parseInt(btn.dataset.gridId));
-            const criterium = index.criteria.find((element) => element.criteriumid === parseInt(btn.dataset.criteriumId));
-            criterium.options.find((element) => element.optionid === parseInt(btn.dataset.id)).deleted = true;
+            const criterion = index.criteria.find((element) => element.criterionid === parseInt(btn.dataset.criterionId));
+            criterion.options.find((element) => element.optionid === parseInt(btn.dataset.id)).deleted = true;
         }
         CompetState.setValue('datatree', state);
     }
@@ -239,12 +239,12 @@ class Manager {
             const index = state.grids.find((element) => element.gridid === parseInt(btn.dataset.id));
             index.edit = true;
         }
-        if (btn.dataset.type === 'criterium') {
+        if (btn.dataset.type === 'criterion') {
             const index = state.grids.find((element) => element.gridid === parseInt(btn.dataset.gridId));
-            const criterium = index.criteria.find((element) => element.criteriumid === parseInt(btn.dataset.id));
-            criterium.edit = true;
+            const criterion = index.criteria.find((element) => element.criterionid === parseInt(btn.dataset.id));
+            criterion.edit = true;
             if (this.dataset == COMPETVET_CRITERIA_LIST || this.dataset == COMPETVET_CRITERIA_EVALUATION) {
-                criterium.hasoptions = true;
+                criterion.hasoptions = true;
             }
         }
         CompetState.setValue('datatree', state);
@@ -275,9 +275,9 @@ class Manager {
             }
             element.criteria.forEach((element) => {
                 if (element.edit && !element.deleted) {
-                    // Update the criterium with the new values from the UI.
+                    // Update the criterion with the new values from the UI.
                     element.haschanged = true;
-                    element.title = this.getValue('criterium', 'title', element.criteriumid);
+                    element.title = this.getValue('criterion', 'title', element.criterionid);
                     if (!element.hasoptions) {
                         return;
                     }

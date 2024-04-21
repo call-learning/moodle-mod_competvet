@@ -78,10 +78,10 @@
     </div>
     <div class="collapse show" id="grid{{gridid}}">
         <div class="pl-4">
-            <div class="criteria container-fluid sortable" data-type="criterium" data-grid-id="{{gridid}}">
+            <div class="criteria container-fluid sortable" data-type="criterion" data-grid-id="{{gridid}}">
                 {{#criteria}}
                     {{^deleted}}
-                        {{> mod_competvet/manager/criteria/criterium}}
+                        {{> mod_competvet/manager/criteria/criterion}}
                     {{/deleted}}
                 {{/criteria}}
                 <div class="row" data-region="criteria-item">
@@ -92,8 +92,8 @@
                 </div>
             </div>
             <div class="d-flex justify-content-end">
-                <a class="btn btn-link jsbutton" href="#" data-grid-id="{{gridid}}" data-action="add" data-type="criterium">
-                    {{#str}}addcriterium, mod_competvet{{/str}}
+                <a class="btn btn-link jsbutton" href="#" data-grid-id="{{gridid}}" data-action="add" data-type="criterion">
+                    {{#str}}addcriterion, mod_competvet{{/str}}
                 </a>
             </div>
         </div>

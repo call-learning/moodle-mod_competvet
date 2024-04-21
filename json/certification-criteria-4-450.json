@@ -3,7 +3,7 @@
     "gridid": 1,
     "criteria": [
         {
-            "criteriumid": 1,
+            "criterionid": 1,
             "title": "Réaliser un examen clinique complet (comprenant entre autres une palpation des thyroïdes et un toucher rectal)",
             "sortorder": 1,
             "niveau": 1,
@@ -27,7 +27,7 @@
             ]
         },
         {
-            "criteriumid": 2,
+            "criterionid": 2,
             "title": "Formuler un bilan anamnestique et clinique en retenant et en hiérarchisant les signes cliniques pertinents",
             "sortorder": 2,
             "niveau": 4,
@@ -38,7 +38,7 @@
             "verified": true
         },
         {
-            "criteriumid": 3,
+            "criterionid": 3,
             "title": "Formuler des hypothèses diagnostiques hiérarchisées à la lumière du contexte anamnestique et clinique",
             "sortorder": 3,
             "niveau": 3,
@@ -49,7 +49,7 @@
             "verified": true
         },
         {
-            "criteriumid": 4,
+            "criterionid": 4,
             "title": "Décider de la nécessité d'une hospitalisation sur la base d'anomalies cliniques ou biologiques",
             "sortorder": 4,
             "niveau": 4,
@@ -60,7 +60,7 @@
             "verified": true
         },
         {
-            "criteriumid": 5,
+            "criterionid": 5,
             "title": "Prescrire et administrer un protocole de fluidothérapie adapté pour un animal hospitalisé",
             "sortorder": 5,
             "niveau": 2,

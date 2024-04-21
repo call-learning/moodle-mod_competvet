@@ -130,8 +130,8 @@ class criteria {
      */
     public static function update_criteria_sortorder(array $criteria): void {
         $sortorder = 1;
-        foreach ($criteria as $criteriumid) {
-            $criterion = criterion::get_record(['id' => $criteriumid]);
+        foreach ($criteria as $criterionid) {
+            $criterion = criterion::get_record(['id' => $criterionid]);
             $criterion->set('sort', $sortorder);
             $criterion->update();
             $sortorder++;

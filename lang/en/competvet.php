@@ -270,10 +270,10 @@ $string['planning'] = 'Planning';
 $string['addplanning'] = 'Add a planning';
 
 $string['addgrid'] = 'Add a grid';
-$string['addcriterium'] = 'Add a criterium';
+$string['addcriterion'] = 'Add a criterion';
 $string['grading'] = 'Grading';
 $string['addoption'] = 'Add an option';
-$string['newcriterium'] = 'New criterium';
+$string['newcriterion'] = 'New criterion';
 $string['newoption'] = 'New option';
 $string['newgrid'] = 'New grid';
 
