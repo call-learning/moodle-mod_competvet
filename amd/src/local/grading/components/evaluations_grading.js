@@ -42,6 +42,7 @@ const stateTemplate = () => {
         // TODO, make the grid selection dynamic.
         Templates.render(template, context).then((html) => {
             region.innerHTML = html;
+            formEvents();
             return;
         }).catch(Notification.exception);
     };
@@ -78,6 +79,9 @@ const formCalculation = () => {
 
 const formEvents = () => {
     const form = document.querySelector('[data-region="evaluations-grading"]');
+    if (form.dataset.events) {
+        return;
+    }
     form.addEventListener('change', async(e) => {
         e.preventDefault();
         const context = formCalculation();
@@ -86,9 +90,19 @@ const formEvents = () => {
     form.addEventListener('submit', async(e) => {
         e.preventDefault();
         const context = formCalculation();
-        await Repository.saveEvaluationGrading(context.grading);
+        const user = CompetState.getValue('user');
+        const planning = CompetState.getValue('planning');
+
+        const args = {
+            userid: user.id,
+            planningid: planning.id,
+            formname: 'evaluations-grading',
+            json: JSON.stringify(context.grading)
+        };
+
+        const result = await Repository.saveFormData(args);
+        context.result = result;
         CompetState.setValue('evaluations-grading', context);
     });
+    form.dataset.events = true;
 };
-
-formEvents();

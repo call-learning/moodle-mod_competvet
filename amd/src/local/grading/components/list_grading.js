@@ -16,7 +16,7 @@
 /**
  * TODO describe module grading_app_usernavigation
  *
- * @module     mod_competvet/local/grading/components/list_criteria
+ * @module     mod_competvet/local/grading/components/list_grading
  * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,7 +33,7 @@ const gradingApp = document.querySelector('[data-region="grading-app"]');
  * Define the user navigation.
  */
 const stateTemplate = () => {
-    const templateName = 'list-criteria';
+    const templateName = 'list-grading';
     const region = gradingApp.querySelector(`[data-region="${templateName}"]`);
     const template = `mod_competvet/grading/components/${templateName}`;
     const regionRenderer = (context) => {
@@ -50,10 +50,10 @@ const stateTemplate = () => {
 };
 
 const formCalculation = () => {
-    const form = document.querySelector('[data-region="list-criteria"]');
+    const form = document.querySelector('[data-region="list-grading"]');
     const formData = new FormData(form);
     const formObject = Object.fromEntries(formData);
-    const {'list-criteria': criteria, user} = CompetState.getData();
+    const {'list-grading': criteria, user} = CompetState.getData();
     criteria.userid = user.id;
     criteria.criteria.forEach((criterion) => {
         const criterionId = criterion.criterionid;
@@ -68,18 +68,18 @@ const formCalculation = () => {
         });
     });
     const context = {
-        'list-criteria': criteria,
+        'list-grading': criteria,
     };
     return context;
 };
 
 const formEvents = () => {
-    const form = document.querySelector('[data-region="list-criteria"]');
+    const form = document.querySelector('[data-region="list-grading"]');
     form.addEventListener('submit', async(e) => {
         e.preventDefault();
         const context = formCalculation();
-        await Repository.saveListGrades(context['list-criteria']);
-        CompetState.setValue('list-criteria', context['list-criteria']);
+        await Repository.saveListGrades(context['list-grading']);
+        CompetState.setValue('list-grading', context['list-grading']);
     });
 };
 

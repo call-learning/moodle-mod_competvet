@@ -1,25 +1,23 @@
 {
-    "certifgrading": {
-        "numcertifvalidated": 0,
-        "maxcertifvalidated": 0,
-        "statusproposed": "not validated",
-        "evaloptions": [
-            {
-                "key": 1,
-                "value": "not validated",
-                "selected": true
-            },
-            {
-                "key": 2,
-                "value": "proposed",
-                "selected": false
-            },
-            {
-                "key": 3,
-                "value": "validated",
-                "selected": false
-            }
-        ],
-        "comment": ""
-    }
+    "numcertifvalidated": 0,
+    "maxcertifvalidated": 0,
+    "statusproposed": "not validated",
+    "evaloptions": [
+        {
+            "key": 1,
+            "value": "not validated",
+            "selected": true
+        },
+        {
+            "key": 2,
+            "value": "proposed",
+            "selected": false
+        },
+        {
+            "key": 3,
+            "value": "validated",
+            "selected": false
+        }
+    ],
+    "comment": ""
 }

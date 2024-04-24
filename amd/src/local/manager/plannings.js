@@ -27,13 +27,10 @@ import Sort from './sortable';
 
 const App = document.querySelector('[data-region="planning"]');
 
-const regions = [
-    'plannings',
-];
 /**
  * Define the situation renderer and subscribe to the state.
  */
-const situations = () => {
+const stateTemplate = () => {
     const regionName = 'plannings';
     const region = App.querySelector(`[data-region="${regionName}"]`);
     const template = `mod_competvet/manager/planning/${regionName}`;
@@ -50,6 +47,4 @@ const situations = () => {
     CompetState.subscribe(regionName, regionRenderer);
 };
 
-situations();
-
-export default regions;
+stateTemplate();

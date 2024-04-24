@@ -128,4 +128,20 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/competvet:editplanning',
     ],
+    'mod_competvet_get_formdata' => [
+        'classname' => \mod_competvet\external\formdata_handler::class,
+        'methodname' => 'get',
+        'description' => 'Get the formdata',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:view',
+    ],
+    'mod_competvet_store_formdata' => [
+        'classname' => \mod_competvet\external\formdata_handler::class,
+        'methodname' => 'store',
+        'description' => 'Store the formdata',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:cangrade',
+    ],
 ];

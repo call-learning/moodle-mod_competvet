@@ -16,14 +16,10 @@
 namespace mod_competvet\output\grading;
 
 use core\output\named_templatable;
-use core_grades\component_gradeitem;
-use grade_item;
 use mod_competvet\competvet;
-use mod_competvet\grades\competvet_gradeitem;
 use renderable;
 use renderer_base;
 use stdClass;
-use tool_brickfield\local\areas\mod_choice\option;
 
 /**
  * Grading app renderable.

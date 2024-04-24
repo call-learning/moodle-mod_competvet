@@ -591,8 +591,10 @@ function xmldb_competvet_upgrade($oldversion) {
     if ($oldversion < 2024042102) {
         // Fix grid default name.
         $grid = grid::get_record(['idnumber' => 'DEFAULTGRID']);
-        $grid->set('idnumber', grid::DEFAULT_GRID_SHORTNAME[$grid->get('type')]);
-        $grid->update();
+        if ($grid) {
+            $grid->set('idnumber', grid::DEFAULT_GRID_SHORTNAME[$grid->get('type')]);
+            $grid->update();
+        }
         upgrade_mod_savepoint(true, 2024042102, 'competvet');
     }
     if ($oldversion < 2024042103) {
@@ -601,6 +603,34 @@ function xmldb_competvet_upgrade($oldversion) {
         $postinstall->set_custom_data(['create_default_grids']);
         core\task\manager::queue_adhoc_task($postinstall);
         upgrade_mod_savepoint(true, 2024042103, 'competvet');
+    }
+    if ($oldversion < 2024042105) {
+
+        // Define table competvet_formdata to be created.
+        $table = new xmldb_table('competvet_formdata');
+
+        // Adding fields to table competvet_formdata.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('planningid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('graderid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('formname', XMLDB_TYPE_CHAR, '254', null, null, null, null);
+        $table->add_field('json', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table competvet_formdata.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+
+        // Conditionally launch create table for competvet_formdata.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024042105, 'competvet');
     }
     return true;
 }

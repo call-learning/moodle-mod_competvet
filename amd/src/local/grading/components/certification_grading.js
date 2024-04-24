@@ -42,14 +42,17 @@ const stateTemplate = () => {
         // TODO, make the grid selection dynamic.
         Templates.render(template, context).then((html) => {
             region.innerHTML = html;
+            formEvents();
             return;
         }).catch(Notification.exception);
     };
     CompetState.subscribe(templateName, regionRenderer);
 };
 
+// The stateTemplate function is called to render the certification-grading template and subscribe to the state.
 stateTemplate();
 
+// Get the form values.
 const formCalculation = () => {
     const {'certification-grading': grade, user} = CompetState.getData();
     const grading = grade.grading;
@@ -71,8 +74,12 @@ const formCalculation = () => {
     return context;
 };
 
+// Listen to the form events and save the form data.
 const formEvents = () => {
     const form = document.querySelector('[data-region="certification-grading"]');
+    if (form.dataset.events) {
+        return;
+    }
     form.addEventListener('change', async(e) => {
         e.preventDefault();
         const context = formCalculation();
@@ -81,9 +88,20 @@ const formEvents = () => {
     form.addEventListener('submit', async(e) => {
         e.preventDefault();
         const context = formCalculation();
-        await Repository.saveCertificationGrading(context.grading);
+        const user = CompetState.getValue('user');
+        const planning = CompetState.getValue('planning');
+
+        const args = {
+            userid: user.id,
+            planningid: planning.id,
+            formname: 'certification-grading',
+            json: JSON.stringify(context.grading)
+        };
+
+        await Repository.saveFormData(args);
         CompetState.setValue('certification-grading', context);
     });
+    form.dataset.events = true;
 };
 
 formEvents();

@@ -44,11 +44,15 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    flex: 0 0 50%;
+    max-width: 50%;
 }
 
 .gradingapp .grade-header .user-header .userimage {
     display: flex;
     align-items: center;
+    flex: 0 0 50%;
+    max-width: 50%;
 }
 
 .gradingapp .grade-header .user-grade {
@@ -288,12 +292,14 @@
     padding: 0;
 }
 
-.manage .tcell.editable input {
+.manage .tcell.editable input,
+.manage .tcell.editable select {
     height: 100%;
     border-radius: 0;
 }
 
-.manage .tcell.editable input:focus {
+.manage .tcell.editable input:focus,
+.manage .tcell.editable select:focus {
     border: 1px solid #007bff;
     box-shadow: none;
 }
@@ -442,7 +448,7 @@
     font-weight: bold;
     font-size: 1.5rem;
     position: absolute;
-    top: 0;
+    top: 0.5rem;
     right: 5px;
     display: flex;
     align-items: center;

@@ -289,11 +289,9 @@ class Repository {
 
     /**
      * Get the Cases for the List Results.
-     * @param {Object} args The arguments.
      * @return {Promise} The promise.
      */
-    async getListResults(args) {
-        window.console.log('getListResults', args);
+    async getListResults() {
         const file = await this.getJsonData({filename: 'list-results'});
         const data = JSON.parse(file.data);
         return data;
@@ -309,6 +307,24 @@ class Repository {
             cmid,
         };
         return Ajax.call([{methodname: 'mod_competvet_get_plannings', args}])[0];
+    }
+
+    /**
+     * Get the formdata for a user.
+     * @param {Object} args The arguments.
+     * @return {Promise} The promise.
+     */
+    async getFormData(args) {
+        return Ajax.call([{methodname: 'mod_competvet_get_formdata', args: args}])[0];
+    }
+
+    /**
+     * Save the formdata for a user.
+     * @param {Object} data The data to save.
+     * @return {Promise} The promise.
+     */
+    async saveFormData(data) {
+        return Ajax.call([{methodname: 'mod_competvet_store_formdata', args: data}])[0];
     }
 }
 

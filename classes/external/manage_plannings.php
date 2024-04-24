@@ -50,9 +50,10 @@ class manage_plannings extends external_api {
             'plannings' => new external_multiple_structure(
                 new external_single_structure([
                     'id' => new external_value(PARAM_INT, 'Id', VALUE_REQUIRED),
+                    'situationid' => new external_value(PARAM_INT, 'Situation id', VALUE_REQUIRED),
+                    'groupid' => new external_value(PARAM_INT, 'Group id', VALUE_REQUIRED),
                     'startdate' => new external_value(PARAM_TEXT, 'Start date', VALUE_REQUIRED),
                     'enddate' => new external_value(PARAM_TEXT, 'End date', VALUE_REQUIRED),
-                    'groupname' => new external_value(PARAM_TEXT, 'Group name', VALUE_REQUIRED),
                     'session' => new external_value(PARAM_TEXT, 'Session name', VALUE_REQUIRED),
                     'haschanged' => new external_value(PARAM_BOOL, 'Has changed', VALUE_OPTIONAL),
                     'deleted' => new external_value(PARAM_BOOL, 'Is the grid deleted', VALUE_OPTIONAL),
@@ -84,6 +85,8 @@ class manage_plannings extends external_api {
             if ($planning['haschanged']) {
                 plannings::update_planning(
                     $planning['id'],
+                    $planning['situationid'],
+                    $planning['groupid'],
                     $planning['startdate'],
                     $planning['enddate'],
                     $planning['session']

@@ -15,7 +15,8 @@
         align-items: center;
         &.editable {
             padding: 0;
-            input {
+            input,
+            select {
                 height: 100%;
                 border-radius: 0;
                 &:focus {
@@ -166,7 +167,7 @@
         font-weight: bold;
         font-size: 1.5rem;
         position: absolute;
-        top: 0;
+        top: 0.5rem;
         right: 5px;
         display: flex;
         align-items: center;

@@ -53,15 +53,34 @@ class get_plannings extends external_api {
         global $USER;
         ['cmid' => $cmid] = self::validate_parameters(self::execute_parameters(), ['cmid' => $cmid]);
         $competvet = competvet::get_from_cmid($cmid);
+        $context = $competvet->get_context();
+
+        $coursegroups = groups_get_all_groups($context->get_course_context()->instanceid);
+        $groups = array_map(function ($group) {
+            return [
+                'id' => $group->id,
+                'name' => $group->name,
+            ];
+        }, $coursegroups);
+
         $plannings = plannings_api::get_plannings_for_situation_id($competvet->get_situation()->get('id'), $USER->id);
         // Covert the startdate and enddate to a human readable format using yyyy-MM-dd
         foreach ($plannings as $key => $planning) {
+            $planninggroups = array_map(function ($group) use ($planning) {
+                return [
+                    'id' => $group['id'],
+                    'name' => $group['name'],
+                    'selected' => $group['id'] === $planning['groupid'],
+                ];
+            }, $groups);
             $plannings[$key]['startdate'] = userdate($planning['startdate'], '%Y-%m-%d');
             $plannings[$key]['enddate'] = userdate($planning['enddate'], '%Y-%m-%d');
+            $plannings[$key]['groups'] = $planninggroups;
         }
 
         return [
             'plannings' => $plannings,
+            'groups' => $groups,
             'version' => time(),
         ];
     }
@@ -76,9 +95,20 @@ class get_plannings extends external_api {
             'plannings' => new external_multiple_structure(new external_single_structure([
                 'id' => new external_value(PARAM_INT, 'Id', VALUE_REQUIRED),
                 'startdate' => new external_value(PARAM_TEXT, 'Start date', VALUE_REQUIRED),
+                'situationid' => new external_value(PARAM_INT, 'Situation id', VALUE_REQUIRED),
+                'groupid' => new external_value(PARAM_INT, 'Group id', VALUE_REQUIRED),
                 'enddate' => new external_value(PARAM_TEXT, 'End date', VALUE_REQUIRED),
                 'groupname' => new external_value(PARAM_TEXT, 'Group name', VALUE_REQUIRED),
                 'session' => new external_value(PARAM_TEXT, 'Session name', VALUE_REQUIRED),
+                'groups' => new external_multiple_structure(new external_single_structure([
+                    'id' => new external_value(PARAM_INT, 'Id', VALUE_REQUIRED),
+                    'name' => new external_value(PARAM_TEXT, 'Name', VALUE_REQUIRED),
+                    'selected' => new external_value(PARAM_BOOL, 'Selected', VALUE_OPTIONAL),
+                ])),
+            ])),
+            'groups' => new external_multiple_structure(new external_single_structure([
+                'id' => new external_value(PARAM_INT, 'Id', VALUE_REQUIRED),
+                'name' => new external_value(PARAM_TEXT, 'Name', VALUE_REQUIRED),
             ])),
             'version' => new external_value(PARAM_INT, 'Version', VALUE_REQUIRED),
         ]);

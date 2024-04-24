@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_competvet/grading/components/list-criteria
+    @template mod_competvet/grading/components/list-grading
 
     Creates the list of criteria for the note tab. For each criterion, it will
     display the title and the options.
@@ -25,7 +25,7 @@
     {
     }
 }}
-{{#list-criteria}}
+{{#list-grading}}
     {{#criteria}}
         <section>
             <h4 class="criterion-title h6">{{{title}}}</h4>
@@ -44,4 +44,4 @@
         </section>
     {{/criteria}}
     <button type="submit" class="btn btn-primary">{{#str}}savechanges{{/str}}</button>
-{{/list-criteria}}
+{{/list-grading}}

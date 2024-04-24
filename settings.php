@@ -22,6 +22,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_competvet\output\view\base;
+
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
@@ -38,6 +40,19 @@ if ($hassiteconfig) {
                 get_string('planning:defaultsession', 'mod_competvet'),
                 $currentyear,
                 PARAM_INT,
+            )
+        );
+        // Add a link to the manage criteria page.
+        $renderer = $PAGE->get_renderer('mod_competvet');
+        $widget = base::factory($USER->id, 'managecriteria');
+        $widget->set_data();
+        $widget->check_access();
+        $url = new moodle_url('/mod/competvet/criteria.php');
+        $settings->add(
+            new admin_setting_heading(
+                'mod_competvet/managecriteria',
+                get_string('managecriteria', 'mod_competvet'),
+                $renderer->render($widget)
             )
         );
         // TODO: Define actual plugin settings page and add it to the tree - {@link https://docs.moodle.org/dev/Admin_settings}.

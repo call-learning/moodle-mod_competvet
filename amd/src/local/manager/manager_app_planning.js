@@ -38,6 +38,7 @@ class Manager {
     constructor() {
         this.app = document.querySelector('[data-region="planning"]');
         this.cmId = this.app.dataset.cmId;
+        this.situationId = this.app.dataset.situationId;
         this.dataset = this.app.region;
         this.addEventListeners();
         this.getData();
@@ -73,7 +74,7 @@ class Manager {
      * Actions.
      * @param {object} btn The button that was clicked.
      */
-    actions(btn) {
+    async actions(btn) {
         if (btn.dataset.action === 'add') {
             this.add(btn);
         }
@@ -81,8 +82,10 @@ class Manager {
             this.edit(btn);
         }
         if (btn.dataset.action === 'save') {
-            this.save();
-            this.stopEdit();
+            const result = await this.save();
+            if (result) {
+                this.stopEdit();
+            }
         }
         if (btn.dataset.action === 'delete') {
             this.delete(btn);
@@ -96,18 +99,15 @@ class Manager {
     add(btn) {
         let state = CompetState.getData();
         if (btn.dataset.type === 'planning') {
-            let newPlanningId = 1;
-            if (state.plannings.length > 0) {
-                newPlanningId = Math.max(...state.plannings.map((element) => element.id)) + 1;
-            }
-
             state.plannings.push({
-                id: newPlanningId,
+                id: 0,
+                situationid: this.situationId, // TODO set the correct situation id.
                 startdate: '',
                 enddate: '',
-                groupname: '',
+                groupid: '',
                 session: '',
                 edit: true,
+                groups: state.groups,
             });
         }
         CompetState.setData(state);
@@ -164,19 +164,51 @@ class Manager {
                 element.haschanged = true;
                 element.startdate = this.getValue('planitem', 'startdate', element.id);
                 element.enddate = this.getValue('planitem', 'enddate', element.id);
-                element.groupname = this.getValue('planitem', 'groupname', element.id);
+                element.groupid = this.getValue('planitem', 'groupid', element.id);
+                if (element.groupid !== '') {
+                    element.groupname = element.groups.find((group) => group.id === parseInt(element.groupid)).name;
+                }
                 element.session = this.getValue('planitem', 'session', element.id);
+                // Set the error flag if startdate, enddate or groupid are empty.
+                if (element.startdate === '') {
+                    element.errorstartdate = true;
+                    element.error = true;
+                }
+                if (element.enddate === '') {
+                    element.errorenddate = true;
+                    element.error = true;
+                }
+                if (element.groupid === '') {
+                    element.errorgroupid = true;
+                    element.error = true;
+                }
+                if (element.startdate !== '' && element.enddate !== '' && element.groupid !== '') {
+                    element.error = false;
+                }
             }
         });
         CompetState.setData(state);
     }
 
     /**
+     * Get the planning object structure.
+     */
+    get planningObjectKeys() {
+        return ['id', 'situationid', 'startdate', 'enddate', 'groupid', 'session', 'haschanged', 'deleted'];
+    }
+
+    /**
      * Save the state to the server.
+     *
+     * @return {Bool} True if the state was saved.
      */
     async save() {
         this.update();
         const state = CompetState.getData();
+        // If any element has an error, do not save.
+        if (state.plannings.find((element) => element.error)) {
+            return false;
+        }
         const saveState = {
             plannings: [],
         };
@@ -184,11 +216,16 @@ class Manager {
             saveState.plannings = [...state.plannings];
         }
         saveState.plannings.forEach((element) => {
-            delete element.edit;
-            delete element.placeholder;
+            // Delete all foreign keys.
+            Object.keys(element).forEach((key) => {
+                if (!this.planningObjectKeys.includes(key)) {
+                    delete element[key];
+                }
+            });
         });
-        await Repository.savePlannings(saveState);
+        const result = await Repository.savePlannings(saveState);
         this.getData();
+        return result;
     }
 
     /**

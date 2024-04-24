@@ -158,15 +158,13 @@ class Manager {
         if (btn.dataset.type === 'criterion') {
             this.removeEdit();
             const index = state.grids.find((element) => element.gridid === parseInt(btn.dataset.gridId));
-            let newCritID = 1;
             let newCritSortOrder = 1;
             if (index.criteria.length > 0) {
-                newCritID = Math.max(...index.criteria.map((element) => element.criterionid)) + 1;
                 newCritSortOrder = Math.max(...index.criteria.map((element) => element.sortorder)) + 1;
             }
             const newcriterion = {
-                criterionid: newCritID,
-                idnumber: 'G' + index.gridid + '-C' + newCritID,
+                criterionid: 0,
+                idnumber: 'G' + index.gridid + '-C' + newCritSortOrder,
                 sortorder: newCritSortOrder,
                 title: '',
                 placeholder: await getString('newcriterion', 'mod_competvet'),
@@ -183,15 +181,13 @@ class Manager {
             const index = state.grids.find((element) => element.gridid === parseInt(btn.dataset.gridId));
             const criterion = index.criteria.find((element) => element.criterionid === parseInt(btn.dataset.criterionId));
             criterion.edit = true;
-            let newOptionId = 1;
             let newOptSortOrder = 1;
             if (criterion.options.length > 0) {
-                newOptionId = Math.max(...criterion.options.map((element) => element.optionid)) + 1;
                 newOptSortOrder = Math.max(...criterion.options.map((element) => element.sortorder)) + 1;
             }
             const newOption = {
-                optionid: newOptionId,
-                idnumber: 'G' + index.gridid + '-C' + criterion.criterionid + '-O' + newOptionId,
+                optionid: 0,
+                idnumber: 'G' + index.gridid + '-C' + criterion.criterionid + '-O' + newOptSortOrder,
                 sortorder: newOptSortOrder,
                 title: '',
                 placeholder: await getString('newoption', 'mod_competvet'),

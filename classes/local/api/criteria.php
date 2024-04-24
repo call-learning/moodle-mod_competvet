@@ -44,11 +44,13 @@ class criteria {
         if (!$grid) {
             $grid = new grid(0);
             $grid->set('name' , $gridname);
+            $grid->set('idnumber', grid::DEFAULT_GRID_SHORTNAME[$type]);
             $grid->set('sortorder', $sortorder);
             $grid->set('type', $type);
             $grid->create();
         } else {
             $grid->set('name' , $gridname);
+            $grid->set('idnumber', grid::DEFAULT_GRID_SHORTNAME[$type]);
             $grid->set('sortorder', $sortorder);
             $grid->set('type', $type);
             $grid->update();
@@ -101,7 +103,8 @@ class criteria {
         $criterion->set('gridid', $gridid);
         $criterion->set('parentid', $parentid);
         $criterion->set('grade', $grade);
-        if ($criterion->get('id')) {
+        $newid = $criterion->get('id');
+        if ($newid) {
             $criterion->update();
         } else {
             $criterion->create();

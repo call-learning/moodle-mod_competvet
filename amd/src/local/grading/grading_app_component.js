@@ -27,7 +27,7 @@ import './components/auto_regions';
 import './components/user_navigation';
 import './components/evaluations_observations';
 import './components/evaluations_grading';
-import './components/list_criteria';
+import './components/list_grading';
 import './components/globalgrade';
 import './components/certification_grading';
 import './components/certification_results';
@@ -63,6 +63,11 @@ class Competvet {
     constructor() {
         this.gradingApp = document.querySelector('[data-region="grading-app"]');
         this.cmId = this.gradingApp.dataset.cmId;
+        const planning = {
+            id: this.gradingApp.dataset.planningid,
+            cmid: this.cmId
+        };
+        CompetState.setValue('planning', planning);
         this.userlist = [];
         this.currentUser = 0;
         this.setup();
@@ -86,21 +91,18 @@ class Competvet {
      * Set the current user.
      * @param {Object} user The user to set as current.
      */
-    setCurrentUser(user) {
+    async setCurrentUser(user) {
         CompetState.setValue('user', user);
         this.currentUser = user;
 
         this.setEvalResults();
-        this.setEvalGrading();
-
         this.setCertifResults();
-        this.setCertifGrading();
-
         this.setListResults();
-        this.setListGrading();
+
+        await this.setListGrading();
 
         this.setGlobalGrade();
-
+        this.setForms();
     }
 
     async setEvalResults() {
@@ -126,24 +128,6 @@ class Competvet {
         // CompetState.setValue('evaluation-results', context);
     }
 
-    /**
-     * Set the Evaluation grading.
-     */
-    async setEvalGrading() {
-        const args = {
-            userid: this.currentUser.id,
-            cmid: this.cmId
-        };
-        const response = await Repository.getEvaluationGrading(args);
-        if (!response.evaluationsgrading) {
-            return;
-        }
-        const context = {
-            'grading': response.evaluationsgrading
-        };
-        CompetState.setValue('evaluations-grading', context);
-    }
-
     async setCertifResults() {
         const args = {
             type: COMPETVET_CRITERIA_CERTIFICATION
@@ -156,24 +140,6 @@ class Competvet {
             'criteria': response.grids[0].criteria
         };
         CompetState.setValue('certification-results', context);
-    }
-
-    /**
-     * Set the Certification grading.
-     */
-    async setCertifGrading() {
-        const args = {
-            userid: this.currentUser.id,
-            cmid: this.cmId
-        };
-        const response = await Repository.getCertificationGrading(args);
-        if (!response.certifgrading) {
-            return;
-        }
-        const context = {
-            'grading': response.certifgrading
-        };
-        CompetState.setValue('certification-grading', context);
     }
 
     async setListResults() {
@@ -199,7 +165,7 @@ class Competvet {
         const context = {
             'criteria': response.grids[0].criteria
         };
-        CompetState.setValue('list-criteria', context);
+        CompetState.setValue('list-grading', context);
     }
 
     /**
@@ -230,6 +196,28 @@ class Competvet {
             return;
         }
         CompetState.setValue('globalgrade', response.globalgrade);
+    }
+
+    /**
+     * Set the forms.
+     */
+    async setForms() {
+        const forms = ['evaluations-grading', 'certification-grading'];
+        forms.forEach(async(formname) => {
+            const args = {
+                userid: this.currentUser.id,
+                planningid: this.gradingApp.dataset.planningid,
+                formname: formname
+            };
+            const response = await Repository.getFormData(args);
+            if (!response.result) {
+                return;
+            }
+            const context = {
+                grading: JSON.parse(response.data)
+            };
+            CompetState.setValue(formname, context);
+        });
     }
 
     /**

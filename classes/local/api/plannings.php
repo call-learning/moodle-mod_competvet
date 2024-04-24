@@ -349,6 +349,8 @@ class plannings {
      * Update the planning
      *
      * @param int $planningid - The planning id
+     * @param int $situationid - The situation id
+     * @param int $groupid - The group id
      * @param string $startdate - The start date
      * @param string $enddate - The end date
      * @param string $groupname - The group name
@@ -357,6 +359,8 @@ class plannings {
      */
     public static function update_planning(
         int $planningid,
+        int $situationid,
+        int $groupid,
         string $startdate,
         string $enddate,
         string $session
@@ -365,6 +369,8 @@ class plannings {
         if (!$planning) {
             $planning = new planning(0);
         }
+        $planning->set('situationid', $situationid);
+        $planning->set('groupid', $groupid);
         $planning->set('startdate', strtotime($startdate));
         $planning->set('enddate', strtotime($enddate));
         $planning->set('session', $session);

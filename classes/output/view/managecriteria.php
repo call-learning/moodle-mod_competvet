@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\output\view;
 
+use context_system;
 use mod_competvet\competvet;
 use renderer_base;
 use stdClass;
@@ -41,7 +42,6 @@ class managecriteria extends base {
     public function export_for_template(renderer_base $output) {
         $data = parent::export_for_template($output);
         $data['version'] = time();
-        $data['cmid'] = $this->competvet->get_course_module_id();
         return $data;
     }
 
@@ -57,13 +57,18 @@ class managecriteria extends base {
      * @return void
      */
     public function set_data(...$data) {
-        if (empty($data)) {
-            global $PAGE;
-            $context = $PAGE->context;
-            $competvet = competvet::get_from_context($context);
-            $data = [$competvet];
+    }
+
+    /**
+     * Check if current user has access to this page and throw an exception if not.
+     *
+     * @return void
+     */
+    public function check_access(): void {
+        $context = context_system::instance();
+        if (!has_capability('mod/competvet:candoeverything', $context)) {
+            throw new \moodle_exception('noaccess', 'data');
         }
-        [$this->competvet] = $data;
     }
 
     /**

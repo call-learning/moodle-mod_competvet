@@ -42,6 +42,7 @@ class manageplanning extends base {
         $data = parent::export_for_template($output);
         $data['version'] = time();
         $data['cmid'] = $this->competvet->get_course_module_id();
+        $data['situationid'] = $this->competvet->get_situation()->get('id');
         return $data;
     }
 

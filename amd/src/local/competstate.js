@@ -122,7 +122,7 @@ class CompetState {
         if (subscriber) {
             subscriber.callback(this.data);
         } else {
-            window.console.log('The key is not subscribed');
+            window.console.log(`The key ${key} is not subscribed`);
         }
     }
 
