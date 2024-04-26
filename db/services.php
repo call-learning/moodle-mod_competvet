@@ -144,4 +144,20 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/competvet:cangrade',
     ],
+    'mod_competvet_get_global_grade' => [
+        'classname' => \mod_competvet\external\manage_grade::class,
+        'methodname' => 'get',
+        'description' => 'Get the global grade',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:view',
+    ],
+    'mod_competvet_save_global_grade' => [
+        'classname' => \mod_competvet\external\manage_grade::class,
+        'methodname' => 'update',
+        'description' => 'Update the global grade',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:cangrade',
+    ],
 ];

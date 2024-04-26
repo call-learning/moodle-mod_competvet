@@ -120,9 +120,10 @@ class Manager {
     delete(btn) {
         let state = CompetState.getData();
         if (btn.dataset.type === 'planning') {
-            state.plannings = state.plannings.filter((element) => element.id !== parseInt(btn.dataset.id));
+            state.plannings.find((element) => element.id === parseInt(btn.dataset.id)).deleted = true;
         }
         CompetState.setData(state);
+        this.save();
     }
 
     /**

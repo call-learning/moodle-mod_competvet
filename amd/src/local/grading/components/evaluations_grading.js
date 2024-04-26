@@ -49,15 +49,12 @@ const stateTemplate = () => {
     CompetState.subscribe(templateName, regionRenderer);
 };
 
-stateTemplate();
-
 const formCalculation = () => {
     const form = document.querySelector('[data-region="evaluations-grading"]');
     const formData = new FormData(form);
     const formObject = Object.fromEntries(formData);
-    const {'evaluations-grading': evaluationsGrading, user} = CompetState.getData();
+    const {'evaluations-grading': evaluationsGrading} = CompetState.getData();
     const grading = evaluationsGrading.grading;
-    grading.userid = user.id;
     grading.deactivatepenalty = formObject.deactivatepenalty === 'on' ? 1 : 0;
     const penalty = grading.deactivatepenalty ? 0 : 1;
     grading.selfevaluation = formObject.selfevaluation;
@@ -106,3 +103,5 @@ const formEvents = () => {
     });
     form.dataset.events = true;
 };
+
+stateTemplate();

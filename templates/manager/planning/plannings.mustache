@@ -45,6 +45,8 @@
 {{> mod_competvet/manager/planning/planning_header}}
 <div class="plannings container-fluid" data-region="crit">
     {{#plannings}}
-        {{> mod_competvet/manager/planning/planning_item}}
+        {{^deleted}}
+            {{> mod_competvet/manager/planning/planning_item}}
+        {{/deleted}}
     {{/plannings}}
 </div>

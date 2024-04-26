@@ -17,7 +17,7 @@ namespace mod_competvet\external;
 use external_api;
 use external_function_parameters;
 use external_value;
-use stdClass;
+use core_date;
 use external_single_structure;
 use external_multiple_structure;
 use mod_competvet\competvet;
@@ -63,7 +63,8 @@ class get_plannings extends external_api {
             ];
         }, $coursegroups);
 
-        $plannings = plannings_api::get_plannings_for_situation_id($competvet->get_situation()->get('id'), $USER->id);
+        $plannings = plannings_api::get_plannings_for_situation_id($competvet->get_situation()->get('id'), $USER->id, false);
+        $timezone = core_date::get_user_timezone_object();
         // Covert the startdate and enddate to a human readable format using yyyy-MM-dd
         foreach ($plannings as $key => $planning) {
             $planninggroups = array_map(function ($group) use ($planning) {
@@ -73,8 +74,8 @@ class get_plannings extends external_api {
                     'selected' => $group['id'] === $planning['groupid'],
                 ];
             }, $groups);
-            $plannings[$key]['startdate'] = userdate($planning['startdate'], '%Y-%m-%d');
-            $plannings[$key]['enddate'] = userdate($planning['enddate'], '%Y-%m-%d');
+            $plannings[$key]['startdate'] = userdate($planning['startdate'], '%Y-%m-%d', $timezone, false);
+            $plannings[$key]['enddate'] = userdate($planning['enddate'], '%Y-%m-%d', $timezone, false);
             $plannings[$key]['groups'] = $planninggroups;
         }
 

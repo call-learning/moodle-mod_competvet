@@ -23,7 +23,6 @@
 import Repository from '../new-repository';
 import CompetState from '../competstate';
 import '../helpers';
-import './components/auto_regions';
 import './components/user_navigation';
 import './components/evaluations_observations';
 import './components/evaluations_grading';
@@ -37,7 +36,7 @@ import './components/evaluation_results';
 /**
  * Constants for eval certif and list.
  */
-//const COMPETVET_CRITERIA_EVALUATION = 1;
+const COMPETVET_CRITERIA_EVALUATION = 1;
 const COMPETVET_CRITERIA_CERTIFICATION = 2;
 const COMPETVET_CRITERIA_LIST = 3;
 
@@ -63,6 +62,9 @@ class Competvet {
     constructor() {
         this.gradingApp = document.querySelector('[data-region="grading-app"]');
         this.cmId = this.gradingApp.dataset.cmId;
+        this.evalgrid = this.gradingApp.dataset.evalgrid;
+        this.certifgrid = this.gradingApp.dataset.certifgrid;
+        this.listgrid = this.gradingApp.dataset.listgrid;
         const planning = {
             id: this.gradingApp.dataset.planningid,
             cmid: this.cmId
@@ -106,31 +108,24 @@ class Competvet {
     }
 
     async setEvalResults() {
-        // THIS GETS THE RESULTS FROM THE JSON FILE.
         const args = {
-            userid: this.currentUser.id,
-            cmid: this.cmId
+            type: COMPETVET_CRITERIA_EVALUATION,
+            gridid: this.evalgrid
         };
-        const response = await Repository.getEvaluationCriteria(args);
-        CompetState.setValue('evaluation-results', response);
-
-        // The COMMENTED OUT CODE IS FOR FUTURE USE.
-        // const args = {
-        //     type: COMPETVET_CRITERIA_EVALUATION
-        // };
-        // const response = await Repository.getCriteria(args);
-        // if (!response.grids) {
-        //     return;
-        // }
-        // const context = {
-        //     'criteria': response.grids[0].criteria
-        // };
-        // CompetState.setValue('evaluation-results', context);
+        const response = await Repository.getCriteria(args);
+        if (!response.grids) {
+            return;
+        }
+        const context = {
+            'criteria': response.grids[0].criteria
+        };
+        CompetState.setValue('evaluation-results', context);
     }
 
     async setCertifResults() {
         const args = {
-            type: COMPETVET_CRITERIA_CERTIFICATION
+            type: COMPETVET_CRITERIA_CERTIFICATION,
+            gridid: this.certifgrid
         };
         const response = await Repository.getCriteria(args);
         if (!response.grids) {
@@ -156,14 +151,17 @@ class Competvet {
      */
     async setListGrading() {
         const args = {
-            type: COMPETVET_CRITERIA_LIST
+            type: COMPETVET_CRITERIA_LIST,
+            gridid: this.listgrid
         };
         const response = await Repository.getCriteria(args);
         if (!response.grids) {
             return;
         }
         const context = {
-            'criteria': response.grids[0].criteria
+            grading: {
+                'criteria': response.grids[0].criteria
+            }
         };
         CompetState.setValue('list-grading', context);
     }
@@ -192,17 +190,17 @@ class Competvet {
             userid: this.currentUser.id
         };
         const response = await Repository.getGlobalGrade(args);
-        if (!response.globalgrade) {
+        if (!response.result) {
             return;
         }
-        CompetState.setValue('globalgrade', response.globalgrade);
+        CompetState.setValue('globalgrade', response.result);
     }
 
     /**
      * Set the forms.
      */
     async setForms() {
-        const forms = ['evaluations-grading', 'certification-grading'];
+        const forms = ['evaluations-grading', 'certification-grading', 'list-grading'];
         forms.forEach(async(formname) => {
             const args = {
                 userid: this.currentUser.id,

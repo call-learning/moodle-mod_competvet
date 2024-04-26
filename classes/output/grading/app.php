@@ -67,6 +67,9 @@ class app implements named_templatable, renderable {
         $export->name = $this->competvet->get_context()->get_context_name(true, false, false);
         $export->courseid = $this->competvet->get_course()->id;
         $export->coursename = $this->competvet->get_course()->fullname;
+        $export->evalgrid = $this->competvet->get_situation()->get('evalgrid');
+        $export->certifgrid = $this->competvet->get_situation()->get('certifgrid');
+        $export->listgrid = $this->competvet->get_situation()->get('listgrid');
         $export->planningid = optional_param('planningid', 0, PARAM_INT);
         $export->studentid = optional_param('studentid', 0, PARAM_INT);
         $export->returnurl = optional_param('returnurl', '', PARAM_URL);

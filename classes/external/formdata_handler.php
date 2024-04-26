@@ -128,11 +128,12 @@ class formdata_handler extends external_api {
 
         if (!$userdata['success']) {
             $defaultdata = get_json::execute($formname); // TODO, find a better way to get default data.
-            if (isset($defaultdata['data'])) {
+            if ($defaultdata['data']) {
                 $returndata = $defaultdata['data'];
                 $result = true;
             } else {
                 $result = false;
+                $returndata = '{}';
             }
         }
 

@@ -38,6 +38,7 @@ const stateTemplate = () => {
         }
         Templates.render(template, context).then((html) => {
             region.innerHTML = html;
+            formEvents();
             return;
         }).catch(Notification.exception);
     };
@@ -52,7 +53,7 @@ const formCalculation = () => {
     globalgrade.userid = user.id;
     globalgrade.finalgrade = formObject.finalgrade;
     globalgrade.finalgradeoptions.forEach(element => {
-        if (element.value === formObject.finalgrade) {
+        if (element.key == formObject.finalgrade) {
             element.selected = true;
         } else {
             element.selected = false;
@@ -67,10 +68,16 @@ const formEvents = () => {
     form.addEventListener('submit', async(e) => {
         e.preventDefault();
         const globalgrade = formCalculation();
-        await Repository.saveGlobalGrade(globalgrade);
+        const user = CompetState.getValue('user');
+        const planning = CompetState.getValue('planning');
+        const args = {
+            userid: user.id,
+            cmid: planning.cmid,
+            grade: globalgrade.finalgrade,
+        };
+        await Repository.saveGlobalGrade(args);
         CompetState.setValue('globalgrade', globalgrade);
     });
 };
 
 stateTemplate();
-formEvents();

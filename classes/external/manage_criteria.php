@@ -39,9 +39,7 @@ DEFINE('COMPETVET_CRITERIA_LIST', 3);
  */
 class manage_criteria extends external_api {
     /**
-     * Returns description of method parameters. This will be used to validate the JSON data sent to the external function. It
-     * Will need to allow the JSON objects for $exampleJsonEval, $exampleJsonCert and $exampleJsonList and it will include the
-     * gridid and the type of criteria to manage.
+     * Returns description of method parameters.
      *
      * @return external_function_parameters
      */
@@ -92,7 +90,6 @@ class manage_criteria extends external_api {
      * @return array
      */
     public static function update($grids, $type): array {
-        global $DB;
         $params = self::validate_parameters(self::update_parameters(), ['grids' => $grids, 'type' => $type]);
 
         $grids = $params['grids'];
@@ -198,13 +195,13 @@ class manage_criteria extends external_api {
 
     /**
      * Returns description of method parameters
-     * Look at the example_json for the structure of the data
      *
      * @return external_function_parameters
      */
     public static function get_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'type' => new external_value(PARAM_INT, 'The type of criteria to manage', VALUE_REQUIRED)
+            'type' => new external_value(PARAM_INT, 'The type of criteria to manage', VALUE_REQUIRED),
+            'gridid' => new external_value(PARAM_INT, 'The grid id', VALUE_OPTIONAL),
         ]);
     }
 
@@ -212,16 +209,22 @@ class manage_criteria extends external_api {
      * Execute and return criteria list
      *
      * @param int $type - The type of criteria to manage
+     * @param int $gridid - The grid id
      * @return array
      */
-    public static function get($type): array {
+    public static function get($type, $gridid): array {
         global $DB;
-        $params = self::validate_parameters(self::get_parameters(), ['type' => $type]);
+        $params = self::validate_parameters(self::get_parameters(), ['type' => $type, 'gridid' => $gridid]);
 
         $type = $params['type'];
+        $gridid = $params['gridid'];
         $results = [];
 
-        $grids = $DB->get_records('competvet_grid', ['type' => $type], 'sortorder ASC');
+        $queryparams = ['type' => $type];
+        if ($gridid) {
+            $queryparams['id'] = $gridid;
+        }
+        $grids = $DB->get_records('competvet_grid', $queryparams, 'sortorder ASC');
 
         $grids = array_map(function ($grid) {
             global $DB;

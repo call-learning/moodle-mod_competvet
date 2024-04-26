@@ -43,6 +43,7 @@ const stateTemplate = () => {
         // TODO, make the grid selection dynamic.
         Templates.render(template, context).then((html) => {
             region.innerHTML = html;
+            formEvents();
             return;
         }).catch(Notification.exception);
     };
@@ -53,9 +54,9 @@ const formCalculation = () => {
     const form = document.querySelector('[data-region="list-grading"]');
     const formData = new FormData(form);
     const formObject = Object.fromEntries(formData);
-    const {'list-grading': criteria, user} = CompetState.getData();
-    criteria.userid = user.id;
-    criteria.criteria.forEach((criterion) => {
+    const {'list-grading': listGrading} = CompetState.getData();
+    const grading = listGrading.grading;
+    grading.criteria.forEach((criterion) => {
         const criterionId = criterion.criterionid;
         criterion.grade = formObject[`criterion-${criterionId}`];
         criterion.comment = formObject[`criterion-${criterionId}-comment`];
@@ -68,20 +69,33 @@ const formCalculation = () => {
         });
     });
     const context = {
-        'list-grading': criteria,
+        grading: grading
     };
     return context;
 };
 
 const formEvents = () => {
     const form = document.querySelector('[data-region="list-grading"]');
+    if (form.dataset.events) {
+        return;
+    }
     form.addEventListener('submit', async(e) => {
         e.preventDefault();
         const context = formCalculation();
-        await Repository.saveListGrades(context['list-grading']);
-        CompetState.setValue('list-grading', context['list-grading']);
+        const user = CompetState.getValue('user');
+        const planning = CompetState.getValue('planning');
+
+        const args = {
+            userid: user.id,
+            planningid: planning.id,
+            formname: 'list-grading',
+            json: JSON.stringify(context.grading)
+        };
+        const result = await Repository.saveFormData(args);
+        context.result = result;
+        CompetState.setValue('list-grading', context);
     });
+    form.dataset.events = true;
 };
 
 stateTemplate();
-formEvents();

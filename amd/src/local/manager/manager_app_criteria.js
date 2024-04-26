@@ -61,9 +61,35 @@ class Manager {
     async getData() {
         const args = {
             type: this.dataset,
+            gridid: 0,
         };
         const response = await Repository.getCriteria(args);
         CompetState.setValue('datatree', response);
+    }
+
+    /**
+     * Get the grid object keys that can be accepted by the server.
+     */
+    get gridObjectKeys() {
+        return ['gridid', 'gridname', 'sortorder', 'criteria', 'haschanged', 'deleted', 'updatesortorder'];
+    }
+
+    /**
+     * Get the criterion object keys that can be accepted by the server.
+     * @return {Array} The keys.
+     */
+    get criterionObjectKeys() {
+        return [
+            'criterionid', 'idnumber', 'sortorder', 'title', 'options', 'haschanged','hasoptions', 'deleted', 'updatesortorder'
+        ];
+    }
+
+    /**
+     * Get the option object keys that can be accepted by the server.
+     * @return {Array} The keys.
+     */
+    get optionObjectKeys() {
+        return ['optionid', 'idnumber', 'sortorder', 'title', 'grade', 'haschanged', 'deleted', 'updatesortorder'];
     }
 
     /**
@@ -220,6 +246,7 @@ class Manager {
             criterion.options.find((element) => element.optionid === parseInt(btn.dataset.id)).deleted = true;
         }
         CompetState.setValue('datatree', state);
+        this.save();
     }
 
     /**
@@ -307,11 +334,17 @@ class Manager {
             saveState.grids = [...state.grids];
         }
         saveState.grids.forEach((element) => {
-            delete element.edit;
-            delete element.placeholder;
+            Object.keys(element).forEach((key) => {
+                if (!this.gridObjectKeys.includes(key)) {
+                    delete element[key];
+                }
+            });
             element.criteria.forEach((element) => {
-                delete element.edit;
-                delete element.placeholder;
+                Object.keys(element).forEach((key) => {
+                    if (!this.criterionObjectKeys.includes(key)) {
+                        delete element[key];
+                    }
+                });
                 if (!element.haschanged) {
                     element.haschanged = false;
                 }
@@ -319,8 +352,11 @@ class Manager {
                     return;
                 }
                 element.options.forEach((element) => {
-                    delete element.edit;
-                    delete element.placeholder;
+                    Object.keys(element).forEach((key) => {
+                        if (!this.optionObjectKeys.includes(key)) {
+                            delete element[key];
+                        }
+                    });
                 });
             });
         });
