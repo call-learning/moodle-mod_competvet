@@ -488,7 +488,6 @@ function xmldb_competvet_upgrade($oldversion) {
         // Launch add key listgrid_fk.
         $dbman->add_key($table, $key);
 
-
         // Criterion TABLE.
         // ########################################################
         // First drop the constraints to be readded later.
@@ -496,7 +495,6 @@ function xmldb_competvet_upgrade($oldversion) {
         $key = new xmldb_key('evalgridid_fk', XMLDB_KEY_FOREIGN, ['evalgridid'], 'competvet_evalgrid', ['id']);
         // Launch drop key evalgridid_fk.
         $dbman->drop_key($table, $key);
-
 
         // Define index idnumber_ix (unique) to be dropped form competvet_criterion.
         $index = new xmldb_index('idnumber_ix', XMLDB_INDEX_UNIQUE, ['idnumber', 'evalgridid']);

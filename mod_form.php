@@ -147,13 +147,13 @@ class mod_competvet_mod_form extends moodleform_mod {
                 ];
             }, $evalgrids);
             $evalgridchoices = array_column($evalgridscolumns, 'name', 'id');
-            $fieldname =  $gridtypename . 'gridid';
+            $fieldname = $gridtypename . 'gridid';
             $mform->addElement(
                 'select',
                 $fieldname,
                 get_string('situation:' . $gridtypename . 'grid', 'competvet'),
                 $evalgridchoices,
-                !empty($defaultgrid) ? $defaultgrid->get('id'): null);
+                !empty($defaultgrid) ? $defaultgrid->get('id') : null);
             $mform->setType($fieldname, PARAM_INT);
         }
     }

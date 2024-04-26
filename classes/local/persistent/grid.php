@@ -99,7 +99,7 @@ class grid extends persistent {
                     self::COMPETVET_CRITERIA_EVALUATION,
                     self::COMPETVET_CRITERIA_CERTIFICATION,
                     self::COMPETVET_CRITERIA_LIST,
-                ]
+                ],
             ],
         ];
     }

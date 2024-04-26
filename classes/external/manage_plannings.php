@@ -25,9 +25,9 @@ use external_multiple_structure;
 use external_warnings;
 use mod_competvet\local\api\plannings;
 
-DEFINE('COMPETVET_CRITERIA_EVALUATION', 1);
-DEFINE('COMPETVET_CRITERIA_CERTIFICATION', 2);
-DEFINE('COMPETVET_CRITERIA_LIST', 3);
+define('COMPETVET_CRITERIA_EVALUATION', 1);
+define('COMPETVET_CRITERIA_CERTIFICATION', 2);
+define('COMPETVET_CRITERIA_LIST', 3);
 
 /**
  * Class manage_plannings
@@ -58,7 +58,7 @@ class manage_plannings extends external_api {
                     'haschanged' => new external_value(PARAM_BOOL, 'Has changed', VALUE_OPTIONAL),
                     'deleted' => new external_value(PARAM_BOOL, 'Is the grid deleted', VALUE_OPTIONAL),
                 ]
-            ))
+            )),
         ]);
     }
 
@@ -94,9 +94,8 @@ class manage_plannings extends external_api {
             }
         }
 
-
         return [
-            'result' => $result
+            'result' => $result,
         ];
     }
 

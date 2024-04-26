@@ -79,7 +79,7 @@ class grid_test extends advanced_testcase {
         $evalgrid = new grid(0, (object) [
             'name' => 'Test grid',
             'idnumber' => 'TESTGRID',
-            'type' => grid::COMPETVET_CRITERIA_EVALUATION
+            'type' => grid::COMPETVET_CRITERIA_EVALUATION,
         ]
         );
         $evalgrid->create();

@@ -25,9 +25,9 @@ use external_multiple_structure;
 use external_warnings;
 use mod_competvet\local\api\criteria;
 
-DEFINE('COMPETVET_CRITERIA_EVALUATION', 1);
-DEFINE('COMPETVET_CRITERIA_CERTIFICATION', 2);
-DEFINE('COMPETVET_CRITERIA_LIST', 3);
+define('COMPETVET_CRITERIA_EVALUATION', 1);
+define('COMPETVET_CRITERIA_CERTIFICATION', 2);
+define('COMPETVET_CRITERIA_LIST', 3);
 
 /**
  * Class manage_criteria
@@ -73,12 +73,12 @@ class manage_criteria extends external_api {
                                     'grade' => new external_value(PARAM_FLOAT, 'The grade of the option', VALUE_OPTIONAL),
                                     'deleted' => new external_value(PARAM_BOOL, 'Is the option deleted', VALUE_OPTIONAL),
                                 ])
-                            )
+                            ),
                         ])
-                    )
+                    ),
                 ])
             ),
-            'type' => new external_value(PARAM_INT, 'The type of criteria to manage', VALUE_REQUIRED)
+            'type' => new external_value(PARAM_INT, 'The type of criteria to manage', VALUE_REQUIRED),
         ]);
     }
 
@@ -189,7 +189,7 @@ class manage_criteria extends external_api {
     public static function update_returns(): external_single_structure {
         return new external_single_structure([
             'result' => new external_value(PARAM_BOOL, 'The processing result'),
-            'warnings' => new external_warnings()
+            'warnings' => new external_warnings(),
         ]);
     }
 
@@ -229,7 +229,7 @@ class manage_criteria extends external_api {
         $grids = array_map(function ($grid) {
             global $DB;
             $criteria = $DB->get_records('competvet_criterion', ['gridid' => $grid->id], 'sort ASC');
-            $gridCriteria = [];
+            $gridcriteria = [];
             foreach ($criteria as $criterion) {
                 if ($criterion->parentid == 0) {
                     $newcriterion = (object) [
@@ -238,26 +238,26 @@ class manage_criteria extends external_api {
                         'idnumber' => $criterion->idnumber,
                         'sortorder' => $criterion->sort,
                         'hasoptions' => $grid->type == COMPETVET_CRITERIA_LIST||COMPETVET_CRITERIA_EVALUATION ? true : false,
-                        'options' => []
+                        'options' => [],
                     ];
                     foreach ($criteria as $option) {
                         if ($option->parentid === $criterion->id) {
-                            $newOption = (object) [
+                            $newoption = (object) [
                                 'optionid' => $option->id,
                                 'idnumber' => $option->idnumber,
                                 'title' => $option->label,
                                 'sortorder' => $option->sort,
-                                'grade' => $option->grade
+                                'grade' => $option->grade,
                             ];
-                            $newOption->hasgrade = $grid->type == COMPETVET_CRITERIA_LIST ? true : false;
-                            $newcriterion->options[] = $newOption;
+                            $newoption->hasgrade = $grid->type == COMPETVET_CRITERIA_LIST ? true : false;
+                            $newcriterion->options[] = $newoption;
                         }
                     }
                     // Sort the options
                     usort($newcriterion->options, function ($a, $b) {
                         return $a->sortorder <=> $b->sortorder;
                     });
-                    $gridCriteria[] = $newcriterion;
+                    $gridcriteria[] = $newcriterion;
                 }
             }
             $newgrid = (object) [
@@ -265,12 +265,12 @@ class manage_criteria extends external_api {
                 'gridname' => $grid->name,
                 'sortorder' => $grid->sortorder,
                 'haschanged' => false,
-                'criteria' => $gridCriteria
+                'criteria' => $gridcriteria,
             ];
             return $newgrid;
         }, $grids);
         return [
-            'grids' => $grids
+            'grids' => $grids,
         ];
     }
 
@@ -302,11 +302,11 @@ class manage_criteria extends external_api {
                                     'hasgrade' => new external_value(PARAM_BOOL, 'Does the option have a grade'),
                                     'grade' => new external_value(PARAM_FLOAT, 'The grade of the option'),
                                 ])
-                            )
+                            ),
                         ])
-                    )
+                    ),
                 ])
-            )
+            ),
         ]);
     }
 

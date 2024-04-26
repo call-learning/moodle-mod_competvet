@@ -87,7 +87,6 @@ class situations {
                 return $tag->name;
             }, $tagsobjects);
 
-
             sort($tags);
             $newsituation['tags'] = json_encode($tags);
             $newsituation['translatedtags'] = json_encode(array_map(

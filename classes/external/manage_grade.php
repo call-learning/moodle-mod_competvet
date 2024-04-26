@@ -44,7 +44,7 @@ class manage_grade extends external_api {
         return new external_function_parameters([
             'userid' => new external_value(PARAM_INT, 'The user id', VALUE_REQUIRED),
             'cmid' => new external_value(PARAM_INT, 'The course module id', VALUE_REQUIRED),
-            'grade' => new external_value(PARAM_TEXT, 'The grade', VALUE_REQUIRED)
+            'grade' => new external_value(PARAM_TEXT, 'The grade', VALUE_REQUIRED),
         ]);
     }
 
@@ -60,7 +60,7 @@ class manage_grade extends external_api {
         $params = self::validate_parameters(self::update_parameters(), [
             'userid' => $userid,
             'cmid' => $cmid,
-            'grade' => $grade
+            'grade' => $grade,
         ]);
         // Set the grade for this user in the Moodle gradebook
         $grade = intval($params['grade']);
@@ -88,12 +88,12 @@ class manage_grade extends external_api {
         if ($result == GRADE_UPDATE_OK) {
             return [
                 'result' => true,
-                'warnings' => []
+                'warnings' => [],
             ];
         } else {
             return [
                 'result' => false,
-                'warnings' => []
+                'warnings' => [],
             ];
         }
     }
@@ -106,7 +106,7 @@ class manage_grade extends external_api {
     public static function update_returns(): external_single_structure {
         return new external_single_structure([
             'result' => new external_value(PARAM_BOOL, 'The processing result'),
-            'warnings' => new external_warnings()
+            'warnings' => new external_warnings(),
         ]);
     }
 
@@ -118,7 +118,7 @@ class manage_grade extends external_api {
     public static function get_parameters(): external_function_parameters {
         return new external_function_parameters([
             'userid' => new external_value(PARAM_INT, 'The user id', VALUE_REQUIRED),
-            'cmid' => new external_value(PARAM_INT, 'The course module id', VALUE_REQUIRED)
+            'cmid' => new external_value(PARAM_INT, 'The course module id', VALUE_REQUIRED),
         ]);
     }
 
@@ -133,7 +133,7 @@ class manage_grade extends external_api {
         global $DB;
         $params = self::validate_parameters(self::get_parameters(), [
             'userid' => $userid,
-            'cmid' => $cmid
+            'cmid' => $cmid,
         ]);
         $cmid = $params['cmid'];
         $userid = $params['userid'];
@@ -154,7 +154,7 @@ class manage_grade extends external_api {
             ['key' => 30, 'value' => 'G', 'selected' => false],
             ['key' => 20, 'value' => 'H', 'selected' => false],
             ['key' => 10, 'value' => 'I', 'selected' => false],
-            ['key' => 0, 'value' => 'J', 'selected' => false]
+            ['key' => 0, 'value' => 'J', 'selected' => false],
         ];
 
         $grade->selectedgrade = 'D';
@@ -167,7 +167,7 @@ class manage_grade extends external_api {
 
         return [
             'result' => $grade,
-            'warnings' => []
+            'warnings' => [],
         ];
 
     }
@@ -188,14 +188,14 @@ class manage_grade extends external_api {
                             [
                                 'key' => new external_value(PARAM_TEXT, 'The key'),
                                 'value' => new external_value(PARAM_TEXT, 'The value'),
-                                'selected' => new external_value(PARAM_BOOL, 'The selected value')
+                                'selected' => new external_value(PARAM_BOOL, 'The selected value'),
                             ]
                         )
                     ),
-                    'selectedgrade' => new external_value(PARAM_TEXT, 'The selected grade')
+                    'selectedgrade' => new external_value(PARAM_TEXT, 'The selected grade'),
                 ]
             ),
-            'warnings' => new external_warnings()
+            'warnings' => new external_warnings(),
         ]);
     }
 }

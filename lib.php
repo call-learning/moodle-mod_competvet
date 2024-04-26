@@ -29,9 +29,9 @@ use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\utils;
 
-DEFINE('COMPETVET_CRITERIA_EVALUATION', 1);
-DEFINE('COMPETVET_CRITERIA_CERTIFICATION', 2);
-DEFINE('COMPETVET_CRITERIA_LIST', 3);
+define('COMPETVET_CRITERIA_EVALUATION', 1);
+define('COMPETVET_CRITERIA_CERTIFICATION', 2);
+define('COMPETVET_CRITERIA_LIST', 3);
 
 /**
  * Return if the plugin supports $feature.

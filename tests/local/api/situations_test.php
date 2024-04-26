@@ -137,7 +137,7 @@ class situations_test extends advanced_testcase {
             'parentid' => 1,
             'parentlabel' => 'Savoir être',
             'parentidnumber' => 'Q001',
-            'grade' => null
+            'grade' => null,
         ], $criteria[8]);
     }
 }

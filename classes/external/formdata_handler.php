@@ -65,7 +65,7 @@ class formdata_handler extends external_api {
             'userid' => $userid,
             'planningid' => $planningid,
             'formname' => $formname,
-            'json' => $json
+            'json' => $json,
         ]);
 
         $userid = $params['userid'];
@@ -77,7 +77,7 @@ class formdata_handler extends external_api {
         $result = formdata::store($userid, $planningid, $graderid, $formname, $json);
 
         return [
-            'result' => $result
+            'result' => $result,
         ];
     }
 
@@ -115,7 +115,7 @@ class formdata_handler extends external_api {
         $params = self::validate_parameters(self::get_parameters(), [
             'userid' => $userid,
             'planningid' => $planningid,
-            'formname' => $formname
+            'formname' => $formname,
         ]);
 
         $userid = $params['userid'];
@@ -139,7 +139,7 @@ class formdata_handler extends external_api {
 
         return [
             'result' => $result,
-            'data' => $returndata
+            'data' => $returndata,
         ];
     }
 
@@ -151,7 +151,7 @@ class formdata_handler extends external_api {
     public static function get_returns(): external_single_structure {
         return new external_single_structure([
             'result' => new external_value(PARAM_BOOL, 'The processing result'),
-            'data' => new external_value(PARAM_TEXT, 'The JSON data')
+            'data' => new external_value(PARAM_TEXT, 'The JSON data'),
         ]);
     }
 }
