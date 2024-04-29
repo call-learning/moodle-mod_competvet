@@ -488,6 +488,7 @@ function xmldb_competvet_upgrade($oldversion) {
         // Launch add key listgrid_fk.
         $dbman->add_key($table, $key);
 
+
         // Criterion TABLE.
         // ########################################################
         // First drop the constraints to be readded later.
@@ -495,6 +496,7 @@ function xmldb_competvet_upgrade($oldversion) {
         $key = new xmldb_key('evalgridid_fk', XMLDB_KEY_FOREIGN, ['evalgridid'], 'competvet_evalgrid', ['id']);
         // Launch drop key evalgridid_fk.
         $dbman->drop_key($table, $key);
+
 
         // Define index idnumber_ix (unique) to be dropped form competvet_criterion.
         $index = new xmldb_index('idnumber_ix', XMLDB_INDEX_UNIQUE, ['idnumber', 'evalgridid']);
@@ -630,5 +632,40 @@ function xmldb_competvet_upgrade($oldversion) {
         // Competvet savepoint reached.
         upgrade_mod_savepoint(true, 2024042105, 'competvet');
     }
+
+    if ($oldversion < 2024042900) {
+
+        // Define key criterion_fk (foreign) to be dropped form competvet_cert_decl.
+        $table = new xmldb_table('competvet_cert_decl');
+        $key = new xmldb_key('criterion_fk', XMLDB_KEY_FOREIGN, ['criterionid'], 'competvet_cert_criterion', ['id']);
+        // Launch drop key criterion_fk.
+        $dbman->drop_key($table, $key);
+
+        $key = new xmldb_key('criterion_fk', XMLDB_KEY_FOREIGN, ['criterionid'], 'competvet_criterion', ['id']);
+        // Launch add key criterion_fk.
+        $dbman->add_key($table, $key);
+        // Define table competvet_cert_decl to be dropped.
+        $table = new xmldb_table('competvet_cert_criterion');
+
+        // Conditionally launch drop table for competvet_cert_decl.
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Define key student_fk (foreign) to be dropped form competvet_cert_decl.
+        $table = new xmldb_table('competvet_cert_decl');
+        $key = new xmldb_key('student_fk', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+
+        // Launch drop key student_fk.
+        $dbman->drop_key($table, $key);
+        $key = new xmldb_key('student_fk', XMLDB_KEY_FOREIGN, ['studentid'], 'user', ['id']);
+
+        // Launch add key student_fk.
+        $dbman->add_key($table, $key);
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024042900, 'competvet');
+    }
+
+
     return true;
 }
