@@ -666,6 +666,106 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2024042900, 'competvet');
     }
 
+    if ($oldversion < 2024042902) {
 
+        // Define table competvet_case_field to be renamed to NEWNAMEGOESHERE.
+        $table = new xmldb_table('competvet_case_sfield');
+
+        if ($dbman->table_exists($table)) {
+            // Launch rename table for competvet_case_field.
+            $dbman->rename_table($table, 'competvet_case_field');
+        } else {
+            $table = new xmldb_table('competvet_case_field');
+        }
+
+        $field = new xmldb_field('shortname', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null, 'id');
+
+        if ($dbman->field_exists($table, $field)) {
+            // Launch rename field shortname.
+            $dbman->rename_field($table, $field, 'idnumber');
+        }
+
+        $field = new xmldb_field('descriptionformat');
+
+        // Conditionally launch drop field description.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $table = new xmldb_table('competvet_case_scat');
+        if ($dbman->table_exists($table)) {
+            // Launch rename table for competvet_case_field.
+            $dbman->rename_table($table, 'competvet_case_cat');
+        } else {
+            $table = new xmldb_table('competvet_case_cat');
+        }
+
+        $field = new xmldb_field('descriptionformat');
+
+        // Conditionally launch drop field description.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $index = new xmldb_index('situationid-shortname-ix', XMLDB_INDEX_NOTUNIQUE, ['situationid', 'shortname']);
+
+        // Conditionally launch drop index situationid-shortname-ix.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        $index = new xmldb_index('compcasescat-sitsho-ix', XMLDB_INDEX_NOTUNIQUE, ['situationid', 'idnumber']);
+
+        // Conditionally launch drop index compcasescat-sitsho-ix.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        $key = new xmldb_key('situationid_fk', XMLDB_KEY_FOREIGN, ['situationid'], 'competvet_situation', ['id']);
+
+        // Launch drop key situationid_fk.
+        $dbman->drop_key($table, $key);
+
+        $field = new xmldb_field('situationid');
+
+        // Conditionally launch drop field situationid.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $field = new xmldb_field('shortname', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null, 'id');
+
+        if ($dbman->field_exists($table, $field)) {
+            // Launch rename field shortname.
+            $dbman->rename_field($table, $field, 'idnumber');
+        }
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024042902, 'competvet');
+    }
+
+    if ($oldversion < 2024042903) {
+
+        // Define table competvet_case_fields to be created.
+        $table = new xmldb_table('competvet_case_fields');
+
+        // Adding fields to table competvet_case_fields.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('fieldid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('situationid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+
+        // Adding keys to table competvet_case_fields.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('situationid_fk', XMLDB_KEY_FOREIGN, ['situationid'], 'competvet_situation', ['id']);
+        $table->add_key('fieldid_fk', XMLDB_KEY_FOREIGN, ['fieldid'], 'competvet_case_field', ['id']);
+
+        // Conditionally launch create table for competvet_case_fields.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024042903, 'competvet');
+    }
     return true;
 }
