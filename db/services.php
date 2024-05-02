@@ -160,4 +160,20 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/competvet:cangrade',
     ],
+    'mod_competvet_get_cases' => [
+        'classname' => \mod_competvet\external\get_cases::class,
+        'methodname' => 'execute',
+        'description' => 'Get the cases',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:view',
+    ],
+    'mod_competvet_delete_entry' => [
+        'classname' => \mod_competvet\external\delete_entry::class,
+        'methodname' => 'execute',
+        'description' => 'Delete a entry',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:cangrade',
+    ],
 ];

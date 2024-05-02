@@ -294,3 +294,9 @@ $string['animalageunknown'] = 'Unknown Age';
 
 // Webservice warnings
 $string['gridnotfound'] = 'The grid with id {$a} was not found';
+
+// Case form
+$string['case:add'] = 'Add a case';
+$string['case:add:save'] = 'Save';
+
+$string['error:accessdenied'] = 'Access denied';

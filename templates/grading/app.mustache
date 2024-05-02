@@ -24,7 +24,7 @@
     }
 }}
 <link rel="stylesheet" href="{{config.wwwroot}}/mod/competvet/scss/styles.css?v={{version}}" />
-<div class="gradingapp" data-region="grading-app" data-cm-id="{{cmid}}" data-studentid="{{studentid}}" data-planningid="{{planningid}}" data-certifgrid="{{certifgrid}}" data-evalgrid="{{evalgrid}}" data-listgrid="{{listgrid}}">
+<div class="gradingapp" data-region="grading-app" data-cm-id="{{cmid}}" data-studentid="{{studentid}}" data-planningid="{{planningid}}" data-certifgrid="{{certifgrid}}" data-evalgrid="{{evalgrid}}" data-listgrid="{{listgrid}}" data-situationid="{{situationid}}">
     <nav class="navbar navbar-light">
         <a href="{{{returnurl}}}" class="btn btn-outline-primary">
             {{#str}}closeevaluation, mod_competvet{{/str}}
@@ -54,7 +54,8 @@
     <div class="tool_usertours-resettourcontainer"></div>
 </div>
 {{#js}}
-    require(['mod_competvet/local/grading/grading_app_component'], function(component) {
+    require(['mod_competvet/local/grading/grading_app_component', 'mod_competvet/local/grading/case_form'], function(component, caseForm) {
+        caseForm.init();
         component.init();
     });
 {{/js}}

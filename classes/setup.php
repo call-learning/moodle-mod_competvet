@@ -26,6 +26,8 @@ use mod_competvet\local\importer\criterion_importer;
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\grid;
 use mod_competvet\reportbuilder\datasource\plannings;
+use mod_competvet\local\importer\fields_importer;
+use mod_competvet\local\persistent\case_field;
 
 /**
  * Setup routines
@@ -210,5 +212,16 @@ class setup {
             $criterionimporter = new criterion_importer(criterion::class);
             $criterionimporter->import($CFG->dirroot . "/mod/competvet/data/default_{$gridtypename}_grid.csv");
         }
+    }
+
+    /**
+     * Create the default cases.
+     *
+     * @return void
+     */
+    public static function create_default_cases() {
+        global $CFG;
+        $criterionimporter = new fields_importer(case_field::class);
+        $criterionimporter->import($CFG->dirroot . "/mod/competvet/data/default_cas_form.csv");
     }
 }

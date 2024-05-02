@@ -109,12 +109,11 @@ class Repository {
 
     /**
      * Get the Cases for the List Results.
+     * @param {Object} args The arguments.
      * @return {Promise} The promise.
      */
-    async getListResults() {
-        const file = await this.getJsonData({filename: 'list-results'});
-        const data = JSON.parse(file.data);
-        return data;
+    async getListResults(args) {
+        return Ajax.call([{methodname: 'mod_competvet_get_cases', args}])[0];
     }
 
     /**
@@ -145,6 +144,15 @@ class Repository {
      */
     async saveFormData(data) {
         return Ajax.call([{methodname: 'mod_competvet_store_formdata', args: data}])[0];
+    }
+
+    /**
+     * Delete a case for a user.
+     * @param {Object} args The arguments.
+     * @return {Promise} The promise.
+     */
+    async deleteEntry(args) {
+        return Ajax.call([{methodname: 'mod_competvet_delete_entry', args}])[0];
     }
 }
 

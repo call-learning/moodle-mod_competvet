@@ -32,7 +32,7 @@
     {
         "list-results":
         {
-            "reports": [
+            "cases": [
                 {
                     "id": 1,
                     "timestamp": "1611152400",
@@ -62,68 +62,55 @@
     }
 }}
 {{#list-results}}
-    {{#reports}}
-        <div class="report mb-3">
-            <div class="report-header position-relative">
+    {{#cases}}
+        <div class="case mb-3">
+            <div class="deletecase">
+                <button class="btn btn-icon icon-no-margin mx-2" data-action="delete-case" data-id="{{id}}">
+                    {{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}
+                </button>
+            </div>
+            <div class="case-header position-relative">
                 {{> mod_competvet/expandcollapse}}
-                <div class="report-title">
+                <div class="case-title">
                     <div class="d-flex align-items-center icon-no-margin">
                         <div class="date mr-2">
                             {{#pix}}i/calendar, core{{/pix}}
-                            {{#userdate}}{{timestamp}}, {{#str}} strftimedatetime, core_langconfig {{/str}} {{/userdate}}
+                            {{#userdate}}{{timecreated}}, {{#str}} strftimedatetime, core_langconfig {{/str}} {{/userdate}}
                         </div>
                         <div class="title">
-                            {{#pix}}i/bullhorn, core{{/pix}}
+                            {{> mod_competvet/grading/svg/paw}}
                             {{title}}
                         </div>
                     </div>
                     <div class="subtitle">{{subtitle}}</div>
                  </div>
             </div>
-            <div class="collapse show" id="reportcollapse{{id}}">
-                <div class="report-content">
-                    <div class="section">
-                        <h5 class="section-header">
-                            {{> mod_competvet/grading/svg/paw}}
-                            {{#str}}animal, mod_competvet{{/str}}
-                        </h5>
-                        <div class="section-content">
-                            <div class="animal-details">
-                                <div class="animal-detail">
-                                    <span class="animal-detail-label">{{#str}}animalspecies, mod_competvet{{/str}}</span>
-                                    <span class="animal-detail-value">{{animal}}</span>
-                                </div>
-                                <div class="animal-detail">
-                                    <span class="animal-detail-label">{{#str}}animalbreed, mod_competvet{{/str}}</span>
-                                    <span class="animal-detail-value">{{{breed}}}{{^breed}}{{#str}}animalbreedunknown, mod_competvet{{/str}}{{/breed}}</span>
-                                </div>
-                                <div class="animal-detail">
-                                    <span class="animal-detail-label">{{#str}}animalsex, mod_competvet{{/str}}</span>
-                                    <span class="animal-detail-value">{{{sex}}}{{^sex}}{{#str}}animalsexunknown, mod_competvet{{/str}}{{/sex}}</span>
-                                </div>
-                                <div class="animal-detail">
-                                    <span class="animal-detail-label">{{#str}}animalage, mod_competvet{{/str}}</span>
-                                    <span class="animal-detail-value">{{age}}{{^age}}{{#str}}animalageunknown, mod_competvet{{/str}}{{/age}}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {{#sections}}
+            <div class="collapse show" id="casecollapse{{id}}">
+                <div class="case-content">
+                    {{#categories}}
                         <div class="section">
                             <h5 class="section-header">
-                                {{#info}}
+                                <div class="sectionicon firstsectionicon">
+                                    {{> mod_competvet/grading/svg/paw}}
+                                </div>
+                                <div class="sectionicon secondsectionicon">
                                     {{> mod_competvet/grading/svg/star}}
-                                {{/info}}
-                                {{#result}}
+                                </div>
+                                <div class="sectionicon defaultsectionicon">
                                     {{> mod_competvet/grading/svg/reader}}
-                                {{/result}}
-                                {{title}}
+                                </div>
+                                {{name}}
                             </h5>
-                            <div class="section-content">{{{content}}}</div>
+                            {{#fields}}
+                                <dl class="field {{type}}">
+                                    <dt class="field-label">{{name}}</dt>
+                                    <dd class="field-value">{{value}}</dd>
+                                </dl>
+                            {{/fields}}
                         </div>
-                    {{/sections}}
+                    {{/categories}}
                 </div>
             </div>
         </div>
-    {{/reports}}
+    {{/cases}}
 {{/list-results}}

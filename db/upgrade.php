@@ -767,5 +767,12 @@ function xmldb_competvet_upgrade($oldversion) {
         // Competvet savepoint reached.
         upgrade_mod_savepoint(true, 2024042903, 'competvet');
     }
+    if ($oldversion < 2024050400) {
+        // Fix grid default name.
+        $postinstall = new mod_competvet\task\post_install();
+        $postinstall->set_custom_data(['create_default_cases']);
+        core\task\manager::queue_adhoc_task($postinstall);
+        upgrade_mod_savepoint(true, 2024050400, 'competvet');
+    }
     return true;
 }

@@ -99,3 +99,6 @@ export const genericFormCreate = (data, action, modulename, submitEventHandler) 
 export const getSelectedElement = (actionName) => {
     return document.querySelectorAll(`[data-action="eval-observation-${actionName}"]`);
 };
+
+// Create a simplified version of the above code in a single function.
+// The

@@ -13,23 +13,24 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\persistent;
 
 use core\persistent;
 use lang_string;
 
 /**
- * Case field category template entity
+ * Case entry template entity
  *
- * @package   mod_competvet
- * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mod_competvet
+ * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class case_cat extends persistent {
+class case_entry extends persistent {
     /**
      * Current table
      */
-    const TABLE = 'competvet_case_cat';
+    const TABLE = 'competvet_case_entry';
 
     /**
      * Return the custom definition of the properties of this model.
@@ -40,25 +41,15 @@ class case_cat extends persistent {
      */
     protected static function define_properties() {
         return [
-            'idnumber' => [
+            'studentid' => [
                 'null' => NULL_NOT_ALLOWED,
-                'type' => PARAM_ALPHANUMEXT,
-                'message' => new lang_string('invaliddata', 'competvet', 'idnumber'),
-            ],
-            'name' => [
-                'null' => NULL_NOT_ALLOWED,
-                'type' => PARAM_TEXT,
-                'message' => new lang_string('invaliddata', 'competvet', 'shortname'),
-            ],
-            'description' => [
-                'null' => NULL_NOT_ALLOWED,
-                'type' => PARAM_TEXT,
-                'message' => new lang_string('invaliddata', 'competvet', 'description'),
-            ],
-            'sortorder' => [
-                'null' => NULL_ALLOWED,
                 'type' => PARAM_INT,
-                'message' => new lang_string('invaliddata', 'competvet', 'sortorder'),
+                'message' => new lang_string('invaliddata', 'competvet', 'studentid'),
+            ],
+            'situationid' => [
+                'null' => NULL_NOT_ALLOWED,
+                'type' => PARAM_INT,
+                'message' => new lang_string('invaliddata', 'competvet', 'situationid'),
             ],
         ];
     }

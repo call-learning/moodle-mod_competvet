@@ -62,6 +62,7 @@ class Competvet {
     constructor() {
         this.gradingApp = document.querySelector('[data-region="grading-app"]');
         this.cmId = this.gradingApp.dataset.cmId;
+        this.situationid = this.gradingApp.dataset.situationid;
         this.evalgrid = this.gradingApp.dataset.evalgrid;
         this.certifgrid = this.gradingApp.dataset.certifgrid;
         this.listgrid = this.gradingApp.dataset.listgrid;
@@ -94,6 +95,7 @@ class Competvet {
      * @param {Object} user The user to set as current.
      */
     async setCurrentUser(user) {
+        this.gradingApp.dataset.studentid = user.id;
         CompetState.setValue('user', user);
         this.currentUser = user;
 
@@ -140,7 +142,7 @@ class Competvet {
     async setListResults() {
         const args = {
             userid: this.currentUser.id,
-            cmid: this.cmId
+            situationid: this.situationid
         };
         const response = await Repository.getListResults(args);
         CompetState.setValue('list-results', response);
@@ -235,7 +237,7 @@ class Competvet {
      * Add event listeners.
      */
     addEventListeners() {
-        document.addEventListener('click', (event) => {
+        document.addEventListener('click', async(event) => {
             if (event.target.closest('[data-action="prevuser"]')) {
                 this.moveUser('prev');
             }
@@ -245,6 +247,14 @@ class Competvet {
             if (event.target.closest('[data-action="reload"]')) {
                 this.getEvaluations();
             }
+            if (event.target.closest('[data-action="delete-case"]')) {
+                const button = event.target.closest('[data-action="delete-case"]');
+                await Repository.deleteEntry({'entryid': button.dataset.id});
+                this.setListResults();
+            }
+        });
+        this.gradingApp.addEventListener('caseAdded', () => {
+            this.setListResults();
         });
     }
 }
