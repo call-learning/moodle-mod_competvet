@@ -64,7 +64,8 @@ class cases {
                         'type' => $field->type,
                         'configdata' => $field->configdata,
                         'description' => $field->description,
-                        'value' => $field_data ? $field_data->get('value') : ''
+                        'value' => $field_data ? $field_data->get('value') : '',
+                        'displayvalue' => $field_data ? $field_data->get_displayvalue($field) : ''
                     ];
                 }
                 $case[] = (object) [

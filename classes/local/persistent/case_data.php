@@ -83,4 +83,34 @@ class case_data extends persistent {
             ],
         ];
     }
+
+    /**
+     * Get the display value of the data.
+     * @param object $field The field object
+     * @return string
+     */
+    public function get_displayvalue($field) {
+        if ($field->type == 'date') {
+            return userdate($this->raw_get('value'), get_string('strftimedate', 'core_langconfig'));
+        } else if ($field->type == 'select') {
+            $json = json_decode(stripslashes($field->configdata));
+            if ($json && isset($json->options)) {
+                $options = $json->options;
+                $selected = $this->raw_get('value');
+                if (isset($options->$selected)) {
+                    return $options->$selected;
+                }
+            }
+        }
+        return $this->raw_get('value');
+    }
+
+    /**
+     * Get printable version of end time
+     *
+     * @return string
+     */
+    public function get_enddate_string() {
+        return userdate($this->raw_get('enddate'), get_string('strftimedate', 'core_langconfig'));
+    }
 }

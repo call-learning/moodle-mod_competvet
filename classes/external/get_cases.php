@@ -70,6 +70,7 @@ class get_cases extends external_api {
                                     'configdata' => new external_value(PARAM_RAW, 'The field configdata'),
                                     'description' => new external_value(PARAM_TEXT, 'The field description'),
                                     'value' => new external_value(PARAM_TEXT, 'The field value'),
+                                    'displayvalue' => new external_value(PARAM_TEXT, 'The field display value'),
                                 ])
                             ),
                         ])
