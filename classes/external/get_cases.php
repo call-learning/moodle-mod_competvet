@@ -42,7 +42,7 @@ class get_cases extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'userid' => new external_value(PARAM_INT, 'The user id', VALUE_OPTIONAL),
-            'situationid' => new external_value(PARAM_INT, 'The situation id', VALUE_OPTIONAL),
+            'planningid' => new external_value(PARAM_INT, 'The planning id', VALUE_OPTIONAL),
         ]);
     }
 
@@ -83,12 +83,12 @@ class get_cases extends external_api {
      * Execute and get the cases for a user, or an empty case structure.
      *
      * @param int $userid The user id
-     * @param int $situationid The situation id
+     * @param int $planningid The planning id
      * @return stdClass
      * @throws \invalid_parameter_exception
      */
-    public static function execute(int $userid, int $situationid): stdClass {
-        $cases = cases::get_entries($userid, $situationid);
+    public static function execute(int $userid, int $planningid): stdClass {
+        $cases = cases::get_entries($userid, $planningid);
         return $cases;
     }
 }

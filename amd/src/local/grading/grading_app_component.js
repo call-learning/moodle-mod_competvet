@@ -62,15 +62,14 @@ class Competvet {
     constructor() {
         this.gradingApp = document.querySelector('[data-region="grading-app"]');
         this.cmId = this.gradingApp.dataset.cmId;
-        this.situationid = this.gradingApp.dataset.situationid;
         this.evalgrid = this.gradingApp.dataset.evalgrid;
         this.certifgrid = this.gradingApp.dataset.certifgrid;
         this.listgrid = this.gradingApp.dataset.listgrid;
-        const planning = {
+        this.planning = {
             id: this.gradingApp.dataset.planningid,
             cmid: this.cmId
         };
-        CompetState.setValue('planning', planning);
+        CompetState.setValue('planning', this.planning);
         this.userlist = [];
         this.currentUser = 0;
         this.setup();
@@ -142,7 +141,7 @@ class Competvet {
     async setListResults() {
         const args = {
             userid: this.currentUser.id,
-            situationid: this.situationid
+            planningid: this.planning.id
         };
         const response = await Repository.getListResults(args);
         CompetState.setValue('list-results', response);

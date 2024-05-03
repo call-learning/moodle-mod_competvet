@@ -34,12 +34,12 @@ class cases {
     /**
      * Get the case user entries
      * $param int $studentid The user id
-     * $param int $situationid The situation id
+     * $param int $planningid The planning id
      * @return Object
      */
-    public static function get_entries($studentid = null, $situationid = null) : stdClass {
+    public static function get_entries($studentid = null, $planningid = null) : stdClass {
         $structure = self::get_case_structure();
-        $entries = case_entry::get_records(['studentid' => $studentid, 'situationid' => $situationid]);
+        $entries = case_entry::get_records(['studentid' => $studentid, 'planningid' => $planningid]);
         $cases = [];
         foreach($entries as $entry) {
             $data = case_data::get_records(['entryid' => $entry->get('id')]);
@@ -75,7 +75,7 @@ class cases {
             }
             $cases[] = (object) [
                 'id' => $entry->get('id'),
-                'situationid' => $entry->get('situationid'),
+                'planningid' => $entry->get('planningid'),
                 'studentid' => $entry->get('studentid'),
                 'timecreated' => $entry->get('timecreated'),
                 'usermodified' => $entry->get('usermodified'),
@@ -118,11 +118,16 @@ class cases {
 
     /**
      * Create a case entry
+     * @param int $planningid The planning id
+     * @param int $studentid The student id
+     * @param array $fields The fields
+     *
+     * @return void
      */
-    public static function create_case($situationid, $studentid, $fields) {
+    public static function create_case($planningid, $studentid, $fields) {
         // Create the case.
         $case = new case_entry();
-        $case->set('situationid', $situationid);
+        $case->set('planningid', $planningid);
         $case->set('studentid', $studentid);
         $case->save();
 

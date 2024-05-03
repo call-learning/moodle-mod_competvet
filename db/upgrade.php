@@ -774,5 +774,32 @@ function xmldb_competvet_upgrade($oldversion) {
         core\task\manager::queue_adhoc_task($postinstall);
         upgrade_mod_savepoint(true, 2024050400, 'competvet');
     }
+    if ($oldversion < 2024050402) {
+
+        // Define field planningid to be added to competvet_case_entry.
+        $table = new xmldb_table('competvet_case_entry');
+        $field = new xmldb_field('planningid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'studentid');
+
+        // Conditionally launch add field planningid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $key = new xmldb_key('planningid_fk', XMLDB_KEY_FOREIGN, ['planningid'], 'competvet_planning', ['id']);
+        // Launch add key planningid_fk.
+        $dbman->add_key($table, $key);
+
+        $key = new xmldb_key('situationid_fk', XMLDB_KEY_FOREIGN, ['situationid'], 'competvet_situation', ['id']);
+        // Launch drop key situationid_fk.
+        $dbman->drop_key($table, $key);
+
+        $field = new xmldb_field('situationid');
+        // Conditionally launch drop field situationid.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024050402, 'competvet');
+    }
     return true;
 }

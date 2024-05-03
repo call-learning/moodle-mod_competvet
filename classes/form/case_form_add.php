@@ -35,9 +35,9 @@ class case_form_add extends dynamic_form {
      */
     protected function definition() {
         $mform = $this->_form;
-        $situationid = $this->optional_param('situationid', null, PARAM_INT);
-        $mform->addElement('hidden', 'situationid', $situationid);
-        $mform->setType('situationid', PARAM_INT);
+        $planningid = $this->optional_param('planningid', null, PARAM_INT);
+        $mform->addElement('hidden', 'planningid', $planningid);
+        $mform->setType('planningid', PARAM_INT);
         $mform->addElement('hidden', 'cmid', $this->optional_param('cmid', null, PARAM_INT));
         $mform->setType('cmid', PARAM_INT);
         $mform->addElement('hidden', 'studentid', $this->optional_param('studentid', null, PARAM_INT));
@@ -84,7 +84,7 @@ class case_form_add extends dynamic_form {
             $data = $this->get_data();
             $fields = self::process_form_data($data);
             cases::create_case(
-                $data->situationid,
+                $data->planningid,
                 $data->studentid,
                 $fields
             );
@@ -116,7 +116,7 @@ class case_form_add extends dynamic_form {
     public function set_data_for_dynamic_submission(): void {
         $data = [
             'cmid' => $this->optional_param('cmid', null, PARAM_INT),
-            'situationid' => $this->optional_param('situationid', null, PARAM_INT),
+            'planningid' => $this->optional_param('planningid', null, PARAM_INT),
             'studentid' => $this->optional_param('studentid', null, PARAM_INT),
         ];
         parent::set_data((object) $data);
