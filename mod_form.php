@@ -41,10 +41,6 @@ require_once($CFG->dirroot . '/course/moodleform_mod.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_competvet_mod_form extends moodleform_mod {
-
-    // The pagination size for the planning list.
-    const PLANNING_PAGINATION_SIZE = 10;
-
     /**
      * Defines forms elements
      */
@@ -67,10 +63,6 @@ class mod_competvet_mod_form extends moodleform_mod {
         // Then the situation fields.
         $this->add_situation_fields();
 
-        // Adding the rest of mod_competvet settings, spreading all them into this fieldset.
-        $mform->addElement('header', 'competvetplanning', get_string('competvetplanning', 'mod_competvet'));
-        $mform->setExpanded('competvetplanning');
-        $this->display_planning();
         // Add standard grading elements.
         $this->standard_grading_coursemodule_elements();
         // Add standard elements.
@@ -147,7 +139,7 @@ class mod_competvet_mod_form extends moodleform_mod {
                 ];
             }, $evalgrids);
             $evalgridchoices = array_column($evalgridscolumns, 'name', 'id');
-            $fieldname = $gridtypename . 'gridid';
+            $fieldname = $gridtypename . 'grid';
             $mform->addElement(
                 'select',
                 $fieldname,
@@ -157,42 +149,6 @@ class mod_competvet_mod_form extends moodleform_mod {
             $mform->setType($fieldname, PARAM_INT);
         }
     }
-
-    /**
-     * Display planning.
-     */
-    private function display_planning() {
-        global $PAGE;
-        $mform = $this->_form;
-        // Get the current value of situationid.
-        $cm = $this->get_coursemodule();
-        if (!empty($cm->id)) {
-            $competvet = competvet::get_from_context($this->get_context());
-            $situation = $competvet->get_situation();
-            $existingreport = \core_reportbuilder\system_report_factory::create(
-                planning_per_situation::class,
-                $this->get_context(),
-                competvet::COMPONENT_NAME,
-                'form',
-                0,
-                ['situationid' => $situation->get('id')]
-            );
-            $html = $existingreport->output();
-            $mform->addElement('html', $html);
-            $mform->addElement(
-                'button',
-                'addplanning',
-                get_string('add'),
-                ['data-cmid' => $cm->id, 'data-action' => 'addplanning']
-            );
-            $PAGE->requires->js_call_amd(
-                'mod_competvet/planning_form_utils',
-                'init',
-                [$existingreport->get_report_persistent()->get('id')]
-            );
-        }
-    }
-
     /**
      * Definition after data
      *

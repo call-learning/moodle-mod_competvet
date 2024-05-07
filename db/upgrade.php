@@ -547,7 +547,7 @@ function xmldb_competvet_upgrade($oldversion) {
         $transferredgrids = [];
         foreach (criterion::get_records() as $criterion) {
             if (isset($transferredgrids[$criterion->get('gridid')])) {
-                $criterion->set('evalgridid', $transferredgrids[$criterion->get('gridid')]);
+                $criterion->set('gridid', $transferredgrids[$criterion->get('gridid')]);
                 $criterion->update();
                 continue;
             }
@@ -665,108 +665,129 @@ function xmldb_competvet_upgrade($oldversion) {
         // Competvet savepoint reached.
         upgrade_mod_savepoint(true, 2024042900, 'competvet');
     }
+    if ($oldversion < 2024042905) {
 
-    if ($oldversion < 2024042902) {
-
-        // Define table competvet_case_field to be renamed to NEWNAMEGOESHERE.
         $table = new xmldb_table('competvet_case_sfield');
-
         if ($dbman->table_exists($table)) {
             // Launch rename table for competvet_case_field.
-            $dbman->rename_table($table, 'competvet_case_field');
-        } else {
-            $table = new xmldb_table('competvet_case_field');
+            $dbman->drop_table($table, 'competvet_case_sfield');
         }
-
-        $field = new xmldb_field('shortname', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null, 'id');
-
-        if ($dbman->field_exists($table, $field)) {
-            // Launch rename field shortname.
-            $dbman->rename_field($table, $field, 'idnumber');
-        }
-
-        $field = new xmldb_field('descriptionformat');
-
-        // Conditionally launch drop field description.
-        if ($dbman->field_exists($table, $field)) {
-            $dbman->drop_field($table, $field);
-        }
-
-        $table = new xmldb_table('competvet_case_scat');
-        if ($dbman->table_exists($table)) {
-            // Launch rename table for competvet_case_field.
-            $dbman->rename_table($table, 'competvet_case_cat');
-        } else {
-            $table = new xmldb_table('competvet_case_cat');
-        }
-
-        $field = new xmldb_field('descriptionformat');
-
-        // Conditionally launch drop field description.
-        if ($dbman->field_exists($table, $field)) {
-            $dbman->drop_field($table, $field);
-        }
-
-        $index = new xmldb_index('situationid-shortname-ix', XMLDB_INDEX_NOTUNIQUE, ['situationid', 'shortname']);
-
-        // Conditionally launch drop index situationid-shortname-ix.
-        if ($dbman->index_exists($table, $index)) {
-            $dbman->drop_index($table, $index);
-        }
-
-        $index = new xmldb_index('compcasescat-sitsho-ix', XMLDB_INDEX_NOTUNIQUE, ['situationid', 'idnumber']);
-
-        // Conditionally launch drop index compcasescat-sitsho-ix.
-        if ($dbman->index_exists($table, $index)) {
-            $dbman->drop_index($table, $index);
-        }
-
-        $key = new xmldb_key('situationid_fk', XMLDB_KEY_FOREIGN, ['situationid'], 'competvet_situation', ['id']);
-
-        // Launch drop key situationid_fk.
-        $dbman->drop_key($table, $key);
-
-        $field = new xmldb_field('situationid');
-
-        // Conditionally launch drop field situationid.
-        if ($dbman->field_exists($table, $field)) {
-            $dbman->drop_field($table, $field);
-        }
-
-        $field = new xmldb_field('shortname', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null, 'id');
-
-        if ($dbman->field_exists($table, $field)) {
-            // Launch rename field shortname.
-            $dbman->rename_field($table, $field, 'idnumber');
-        }
-
-        // Competvet savepoint reached.
-        upgrade_mod_savepoint(true, 2024042902, 'competvet');
-    }
-
-    if ($oldversion < 2024042903) {
-
-        // Define table competvet_case_fields to be created.
         $table = new xmldb_table('competvet_case_fields');
+        if ($dbman->table_exists($table)) {
+            // Launch rename table for competvet_case_scat.
+            $dbman->drop_table($table, 'competvet_case_sfield');
+        }
 
-        // Adding fields to table competvet_case_fields.
+        // Define table competvet_case_field to be created.
+        $table = new xmldb_table('competvet_case_field');
+
+        // Adding fields to table competvet_case_field.
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-        $table->add_field('fieldid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-        $table->add_field('situationid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('idnumber', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '400', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('type', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('categoryid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('configdata', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
 
-        // Adding keys to table competvet_case_fields.
+        // Adding keys to table competvet_case_field.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-        $table->add_key('situationid_fk', XMLDB_KEY_FOREIGN, ['situationid'], 'competvet_situation', ['id']);
-        $table->add_key('fieldid_fk', XMLDB_KEY_FOREIGN, ['fieldid'], 'competvet_case_field', ['id']);
+        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+        $table->add_key('category_fk', XMLDB_KEY_FOREIGN, ['categoryid'], 'competvet_case_scat', ['id']);
 
-        // Conditionally launch create table for competvet_case_fields.
+        // Adding indexes to table competvet_case_field.
+        $table->add_index('categoryid_sortorder', XMLDB_INDEX_NOTUNIQUE, ['categoryid', 'sortorder']);
+
+        // Conditionally launch create table for competvet_case_field.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table competvet_case_cat to be created.
+        $table = new xmldb_table('competvet_case_cat');
+
+        // Adding fields to table competvet_case_cat.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '1024', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('shortname', XMLDB_TYPE_CHAR, '254', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table competvet_case_cat.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+
+        // Conditionally launch create table for competvet_case_cat.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table competvet_case_entry to be created.
+        $table = new xmldb_table('competvet_case_entry');
+
+        // Adding fields to table competvet_case_entry.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('studentid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('planningid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table competvet_case_entry.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('planningid_fk', XMLDB_KEY_FOREIGN, ['planningid'], 'competvet_planning', ['id']);
+        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+        $table->add_key('studentid', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+
+        // Conditionally launch create table for competvet_case_entry.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        // Define table competvet_case_data to be created.
+        $table = new xmldb_table('competvet_case_data');
+
+        // Adding fields to table competvet_case_data.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('fieldid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('entryid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('intvalue', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('decvalue', XMLDB_TYPE_NUMBER, '10, 5', null, null, null, null);
+        $table->add_field('shortcharvalue', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('charvalue', XMLDB_TYPE_CHAR, '1333', null, null, null, null);
+        $table->add_field('value', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('valueformat', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table competvet_case_data.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('fieldid', XMLDB_KEY_FOREIGN, ['fieldid'], 'customfield_field', ['id']);
+        $table->add_key('entry_fk', XMLDB_KEY_FOREIGN, ['entryid'], 'competvet_case_entry', ['id']);
+        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+
+        // Adding indexes to table competvet_case_data.
+        $table->add_index('entryid-fieldid', XMLDB_INDEX_UNIQUE, ['entryid', 'fieldid']);
+        $table->add_index('fieldid-intvalue', XMLDB_INDEX_NOTUNIQUE, ['fieldid', 'intvalue']);
+        $table->add_index('fieldid-shortcharvalue', XMLDB_INDEX_NOTUNIQUE, ['fieldid', 'shortcharvalue']);
+        $table->add_index('fieldid-decvalue', XMLDB_INDEX_NOTUNIQUE, ['fieldid', 'decvalue']);
+
+        // Conditionally launch create table for competvet_case_data.
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
 
         // Competvet savepoint reached.
-        upgrade_mod_savepoint(true, 2024042903, 'competvet');
+        upgrade_mod_savepoint(true, 2024042905, 'competvet');
     }
+
     if ($oldversion < 2024050400) {
         // Fix grid default name.
         $postinstall = new mod_competvet\task\post_install();
@@ -800,6 +821,138 @@ function xmldb_competvet_upgrade($oldversion) {
 
         // Competvet savepoint reached.
         upgrade_mod_savepoint(true, 2024050402, 'competvet');
+    }
+    if ($oldversion < 2024050404) {
+
+        // Define table competvet_formdata to be created.
+        $table = new xmldb_table('competvet_formdata');
+
+        // Adding fields to table competvet_formdata.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('planningid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('graderid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('formname', XMLDB_TYPE_CHAR, '254', null, null, null, null);
+        $table->add_field('json', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table competvet_formdata.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+
+        // Conditionally launch create table for competvet_formdata.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        // Define table competvet_case_field to be created.
+        $table = new xmldb_table('competvet_case_field');
+
+        // Adding fields to table competvet_case_field.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('idnumber', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '400', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('type', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('categoryid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('configdata', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table competvet_case_field.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+        $table->add_key('category_fk', XMLDB_KEY_FOREIGN, ['categoryid'], 'competvet_case_scat', ['id']);
+
+        // Adding indexes to table competvet_case_field.
+        $table->add_index('categoryid_sortorder', XMLDB_INDEX_NOTUNIQUE, ['categoryid', 'sortorder']);
+
+        // Conditionally launch create table for competvet_case_field.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table competvet_case_cat to be created.
+        $table = new xmldb_table('competvet_case_cat');
+
+        // Adding fields to table competvet_case_cat.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '1024', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('shortname', XMLDB_TYPE_CHAR, '254', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table competvet_case_cat.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+
+        // Conditionally launch create table for competvet_case_cat.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table competvet_case_entry to be created.
+        $table = new xmldb_table('competvet_case_entry');
+
+        // Adding fields to table competvet_case_entry.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('studentid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('planningid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table competvet_case_entry.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('planningid_fk', XMLDB_KEY_FOREIGN, ['planningid'], 'competvet_planning', ['id']);
+        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+        $table->add_key('studentid', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+
+        // Conditionally launch create table for competvet_case_entry.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        // Define table competvet_case_data to be created.
+        $table = new xmldb_table('competvet_case_data');
+
+        // Adding fields to table competvet_case_data.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('fieldid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('entryid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('intvalue', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('decvalue', XMLDB_TYPE_NUMBER, '10, 5', null, null, null, null);
+        $table->add_field('shortcharvalue', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('charvalue', XMLDB_TYPE_CHAR, '1333', null, null, null, null);
+        $table->add_field('value', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('valueformat', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table competvet_case_data.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('fieldid', XMLDB_KEY_FOREIGN, ['fieldid'], 'customfield_field', ['id']);
+        $table->add_key('entry_fk', XMLDB_KEY_FOREIGN, ['entryid'], 'competvet_case_entry', ['id']);
+        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+
+        // Adding indexes to table competvet_case_data.
+        $table->add_index('entryid-fieldid', XMLDB_INDEX_UNIQUE, ['entryid', 'fieldid']);
+        $table->add_index('fieldid-intvalue', XMLDB_INDEX_NOTUNIQUE, ['fieldid', 'intvalue']);
+        $table->add_index('fieldid-shortcharvalue', XMLDB_INDEX_NOTUNIQUE, ['fieldid', 'shortcharvalue']);
+        $table->add_index('fieldid-decvalue', XMLDB_INDEX_NOTUNIQUE, ['fieldid', 'decvalue']);
+
+        // Conditionally launch create table for competvet_case_data.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024050404, 'competvet');
     }
     return true;
 }
