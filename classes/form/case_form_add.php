@@ -79,6 +79,11 @@ class case_form_add extends dynamic_form {
         }
     }
 
+    /**
+     * Process the form submission, used if form was submitted via AJAX
+     *
+     * @return array
+     */
     public function process_dynamic_submission() {
         try {
             $data = $this->get_data();
@@ -100,12 +105,21 @@ class case_form_add extends dynamic_form {
         }
     }
 
+    /**
+     * Returns context where this form is used
+     *
+     * @return context
+     */
     protected function get_context_for_dynamic_submission(): context {
         $cmid = $this->optional_param('cmid', null, PARAM_INT);
         $competvet = competvet::get_from_cmid($cmid);
         return $competvet->get_context();
     }
 
+    /**
+     * Checks if current user has access to this form, otherwise throws exception
+     *
+     */
     protected function check_access_for_dynamic_submission(): void {
         $context = $this->get_context_for_dynamic_submission();
         if (!has_capability('mod/competvet:canobserve', $context)) {
@@ -113,6 +127,9 @@ class case_form_add extends dynamic_form {
         }
     }
 
+    /**
+     * Load in existing data as form defaults
+     */
     public function set_data_for_dynamic_submission(): void {
         $data = [
             'cmid' => $this->optional_param('cmid', null, PARAM_INT),
@@ -122,6 +139,10 @@ class case_form_add extends dynamic_form {
         parent::set_data((object) $data);
     }
 
+    /**
+     * Returns url to set in $PAGE->set_url() when form is being rendered or submitted via AJAX
+     *
+     */
     protected function get_page_url_for_dynamic_submission(): moodle_url {
         $returnurl = $this->optional_param('returnurl', null, PARAM_URL);
         if (empty($returnurl)) {

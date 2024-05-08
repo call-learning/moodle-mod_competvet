@@ -71,6 +71,15 @@ class Repository {
     }
 
     /**
+     * Get the User data for the Criteria.
+     * @param {Object} args The arguments.
+     * @return {Promise} The promise.
+     */
+    async getCertifResults(args) {
+        return Ajax.call([{methodname: 'mod_competvet_get_certif_results', args: args}])[0];
+    }
+
+    /**
      * Get the global grade for a user.
      * @param {Object} args The arguments.
      * @return {Promise} The promise.

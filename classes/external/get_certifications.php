@@ -50,13 +50,10 @@ class get_certifications extends external_api {
     */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
-            'certifications' => new external_multiple_structure(
+            'criteria' => new external_multiple_structure(
                 new external_single_structure([
-                    'id' => new external_value(PARAM_INT, 'The certification id'),
-                    'criterion' => new external_single_structure([
-                        'id' => new external_value(PARAM_INT, 'The criterion id'),
-                        'name' => new external_value(PARAM_TEXT, 'The criterion name'),
-                    ]),
+                    'declid' => new external_value(PARAM_INT, 'The certification id'),
+                    'criterionid' => new external_value(PARAM_INT, 'The criterion id'),
                     'level' => new external_value(PARAM_INT, 'The level'),
                     'comment' => new external_value(PARAM_TEXT, 'The comment'),
                     'commentformat' => new external_value(PARAM_INT, 'The comment format'),
@@ -87,6 +84,7 @@ class get_certifications extends external_api {
     * @return array
     */
     public static function execute($studentid, $planningid): array {
-        return certifications::get_certifications($studentid, $planningid);
+        $certifications = certifications::get_certifications($studentid, $planningid);
+        return ['criteria' => $certifications];
     }
 }

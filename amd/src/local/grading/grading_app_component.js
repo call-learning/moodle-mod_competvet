@@ -126,7 +126,7 @@ class Competvet {
     async setCertifResults() {
         const args = {
             type: COMPETVET_CRITERIA_CERTIFICATION,
-            gridid: this.certifgrid
+            gridid: this.certifgrid,
         };
         const response = await Repository.getCriteria(args);
         if (!response.grids) {
@@ -135,6 +135,28 @@ class Competvet {
         const context = {
             'criteria': response.grids[0].criteria
         };
+
+        // Get the certification results.
+        const certArgs = {
+            studentid: this.currentUser.id,
+            planningid: this.planning.id
+        };
+        const certResponse = await Repository.getCertifResults(certArgs);
+
+        if (certResponse.criteria) {
+            // Match the criteria in the certResponse array with the criteria in the context on the criterionid.
+            // Add a attribute realised on the criteria in the context if the criterion is in the certResponse array.
+            context.criteria.forEach(criterion => {
+                const certCriterion = certResponse.criteria.find(
+                    certCriterion => certCriterion.criterionid === criterion.criterionid
+                );
+                if (certCriterion) {
+                    criterion.declid = certCriterion.declid;
+                    criterion.realised = certCriterion.status === 1;
+                    criterion.notrealised = certCriterion.status === 2;
+                }
+            });
+        }
         CompetState.setValue('certification-results', context);
     }
 
@@ -153,7 +175,7 @@ class Competvet {
     async setListGrading() {
         const args = {
             type: COMPETVET_CRITERIA_LIST,
-            gridid: this.listgrid
+            gridid: this.listgrid,
         };
         const response = await Repository.getCriteria(args);
         if (!response.grids) {
@@ -254,6 +276,9 @@ class Competvet {
         });
         this.gradingApp.addEventListener('caseAdded', () => {
             this.setListResults();
+        });
+        this.gradingApp.addEventListener('certAdded', () => {
+            this.setCertifResults();
         });
     }
 }

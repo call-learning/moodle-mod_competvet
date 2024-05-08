@@ -54,8 +54,13 @@
     <div class="tool_usertours-resettourcontainer"></div>
 </div>
 {{#js}}
-    require(['mod_competvet/local/grading/grading_app_component', 'mod_competvet/local/grading/case_form'], function(component, caseForm) {
+    require([
+        'mod_competvet/local/grading/grading_app_component',
+        'mod_competvet/local/grading/case_form',
+        'mod_competvet/local/grading/cert_decl_form',
+    ], function(component, caseForm, certDeclForm) {
         caseForm.init();
         component.init();
+        certDeclForm.init();
     });
 {{/js}}

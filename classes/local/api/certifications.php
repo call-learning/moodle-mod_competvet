@@ -30,6 +30,10 @@ use mod_competvet\utils;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class certifications {
+
+    const STATUS_SEENDONE = 1;
+    const STATUS_NOTSEEN = 2;
+
     /**
      * Add a certification
      * @param int $criterionid The criterion id
@@ -155,6 +159,33 @@ class certifications {
     }
 
     /**
+     * Get a single certification
+     * @param int $declid The declaration id
+     */
+    public static function get_certification($declid) {
+        $cert = new cert_decl($declid);
+        $certrecord = [];
+        $certrecord['declid'] = $cert->get('id');
+        $certrecord['criterionid'] = $cert->get('criterionid');
+        $certrecord['level'] = $cert->get('level');
+        $certrecord['comment'] = $cert->get('comment');
+        $certrecord['commentformat'] = $cert->get('commentformat');
+        $certrecord['status'] = $cert->get('status');
+        $certrecord['validations'] = [];
+        $valids = cert_valid::get_records(['declid' => $cert->get('id')]);
+        foreach ($valids as $valid) {
+            $validrecord = [];
+            $validrecord['id'] = $valid->get('id');
+            $validrecord['supervisor'] = utils::get_user_info($valid->get('supervisorid'));
+            $validrecord['status'] = $valid->get('status');
+            $validrecord['comment'] = $valid->get('comment');
+            $validrecord['commentformat'] = $valid->get('commentformat');
+            $certrecord['validations'][] = $validrecord;
+        }
+        return $certrecord;
+    }
+
+    /**
      * Get the certifications and validations for a student
      *
      * Get the list of certifications for a student and add the level and comment provided by the student and the supervisor(s)
@@ -170,8 +201,8 @@ class certifications {
         $certarray = [];
         foreach ($certs as $cert) {
             $certrecord = [];
-            $certrecord['id'] = $cert->get('id');
-            $certrecord['criterion'] = criterion::get_record(['id' => $cert->get('criterionid')]);
+            $certrecord['declid'] = $cert->get('id');
+            $certrecord['criterionid'] = $cert->get('criterionid');
             $certrecord['level'] = $cert->get('level');
             $certrecord['comment'] = $cert->get('comment');
             $certrecord['commentformat'] = $cert->get('commentformat');

@@ -176,4 +176,12 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/competvet:cangrade',
     ],
+    'mod_competvet_get_certif_results' => [
+        'classname' => \mod_competvet\external\get_certifications::class,
+        'methodname' => 'execute',
+        'description' => 'Get the certification results',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:view',
+    ],
 ];

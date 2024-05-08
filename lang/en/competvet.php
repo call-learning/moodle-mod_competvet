@@ -300,3 +300,12 @@ $string['case:add'] = 'Add a case';
 $string['case:add:save'] = 'Save';
 
 $string['error:accessdenied'] = 'Access denied';
+
+// Entry form
+$string['level'] = 'Your confidence level';
+$string['level_help'] = 'Indicate here with what level of confidence (from 0 to 100%) you would feel able to reproduce this gesture or procedure in the future.';
+$string['status'] = 'Status';
+$string['seendone'] = 'I declare that I have carried out the essential clinic above on {$a} and ask the teachers below who supervised me on this procedure to confirm this.';
+$string['notseen'] = 'I have not encountered this situation yet.';
+$string['certdecl'] = 'Certification declaration';
+

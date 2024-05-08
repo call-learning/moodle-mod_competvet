@@ -40,7 +40,13 @@
     {{#criteria}}
         <div class="certif">
             <div class="col1">
-                <div class="description mb-2"><strong>{{title}}</strong></div>
+                <div class="description mb-2">
+                    <strong>{{title}}</strong>
+                    <button class="btn btn-icon icon-no-margin" data-action="cert-decl" data-id="{{criterionid}}" data-decl-id="{{declid}}">
+                        {{#pix}}t/message{{/pix}}
+                        <span class="sr-only">{{#str}}comment, competvet{{/str}}</span>
+                    </button>
+                </div>
                 <div>
                     {{#feedback}}
                         {{> mod_competvet/comment}}
