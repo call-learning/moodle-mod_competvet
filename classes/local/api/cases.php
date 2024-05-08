@@ -146,4 +146,47 @@ class cases {
             $data->save();
         }
     }
+
+    /**
+     * Update a case entry
+     * @param int $entryid The entry id
+     * @param array $fields The fields
+     * @return void
+     */
+    public static function update_case($entryid, $fields) {
+        // Update the case.
+        $case = new case_entry($entryid);
+        foreach ($fields as $fieldid => $value) {
+            $data = case_data::get_records(['entryid' => $entryid, 'fieldid' => $fieldid]);
+            if (count($data) > 0) {
+                $data[0]->set('value', $value);
+                $data[0]->save();
+            } else {
+                $data = new case_data();
+                $data->set('fieldid', $fieldid);
+                $data->set('entryid', $entryid);
+                $data->set('intvalue', 0);
+                $data->set('decvalue', 0);
+                $data->set('shortcharvalue', '');
+                $data->set('charvalue', '');
+                $data->set('value', $value);
+                $data->set('valueformat', 0);
+                $data->save();
+            }
+        }
+    }
+
+    /**
+     * Delete a case entry
+     * @param int $entryid The entry id
+     * @return void
+     */
+    public static function delete_case($entryid) {
+        $case = new case_entry($entryid);
+        $case->delete();
+        $data = case_data::get_records(['entryid' => $entryid]);
+        foreach ($data as $d) {
+            $d->delete();
+        }
+    }
 }

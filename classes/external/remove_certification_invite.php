@@ -21,47 +21,50 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use stdClass;
-use mod_competvet\local\api\cases;
+use mod_competvet\local\api\certifications;
 
 /**
- * Class delete_entry
+ * Class remove_certification_supervisor_invite
  *
  * @package    mod_competvet
  * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class delete_entry extends external_api {
+class remove_certification_invite extends external_api {
 
-        /**
-         * Returns description of method parameters
-         *
-         * @return external_function_parameters
-         */
+    /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'entryid' => new external_value(PARAM_INT, 'The entry id', VALUE_REQUIRED),
+            'declid' => new external_value(PARAM_INT, 'The certification declaration id', VALUE_REQUIRED),
+            'supervisorid' => new external_value(PARAM_INT, 'The supervisor id', VALUE_REQUIRED),
         ]);
     }
 
-        /**
-         * Returns description of method return value
-         *
-         * @return external_single_structure
-         */
+    /**
+     * Returns description of method return value
+     *
+     * @return external_single_structure
+     */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'success' => new external_value(PARAM_BOOL, 'The success of the operation'),
         ]);
     }
 
-        /**
-         * Delete a case
-         *
-         * @param int $entryid The case id
-         * @return stdClass
-         */
-    public static function execute($entryid) : stdClass {
-        if (cases::delete_case($entryid)) {
+    /**
+     * Remove a certification supervisor invite
+     *
+     * @param int $declid The certification declaration id
+     * @param int $supervisorid The supervisor id
+     * @return stdClass
+     */
+    public static function execute($declid, $supervisorid): stdClass {
+        self::validate_parameters(self::execute_parameters(), ['declid' => $declid, 'supervisorid' => $supervisorid]);
+        if (certifications::certification_supervisor_remove($declid, $supervisorid)) {
             return (object) ['success' => true];
         }
         return (object) ['success' => false];

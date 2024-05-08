@@ -954,5 +954,26 @@ function xmldb_competvet_upgrade($oldversion) {
         // Competvet savepoint reached.
         upgrade_mod_savepoint(true, 2024050404, 'competvet');
     }
+
+    if ($oldversion < 2024050800) {
+
+        // Define field planningid to be added to competvet_cert_decl.
+        $table = new xmldb_table('competvet_cert_decl');
+        $field = new xmldb_field('planningid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'criterionid');
+
+        // Conditionally launch add field planningid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $key = new xmldb_key('planningid_fk', XMLDB_KEY_FOREIGN, ['planningid'], 'competvet_planning', ['id']);
+
+        // Launch add key planningid_fk.
+        $dbman->add_key($table, $key);
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024050800, 'competvet');
+    }
+
     return true;
 }
