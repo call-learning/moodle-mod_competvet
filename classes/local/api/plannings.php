@@ -305,7 +305,7 @@ class plannings {
      * Get users infos for planning id
      *
      * @param int $planningid
-     * @return void
+     * @return array
      */
     public static function get_observers_infos_for_planning_id(int $planningid): array {
         $observers = [];

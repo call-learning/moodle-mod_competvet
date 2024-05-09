@@ -21,6 +21,7 @@ use mod_competvet\local\persistent\cert_decl_asso;
 use mod_competvet\local\persistent\cert_valid;
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\utils;
+use context_system;
 
 /**
  * Class certifications
@@ -31,8 +32,13 @@ use mod_competvet\utils;
  */
 class certifications {
 
-    const STATUS_SEENDONE = 1;
-    const STATUS_NOTSEEN = 2;
+    const STATUS_DECL_SEENDONE = 1;
+    const STATUS_DECL_NOTSEEN = 2;
+
+    const STATUS_VALID_ASKED = 0;
+    const STATUS_VALID_CONFIRMED = 1;
+    const STATUS_VALID_NOTSEEN = 2;
+    const STATUS_VALID_NOTREACHED = 3;
 
     /**
      * Add a certification
@@ -87,6 +93,20 @@ class certifications {
     }
 
     /**
+     * Get the supervisor invitations for a certification
+     * @param int $declid The declaration id
+     * @return array The supervisor ids
+     */
+    public static function get_certification_supervisors($declid) {
+        $certs = cert_decl_asso::get_records(['declid' => $declid]);
+        $supervisors = [];
+        foreach ($certs as $cert) {
+            $supervisors[] = $cert->get('supervisorid');
+        }
+        return $supervisors;
+    }
+
+    /**
      * Invite supervisor to reply on a certification
      * @param int $declid The declaration id
      * @param int $supervisorid The supervisor id
@@ -108,9 +128,7 @@ class certifications {
      * @return bool success
      */
     public static function certification_supervisor_remove($declid, $supervisorid) {
-        $cert = new cert_decl_asso();
-        $cert->set('declid', $declid);
-        $cert->set('supervisorid', $supervisorid);
+        $cert = cert_decl_asso::get_record(['declid' => $declid, 'supervisorid' => $supervisorid]);
         if ($cert->delete()) {
             return true;
         }
@@ -163,6 +181,8 @@ class certifications {
      * @param int $declid The declaration id
      */
     public static function get_certification($declid) {
+        global $PAGE;
+        $PAGE->set_context(context_system::instance());
         $cert = new cert_decl($declid);
         $certrecord = [];
         $certrecord['declid'] = $cert->get('id');
@@ -171,6 +191,7 @@ class certifications {
         $certrecord['comment'] = $cert->get('comment');
         $certrecord['commentformat'] = $cert->get('commentformat');
         $certrecord['status'] = $cert->get('status');
+        $certrecord['timecreated'] = $cert->get('timecreated');
         $certrecord['validations'] = [];
         $valids = cert_valid::get_records(['declid' => $cert->get('id')]);
         foreach ($valids as $valid) {
@@ -194,28 +215,45 @@ class certifications {
      * @return array The certifications
      */
     public static function get_certifications($studentid, $planningid) {
+        global $PAGE;
+        // Set the context to system to get the user info
+        $PAGE->set_context(context_system::instance());
         $certs = cert_decl::get_records([
             'studentid' => $studentid,
             'planningid' => $planningid,
         ]);
         $certarray = [];
         foreach ($certs as $cert) {
+            $student = utils::get_user_info($studentid);
             $certrecord = [];
             $certrecord['declid'] = $cert->get('id');
             $certrecord['criterionid'] = $cert->get('criterionid');
             $certrecord['level'] = $cert->get('level');
+            $certrecord['total'] = 5; // TODO: get the total from the criterion
             $certrecord['comment'] = $cert->get('comment');
             $certrecord['commentformat'] = $cert->get('commentformat');
+            $certrecord['feedback'] = [
+                'picture' => $student['userpictureurl'],
+                'fullname' => $student['fullname'],
+                'comments' => [
+                    'commenttext' => format_text($cert->get('comment'), $cert->get('commentformat')),
+                ],
+            ];
             $certrecord['status'] = $cert->get('status');
             $certrecord['validations'] = [];
             $valids = cert_valid::get_records(['declid' => $cert->get('id')]);
             foreach ($valids as $valid) {
+                $supervisor = utils::get_user_info($valid->get('supervisorid'));
                 $validrecord = [];
                 $validrecord['id'] = $valid->get('id');
-                $validrecord['supervisor'] = utils::get_user_info($valid->get('supervisorid'));
+                $validrecord['feedback'] = [
+                    'picture' => $supervisor['userpictureurl'],
+                    'fullname' => $supervisor['fullname'],
+                    'comments' => [
+                        'commenttext' => format_text($valid->get('comment'), $valid->get('commentformat')),
+                    ],
+                ];
                 $validrecord['status'] = $valid->get('status');
-                $validrecord['comment'] = $valid->get('comment');
-                $validrecord['commentformat'] = $valid->get('commentformat');
                 $certrecord['validations'][] = $validrecord;
             }
             $certarray[] = $certrecord;

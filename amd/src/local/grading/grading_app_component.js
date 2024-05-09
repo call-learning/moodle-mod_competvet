@@ -40,6 +40,14 @@ const COMPETVET_CRITERIA_EVALUATION = 1;
 const COMPETVET_CRITERIA_CERTIFICATION = 2;
 const COMPETVET_CRITERIA_LIST = 3;
 
+const STATUS_DECL_SEENDONE = 1;
+const STATUS_DECL_NOTSEEN = 2;
+
+// const STATUS_VALID_ASKED = 0;
+const STATUS_VALID_CONFIRMED = 1;
+const STATUS_VALID_NOTSEEN = 2;
+const STATUS_VALID_NOTREACHED = 3;
+
 class Competvet {
     /*
      * The Grading App Element.
@@ -152,8 +160,15 @@ class Competvet {
                 );
                 if (certCriterion) {
                     criterion.declid = certCriterion.declid;
-                    criterion.realised = certCriterion.status === 1;
-                    criterion.notrealised = certCriterion.status === 2;
+                    criterion.level = certCriterion.level;
+                    criterion.total = certCriterion.total;
+                    criterion.feedback = certCriterion.feedback;
+                    criterion.validations = certCriterion.validations;
+                    criterion.realised = certCriterion.status === STATUS_DECL_SEENDONE;
+                    criterion.notrealised = certCriterion.status === STATUS_DECL_NOTSEEN;
+                    criterion.validated = criterion.validations.some(validation => validation.status === STATUS_VALID_CONFIRMED);
+                    criterion.notvalidated = criterion.validations.some(validation => validation.status === STATUS_VALID_NOTSEEN);
+                    criterion.notreached = criterion.validations.some(validation => validation.status === STATUS_VALID_NOTREACHED);
                 }
             });
         }

@@ -25,26 +25,26 @@
 }}
 <div class="competvet-view-evaluations">
     <div class="accordion" id="evaluations-accordion">
-                {{#observations}}
-                    <div class="card">
-                        <div class="card-header" id="competvet-view-evaluations-cat-heading-{{category}}">
-                            <h2 class="mb-0">
-                                <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#competvet-view-evaluations-cat-{{category}}"
-                                        aria-expanded="true" aria-controls="competvet-view-evaluations-cat-{{category}}">
-                                    {{categorytext}}
-                                </button>
-                            </h2>
-                        </div>
-                        <div id="competvet-view-evaluations-cat-{{category}}" class="collapse show" aria-labelledby="competvet-view-evaluations-cat-heading-{{category}}"
-                             data-parent="#evaluations-accordion">
-                            <div class="card-body">
-                                {{#list}}
-                                    {{> mod_competvet/view/observation_card}}
-                                {{/list}}
-                            </div>
-                        </div>
+        {{#observations}}
+            <div class="card">
+                <div class="card-header" id="competvet-view-evaluations-cat-heading-{{category}}">
+                    <h2 class="mb-0">
+                        <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#competvet-view-evaluations-cat-{{category}}"
+                                aria-expanded="true" aria-controls="competvet-view-evaluations-cat-{{category}}">
+                            {{categorytext}}
+                        </button>
+                    </h2>
+                </div>
+                <div id="competvet-view-evaluations-cat-{{category}}" class="collapse show" aria-labelledby="competvet-view-evaluations-cat-heading-{{category}}"
+                        data-parent="#evaluations-accordion">
+                    <div class="card-body">
+                        {{#list}}
+                            {{> mod_competvet/view/observation_card}}
+                        {{/list}}
                     </div>
-                {{/observations}}
+                </div>
+            </div>
+        {{/observations}}
     </div>
     {{#isstudent}}
     <div>

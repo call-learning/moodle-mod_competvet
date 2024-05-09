@@ -55,20 +55,26 @@ class get_certifications extends external_api {
                     'declid' => new external_value(PARAM_INT, 'The certification id'),
                     'criterionid' => new external_value(PARAM_INT, 'The criterion id'),
                     'level' => new external_value(PARAM_INT, 'The level'),
-                    'comment' => new external_value(PARAM_TEXT, 'The comment'),
-                    'commentformat' => new external_value(PARAM_INT, 'The comment format'),
+                    'total' => new external_value(PARAM_INT, 'The total'),
+                    'feedback' => new external_single_structure([
+                        'picture' => new external_value(PARAM_TEXT, 'The picture'),
+                        'fullname' => new external_value(PARAM_TEXT, 'The fullname'),
+                        'comments' => new external_single_structure([
+                            'commenttext' => new external_value(PARAM_TEXT, 'The comment'),
+                        ])
+                    ]),
                     'status' => new external_value(PARAM_INT, 'The status'),
                     'validations' => new external_multiple_structure(
                         new external_single_structure([
                             'id' => new external_value(PARAM_INT, 'The validation id'),
-                            'supervisor' => new external_single_structure([
-                                'id' => new external_value(PARAM_INT, 'The supervisor id'),
-                                'firstname' => new external_value(PARAM_TEXT, 'The supervisor firstname'),
-                                'lastname' => new external_value(PARAM_TEXT, 'The supervisor lastname'),
+                            'feedback' => new external_single_structure([
+                                'picture' => new external_value(PARAM_TEXT, 'The picture'),
+                                'fullname' => new external_value(PARAM_TEXT, 'The fullname'),
+                                'comments' => new external_single_structure([
+                                    'commenttext' => new external_value(PARAM_TEXT, 'The comment'),
+                                ])
                             ]),
                             'status' => new external_value(PARAM_INT, 'The status'),
-                            'comment' => new external_value(PARAM_TEXT, 'The comment'),
-                            'commentformat' => new external_value(PARAM_INT, 'The comment format'),
                         ])
                     ),
                 ])

@@ -303,9 +303,16 @@ $string['error:accessdenied'] = 'Access denied';
 
 // Entry form
 $string['level'] = 'Your confidence level';
+$string['declaredlevel'] = 'Stated confidence level';
+$string['declareddate'] = 'Declared having achieved this essential on {$a}';
 $string['level_help'] = 'Indicate here with what level of confidence (from 0 to 100%) you would feel able to reproduce this gesture or procedure in the future.';
 $string['status'] = 'Status';
 $string['seendone'] = 'I declare that I have carried out the essential clinic above on {$a} and ask the teachers below who supervised me on this procedure to confirm this.';
 $string['notseen'] = 'I have not encountered this situation yet.';
 $string['certdecl'] = 'Certification declaration';
+$string['addsupervisor'] = 'Add a supervisor to validate this certification';
+$string['supervisorsection'] = 'Supervisors';
+$string['statusconfirmed'] = 'I confirm that this essential has been achieved';
+$string['statusnotseen'] = 'I do not validate because I did not see this essential';
+$string['statusnotreached'] = 'I do not validate because the level is not reached';
 

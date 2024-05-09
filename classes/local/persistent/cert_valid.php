@@ -32,19 +32,19 @@ class cert_valid extends persistent {
      */
     const TABLE = 'competvet_cert_valid';
 
-    const STATUS_ASKED = 0;
-    const STATUS_CONFIRMED = 1;
-    const STATUS_NOTSEEN = 2;
-    const STATUS_NOTREACHED = 3;
+    const STATUS_VALID_ASKED = 0;
+    const STATUS_VALID_CONFIRMED = 1;
+    const STATUS_VALID_NOTSEEN = 2;
+    const STATUS_VALID_NOTREACHED = 3;
 
     /**
      * Decl status types
      */
     const STATUS_TYPES = [
-        self::STATUS_ASKED,
-        self::STATUS_CONFIRMED,
-        self::STATUS_NOTSEEN,
-        self::STATUS_NOTREACHED,
+        self::STATUS_VALID_ASKED,
+        self::STATUS_VALID_CONFIRMED,
+        self::STATUS_VALID_NOTSEEN,
+        self::STATUS_VALID_NOTREACHED,
     ];
 
     /**

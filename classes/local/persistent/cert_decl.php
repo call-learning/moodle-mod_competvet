@@ -32,15 +32,15 @@ class cert_decl extends persistent {
      */
     const TABLE = 'competvet_cert_decl';
 
-    const STATUS_SEENDONE = 1;
-    const STATUS_NOTSEEN = 2;
+    const STATUS_DECL_SEENDONE = 1;
+    const STATUS_DECL_NOTSEEN = 2;
 
     /**
      * Decl status types
      */
     const STATUS_TYPES = [
-        self::STATUS_SEENDONE,
-        self::STATUS_NOTSEEN,
+        self::STATUS_DECL_SEENDONE,
+        self::STATUS_DECL_NOTSEEN,
     ];
 
     /**
@@ -77,8 +77,8 @@ class cert_decl extends persistent {
                 'type' => PARAM_INT,
                 'message' => new lang_string('invaliddata', 'competvet', 'status'),
                 'choices' => [
-                    self::STATUS_SEENDONE,
-                    self::STATUS_NOTSEEN,
+                    self::STATUS_DECL_SEENDONE,
+                    self::STATUS_DECL_NOTSEEN,
                 ],
             ],
             'comment' => [
