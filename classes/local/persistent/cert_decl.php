@@ -39,8 +39,8 @@ class cert_decl extends persistent {
      * Decl status types
      */
     const STATUS_TYPES = [
-        self::STATUS_DECL_SEENDONE,
-        self::STATUS_DECL_NOTSEEN,
+        self::STATUS_DECL_SEENDONE => 'cert:seendone',
+        self::STATUS_DECL_NOTSEEN => 'cert:notseen',
     ];
 
     /**
@@ -76,10 +76,7 @@ class cert_decl extends persistent {
                 'null' => NULL_NOT_ALLOWED,
                 'type' => PARAM_INT,
                 'message' => new lang_string('invaliddata', 'competvet', 'status'),
-                'choices' => [
-                    self::STATUS_DECL_SEENDONE,
-                    self::STATUS_DECL_NOTSEEN,
-                ],
+                'choices' => array_keys(self::STATUS_TYPES),
             ],
             'comment' => [
                 'null' => NULL_ALLOWED,

@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\grid;
 use mod_competvet\local\persistent\observation;
@@ -21,6 +22,7 @@ use mod_competvet\local\persistent\observation_comment;
 use mod_competvet\local\persistent\observation_criterion_comment;
 use mod_competvet\local\persistent\observation_criterion_level;
 use mod_competvet\local\persistent\planning;
+use mod_competvet\local\persistent\situation;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -66,6 +68,11 @@ class mod_competvet_generator extends testing_module_generator {
         if (empty($record->shortname)) {
             // Strip spaces in the name and convert to uppercase.
             $record->shortname = clean_param(strtoupper(preg_replace('/\s+/', '', $record->name)), PARAM_ALPHANUMEXT);
+        }
+
+        $hasrecord = situation::get_records(['shortname' => $record->shortname]);
+        if ($hasrecord) {
+            throw new moodle_exception('shortnametaken', '', '', $record->shortname);
         }
 
         // Now take care of the tags.
@@ -127,7 +134,75 @@ class mod_competvet_generator extends testing_module_generator {
      * @param array|stdClass|null $record
      * @return stdClass
      */
+    public function create_observation_with_comment($record = null) {
+        $record = (object) (array) $record;
+        $comment = $record->comment;
+        $context = $record->context;
+        unset($record->comment);
+        unset($record->context);
+        $planning = planning::get_record(['id' => $record->planningid]);
+        if (!$planning) {
+            throw new moodle_exception('planningnotfound', 'competvet', '', $record->planningid);
+        }
+        if (!groups_is_member($planning->get('groupid'), $record->studentid)) {
+            throw new moodle_exception('studentnotingroup', 'competvet', '', $record->studentid);
+        }
+        $existingobservation = observation::get_record(
+            [
+                'studentid' => $record->studentid,
+                'observerid' => $record->observerid,
+                'planningid' => $record->planningid,
+            ]
+        );
+
+        if ($existingobservation) {
+            $observation = $existingobservation->to_record();
+        } else {
+            $observation = $this->create_observation($record);
+        }
+        $contextrecord = (object) [
+            'observationid' => $observation->id,
+            'comment' => $context,
+            'commentformat' => 1,
+            'usercreated' => $record->studentid,
+            'type' => observation_comment::OBSERVATION_CONTEXT,
+        ];
+        $this->create_from_entity_name(observation_comment::class, $contextrecord);
+        $commentrecord = (object) [
+            'observationid' => $observation->id,
+            'comment' => $comment,
+            'commentformat' => 1,
+            'usercreated' => $record->observerid,
+            'type' => observation_comment::OBSERVATION_COMMENT,
+        ];
+        $this->create_from_entity_name(observation_comment::class, $commentrecord);
+        return $observation;
+    }
+
+    /**
+     * Create a new instance of observation.
+     *
+     * @param array|stdClass|null $record
+     * @return stdClass
+     */
     public function create_observation($record = null) {
+        $record = (object) (array) $record;
+        if (is_string($record->status)) {
+            $statustoint = array_search($record->status, observation::STATUS);
+            if ($statustoint !== false) {
+                $record->status = $statustoint;
+            } else {
+                throw new moodle_exception('obs:invalidstatus', 'competvet', '', $record->status);
+            }
+        }
+        if (is_string($record->category)) {
+            $categorytoint = array_search($record->category, observation::CATEGORIES);
+            if ($categorytoint !== false) {
+                $record->category = $categorytoint;
+            } else {
+                throw new moodle_exception('obs:invalidcategory', 'competvet', '', $record->category);
+            }
+        }
         return $this->create_from_entity_name(observation::class, $record);
     }
 
@@ -149,8 +224,70 @@ class mod_competvet_generator extends testing_module_generator {
         }
 
         $entity = new $entityclass(0, $record);
-        $entity->create();
+        try {
+            $entity->create();
+        } catch (dml_exception $e) {
+            $entity = $entityclass::get_record((array) $record);
+            $entity->update();
+        }
         return $entity->to_record();
+    }
+
+    /**
+     * Create a new instance of observation_comment or observation_criterion_level.
+     *
+     * @param array|stdClass|null $record
+     * @return stdClass
+     */
+    public function create_observation_criterion_value($record = null) {
+        $record = (object) (array) $record;
+        $criterion = criterion::get_record(['id' => $record->criterionid]);
+        if (!$criterion) {
+            throw new moodle_exception('criterionnotfound', 'competvet', '', $record->criterionid);
+        }
+        $valuerecord = [
+            'observationid' => $record->observationid,
+            'criterionid' => $record->criterionid,
+        ];
+        if (!$criterion->get('parentid')) {
+            $valuerecord['level'] = intval($record->value);
+            if ($existingrecord = observation_criterion_level::get_record(['observationid' => $record->observationid,
+                'criterionid' => $record->criterionid])) {
+                $existingrecord->set_many($valuerecord);
+                $existingrecord->update();
+                return $existingrecord->to_record();
+            }
+            return $this->create_observation_criterion_level($valuerecord);
+        } else {
+            $valuerecord['comment'] = $record->value;
+            $valuerecord['commentformat'] = 1;
+            if ($existingrecord = observation_criterion_comment::get_record(['observationid' => $record->observationid,
+                'criterionid' => $record->criterionid])) {
+                $existingrecord->set_many($valuerecord);
+                return $existingrecord->to_record();
+            }
+            return $this->create_observation_criterion_comment($valuerecord);
+        }
+    }
+
+    /**
+     * Create a new instance of observation_criterion level.
+     *
+     * @param array|stdClass|null $record
+     * @return stdClass
+     */
+    public function create_observation_criterion_level($record = null) {
+        return $this->create_from_entity_name(observation_criterion_level::class, $record);
+    }
+
+    /**
+     * Create a new instance of observation_criterion level.
+     *
+     * @param array|stdClass|null $record
+     * @return stdClass
+     */
+    public function create_observation_criterion_comment($record = null) {
+        return $this->create_from_entity_name(observation_criterion_comment::class, $record);
     }
 
     /**
@@ -163,24 +300,6 @@ class mod_competvet_generator extends testing_module_generator {
         return $this->create_from_entity_name(observation_comment::class, $record);
     }
 
-    /**
-     * Create a new instance of observation_criterion level.
-     *
-     * @param array|stdClass|null $record
-     * @return stdClass
-     */
-    public function create_observation_criterion_level($record = null) {
-        return $this->create_from_entity_name(observation_criterion_level::class, $record);
-    }
-    /**
-     * Create a new instance of observation_criterion level.
-     *
-     * @param array|stdClass|null $record
-     * @return stdClass
-     */
-    public function create_observation_criterion_comment($record = null) {
-        return $this->create_from_entity_name(observation_criterion_comment::class, $record);
-    }
     /**
      * Create a new instance of criterion.
      *
@@ -208,7 +327,32 @@ class mod_competvet_generator extends testing_module_generator {
      * @return stdClass
      */
     public function create_planning($record = null) {
+        $record = (object) (array) $record;
+        if (is_string($record->startdate)) {
+            $record->startdate = ((new DateTime($record->startdate)))->getTimestamp();
+        }
+        if (is_string($record->enddate)) {
+            $record->enddate = ((new DateTime($record->enddate)))->getTimestamp();
+        }
         return $this->create_from_entity_name(planning::class, $record);
     }
 
+    /**
+     * Create a new instance of planning.
+     *
+     * @param array|stdClass|null $record
+     * @return stdClass
+     */
+    public function create_certification($record = null) {
+        $record = (object) (array) $record;
+        if (is_string($record->status)) {
+            $statustoint = array_search($record->status, cert_decl::STATUS_TYPES);
+            if ($statustoint !== false) {
+                $record->status = $statustoint;
+            } else {
+                throw new moodle_exception('cert:invalidstatus', 'competvet', '', $record->status);
+            }
+        }
+        return $this->create_from_entity_name(cert_decl::class, $record);
+    }
 }

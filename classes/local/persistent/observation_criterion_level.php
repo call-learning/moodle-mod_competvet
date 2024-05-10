@@ -53,7 +53,7 @@ class observation_criterion_level extends persistent {
             'level' => [
                 'null' => NULL_NOT_ALLOWED,
                 'type' => PARAM_INT,
-                'message' => new lang_string('invaliddata', 'competvet', 'grade'),
+                'message' => new lang_string('invaliddata', 'competvet', 'level'),
             ],
             'isactive' => [
                 'null' => NULL_NOT_ALLOWED,

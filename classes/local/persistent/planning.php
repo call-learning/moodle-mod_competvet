@@ -38,14 +38,16 @@ class planning extends persistent {
      *
      * @param int $startdate
      * @param int $enddate
+     * @param string $session
      * @param int $situationid
      * @return planning
      */
-    public static function get_by_dates_and_situation(int $startdate, int $enddate, int $situationid): planning {
+    public static function get_by_dates_and_situation(int $startdate, int $enddate, string $session, int $situationid): planning {
         $params = [
             'situationid' => $situationid,
             'startdate' => $startdate,
             'enddate' => $enddate,
+            'session' => $session,
         ];
         return self::get_record($params);
     }

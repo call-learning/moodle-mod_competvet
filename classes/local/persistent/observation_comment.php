@@ -95,7 +95,7 @@ class observation_comment extends persistent {
             ],
             'type' => [
                 'type' => PARAM_INT,
-                'default' => 0,
+                'default' => self::OBSERVATION_COMMENT,
                 'message' => new lang_string('invaliddata', 'competvet', 'type'),
                 'choices' => array_keys(self::COMMENT_TYPES),
             ],

@@ -103,7 +103,7 @@ class observation extends persistent {
             'category' => [
                 'type' => PARAM_INT,
                 'default' => self::CATEGORY_EVAL_OBSERVATION,
-                'message' => new lang_string('invaliddata', 'competvet', 'status'),
+                'message' => new lang_string('invaliddata', 'competvet', 'category'),
                 'choices' => array_keys(self::CATEGORIES),
             ],
         ];

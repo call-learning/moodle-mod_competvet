@@ -58,7 +58,7 @@ trait test_data_definition {
                 foreach ($situationinfo['plannings'] as $planning) {
                     $groupid = groups_get_group_by_name($course->id, $planning['groupname']);
                     $competvetevalgenerator->create_planning([
-                        'shortname' => $situationname,
+                        //'shortname' => $situationname,
                         'courseid' => $course->id,
                         'startdate' => $planning['startdate'],
                         'enddate' => $planning['enddate'],

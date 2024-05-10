@@ -25,6 +25,7 @@ use mod_competvet\local\grader;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\observation_comment;
 use mod_competvet\local\persistent\observation_criterion_level;
+use mod_competvet\local\persistent\observation_criterion_comment;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\utils;
@@ -146,6 +147,10 @@ function competvet_delete_instance($id) {
                 $comment->delete();
             }
             $obscriteria = observation_criterion_level::get_records(['observationid' => $observation->get('id')]);
+            foreach ($obscriteria as $criterion) {
+                $criterion->delete();
+            }
+            $obscriteria = observation_criterion_comment::get_records(['observationid' => $observation->get('id')]);
             foreach ($obscriteria as $criterion) {
                 $criterion->delete();
             }

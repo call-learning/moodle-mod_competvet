@@ -13,6 +13,10 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+use mod_competvet\local\persistent\criterion;
+use mod_competvet\local\persistent\observation;
+use mod_competvet\local\persistent\planning;
+use mod_competvet\local\persistent\situation;
 
 /**
  * Behat data generator for mod_competvet.
@@ -32,9 +36,52 @@ class behat_mod_competvet_generator extends behat_generator_base {
         return [
             'observations' => [
                 'singular' => 'observation',
-                'datagenerator' => 'observations',
-                'required' => ['student', 'appraiser', 'evalplan'],
-                'switchids' => ['student' => 'studentid', 'appraiser' => 'appraiserid', 'evalplan' => 'evalplanid'],
+                'datagenerator' => 'observation_with_comment',
+                'required' => ['student', 'observer', 'planning', 'context', 'comment'],
+                'switchids' => ['student' => 'studentid', 'observer' => 'observerid', 'planning' => 'planningid'],
+            ],
+            'observation_comments' => [
+                'singular' => 'observation_comment',
+                'datagenerator' => 'observation_comment',
+                'required' => ['observation', 'user', 'comment'],
+                'switchids' => ['student' => 'studentid', 'usercreated' => 'user'],
+            ],
+            'observation_criterion_comments' => [
+                'singular' => 'observation_criterion_comment',
+                'datagenerator' => 'observation_criterion_comment',
+                'required' => ['criterion', 'observation'],
+                'switchids' => ['criterion' => 'criterionid', 'observation' => 'observationid'],
+            ],
+            'observation_criterion_levels' => [
+                'singular' => 'observation_criterion_level',
+                'datagenerator' => 'observation_criterion_level',
+                'required' => ['criterion', 'observation', 'level'],
+                'switchids' => ['criterion' => 'criterionid', 'observation' => 'observationid'],
+            ],
+            'observation_criterion_values' => [
+                'singular' => 'observation_criterion_value',
+                'datagenerator' => 'observation_criterion_value',
+                'required' => ['observation', 'criterion', 'value'],
+                'switchids' => [
+                    'observation' => 'observationid',
+                    'criterion' => 'criterionid',
+                ],
+            ],
+            'certifications' => [
+                'singular' => 'certification',
+                'datagenerator' => 'certification',
+                'required' => ['student', 'planning', 'criterion', 'comment'],
+                'switchids' => [
+                    'student' => 'studentid',
+                    'planning' => 'planningid',
+                    'criterion' => 'criterionid',
+                ],
+            ],
+            'plannings' => [
+                'singular' => 'planning',
+                'datagenerator' => 'planning',
+                'required' => ['situation', 'startdate', 'enddate'],
+                'switchids' => ['situation' => 'situationid', 'group' => 'groupid'],
             ],
         ];
     }
@@ -50,27 +97,93 @@ class behat_mod_competvet_generator extends behat_generator_base {
     }
 
     /**
-     * Get the evaluation plan id from the date and situation shortname.
+     * Gets the appraiser user id from its username.
      *
-     * @param string $datesandsituation dates and situation shortname in the format STARTDATE > ENDDATE > SITUATIONSHORTNAME
-     * @return int The cmid
+     * @param string $username
+     * @return int
      */
-    protected function get_evalplan_id(string $datesandsituation): int {
-        [$startdate, $enddate, $situationname] = explode('>', $datesandsituation);
-        // Parse dates.
-        $startdate = strtotime($startdate);
-        $enddate = strtotime($enddate);
-        $situationid = $this->get_competvet_id($situationname);
-
-        if (!$startdate || !$enddate || !$situationid) {
-            throw new moodle_exception('Invalid dates and situation shortname format');
-        }
-        $evallplan = \mod_competvet\local\persistent\planning::get_by_dates_and_situation($startdate, $enddate, $situationid);
-        return $evallplan->get('id');
+    protected function get_appraiser_id(string $username): int {
+        return $this->get_user_id($username);
     }
 
     /**
-     * Gets the student user id from it's username.
+     * Gets the criterion id from its shortname.
+     *
+     * @param string $criterionsn
+     * @return int
+     */
+    protected function get_criterion_id(string $criterionsn): int {
+        $criterion = criterion::get_record(['idnumber' => $criterionsn]);
+        if (!$criterion) {
+            throw new moodle_exception("Criterion $criterionsn  not found");
+        }
+        return $criterion->get('id');
+    }
+
+    /**
+     * Gets the observation id from its description : startdate > enddate > session >
+     *      situationshortname > student > observer
+     *
+     * @param string $description
+     * @return int
+     * @throws moodle_exception
+     */
+    protected function get_observation_id(string $description): int {
+        $planningid = $this->get_planning_id($description);
+        $description = explode('>', $description);
+        $description = array_map('trim', $description);
+        [$student, $observer] = array_splice($description, -2);
+        $studentid = $this->get_student_id($student);
+        $observerid = $this->get_observer_id($observer);
+        $observation =
+            observation::get_record(['studentid' => $studentid, 'observerid' => $observerid, 'planningid' => $planningid]);
+        if (!$observation) {
+            throw new moodle_exception("Observation $description  not found");
+        }
+        return $observation->get('id');
+    }
+
+    /**
+     * Get the plan from the date and situation shortname.
+     *
+     * @param string $datesandsituation dates and situation shortname in the format startdate > enddate > session >
+     *     situationshortname
+     * @return int The cmid
+     */
+    protected function get_planning_id(string $datesandsituation): int {
+        $description = explode('>', $datesandsituation);
+        $description = array_map('trim', $description);
+        [$startdate, $enddate, $session, $situationname] = $description;
+        // Parse dates.
+        $startdate = strtotime($startdate);
+        $enddate = strtotime($enddate);
+        $situationid = $this->get_situation_id($situationname);
+        if (!$startdate || !$enddate || !$situationid) {
+            throw new moodle_exception('Invalid dates and situation shortname format');
+        }
+        $planning = planning::get_by_dates_and_situation($startdate, $enddate, $session, $situationid);
+        if (!$planning) {
+            throw new moodle_exception("Planning $datesandsituation not found");
+        }
+        return $planning->get('id');
+    }
+
+    /**
+     * Gets the situation user id from its shortname.
+     *
+     * @param string $situationname
+     * @return int
+     */
+    protected function get_situation_id(string $situationname): int {
+        $situation = situation::get_record(['shortname' => $situationname]);
+        if (!$situation) {
+            throw new moodle_exception("Situation $situationname  not found");
+        }
+        return $situation->get('id');
+    }
+
+    /**
+     * Gets the student user id from its username.
      *
      * @param string $username
      * @return int
@@ -80,12 +193,12 @@ class behat_mod_competvet_generator extends behat_generator_base {
     }
 
     /**
-     * Gets the appraisaer user id from it's username.
+     * Gets the observer user id from its username.
      *
      * @param string $username
      * @return int
      */
-    protected function get_appraiser_id(string $username): int {
+    protected function get_observer_id(string $username): int {
         return $this->get_user_id($username);
     }
 }
