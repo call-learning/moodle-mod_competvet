@@ -18,6 +18,8 @@ namespace mod_competvet\local\api;
 
 use mod_competvet\local\persistent\grid;
 use mod_competvet\local\persistent\criterion;
+use mod_competvet\local\persistent\situation;
+use mod_competvet\local\persistent\planning;
 
 /**
  * Criteria API
@@ -71,6 +73,37 @@ class criteria {
         foreach ($criteria as $criterion) {
             $criterion->delete();
         }
+    }
+
+    /**
+     * Get the grid for this planning
+     * @param int $planningid - The planning id
+     * @param string $type - The type
+     * @return grid|null - The grid
+     */
+    public static function get_grid_for_planning(int $planningid, string $type): ?grid {
+        $planning = planning::get_record(['id' => $planningid]);
+        if ($planning) {
+            $situation = situation::get_record(['id' => $planning->get('situationid')]);
+            if ($situation) {
+                if ($type == 'cert') {
+                    return grid::get_record(['id' => $situation->get('certifgrid')]);
+                } else if ($type == 'eval') {
+                    return grid::get_record(['id' => $situation->get('evalgrid')]);
+                } else if ($type == 'list') {
+                    return grid::get_record(['id' => $situation->get('listgrid')]);
+                }
+            }
+        }
+    }
+
+    /**
+     * Get the criteria for this grid
+     * @param int $gridid - The grid id
+     * @return array - The criteria
+     */
+    public static function get_criteria_for_grid(int $gridid): array {
+        return criterion::get_records(['gridid' => $gridid]);
     }
 
     /**

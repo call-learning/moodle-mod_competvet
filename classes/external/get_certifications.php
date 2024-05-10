@@ -50,20 +50,26 @@ class get_certifications extends external_api {
     */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
-            'criteria' => new external_multiple_structure(
+            'certifications' => new external_multiple_structure(
                 new external_single_structure([
                     'declid' => new external_value(PARAM_INT, 'The certification id'),
+                    'label' => new external_value(PARAM_TEXT, 'The label'),
                     'criterionid' => new external_value(PARAM_INT, 'The criterion id'),
-                    'level' => new external_value(PARAM_INT, 'The level'),
-                    'total' => new external_value(PARAM_INT, 'The total'),
+                    'level' => new external_value(PARAM_INT, 'The level', VALUE_OPTIONAL),
+                    'total' => new external_value(PARAM_INT, 'The total', VALUE_OPTIONAL),
+                    'status' => new external_value(PARAM_INT, 'The status', VALUE_OPTIONAL),
+                    'realised' => new external_value(PARAM_BOOL, 'Is realised', VALUE_OPTIONAL),
+                    'notrealised' => new external_value(PARAM_BOOL, 'Is not realised', VALUE_OPTIONAL),
+                    'validated' => new external_value(PARAM_BOOL, 'Is validated', VALUE_OPTIONAL),
+                    'notvalidated' => new external_value(PARAM_BOOL, 'Is not validated', VALUE_OPTIONAL),
+                    'notreached' => new external_value(PARAM_BOOL, 'Is not reached', VALUE_OPTIONAL),
                     'feedback' => new external_single_structure([
                         'picture' => new external_value(PARAM_TEXT, 'The picture'),
                         'fullname' => new external_value(PARAM_TEXT, 'The fullname'),
                         'comments' => new external_single_structure([
                             'commenttext' => new external_value(PARAM_TEXT, 'The comment'),
-                        ])
-                    ]),
-                    'status' => new external_value(PARAM_INT, 'The status'),
+                        ], 'The comments', VALUE_OPTIONAL)
+                    ], 'The feedback', VALUE_OPTIONAL),
                     'validations' => new external_multiple_structure(
                         new external_single_structure([
                             'id' => new external_value(PARAM_INT, 'The validation id'),
@@ -75,7 +81,7 @@ class get_certifications extends external_api {
                                 ])
                             ]),
                             'status' => new external_value(PARAM_INT, 'The status'),
-                        ])
+                        ]), 'The validations', VALUE_OPTIONAL
                     ),
                 ])
             ),
@@ -91,6 +97,6 @@ class get_certifications extends external_api {
     */
     public static function execute($studentid, $planningid): array {
         $certifications = certifications::get_certifications($studentid, $planningid);
-        return ['criteria' => $certifications];
+        return ['certifications' => $certifications];
     }
 }

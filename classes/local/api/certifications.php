@@ -19,9 +19,11 @@ namespace mod_competvet\local\api;
 use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\cert_decl_asso;
 use mod_competvet\local\persistent\cert_valid;
-use mod_competvet\local\persistent\criterion;
+use mod_competvet\local\persistent\planning;
+use mod_competvet\local\persistent\situation;
+use mod_competvet\competvet;
 use mod_competvet\utils;
-use context_system;
+use context_module;
 
 /**
  * Class certifications
@@ -182,8 +184,15 @@ class certifications {
      */
     public static function get_certification($declid) {
         global $PAGE;
-        $PAGE->set_context(context_system::instance());
         $cert = new cert_decl($declid);
+        if (!$cert->get('id')) {
+            return [];
+        }
+        $planning = planning::get_record(['id' => $cert->get('planningid')]);
+        $situation = situation::get_record(['id' => $planning->get('situationid')]);
+        $competvet = competvet::get_from_situation($situation);
+        $PAGE->set_context($competvet->get_context());
+
         $certrecord = [];
         $certrecord['declid'] = $cert->get('id');
         $certrecord['criterionid'] = $cert->get('criterionid');
@@ -214,50 +223,68 @@ class certifications {
      * @param int $planningid The planning id
      * @return array The certifications
      */
-    public static function get_certifications($studentid, $planningid) {
+    public static function get_certifications($studentid, $planningid) : array {
         global $PAGE;
-        // Set the context to system to get the user info
-        $PAGE->set_context(context_system::instance());
-        $certs = cert_decl::get_records([
-            'studentid' => $studentid,
-            'planningid' => $planningid,
-        ]);
-        $certarray = [];
-        foreach ($certs as $cert) {
-            $student = utils::get_user_info($studentid);
+        // Get the page context. Needed because the webservice does not have the context set.
+        $planning = planning::get_record(['id' => $planningid]);
+        $situation = situation::get_record(['id' => $planning->get('situationid')]);
+        $competvet = competvet::get_from_situation($situation);
+        $PAGE->set_context($competvet->get_context());
+
+        $gridid = criteria::get_grid_for_planning($planningid, 'cert')->get('id');
+        $criteria = criteria::get_criteria_for_grid($gridid);
+
+        $student = utils::get_user_info($studentid);
+
+        $returnarray = [];
+        foreach ($criteria as $criterion) {
             $certrecord = [];
-            $certrecord['declid'] = $cert->get('id');
-            $certrecord['criterionid'] = $cert->get('criterionid');
-            $certrecord['level'] = $cert->get('level');
-            $certrecord['total'] = 5; // TODO: get the total from the criterion
-            $certrecord['comment'] = $cert->get('comment');
-            $certrecord['commentformat'] = $cert->get('commentformat');
-            $certrecord['feedback'] = [
-                'picture' => $student['userpictureurl'],
-                'fullname' => $student['fullname'],
-                'comments' => [
-                    'commenttext' => format_text($cert->get('comment'), $cert->get('commentformat')),
-                ],
-            ];
-            $certrecord['status'] = $cert->get('status');
-            $certrecord['validations'] = [];
-            $valids = cert_valid::get_records(['declid' => $cert->get('id')]);
-            foreach ($valids as $valid) {
-                $supervisor = utils::get_user_info($valid->get('supervisorid'));
-                $validrecord = [];
-                $validrecord['id'] = $valid->get('id');
-                $validrecord['feedback'] = [
-                    'picture' => $supervisor['userpictureurl'],
-                    'fullname' => $supervisor['fullname'],
+            $certrecord['label'] = $criterion->get('label');
+            $certrecord['grade'] = $criterion->get('grade');
+            $certrecord['criterionid'] = $criterion->get('id');
+            $certrecord['declid'] = 0;
+
+            $certdecl = cert_decl::get_record([
+                'studentid' => $studentid,
+                'planningid' => $planningid,
+                'criterionid' => $criterion->get('id'),
+            ]);
+            if ($certdecl) {
+                $certrecord['declid'] = $certdecl->get('id');
+                $certrecord['level'] = $certdecl->get('level');
+                $certrecord['total'] = 5; // TODO: get the total from the criterion? maybe change to grade.
+                $certrecord['status'] = $certdecl->get('status');
+                $certrecord['realised'] = ($certdecl->get('status') == self::STATUS_DECL_SEENDONE);
+                $certrecord['notrealised'] = ($certdecl->get('status') == self::STATUS_DECL_NOTSEEN);
+                $certrecord['feedback'] = [
+                    'picture' => $student['userpictureurl'],
+                    'fullname' => $student['fullname'],
                     'comments' => [
-                        'commenttext' => format_text($valid->get('comment'), $valid->get('commentformat')),
+                        'commenttext' => format_text($certdecl->get('comment'), $certdecl->get('commentformat')),
                     ],
                 ];
-                $validrecord['status'] = $valid->get('status');
-                $certrecord['validations'][] = $validrecord;
+                $certrecord['validations'] = [];
+                $valids = cert_valid::get_records(['declid' => $certdecl->get('id')]);
+                foreach ($valids as $valid) {
+                    $supervisor = utils::get_user_info($valid->get('supervisorid'));
+                    $validrecord = [];
+                    $validrecord['id'] = $valid->get('id');
+                    $validrecord['feedback'] = [
+                        'picture' => $supervisor['userpictureurl'],
+                        'fullname' => $supervisor['fullname'],
+                        'comments' => [
+                            'commenttext' => format_text($valid->get('comment'), $valid->get('commentformat')),
+                        ],
+                    ];
+                    $validrecord['status'] = $valid->get('status');
+                    $certrecord['validations'][] = $validrecord;
+                    $certrecord['validated'] = ($valid->get('status') == self::STATUS_VALID_CONFIRMED);
+                    $certrecord['notvalidated'] = ($valid->get('status') == self::STATUS_VALID_NOTSEEN);
+                    $certrecord['notreached'] = ($valid->get('status') == self::STATUS_VALID_NOTREACHED);
+                }
             }
-            $certarray[] = $certrecord;
+            $returnarray[] = $certrecord;
         }
-        return $certarray;
+        return $returnarray;
     }
 }

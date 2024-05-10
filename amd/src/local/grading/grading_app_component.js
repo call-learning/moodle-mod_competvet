@@ -37,16 +37,8 @@ import './components/evaluation_results';
  * Constants for eval certif and list.
  */
 const COMPETVET_CRITERIA_EVALUATION = 1;
-const COMPETVET_CRITERIA_CERTIFICATION = 2;
 const COMPETVET_CRITERIA_LIST = 3;
 
-const STATUS_DECL_SEENDONE = 1;
-const STATUS_DECL_NOTSEEN = 2;
-
-// const STATUS_VALID_ASKED = 0;
-const STATUS_VALID_CONFIRMED = 1;
-const STATUS_VALID_NOTSEEN = 2;
-const STATUS_VALID_NOTREACHED = 3;
 
 class Competvet {
     /*
@@ -132,17 +124,6 @@ class Competvet {
     }
 
     async setCertifResults() {
-        const args = {
-            type: COMPETVET_CRITERIA_CERTIFICATION,
-            gridid: this.certifgrid,
-        };
-        const response = await Repository.getCriteria(args);
-        if (!response.grids) {
-            return;
-        }
-        const context = {
-            'criteria': response.grids[0].criteria
-        };
 
         // Get the certification results.
         const certArgs = {
@@ -150,29 +131,7 @@ class Competvet {
             planningid: this.planning.id
         };
         const certResponse = await Repository.getCertifResults(certArgs);
-
-        if (certResponse.criteria) {
-            // Match the criteria in the certResponse array with the criteria in the context on the criterionid.
-            // Add a attribute realised on the criteria in the context if the criterion is in the certResponse array.
-            context.criteria.forEach(criterion => {
-                const certCriterion = certResponse.criteria.find(
-                    certCriterion => certCriterion.criterionid === criterion.criterionid
-                );
-                if (certCriterion) {
-                    criterion.declid = certCriterion.declid;
-                    criterion.level = certCriterion.level;
-                    criterion.total = certCriterion.total;
-                    criterion.feedback = certCriterion.feedback;
-                    criterion.validations = certCriterion.validations;
-                    criterion.realised = certCriterion.status === STATUS_DECL_SEENDONE;
-                    criterion.notrealised = certCriterion.status === STATUS_DECL_NOTSEEN;
-                    criterion.validated = criterion.validations.some(validation => validation.status === STATUS_VALID_CONFIRMED);
-                    criterion.notvalidated = criterion.validations.some(validation => validation.status === STATUS_VALID_NOTSEEN);
-                    criterion.notreached = criterion.validations.some(validation => validation.status === STATUS_VALID_NOTREACHED);
-                }
-            });
-        }
-        CompetState.setValue('certification-results', context);
+        CompetState.setValue('certification-results', certResponse);
     }
 
     async setListResults() {

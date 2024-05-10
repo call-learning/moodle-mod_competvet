@@ -28,20 +28,20 @@
         <div class="col1">
         </div>
         <div class="col2">
-            <div class="description mb-2 d-flex justify-content-end"><strong>Niveau de confiance</strong></div>
+            <div class="description mb-2 d-flex justify-content-end"><strong>{{#str}}confidencelevel, mod_competvet{{/str}}</strong></div>
         </div>
         <div class="col3">
-            <div class="description mb-2"><strong>Réalisé</strong></div>
+            <div class="description mb-2"><strong>{{#str}}realised, mod_competvet{{/str}}</strong></div>
         </div>
         <div class="col4">
-            <div class="description mb-2"><strong>Validé</strong></div>
+            <div class="description mb-2"><strong>{{#str}}verified, mod_competvet{{/str}}</strong></div>
         </div>
     </div>
-    {{#criteria}}
+    {{#certifications}}
         <div class="certif">
             <div class="col1">
                 <div class="description mb-2">
-                    <strong>{{title}}</strong>
+                    <strong>{{label}}</strong>
                     <button class="btn btn-icon icon-no-margin" data-action="cert-decl" data-id="{{criterionid}}" data-decl-id="{{declid}}">
                         {{#pix}}t/message{{/pix}}
                         <span class="sr-only">{{#str}}comment, competvet{{/str}}</span>
@@ -88,5 +88,5 @@
                 {{/notreached}}
             </div>
         </div>
-    {{/criteria}}
+    {{/certifications}}
 {{/certification-results}}

@@ -227,6 +227,7 @@ class plannings {
             [
                 'id' => $userid,
                 'planningid' => $planningid,
+                'situationid' => $situation->get('id'),
                 'info' => self::create_planning_info_for_student($userid, $situation, $observations),
             ];
         return $result;
@@ -265,6 +266,16 @@ class plannings {
         }
         $info[] = $eval;
         $info[] = $autoeval;
+        $info[] = [
+            'type' => 'cert',
+            'nbdone' => '',
+            'nbrequired' => '',
+        ];
+        $info[] = [
+            'type' => 'list',
+            'nbdone' => '',
+            'nbrequired' => '',
+        ];
         return $info;
     }
 

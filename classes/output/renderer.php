@@ -16,6 +16,7 @@
 namespace mod_competvet\output;
 
 use mod_competvet\output\view\student_evaluations;
+use mod_competvet\output\view\student_certifications;
 use tabobject;
 
 /**
@@ -45,6 +46,28 @@ class renderer extends \plugin_renderer_base {
         }
         $output = $this->output->tabtree($tabtree, $currenttab);
         $output .= $this->render_from_template($evaluationinfo->get_template_name($this->output), $data);
+        return $output;
+    }
+
+    /**
+     * Render the certification list
+     *
+     * @param student_certifications $certificationinfo
+     * @return string
+     */
+    public function render_student_certifications(student_certifications $certificationinfo) {
+        $data = $certificationinfo->export_for_template($this);
+        $currenttab = optional_param('currenttab', 'cert', PARAM_ALPHA);
+        $tabtree = [];
+        foreach($data['tabs'] as $tab) {
+            $tabtree[] = new tabobject(
+                $tab['id'],
+                $tab['url'],
+                $tab['label'],
+            );
+        }
+        $output = $this->output->tabtree($tabtree, $currenttab);
+        $output .= $this->render_from_template($certificationinfo->get_template_name($this->output), $data);
         return $output;
     }
 }

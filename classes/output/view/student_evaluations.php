@@ -17,12 +17,12 @@ namespace mod_competvet\output\view;
 
 use mod_competvet\competvet;
 use mod_competvet\local\api\observations;
+use mod_competvet\local\api\certifications;
 use mod_competvet\local\api\plannings;
 use mod_competvet\local\api\user_role;
 use mod_competvet\local\persistent\situation;
 use moodle_url;
 use renderer_base;
-use single_button;
 use stdClass;
 
 /**
@@ -92,32 +92,30 @@ class student_evaluations extends base {
         // Concatenate stats for autoeval and eval.
 
         if (!empty($this->planninginfo['info'])) {
-            $planninginfostats = [
-                'eval' => [
-                    'nbdone' => 0,
-                    'nbrequired' => 0,
-                ],
+            $tabs = [
+                'eval' => 'eval',
+                'cert' => 'cert',
+                'list' => 'list',
             ];
-            foreach ($this->planninginfo['info'] as $value) {
-                $key = $value['type'];
-                if ($key == 'autoeval' || $key == 'eval') {
-                    $planninginfostats['eval']['type'] = 'eval';
-                    $planninginfostats['eval']['nbdone'] += $value['nbdone'];
-                    $planninginfostats['eval']['nbrequired'] += $value['nbrequired'];
-                } else {
-                    $planninginfostats[$key] = $value;
-                }
-            }
-            foreach ($planninginfostats as $infotype => $userinfovalue) {
-                $tab = [
-                    'id' => $userinfovalue['type'],
-                    'url' => new moodle_url($this->baseurl, ['currenttab' => $infotype]),
-                    'label' => get_string('tab:' . $userinfovalue['type'], 'mod_competvet', (object) [
-                        'done' => $userinfovalue['nbdone'] ?? 0,
-                        'required' => $userinfovalue['nbrequired'] ?? 0,
-                    ]),
+            foreach ($tabs as $tab => $name) {
+                $stringcontext = (object) [
+                    'done' => 0,
+                    'required' => 0,
+                    'certdone' => 0,
+                    'certopen' => 0,
+                    'cases' => 0,
                 ];
-                $data['tabs'][] = $tab;
+                foreach ($this->planninginfo['info'] as $value) {
+                    if ($value['type'] == 'autoeval' || $value['type'] == 'eval') {
+                        $stringcontext->done += $value['nbdone'];
+                        $stringcontext->required += $value['nbrequired'];
+                    }
+                }
+                $data['tabs'][] = [
+                    'id' => $tab, // 'id' is used in the template to set the 'active' class
+                    'url' => $this->views[$tab]->out(false),
+                    'label' => get_string('tab:' . $name, 'mod_competvet', $stringcontext),
+                ];
             }
         }
         // Find planning, module infos.
@@ -154,20 +152,25 @@ class student_evaluations extends base {
             $userobservations = observations::get_user_observations($planningid, $studentid);
             $competvet = competvet::get_from_context($context);
             $planninginfo = plannings::get_planning_info_for_student($planningid, $studentid);
+            $urlparams = [
+                'id' => $competvet->get_course_module_id(),
+                'planningid' => $planningid,
+                'studentid' => $studentid,
+            ];
             $data = [
                 $planninginfo,
                 [
                     'eval' => new moodle_url(
                         $this->baseurl,
-                        ['pagetype' => 'student_eval', 'id' => $competvet->get_course_module_id()]
+                        array_merge(['pagetype' => 'student_evaluations', 'currenttab' => 'eval'], $urlparams)
                     ),
                     'list' => new moodle_url(
                         $this->baseurl,
-                        ['pagetype' => 'student_list', 'id' => $competvet->get_course_module_id()]
+                        array_merge(['pagetype' => 'student_list', 'currenttab' => 'list'], $urlparams)
                     ),
-                    'certif' => new moodle_url(
+                    'cert' => new moodle_url(
                         $this->baseurl,
-                        ['pagetype' => 'student_certif', 'id' => $competvet->get_course_module_id()]
+                        array_merge(['pagetype' => 'student_certifications', 'currenttab' => 'cert'], $urlparams)
                     ),
                 ],
                 $userobservations,
