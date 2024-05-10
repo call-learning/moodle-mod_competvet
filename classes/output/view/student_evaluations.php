@@ -162,7 +162,7 @@ class student_evaluations extends base {
                 [
                     'eval' => new moodle_url(
                         $this->baseurl,
-                        array_merge(['pagetype' => 'student_evaluations', 'currenttab' => 'eval'], $urlparams)
+                        array_merge(['pagetype' => 'student_eval', 'currenttab' => 'eval'], $urlparams)
                     ),
                     'list' => new moodle_url(
                         $this->baseurl,
