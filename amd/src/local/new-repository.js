@@ -71,6 +71,15 @@ class Repository {
     }
 
     /**
+     * Get the user data for the Evaluation.
+     * @param {Object} args The arguments.
+     * @return {Promise} The promise.
+     */
+    async getEvalResults(args) {
+        return Ajax.call([{methodname: 'mod_competvet_get_evaluation_results', args: args}])[0];
+    }
+
+    /**
      * Get the User data for the Criteria.
      * @param {Object} args The arguments.
      * @return {Promise} The promise.

@@ -24,7 +24,6 @@ import Repository from '../new-repository';
 import CompetState from '../competstate';
 import '../helpers';
 import './components/user_navigation';
-import './components/evaluations_observations';
 import './components/evaluations_grading';
 import './components/list_grading';
 import './components/globalgrade';
@@ -32,11 +31,11 @@ import './components/certification_grading';
 import './components/certification_results';
 import './components/list_results';
 import './components/evaluation_results';
+import './components/evaluation_chart';
 
 /**
  * Constants for eval certif and list.
  */
-const COMPETVET_CRITERIA_EVALUATION = 1;
 const COMPETVET_CRITERIA_LIST = 3;
 
 
@@ -110,27 +109,20 @@ class Competvet {
 
     async setEvalResults() {
         const args = {
-            type: COMPETVET_CRITERIA_EVALUATION,
-            gridid: this.evalgrid
-        };
-        const response = await Repository.getCriteria(args);
-        if (!response.grids) {
-            return;
-        }
-        const context = {
-            'criteria': response.grids[0].criteria
-        };
-        CompetState.setValue('evaluation-results', context);
-    }
-
-    async setCertifResults() {
-
-        // Get the certification results.
-        const certArgs = {
             studentid: this.currentUser.id,
             planningid: this.planning.id
         };
-        const certResponse = await Repository.getCertifResults(certArgs);
+        const evalResponse = await Repository.getEvalResults(args);
+        CompetState.setValue('evaluation-results', evalResponse);
+        CompetState.setValue('evaluation-chart', evalResponse);
+    }
+
+    async setCertifResults() {
+        const args = {
+            studentid: this.currentUser.id,
+            planningid: this.planning.id
+        };
+        const certResponse = await Repository.getCertifResults(args);
         CompetState.setValue('certification-results', certResponse);
     }
 

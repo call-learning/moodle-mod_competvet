@@ -249,6 +249,7 @@ $string['scoreevaluator_help'] = 'This grade will be the one taken into account 
 $string['freecommenteval'] = 'Free comment for the Eval part';
 $string['selfevalnone'] = '+ 0 No relevant self-evaluation';
 $string['selfevalbonus'] = '+{$a} realised and relevant';
+$string['supervisorchart'] = 'Supervisor chart';
 
 // Certif
 $string['certifevaluation'] = 'Certif evaluation';

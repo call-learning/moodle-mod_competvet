@@ -15,28 +15,12 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_competvet/grading/tabs/tab/evaluate
+    @template mod_competvet/grading/components/evaluation-chart
 
-    TODO describe template evaluate
+    TODO describe template evaluation-chart
 
     Example context (json):
     {
     }
 }}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<div class="tab-main">
-    <div class="p-3 evaluation" data-region="evaluation-results">
-    </div>
-    <div class="p-3 chart" data-region="evaluation-chart">
-    </div>
-</div>
-<div class="tab-aside">
-    <div class="p-3" data-region="tab-side">
-        <div class="certifheading d-flex justify-content-center mb-5">
-          <h4>{{#str}}evalevaluation, mod_competvet{{/str}}</h4>
-        </div>
-        <form data-region="evaluations-grading">
-        </form>
-    </div>
-</div>
+<canvas id="evaluation-chart" width="400" height="400"></canvas>

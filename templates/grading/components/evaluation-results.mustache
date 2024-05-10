@@ -27,36 +27,31 @@
     <div class="eval header">
         <div class="col1">
         </div>
-        {{#criteria.0}}
-            {{#observer}}
+        {{#evaluations.0}}
+            {{#grades}}
                 <span class="col3">
-                    {{{fullname}}}
+                    {{{gradername}}}
                 </span>
-            {{/observer}}
-        {{/criteria.0}}
+            {{/grades}}
+        {{/evaluations.0}}
     </div>
-    {{#criteria}}
+    {{#evaluations}}
         <div class="eval">
             <div class="col1">
-                <div class="description mb-2"><strong>{{title}}</strong></div>
+                <div class="description mb-2"><strong>{{name}}</strong></div>
             </div>
-            {{#observer}}
+            {{#grades}}
                 <div class="col3">
-                    {{grade}}
+                    {{value}}
                 </div>
-            {{/observer}}
+            {{/grades}}
         </div>
-    {{/criteria}}
+    {{/evaluations}}
     <div class="evalcomments d-flex row">
         <div class="col-md-6">
-            {{#observercomments}}
+            {{#comments}}
                 {{>mod_competvet/comment}}
-            {{/observercomments}}
-        </div>
-        <div class="col-md-6">
-            {{#usercomments}}
-                {{>mod_competvet/comment}}
-            {{/usercomments}}
+            {{/comments}}
         </div>
     </div>
 {{/evaluation-results}}

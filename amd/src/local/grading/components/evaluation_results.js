@@ -28,7 +28,7 @@ import Templates from 'core/templates';
 const gradingApp = document.querySelector('[data-region="grading-app"]');
 
 /**
- * Define the user navigation.
+ * Define the evaluation results template.
  */
 const stateTemplate = () => {
     const templateName = 'evaluation-results';
