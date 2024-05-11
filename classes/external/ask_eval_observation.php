@@ -66,7 +66,7 @@ class ask_eval_observation extends external_api {
                 'studentid' => $studentid,
             ]);
         $planning = planning::get_record(['id' => $planningid]);
-        $situation = situation::get_record(['id' => $planning->get('situationid')]);
+        $situation = $planning->get_situation();
         $competvet = competvet::get_from_situation($situation);
         self::validate_context($competvet->get_context());
         return [

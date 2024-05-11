@@ -84,7 +84,7 @@ class criteria {
     public static function get_grid_for_planning(int $planningid, string $type): ?grid {
         $planning = planning::get_record(['id' => $planningid]);
         if ($planning) {
-            $situation = situation::get_record(['id' => $planning->get('situationid')]);
+            $situation = $planning->get_situation();
             if ($situation) {
                 if ($type == 'cert') {
                     return grid::get_record(['id' => $situation->get('certifgrid')]);

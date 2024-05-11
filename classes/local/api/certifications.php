@@ -189,7 +189,7 @@ class certifications {
             return [];
         }
         $planning = planning::get_record(['id' => $cert->get('planningid')]);
-        $situation = situation::get_record(['id' => $planning->get('situationid')]);
+        $situation = $planning->get_situation();
         $competvet = competvet::get_from_situation($situation);
         $PAGE->set_context($competvet->get_context());
 
@@ -227,7 +227,7 @@ class certifications {
         global $PAGE;
         // Get the page context. Needed because the webservice does not have the context set.
         $planning = planning::get_record(['id' => $planningid]);
-        $situation = situation::get_record(['id' => $planning->get('situationid')]);
+        $situation = $planning->get_situation();
         $competvet = competvet::get_from_situation($situation);
         $PAGE->set_context($competvet->get_context());
 

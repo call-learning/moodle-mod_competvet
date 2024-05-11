@@ -72,7 +72,7 @@ class observations {
         $observation =
             observation::get_record(['id' => $observationid]);
         $planning = planning::get_record(['id' => $observation->get('planningid')]);
-        $situation = situation::get_record(['id' => $planning->get('situationid')]);
+        $situation = $planning->get_situation();
         $criteria = $situation->get_eval_criteria();
         $criteria = array_combine(
             array_map(fn($crit) => $crit->get('id'), $criteria),
@@ -202,7 +202,7 @@ class observations {
         // Now create the criteria and subcriteria structure.
         $observationid = $observation->get('id');
         $planning = planning::get_record(['id' => $planningid]);
-        $situation = situation::get_record(['id' => $planning->get('situationid')]);
+        $situation = $planning->get_situation();
         $criteriamodels = $situation->get_eval_criteria();
         if (!empty($criteria)) {
             // Flattern the structure so we can easily find the values.

@@ -120,7 +120,7 @@ class student_evaluations extends base {
         }
         // Find planning, module infos.
         $planning = \mod_competvet\local\persistent\planning::get_record(['id' => $this->planninginfo['planningid']]);
-        $situation = situation::get_record(['id' => $planning->get('situationid')]);
+        $situation = $planning->get_situation();
         $competvet = competvet::get_from_situation($situation);
         $data['cmid'] = $competvet->get_course_module_id();
         $data['planningid'] = $this->planninginfo['planningid'];

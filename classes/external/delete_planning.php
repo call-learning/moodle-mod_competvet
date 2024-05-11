@@ -62,7 +62,7 @@ class delete_planning extends external_api {
         ['planningid' => $planningid] = self::validate_parameters(self::execute_parameters(), ['planningid' => $planningid]);
         $planning  = planning::get_record(['id' => $planningid]);
         // Check if we can delete.
-        $situation = situation::get_record(['id' => $planning->get('situationid')]);
+        $situation = $planning->get_situation();
         $competvet = competvet::get_from_situation($situation);
         self::validate_context($competvet->get_context());
         // Now delete.

@@ -153,7 +153,7 @@ class todos extends system_report {
             function (stdClass $row) use ($USER) {
                 $data = json_decode($row->rawdata);
                 $planning = \mod_competvet\local\persistent\planning::get_record(['id' => $row->planningid]);
-                $situation = \mod_competvet\local\persistent\situation::get_record(['id' => $planning->get('situationid')]);
+                $situation = $planning->get_situation();
                 $competvet = \mod_competvet\competvet::get_from_situation($situation);
                 $row->cmid = $competvet->get_course_module()->id;
                 return has_capability('mod/competvet:canobserve', $competvet->get_context(), $USER);

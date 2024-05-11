@@ -164,6 +164,15 @@ class planning extends persistent {
     }
 
     /**
+     * Get the situation related to this planning.
+     *
+     * @return situation
+     */
+    public function get_situation(): situation {
+        return situation::get_record(['id' => $this->raw_get('situationid')], MUST_EXIST);
+    }
+
+    /**
      * Category definition
      */
     const CATEGORY = [

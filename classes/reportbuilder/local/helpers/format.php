@@ -39,7 +39,7 @@ class format {
             case todo::ACTION_EVAL_OBSERVATION_ASKED:
                 $planning = \mod_competvet\local\persistent\planning::get_record(['id' => $row->planningid]);
                 $student = \core_user::get_user($row->targetuserid);
-                $situation = \mod_competvet\local\persistent\situation::get_record(['id' => $planning->get('situationid')]);
+                $situation = $planning->get_situation();
                 $competvet = \mod_competvet\competvet::get_from_situation($situation);
                 $label = $competvet->get_course_module()->name;
                 return "Observation demandée par " . fullname($student) . " pour la situation '{$label}'";

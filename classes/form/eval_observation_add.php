@@ -37,7 +37,7 @@ class eval_observation_add extends dynamic_form {
         try {
             $data = $this->get_data();
             $planning = planning::get_record(['id' => $data->planningid]);
-            $situation = situation::get_record(['id' => $planning->get('situationid')]);
+            $situation = $planning->get_situation();
             $comments = eval_observation_helper::process_form_data_comments($data);
             $criteria = eval_observation_helper::process_form_data_criteria($data, $situation);
             observations::create_observation(
@@ -107,7 +107,7 @@ class eval_observation_add extends dynamic_form {
         $mform->setType('context', PARAM_TEXT);
 
         $planning = planning::get_record(['id' => $planningid]);
-        $situation = situation::get_record(['id' => $planning->get('situationid')]);
+        $situation = $planning->get_situation();
         eval_observation_helper::add_criteria_to_form($situation, $this, $mform);
 
     }

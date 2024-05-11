@@ -222,7 +222,7 @@ class plannings {
         $observations =
             observation::get_records($params, 'studentid, observerid');
         $planning = planning::get_record(['id' => $planningid]);
-        $situation = situation::get_record(['id' => $planning->get('situationid')]);
+        $situation = $planning->get_situation();
         $result =
             [
                 'id' => $userid,
@@ -288,7 +288,7 @@ class plannings {
     public static function get_users_infos_for_planning_id(int $planningid): array {
         $students = [];
         $planning = planning::get_record(['id' => $planningid]);
-        $situation = situation::get_record(['id' => $planning->get('situationid')]);
+        $situation = $planning->get_situation();
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         $studentsid = array_keys(self::get_students_for_planning_id($planningid));
         if (!has_capability('mod/competvet:viewother', $competvet->get_context())) {
