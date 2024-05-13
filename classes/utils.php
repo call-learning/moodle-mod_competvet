@@ -83,9 +83,8 @@ class utils {
      * @return object [persistent, otherproperties ]
      */
     public static function split_properties_from_persistent($persistentclass, $record): array {
-        $persistentfields = static::get_persistent_fields_without_standards(
-            $persistentclass,
-            ['timecreated', 'id', 'timemodified', 'usermodified']
+        $persistentfields = static::get_persistent_fields_without_internals(
+            $persistentclass
         );
         // Extract values for persitent that are in property definition (keys).
         $persistent = array_intersect_key((array) $record, $persistentfields);
@@ -102,10 +101,10 @@ class utils {
      * @param $persistentclass
      * @return array
      */
-    public static function get_persistent_fields_without_standards($persistentclass, ?array $fieldstoremove = []): array {
+    public static function get_persistent_fields_without_internals($persistentclass, ?array $fieldstoremove = []): array {
         $persistentfields = $persistentclass::properties_definition();
         if (empty($fieldstoremove)) {
-            $fieldstoremove = ['timecreated', 'timemodified', 'usermodified'];
+            $fieldstoremove = ['timecreated', 'id', 'timemodified', 'usermodified'];
         }
         // Remove persistent fields from definition.
         return array_diff_key($persistentfields, array_flip($fieldstoremove));
