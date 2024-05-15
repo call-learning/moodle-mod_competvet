@@ -268,13 +268,13 @@ class plannings {
         $info[] = $autoeval;
         $info[] = [
             'type' => 'cert',
-            'nbdone' => '',
-            'nbrequired' => '',
+            'nbdone' => 0,
+            'nbrequired' => 0,
         ];
         $info[] = [
             'type' => 'list',
-            'nbdone' => '',
-            'nbrequired' => '',
+            'nbdone' => 0,
+            'nbrequired' => 0,
         ];
         return $info;
     }
