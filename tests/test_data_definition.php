@@ -58,7 +58,6 @@ trait test_data_definition {
                 foreach ($situationinfo['plannings'] as $planning) {
                     $groupid = groups_get_group_by_name($course->id, $planning['groupname']);
                     $competvetevalgenerator->create_planning([
-                        //'shortname' => $situationname,
                         'courseid' => $course->id,
                         'startdate' => $planning['startdate'],
                         'enddate' => $planning['enddate'],
@@ -117,8 +116,8 @@ trait test_data_definition {
                                 'session' => '2023',
                             ],
                             [
-                                'startdate' => '1901973463', // Future time.
-                                'enddate' => '1902578263',
+                                'startdate' => 1901973463, // Future time.
+                                'enddate' => 1902578263,
                                 'groupname' => 'group 8.1',
                                 'session' => '2030',
                             ],
@@ -259,8 +258,8 @@ trait test_data_definition {
                                 'session' => '2023',
                             ],
                             [
-                                'startdate' => '1901973463', // Future time.
-                                'enddate' => '1902578263',
+                                'startdate' => 1901973463, // Future time.
+                                'enddate' => 1902578263,
                                 'session' => '2030',
                                 'groupname' => 'group 8.3',
                             ],
@@ -277,8 +276,8 @@ trait test_data_definition {
                                 'session' => '2023',
                             ],
                             [
-                                'startdate' => '1901973463', // Future time.
-                                'enddate' => '1902578263',
+                                'startdate' => 1901973463, // Future time.
+                                'enddate' => 1902578263,
                                 'groupname' => 'group 8.4',
                                 'session' => '2030',
                             ],

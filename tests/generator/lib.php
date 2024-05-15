@@ -80,6 +80,10 @@ class mod_competvet_generator extends testing_module_generator {
             $possibletags = static::get_situation_sample_tags();
             $tag = $possibletags[rand(0, count($possibletags) - 1)];
             $record->situationtags = [$tag];
+        } else {
+            if (is_string($record->situationtags)) {
+                $record->situationtags = explode(',', $record->situationtags);
+            }
         }
         return parent::create_instance($record, (array) $options);
     }
