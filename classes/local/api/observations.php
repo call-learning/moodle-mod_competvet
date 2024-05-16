@@ -20,7 +20,6 @@ use mod_competvet\local\persistent\observation_comment;
 use mod_competvet\local\persistent\observation_criterion_comment;
 use mod_competvet\local\persistent\observation_criterion_level;
 use mod_competvet\local\persistent\planning;
-use mod_competvet\local\persistent\situation;
 use mod_competvet\utils;
 
 /**
@@ -229,8 +228,7 @@ class observations {
                 $obscrit->set('criterionid', $criterionmodel->get('id'));
                 if (isset($criteriadict[$criterionmodel->get('id')])) {
                     $obscrit->set('level', $criteriadict[$criterionmodel->get('id')]['level']);
-                } else {
-                    $obscrit->set('level', 0);
+                    $obscrit->set('isactive', $criteriadict[$criterionmodel->get('id')]['isactive']);
                 }
                 $obscrit->create();
             } else {
@@ -252,29 +250,32 @@ class observations {
      * Edit an observation
      *
      * @param int $observationid
-     * @param array $context
+     * @param object|null $context
      * @param array $comments
      * @param array $criteria
      * @return void
      */
-    public static function edit_observation(int $observationid, object $context, array $comments, array $criteria) {
+    public static function edit_observation(int $observationid, ?object $context = null, array $comments = [],
+        array $criteria = []) {
         global $USER;
         $observation = observation::get_record(['id' => $observationid]);
         $observation->update();
-        if (empty($context->id)) {
-            $contextcomment = new observation_comment(0);
-            $contextcomment->set('observationid', $observationid);
-            $contextcomment->set('type', observation_comment::OBSERVATION_CONTEXT);
-            $contextcomment->set('usercreated', $USER->id);
-            $contextcomment->create();
-        } else {
-            $contextcomment = observation_comment::get_record(['id' => $context->id]);
+        if ($context) {
+            if (empty($context->id)) {
+                $contextcomment = new observation_comment(0);
+                $contextcomment->set('observationid', $observationid);
+                $contextcomment->set('type', observation_comment::OBSERVATION_CONTEXT);
+                $contextcomment->set('usercreated', $USER->id);
+                $contextcomment->create();
+            } else {
+                $contextcomment = observation_comment::get_record(['id' => $context->id]);
+            }
+            $contextcomment->set('comment', $context->comment);
+            $contextcomment->set('commentformat', FORMAT_HTML);
+            $contextcomment->update();
         }
-        $contextcomment->set('comment', $context->comment);
-        $contextcomment->set('commentformat', FORMAT_HTML);
-        $contextcomment->update();
         $commentstodelete = observation_comment::get_records(['observationid' => $observationid,
-            'type' => observation_comment::OBSERVATION_COMMENT, ]);
+            'type' => observation_comment::OBSERVATION_COMMENT,]);
         $commentstodelete = array_combine(
             array_map(fn($comment) => $comment->get('id'), $commentstodelete),
             $commentstodelete
@@ -315,7 +316,7 @@ class observations {
                 $updates = true;
             }
             if (isset($criterion['isactive'])) {
-                $obscrit->set('level', $criterion['isactive']);
+                $obscrit->set('isactive', $criterion['isactive']);
                 $updates = true;
             }
             if ($updates) {
