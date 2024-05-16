@@ -50,6 +50,7 @@ class observations {
                 'id' => $observation->get('id'),
                 'studentinfo' => utils::get_user_info($observation->get('studentid')),
                 'observerinfo' => utils::get_user_info($observation->get('observerid')),
+                'isautoeval' => $observation->is_autoeval(),
                 'status' => $observation->get('status'),
                 'time' => $observation->get('timemodified'),
                 'category' => $category,
@@ -85,6 +86,7 @@ class observations {
         $result = [
             'id' => $observation->get('id'),
             'category' => $observation->get_observation_type(),
+            'grader' => $observation->get('observerid'),
         ];
         if (!empty($context)) {
             $contextrecord = $context->to_record();
@@ -113,7 +115,7 @@ class observations {
                 }, $othercomments)
             );
 
-        $result['criteria'] =
+        $result['criteria'] = array_values(
             array_map(function($obscrit) use ($criteria) {
                 $criterioninfo = (array) $criteria[$obscrit->get('criterionid')]->to_record();
                 unset($criterioninfo['timecreated']);
@@ -126,7 +128,8 @@ class observations {
                 ];
                 $return['subcriteria'] = [];
                 return $return;
-            }, $observation->get_criteria_levels());
+            }, $observation->get_criteria_levels())
+        );
 
         $allcomments = $observation->get_criteria_comments();
         foreach ($result['criteria'] as &$criterion) {

@@ -19,6 +19,7 @@ use mod_competvet\competvet;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
+use mod_competvet\local\persistent\case_entry;
 use mod_competvet\utils;
 
 /**
@@ -228,7 +229,7 @@ class plannings {
                 'id' => $userid,
                 'planningid' => $planningid,
                 'situationid' => $situation->get('id'),
-                'info' => self::create_planning_info_for_student($userid, $situation, $observations),
+                'info' => self::create_planning_info_for_student($userid, $situation, $observations, $planningid),
             ];
         return $result;
     }
@@ -239,9 +240,11 @@ class plannings {
      * @param int $studentid The ID of the student.
      * @param situation $situation The situation object.
      * @param array $existingobservations An array of existing observations.
+     * @param int $planningid The ID of the planning.
      * @return array The planning information for the student.
      */
-    protected static function create_planning_info_for_student(int $studentid, situation $situation, array $existingobservations) {
+    protected static function create_planning_info_for_student(
+        int $studentid, situation $situation, array $existingobservations, int $planningid) {
         $info = [];
         // Check for eval.
         $eval = [
@@ -271,10 +274,20 @@ class plannings {
             'nbdone' => 0,
             'nbrequired' => 0,
         ];
+        $entries = case_entry::get_records(['studentid' => $studentid, 'planningid' => $planningid]);
         $info[] = [
             'type' => 'list',
-            'nbdone' => 0,
+            'nbdone' => count($entries),
             'nbrequired' => 0,
+        ];
+        $gridid = criteria::get_grid_for_planning($planningid, 'cert')->get('id');
+        $criteria = criteria::get_sorted_parent_criteria($gridid);
+        $certifcations = certifications::get_certifications($studentid, $planningid);
+        $numvalidated = array_reduce($certifcations, fn($carry, $certification) => $carry + $certification['validated'], 0);
+        $info[] = [
+            'type' => 'cert',
+            'nbdone' => $numvalidated,
+            'nbrequired' => count($criteria),
         ];
         return $info;
     }
@@ -306,7 +319,7 @@ class plannings {
             $params = ['planningid' => $planningid, 'status' => observation::STATUS_COMPLETED, 'studentid' => $studentid];
             $observations =
                 observation::get_records($params, 'studentid, observerid');
-            $userinfo['planninginfo'] = self::create_planning_info_for_student($studentid, $situation, $observations);
+            $userinfo['planninginfo'] = self::create_planning_info_for_student($studentid, $situation, $observations, $planningid);
             $students[] = $userinfo;
         }
         return ['students' => $students, 'observers' => self::get_observers_infos_for_planning_id($planningid)];

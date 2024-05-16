@@ -1,0 +1,86 @@
+.path-mod-competvet .case {
+    position: relative;
+    .deletecase {
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: 3;
+    }
+    .subtitle {
+        color: #666;
+    }
+    .section {
+        margin-left: 38px;
+        margin-top: 2rem;
+        .section-header {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            .sectionicon {
+                margin-right: 0.4rem;
+                margin-bottom: 0.2rem;
+            }
+        }
+        .firstsectionicon {
+            display: none;
+        }
+        .secondsectionicon {
+            display: none;
+        }
+        .defaultsectionicon {
+            display: block;
+        }
+        &:first-child {
+            .firstsectionicon {
+                display: block;
+            }
+            .defaultsectionicon {
+                display: none;
+            }
+        }
+        &:nth-child(2) {
+            .secondsectionicon {
+                display: block;
+            }
+            .defaultsectionicon {
+                display: none;
+            }
+        }
+        .section-content {
+            margin-left: 1rem;
+        }
+    }
+
+    .animal-detail-label {
+        width: 100px;
+        display: inline-block;
+    }
+    .field {
+        margin-bottom: 0.5rem;
+        margin-left: 1.5em;
+        .field-value {
+            min-height: 1.3rem;
+            &:empty {
+                background-color: #f5f5f5;
+            }
+        }
+    }
+    .field.text,
+    .field.date {
+        display: flex;
+        margin-bottom: 0.5rem;
+        .field-label {
+            margin-right: 1rem;
+            flex: 1 1 150px;
+            max-width: 150px;
+        }
+        .field-value {
+            flex: 1 1 auto;
+            margin-bottom: 0;
+        }
+    }
+    .field.textarea {
+        margin-bottom: 1rem;
+    }
+}

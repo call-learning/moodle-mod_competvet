@@ -20,27 +20,33 @@ use renderer_base;
 use mod_competvet\competvet;
 use mod_competvet\local\api\plannings;
 use mod_competvet\local\persistent\planning;
-use mod_competvet\local\api\certifications;
 use mod_competvet\local\api\user_role;
+use mod_competvet\local\api\cases;
 use moodle_url;
 
 /**
- * Class student_certifications
+ * Class student_list
  *
  * @package    mod_competvet
  * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class student_certifications extends base {
+class student_list extends base  {
+
     /**
      * @var array $planninginfo The planning information.
      */
     protected array $planninginfo;
 
     /**
-     * @var array $certifications The certifications information.
+     * @var array $views The url to view different evaluation types.
      */
-    protected array $certifications;
+    protected array $views;
+
+    /**
+     * @var object $cases The cases information.
+     */
+    protected object $cases;
 
     /**
      * Export this data so it can be used in a mustache template.
@@ -51,9 +57,9 @@ class student_certifications extends base {
     public function export_for_template(renderer_base $output) {
         $data = parent::export_for_template($output);
 
-        // Get the certifiation criteria.
-        $data['certification-results'] = [
-            'certifications' => $this->certifications
+        $data['cases'] = $this->cases;
+        $data['list-results'] = [
+            'cases' => $this->cases->cases
         ];
         $planning = planning::get_record(['id' => $this->planninginfo['planningid']]);
         $data['cmid'] = competvet::get_from_situation_id($planning->get('situationid'))->get_course_module_id();
@@ -62,7 +68,6 @@ class student_certifications extends base {
         $situation = $planning->get_situation();
         $userrole = user_role::get_top($this->currentuserid, $situation->get('id'));
         $data['isstudent'] = $userrole == 'student';
-        $data['isevaluator'] = $userrole == 'evaluator';
         return $data;
     }
 
@@ -82,18 +87,18 @@ class student_certifications extends base {
             $planningid = required_param('planningid', PARAM_INT);
             $studentid = required_param('studentid', PARAM_INT);
             $planninginfo = plannings::get_planning_info_for_student($planningid, $studentid);
-            $certifcations = certifications::get_certifications($studentid, $planningid);
+            $cases = cases::get_entries($studentid, $planningid);
             $situationid = $planninginfo['situationid'];
             $competvet = competvet::get_from_situation_id($situationid);
             $data = [
                 $planninginfo,
-                $certifcations
+                $cases
             ];
             $this->set_backurl(new moodle_url(
                 $this->baseurl,
                 ['pagetype' => 'planning', 'id' => $competvet->get_course_module_id(), 'planningid' => $planningid]
             ));
         }
-        [$this->planninginfo, $this->certifications] = $data;
+        [$this->planninginfo, $this->cases] = $data;
     }
 }

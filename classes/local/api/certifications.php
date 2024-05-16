@@ -243,6 +243,9 @@ class certifications {
             $certrecord['grade'] = $criterion->get('grade');
             $certrecord['criterionid'] = $criterion->get('id');
             $certrecord['declid'] = 0;
+            $certrecord['validated'] = false;
+            $certrecord['notvalidated'] = false;
+            $certrecord['notreached'] = false;
 
             $certdecl = cert_decl::get_record([
                 'studentid' => $studentid,

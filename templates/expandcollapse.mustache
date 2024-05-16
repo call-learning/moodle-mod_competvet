@@ -24,10 +24,10 @@
     }
 }}
 <a role="button" data-toggle="collapse"
-    href="#casecollapse{{id}}"
-    id="collapsereport{{id}}"
+    href="#collapse{{$id}}{{id}}{{/id}}"
+    id="collapsereport{{$id}}{{id}}{{/id}}"
     aria-expanded="{{^contentcollapsed}}true{{/contentcollapsed}}{{#contentcollapsed}}false{{/contentcollapsed}}"
-    aria-controls="casecollapse{{id}}"
+    aria-controls="collapse{{$id}}{{id}}{{/id}}"
     class="btn btn-icon mr-1 icons-collapse-expand justify-content-center stretched-link
         {{#contentcollapsed}} collapsed {{/contentcollapsed}}"
     aria-label="{{title}}">

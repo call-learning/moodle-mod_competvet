@@ -25,7 +25,37 @@
 }}
 <div class="competvet-view-evaluations">
     <div class="accordion" id="evaluations-accordion">
-        {{#observations}}
+        <div class="row no-gutters">
+            <div class="col-4 criterionlabel">
+            </div>
+            {{#userevals.0}}
+                {{#grades}}
+                    <div class="col-1 evaluator font-weight-bold text-center d-flex">
+                        {{graderinfo.fullname}}
+                        <a href="{{{viewurl}}}" class="btn btn-icon icon-no-margin d-flex align-items-center justify-content-center">
+                            {{#pix}}i/search, core{{/pix}}
+                        </a>
+                    </div>
+                {{/grades}}
+            {{/userevals.0}}
+        </div>
+            {{#userevals}}
+                <div class="row no-gutters mb-2">
+                    <div class="col-4 criterionlabel font-weight-bold">
+                        {{criterion.label}}
+                    </div>
+                    {{#grades}}
+                        <div class="col-1 grade text-center">
+                            {{level}}
+                            <div class="sr-only">
+                                {{graderinfo.fullname}}
+                            </div>
+                        </div>
+                    {{/grades}}
+                </div>
+            {{/userevals}}
+        {{#observationsold}}
+        </div>
             <div class="card">
                 <div class="card-header" id="competvet-view-evaluations-cat-heading-{{category}}">
                     <h2 class="mb-0">
@@ -44,7 +74,7 @@
                     </div>
                 </div>
             </div>
-        {{/observations}}
+        {{/observationsold}}
     </div>
     {{#isstudent}}
     <div>

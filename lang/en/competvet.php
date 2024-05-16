@@ -300,12 +300,14 @@ $string['animalageunknown'] = 'Unknown Age';
 $string['gridnotfound'] = 'The grid with id {$a} was not found';
 
 // Case form
-$string['case:add'] = 'Add a case';
+$string['case:add'] = 'Add a clinical case';
 $string['case:add:save'] = 'Save';
 
 $string['error:accessdenied'] = 'Access denied';
 
 // Entry form
+$string['declarelevel'] = 'Declare your confidence level';
+$string['validate'] = 'Validate this essential';
 $string['level'] = 'Your confidence level';
 $string['declaredlevel'] = 'Stated confidence level';
 $string['declareddate'] = 'Declared having achieved this essential on {$a}';

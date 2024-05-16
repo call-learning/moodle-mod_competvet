@@ -63,11 +63,7 @@
 {{#js}}
     require([
         'mod_competvet/local/grading/grading_app_component',
-        'mod_competvet/local/grading/case_form',
-        'mod_competvet/local/grading/cert_decl_form',
-    ], function(component, caseForm, certDeclForm) {
-        caseForm.init();
+    ], function(component, certDeclForm) {
         component.init();
-        certDeclForm.init();
     });
 {{/js}}

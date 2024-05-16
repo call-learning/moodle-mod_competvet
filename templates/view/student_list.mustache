@@ -15,26 +15,48 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_competvet/view/student_certifications
+    @template mod_competvet/view/student_list
 
-    TODO describe template student_certifications
+    TODO describe template student_list
 
     Example context (json):
     {
     }
 }}
-<div class="gradingapp"{{!
+<div {{!
 }} data-region="grading-app" {{!
 }} data-cm-id="{{cmid}}" {{!
 }} data-studentid="{{studentid}}" {{!
 }} data-planningid="{{planningid}}" {{!
 }}>
-    <div class="certification">
-        {{> mod_competvet/grading/components/certification-results}}
+    {{#isstudent}}
+    <div class="actions d-flex justify-content-end mb-5">
+        <button class="btn btn-outline-secondary btn-sm"
+            data-studentid="4"
+            data-cmid="{{cmid}}"
+            data-action="case-add"
+        >
+            {{#str}}case:add, mod_competvet{{/str}}
+        </button>
     </div>
+    {{/isstudent}}
+    <div class="certification">
+        {{> mod_competvet/grading/components/list-results}}
+    </div>
+    {{#isstudent}}
+    <div class="actions d-flex justify-content-end mt-5">
+        <button class="btn btn-outline-secondary btn-sm"
+            data-studentid="4"
+            data-cmid="{{cmid}}"
+            data-action="case-add"
+        >
+            {{#str}}case:add, mod_competvet{{/str}}
+        </button>
+    </div>
+    {{/isstudent}}
 </div>
 {{#js}}
-require(['mod_competvet/local/forms/cert_decl_form'], function(certDeclForm) {
-    certDeclForm.init();
+require(['mod_competvet/local/forms/case_form'], function(caseForm) {
+    caseForm.init();
 });
 {{/js}}

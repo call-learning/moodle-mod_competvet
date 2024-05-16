@@ -19,42 +19,49 @@ import {get_string as getString} from 'core/str';
 /**
  * Create a Modal Form to add a Certificate Declaration
  *
- * @module     mod_competvet/local/grading/cert_decl_form
+ * @module     mod_competvet/local/forms/cert_decl_form
  * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+const getDataset = (element) => {
+    const gradingApp = document.querySelector('[data-region="grading-app"]');
+    const data = gradingApp.dataset;
+    const datasetLowercase = Object.entries(data).reduce((acc, [key, value]) => {
+        acc[key.toLowerCase()] = value;
+        return acc;
+    }, {});
+    datasetLowercase.criterionid = element.dataset.id;
+    if (element.dataset.declId) {
+        datasetLowercase.declid = element.dataset.declId;
+    }
+    return datasetLowercase;
+};
+
+const submitEventHandler = () => {
+    location.reload();
+};
+
 export const init = () => {
-    const submitEventHandler = () => {
-        // Fire a custom event to notify the grading app that a case has been added.
-        const gradingApp = document.querySelector('[data-region="grading-app"]');
-        const customEvent = new CustomEvent('certAdded', {});
-        gradingApp.dispatchEvent(customEvent);
-    };
     document.addEventListener('click', function(event) {
-        if (event.target.closest('[data-action="cert-decl"]')) {
-            const button = event.target.closest('[data-action="cert-decl"]');
+        if (event.target.closest('[data-action="cert-decl-student"]')) {
             event.preventDefault();
-            const gradingApp = document.querySelector('[data-region="grading-app"]');
-            const data = gradingApp.dataset;
-            const datasetLowercase = Object.entries(data).reduce((acc, [key, value]) => {
-                acc[key.toLowerCase()] = value;
-                return acc;
-            }, {});
-            datasetLowercase.criterionid = button.dataset.id;
-            if (button.dataset.declId) {
-                datasetLowercase.declid = button.dataset.declId;
-            }
+
+            const button = event.target.closest('[data-action="cert-decl-student"]');
+            const dataset = getDataset(button);
+
             const modalForm = new ModalForm({
                 modalConfig: {
                     title: getString('certdecl', 'mod_competvet'),
                 },
-                formClass: `mod_competvet\\form\\cert_decl`,
+                formClass: `mod_competvet\\form\\cert_decl_student`,
                 args: {
-                    ...datasetLowercase,
+                    ...dataset,
                     currenturl: window.location.href,
                 },
                 saveButtonText: getString('save'),
             });
+
             // This sets the level field to the value of the range input.
             modalForm.addEventListener(modalForm.events.LOADED, () => {
                 // Get the value of the range input and set it to the hidden level field.
@@ -69,6 +76,25 @@ export const init = () => {
                         currentLevel.text(rangeInput.val());
                     });
                 });
+            });
+
+            modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, submitEventHandler);
+            modalForm.show();
+        }
+        if (event.target.closest('[data-action="cert-decl-evaluator"]')) {
+            const button = event.target.closest('[data-action="cert-decl-evaluator"]');
+            const dataset = getDataset(button);
+
+            const modalForm = new ModalForm({
+                modalConfig: {
+                    title: getString('certdecl', 'mod_competvet'),
+                },
+                formClass: `mod_competvet\\form\\cert_decl_evaluator`,
+                args: {
+                    ...dataset,
+                    currenturl: window.location.href,
+                },
+                saveButtonText: getString('save'),
             });
             modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, submitEventHandler);
             modalForm.show();

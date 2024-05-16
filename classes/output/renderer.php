@@ -15,8 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\output;
 
+use mod_competvet\utils;
 use mod_competvet\output\view\student_evaluations;
 use mod_competvet\output\view\student_certifications;
+use mod_competvet\output\view\student_list;
+use mod_competvet\output\view\student_tabs;
 use tabobject;
 
 /**
@@ -27,6 +30,7 @@ use tabobject;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class renderer extends \plugin_renderer_base {
+
     /**
      * Render the evaluation list
      *
@@ -35,39 +39,46 @@ class renderer extends \plugin_renderer_base {
      */
     public function render_student_evaluations(student_evaluations $evaluationinfo) {
         $data = $evaluationinfo->export_for_template($this);
+        $tabtree = student_tabs::export_tabs($data['planningid'], $data['studentid']);
         $currenttab = optional_param('currenttab', 'eval', PARAM_ALPHA);
-        $tabtree = [];
-        foreach($data['tabs'] as $tab) {
-            $tabtree[] = new tabobject(
-                $tab['id'],
-                $tab['url'],
-                $tab['label'],
-            );
-        }
-        $output = $this->output->tabtree($tabtree, $currenttab);
+        $userinfo = utils::get_user_info($data['studentid']);
+        $output = $this->render_from_template('mod_competvet/view/user_info', $userinfo);
+        $output .= $this->output->tabtree($tabtree, $currenttab);
         $output .= $this->render_from_template($evaluationinfo->get_template_name($this->output), $data);
         return $output;
     }
 
     /**
-     * Render the certification list
+     * Render the certifications
      *
      * @param student_certifications $certificationinfo
      * @return string
      */
     public function render_student_certifications(student_certifications $certificationinfo) {
         $data = $certificationinfo->export_for_template($this);
+        $tabtree = student_tabs::export_tabs($data['planningid'], $data['studentid']);
         $currenttab = optional_param('currenttab', 'cert', PARAM_ALPHA);
-        $tabtree = [];
-        foreach($data['tabs'] as $tab) {
-            $tabtree[] = new tabobject(
-                $tab['id'],
-                $tab['url'],
-                $tab['label'],
-            );
-        }
-        $output = $this->output->tabtree($tabtree, $currenttab);
+        $userinfo = utils::get_user_info($data['studentid']);
+        $output = $this->render_from_template('mod_competvet/view/user_info', $userinfo);
+        $output .= $this->output->tabtree($tabtree, $currenttab);
         $output .= $this->render_from_template($certificationinfo->get_template_name($this->output), $data);
+        return $output;
+    }
+
+    /**
+     * Render the list
+     *
+     * @param student_list $studentinfo
+     * @return string
+     */
+    public function render_student_list(student_list $studentinfo) {
+        $data = $studentinfo->export_for_template($this);
+        $tabtree = student_tabs::export_tabs($data['planningid'], $data['studentid']);
+        $currenttab = optional_param('currenttab', 'list', PARAM_ALPHA);
+        $userinfo = utils::get_user_info($data['studentid']);
+        $output = $this->render_from_template('mod_competvet/view/user_info', $userinfo);
+        $output .= $this->output->tabtree($tabtree, $currenttab);
+        $output .= $this->render_from_template($studentinfo->get_template_name($this->output), $data);
         return $output;
     }
 }

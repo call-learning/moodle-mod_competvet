@@ -107,6 +107,27 @@ class criteria {
     }
 
     /**
+     * Get the sorted criteria for this grid
+     * @param int $gridid - The grid id
+     * @return array - A sorted array of criteria
+     */
+    public static function get_sorted_parent_criteria(int $gridid): array {
+        $sorted = criterion::get_records(['gridid' => $gridid, 'parentid' => 0], 'sort');
+        $criteria = [];
+        foreach ($sorted as $criterion) {
+            $criteria[] = [
+                'id' => $criterion->get('id'),
+                'label' => $criterion->get('label'),
+                'idnumber' => $criterion->get('idnumber'),
+                'grade' => $criterion->get('grade'),
+                'parentid' => $criterion->get('parentid'),
+                'sort' => $criterion->get('sort'),
+            ];
+        }
+        return $criteria;
+    }
+
+    /**
      * Update the criterion
      * @param int $criterionid - The criterion id
      * @param string $criterionname - The criterion name

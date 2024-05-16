@@ -19,7 +19,7 @@ import {get_string as getString} from 'core/str';
 /**
  * Create a Modal Form to add a case
  *
- * @module     mod_competvet/local/grading/case_form
+ * @module     mod_competvet/local/forms/case_form
  * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,6 +33,9 @@ export const init = () => {
         gradingApp.dispatchEvent(customEvent);
     };
     const button = document.querySelector('[data-action="case-add"]');
+    if (!button) {
+        return;
+    }
     button.addEventListener('click', (event) => {
         event.preventDefault();
         const gradingApp = document.querySelector('[data-region="grading-app"]');

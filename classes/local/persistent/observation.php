@@ -128,6 +128,13 @@ class observation extends persistent {
     }
 
     /**
+     * Is auto evaluation
+     */
+    public function is_autoeval() {
+        return $this->get_observation_type() == self::CATEGORY_EVAL_AUTOEVAL;
+    }
+
+    /**
      * Can the observation be edited
      *
      * @return bool
