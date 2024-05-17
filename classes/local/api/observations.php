@@ -125,6 +125,7 @@ class observations {
                     'criterioninfo' => $criterioninfo,
                     'id' => $obscrit->get('id'),
                     'level' => $obscrit->get('level'),
+                    'isactive' => $obscrit->get('isactive'),
                 ];
                 $return['subcriteria'] = [];
                 return $return;
@@ -316,6 +317,7 @@ class observations {
             $updates = false;
             if (isset($criterion['level'])) {
                 $obscrit->set('level', $criterion['level']);
+                $obscrit->set('isactive', true);
                 $updates = true;
             }
             if (isset($criterion['isactive'])) {
