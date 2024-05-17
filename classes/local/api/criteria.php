@@ -95,6 +95,7 @@ class criteria {
                 }
             }
         }
+        return null;
     }
 
     /**
