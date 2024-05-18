@@ -73,8 +73,8 @@ class plannings {
             $planningfilters = array_merge($planningfilters, $params);
         }
         if ($nofuture) {
-            $planningfilters['startdate'] = (new \DateTime('-1 hour'))->getTimestamp();
-            $planninngssql .= " AND startdate < :startdate";
+            $planningfilters['minstartdate'] = (new \DateTime('next Monday'))->getTimestamp();
+            $planninngssql .= " AND startdate < :minstartdate";
         }
         $allplannings = planning::get_records_select($planninngssql, $planningfilters);
         $plannings = [];
