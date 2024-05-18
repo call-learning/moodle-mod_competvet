@@ -20,6 +20,7 @@ require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
 
 use advanced_testcase;
 use core_user;
+use DateTime;
 use test_data_definition;
 
 /**
@@ -55,9 +56,7 @@ class situation_test extends advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
-        $generator = $this->getDataGenerator();
-        $competvetgenerator = $generator->get_plugin_generator('mod_competvet');
-        $this->generates_definition($this->get_data_definition_set_1(), $generator, $competvetgenerator);
+        $this->prepare_scenario('set_1');
     }
 
     /**

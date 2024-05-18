@@ -20,6 +20,7 @@ require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
 
 use advanced_testcase;
 use core_user;
+use DateTime;
 use mod_competvet\local\api\plannings;
 use mod_competvet\local\api\situations;
 use mod_competvet\local\persistent\situation;
@@ -50,6 +51,7 @@ class plannings_test extends advanced_testcase {
     public static function all_situations_with_planning(): array {
         global $CFG;
         $results = [];
+        $startdate = (new DateTime('last Monday'))->getTimestamp();
         include_once($CFG->dirroot . '/mod/competvet/tests/fixtures/plannings_tests_results.php');
         return [
             'student1 situations with no future' => [
@@ -83,9 +85,7 @@ class plannings_test extends advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
-        $generator = $this->getDataGenerator();
-        $competvetgenerator = $generator->get_plugin_generator('mod_competvet');
-        $this->generates_definition($this->get_data_definition_set_1(), $generator, $competvetgenerator);
+        $this->prepare_scenario('set_1');
         $this->setAdminUser(); // Needed for report builder to work.
     }
 
@@ -98,16 +98,17 @@ class plannings_test extends advanced_testcase {
      * @dataProvider all_situations_with_planning
      * @covers       \mod_competvet\local\api\situations::get_all_situations_for
      */
-    public function test_get_plannings_for_situation_id(string $username, bool $withfuture, array $expected) {
+    public function test_get_plannings_for_situation_id(string $username, bool $nofuture, array $expected) {
         $user = core_user::get_user_by_username($username);
         $situations = situation::get_all_situations_id_for($user->id);
         $allplannings = [];
         foreach ($situations as $situationid) {
             $situation = situation::get_record(['id' => $situationid]);
-            $plannings = plannings::get_plannings_for_situation_id($situationid, $user->id, $withfuture);
+            $shortname = $situation->get('shortname');
+            $plannings = plannings::get_plannings_for_situation_id($situationid, $user->id, $nofuture);
             test_helpers::remove_elements_for_assertions($plannings, ['id']);
-            $allplannings[$situation->get('shortname')] =
-                array_merge($allplannings[$situation->get('shortname')] ?? [], $plannings);
+            $allplannings[$shortname] =
+                array_merge($allplannings[$shortname] ?? [], $plannings);
         }
         ksort($allplannings);
         ksort($expected);

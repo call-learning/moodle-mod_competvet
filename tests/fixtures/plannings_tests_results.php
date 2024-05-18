@@ -14,14 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 defined('MOODLE_INTERNAL') || die();
-
+$oneweek = 60 * 60 * 24 * 7; // 1 week in seconds.
+$onemonth = $oneweek * 4; // 1 month in seconds.
 $results = [];
 $results['student1results'] = [
     'SIT1' =>
         [
             [
-                'startdate' => '1698793200',
-                'enddate' => '1699398000',
+                'startdate' => (string) $startdate,
+                'enddate' => (string) ($startdate + $oneweek),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
@@ -29,8 +30,8 @@ $results['student1results'] = [
     'SIT2' =>
         [
             [
-                'startdate' => '1701385200',
-                'enddate' => '1701990000',
+                'startdate' => (string) $startdate,
+                'enddate' => (string) ($startdate + $oneweek * 2),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
@@ -38,37 +39,27 @@ $results['student1results'] = [
     'SIT3' =>
         [
             [
-                'startdate' => '1703977200',
-                'enddate' => '1704582000',
+                'startdate' => (string) $startdate,
+                'enddate' => (string) ($startdate + $oneweek),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
         ],
-    'SIT4' =>
-        [
-            [
-                'startdate' => '1706569200',
-                'enddate' => '1704582000',
-                'session' => '2023',
-                'groupname' => 'group 8.1',
-            ],
-        ],
-    'SIT7' =>
-        [
-        ],
+    'SIT4' => [],
+    'SIT7' => [],
 ];
 $results['student1resultswithfuture'] = [
     'SIT1' =>
         [
             [
-                'startdate' => '1698793200',
-                'enddate' => '1699398000',
+                'startdate' => (string) $startdate,
+                'enddate' => (string) ($startdate + $oneweek),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
             [
-                'startdate' => '1901973463',
-                'enddate' => '1902578263',
+                'startdate' => (string) ($startdate + $onemonth * 12),
+                'enddate' => (string) ($startdate + $onemonth * 12 + $oneweek),
                 'session' => '2030',
                 'groupname' => 'group 8.1',
             ],
@@ -76,8 +67,8 @@ $results['student1resultswithfuture'] = [
     'SIT2' =>
         [
             [
-                'startdate' => '1701385200',
-                'enddate' => '1701990000',
+                'startdate' => (string) ($startdate),
+                'enddate' => (string) ($startdate + $oneweek * 2),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
@@ -85,8 +76,8 @@ $results['student1resultswithfuture'] = [
     'SIT3' =>
         [
             [
-                'startdate' => '1703977200',
-                'enddate' => '1704582000',
+                'startdate' => (string) ($startdate),
+                'enddate' => (string) ($startdate + $oneweek),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
@@ -94,8 +85,8 @@ $results['student1resultswithfuture'] = [
     'SIT4' =>
         [
             [
-                'startdate' => '1706569200',
-                'enddate' => '1704582000',
+                'startdate' => (string) ($startdate + $onemonth * 3),
+                'enddate' => (string) ($startdate + $onemonth * 3 + $oneweek),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
@@ -103,8 +94,8 @@ $results['student1resultswithfuture'] = [
     'SIT7' =>
         [
             [
-                'startdate' => '1714345200',
-                'enddate' => '1704582000',
+                'startdate' => (string) ($startdate + $onemonth * 6),
+                'enddate' => (string) ($startdate + $onemonth * 6 + $oneweek),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
@@ -114,23 +105,17 @@ $results['observer1results'] = [
     'SIT1' =>
         [
             [
-                'startdate' => '1698793200',
-                'enddate' => '1699398000',
+                'startdate' => (string) $startdate,
+                'enddate' => (string) ($startdate + $oneweek),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
-            ],
-            [
-                'startdate' => '1699398000',
-                'enddate' => '1700002800',
-                'session' => '2023',
-                'groupname' => 'group 8.2',
             ],
         ],
     'SIT2' =>
         [
             [
-                'startdate' => '1701385200',
-                'enddate' => '1701990000',
+                'startdate' => (string) $startdate,
+                'enddate' => (string) ($startdate + $oneweek * 2),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
@@ -138,16 +123,10 @@ $results['observer1results'] = [
     'SIT3' =>
         [
             [
-                'startdate' => '1703977200',
-                'enddate' => '1704582000',
+                'startdate' => (string) ($startdate),
+                'enddate' => (string) ($startdate + $oneweek),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
-            ],
-            [
-                'startdate' => '1704582000',
-                'enddate' => '1705186800',
-                'session' => '2023',
-                'groupname' => 'group 8.2',
             ],
         ],
 ];
@@ -155,20 +134,20 @@ $results['observer1resultswithfuture'] = [
     'SIT1' =>
         [
             [
-                'startdate' => '1698793200',
-                'enddate' => '1699398000',
+                'startdate' => (string) $startdate,
+                'enddate' => (string) ($startdate + $oneweek),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
             [
-                'startdate' => '1699398000',
-                'enddate' => '1700002800',
+                'startdate' => (string) ($startdate + $oneweek),
+                'enddate' => (string) ($startdate + $oneweek * 2),
                 'session' => '2023',
                 'groupname' => 'group 8.2',
             ],
             [
-                'startdate' => '1901973463',
-                'enddate' => '1902578263',
+                'startdate' => (string) ($startdate + $onemonth * 12),
+                'enddate' => (string) ($startdate + $onemonth * 12 + $oneweek),
                 'session' => '2030',
                 'groupname' => 'group 8.1',
             ],
@@ -177,8 +156,8 @@ $results['observer1resultswithfuture'] = [
         [
             0 =>
                 [
-                    'startdate' => '1701385200',
-                    'enddate' => '1701990000',
+                    'startdate' => (string) $startdate,
+                    'enddate' => (string) ($startdate + $oneweek * 2),
                     'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
@@ -187,15 +166,15 @@ $results['observer1resultswithfuture'] = [
         [
             0 =>
                 [
-                    'startdate' => '1703977200',
-                    'enddate' => '1704582000',
+                    'startdate' => (string) ($startdate),
+                    'enddate' => (string) ($startdate + $oneweek),
                     'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
             1 =>
                 [
-                    'startdate' => '1704582000',
-                    'enddate' => '1705186800',
+                    'startdate' => (string) ($startdate + $onemonth * 2 + $oneweek),
+                    'enddate' => (string) ($startdate + $onemonth * 2 + $oneweek * 2),
                     'session' => '2023',
                     'groupname' => 'group 8.2',
                 ],

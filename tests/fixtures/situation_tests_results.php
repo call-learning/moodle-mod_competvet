@@ -14,7 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 defined('MOODLE_INTERNAL') || die();
-
+$oneweek = 60 * 60 * 24 * 7; // 1 week in seconds.
+$onemonth = $oneweek * 4; // 1 month in seconds.
 $results = [];
 $results['student1results'] = [
     [
@@ -22,14 +23,14 @@ $results['student1results'] = [
             [
 
                 [
-                    'startdate' => '1698793200',
-                    'enddate' => '1699398000',
+                    'startdate' => (string) $startdate,
+                    'enddate' => (string) ($startdate + $oneweek),
                     'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
                 [
-                    'startdate' => '1901973463',
-                    'enddate' => '1902578263',
+                    'startdate' => (string) ($startdate + $onemonth * 12),
+                    'enddate' => (string) ($startdate + $onemonth * 12 + $oneweek),
                     'session' => '2030',
                     'groupname' => 'group 8.1',
                 ],
@@ -46,8 +47,8 @@ $results['student1results'] = [
             [
 
                 [
-                    'startdate' => '1701385200',
-                    'enddate' => '1701990000',
+                    'startdate' => (string) ($startdate),
+                    'enddate' => (string) ($startdate + $oneweek * 2),
                     'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
@@ -64,8 +65,8 @@ $results['student1results'] = [
             [
 
                 [
-                    'startdate' => '1703977200',
-                    'enddate' => '1704582000',
+                    'startdate' => (string) ($startdate),
+                    'enddate' => (string) ($startdate + $oneweek),
                     'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
@@ -82,8 +83,8 @@ $results['student1results'] = [
             [
 
                 [
-                    'startdate' => '1706569200',
-                    'enddate' => '1704582000',
+                    'startdate' => (string) ($startdate + $onemonth * 3),
+                    'enddate' => (string) ($startdate + $onemonth * 3 + $oneweek),
                     'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
@@ -100,8 +101,8 @@ $results['student1results'] = [
             [
 
                 [
-                    'startdate' => '1714345200',
-                    'enddate' => '1704582000',
+                    'startdate' => (string) ($startdate + $onemonth * 6),
+                    'enddate' => (string) ($startdate + $onemonth * 6 + $oneweek),
                     'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
@@ -120,8 +121,8 @@ $results['student2results'] = [
             [
 
                 [
-                    'startdate' => '1699398000',
-                    'enddate' => '1700002800',
+                    'startdate' => (string) ($startdate + $oneweek),
+                    'enddate' => (string) ($startdate + $oneweek * 2),
                     'session' => '2023',
                     'groupname' => 'group 8.2',
                 ],
@@ -139,8 +140,8 @@ $results['student2results'] = [
             [
 
                 [
-                    'startdate' => '1704582000',
-                    'enddate' => '1705186800',
+                    'startdate' => (string) ($startdate + $onemonth * 2 + $oneweek),
+                    'enddate' => (string) ($startdate + $onemonth * 2 + $oneweek * 2),
                     'session' => '2023',
                     'groupname' => 'group 8.2',
                 ],
@@ -158,8 +159,8 @@ $results['student2results'] = [
             [
 
                 [
-                    'startdate' => '1706569200',
-                    'enddate' => '1704582000',
+                    'startdate' => (string) ($startdate + $onemonth * 3),
+                    'enddate' => (string) ($startdate + $onemonth * 3 + $oneweek),
                     'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
@@ -177,8 +178,8 @@ $results['student2results'] = [
             [
 
                 [
-                    'startdate' => '1714345200',
-                    'enddate' => '1704582000',
+                    'startdate' => (string) ($startdate + $onemonth * 6),
+                    'enddate' => (string) ($startdate + $onemonth * 6 + $oneweek),
                     'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
@@ -197,20 +198,20 @@ $results['observer1results'] = [
         'plannings' =>
             [
                 [
-                    'startdate' => '1698793200',
-                    'enddate' => '1699398000',
+                    'startdate' => (string) $startdate,
+                    'enddate' => (string) ($startdate + $oneweek),
                     'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
                 [
-                    'startdate' => '1699398000',
-                    'enddate' => '1700002800',
+                    'startdate' => (string) ($startdate + $oneweek),
+                    'enddate' => (string) ($startdate + $oneweek * 2),
                     'session' => '2023',
                     'groupname' => 'group 8.2',
                 ],
                 [
-                    'startdate' => '1901973463',
-                    'enddate' => '1902578263',
+                    'startdate' => (string) ($startdate + $onemonth * 12),
+                    'enddate' => (string) ($startdate + $onemonth * 12 + $oneweek),
                     'session' => '2030',
                     'groupname' => 'group 8.1',
                 ],
@@ -228,8 +229,8 @@ $results['observer1results'] = [
             [
 
                 [
-                    'startdate' => '1701385200',
-                    'enddate' => '1701990000',
+                    'startdate' => (string) ($startdate),
+                    'enddate' => (string) ($startdate + $oneweek * 2),
                     'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
@@ -246,14 +247,14 @@ $results['observer1results'] = [
         'plannings' =>
             [
                 [
-                    'startdate' => '1703977200',
-                    'enddate' => '1704582000',
+                    'startdate' => (string) ($startdate),
+                    'enddate' => (string) ($startdate + $oneweek),
                     'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
                 [
-                    'startdate' => '1704582000',
-                    'enddate' => '1705186800',
+                    'startdate' => (string) ($startdate + $onemonth * 2 + $oneweek),
+                    'enddate' => (string) ($startdate + $onemonth * 2 + $oneweek * 2),
                     'session' => '2023',
                     'groupname' => 'group 8.2',
                 ],
@@ -268,159 +269,159 @@ $results['observer1results'] = [
     ],
 ];
 $results['observer2results'] = [
-        [
-            'plannings' =>
+    [
+        'plannings' =>
+            [
+
                 [
-
-                    [
-                        'startdate' => '1706569200',
-                        'enddate' => '1704582000',
-                        'session' => '2023',
-                        'groupname' => 'group 8.1',
-                    ],
-
-                    [
-                        'startdate' => '1707174000',
-                        'enddate' => '1707778800',
-                        'session' => '2023',
-                        'groupname' => 'group 8.3',
-                    ],
+                    'startdate' => (string) ($startdate + $onemonth * 3),
+                    'enddate' => (string) ($startdate + $onemonth * 3 + $oneweek),
+                    'session' => '2023',
+                    'groupname' => 'group 8.1',
                 ],
-            'tags' => '["y:1"]',
-            'translatedtags' => '[{"y:1":"First year"}]',
-            'shortname' => 'SIT4',
-            'name' => 'SIT4',
-            'evalnum' => 1,
-            'autoevalnum' => 1,
-        ],
-        [
-            'plannings' =>
+
                 [
-
-                    [
-                        'startdate' => '1709161200',
-                        'enddate' => '1704582000',
-                        'session' => '2023',
-                        'groupname' => 'group 8.2',
-                    ],
-
-                    [
-                        'startdate' => '1709766000',
-                        'enddate' => '1710370800',
-                        'session' => '2023',
-                        'groupname' => 'group 8.3',
-                    ],
+                    'startdate' => (string) ($startdate + $onemonth * 3 + $oneweek),
+                    'enddate' => (string) ($startdate + $onemonth * 3 + $oneweek * 2),
+                    'session' => '2023',
+                    'groupname' => 'group 8.3',
                 ],
-            'tags' => '["y:2"]',
-            'translatedtags' => '[{"y:2":"Second year"}]',
-            'shortname' => 'SIT5',
-            'name' => 'SIT5',
-            'evalnum' => 1,
-            'autoevalnum' => 1,
-        ],
-        [
-            'plannings' =>
+            ],
+        'tags' => '["y:1"]',
+        'translatedtags' => '[{"y:1":"First year"}]',
+        'shortname' => 'SIT4',
+        'name' => 'SIT4',
+        'evalnum' => 1,
+        'autoevalnum' => 1,
+    ],
+    [
+        'plannings' =>
+            [
+
                 [
+                    'startdate' => (string) ($startdate + $onemonth * 4),
+                    'enddate' => (string) ($startdate + $onemonth * 4 + $oneweek),
+                    'session' => '2023',
+                    'groupname' => 'group 8.2',
+                ],
 
-                    [
-                        'startdate' => '1711753200',
-                        'enddate' => '1704582000',
-                        'session' => '2023',
-                        'groupname' => 'group 8.3',
-                    ],
-                ],
-            'tags' => '["y:3"]',
-            'translatedtags' => '[{"y:3":"Third year"}]',
-            'shortname' => 'SIT6',
-            'name' => 'SIT6',
-            'evalnum' => 1,
-            'autoevalnum' => 1,
-        ],
-        [
-            'plannings' =>
                 [
+                    'startdate' => (string) ($startdate + $onemonth * 4 + $oneweek),
+                    'enddate' => (string) ($startdate + $onemonth * 4 + $oneweek * 2),
+                    'session' => '2023',
+                    'groupname' => 'group 8.3',
+                ],
+            ],
+        'tags' => '["y:2"]',
+        'translatedtags' => '[{"y:2":"Second year"}]',
+        'shortname' => 'SIT5',
+        'name' => 'SIT5',
+        'evalnum' => 1,
+        'autoevalnum' => 1,
+    ],
+    [
+        'plannings' =>
+            [
 
-                    [
-                        'startdate' => '1714345200',
-                        'enddate' => '1704582000',
-                        'session' => '2023',
-                        'groupname' => 'group 8.1',
-                    ],
-                ],
-            'tags' => '["y:1"]',
-            'translatedtags' => '[{"y:1":"First year"}]',
-            'shortname' => 'SIT7',
-            'name' => 'SIT7',
-            'evalnum' => 1,
-            'autoevalnum' => 1,
-        ],
-        [
-            'plannings' =>
                 [
+                    'startdate' => (string) ($startdate + $onemonth * 5),
+                    'enddate' => (string) ($startdate + $onemonth * 5 + $oneweek),
+                    'session' => '2023',
+                    'groupname' => 'group 8.3',
+                ],
+            ],
+        'tags' => '["y:3"]',
+        'translatedtags' => '[{"y:3":"Third year"}]',
+        'shortname' => 'SIT6',
+        'name' => 'SIT6',
+        'evalnum' => 1,
+        'autoevalnum' => 1,
+    ],
+    [
+        'plannings' =>
+            [
 
-                    [
-                        'startdate' => '1716937200',
-                        'enddate' => '1704582000',
-                        'session' => '2023',
-                        'groupname' => 'group 8.3',
-                    ],
-                    [
-                        'startdate' => '1901973463',
-                        'enddate' => '1902578263',
-                        'session' => '2030',
-                        'groupname' => 'group 8.3',
-                    ],
-                ],
-            'tags' => '["y:2"]',
-            'translatedtags' => '[{"y:2":"Second year"}]',
-            'shortname' => 'SIT8',
-            'name' => 'SIT8',
-            'evalnum' => 1,
-            'autoevalnum' => 1,
-        ],
-        [
-            'plannings' =>
                 [
-                    [
-                        'startdate' => '1719529200',
-                        'enddate' => '1704582000',
-                        'session' => '2023',
-                        'groupname' => 'group 8.4',
-                    ],
-                    [
-                        'startdate' => '1901973463',
-                        'enddate' => '1902578263',
-                        'session' => '2030',
-                        'groupname' => 'group 8.4',
-                    ],
+                    'startdate' => (string) ($startdate + $onemonth * 6),
+                    'enddate' => (string) ($startdate + $onemonth * 6 + $oneweek),
+                    'session' => '2023',
+                    'groupname' => 'group 8.1',
                 ],
-            'tags' => '["y:3"]',
-            'translatedtags' => '[{"y:3":"Third year"}]',
-            'shortname' => 'SIT9',
-            'name' => 'SIT9',
-            'evalnum' => 1,
-            'autoevalnum' => 1,
-        ],
+            ],
+        'tags' => '["y:1"]',
+        'translatedtags' => '[{"y:1":"First year"}]',
+        'shortname' => 'SIT7',
+        'name' => 'SIT7',
+        'evalnum' => 1,
+        'autoevalnum' => 1,
+    ],
+    [
+        'plannings' =>
+            [
+
+                [
+                    'startdate' => (string) ($startdate + $onemonth * 7),
+                    'enddate' => (string) ($startdate + $onemonth * 7 + $oneweek),
+                    'session' => '2023',
+                    'groupname' => 'group 8.3',
+                ],
+                [
+                    'startdate' => (string) ($startdate + $onemonth * 12),
+                    'enddate' => (string) ($startdate + $onemonth * 12 + $oneweek),
+                    'session' => '2030',
+                    'groupname' => 'group 8.3',
+                ],
+            ],
+        'tags' => '["y:2"]',
+        'translatedtags' => '[{"y:2":"Second year"}]',
+        'shortname' => 'SIT8',
+        'name' => 'SIT8',
+        'evalnum' => 1,
+        'autoevalnum' => 1,
+    ],
+    [
+        'plannings' =>
+            [
+                [
+                    'startdate' => (string) ($startdate + $onemonth * 8),
+                    'enddate' => (string) ($startdate + $onemonth * 8 + $oneweek),
+                    'session' => '2023',
+                    'groupname' => 'group 8.4',
+                ],
+                [
+                    'startdate' => (string) ($startdate + $onemonth * 12),
+                    'enddate' => (string) ($startdate + $onemonth * 12 + $oneweek),
+                    'session' => '2030',
+                    'groupname' => 'group 8.4',
+                ],
+            ],
+        'tags' => '["y:3"]',
+        'translatedtags' => '[{"y:3":"Third year"}]',
+        'shortname' => 'SIT9',
+        'name' => 'SIT9',
+        'evalnum' => 1,
+        'autoevalnum' => 1,
+    ],
 ];
 $results['teacher1results'] = [
     [
         'plannings' =>
             [
                 [
-                    'startdate' => '1698793200',
-                    'enddate' => '1699398000',
+                    'startdate' => (string) $startdate,
+                    'enddate' => (string) ($startdate + $oneweek),
                     'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
                 [
-                    'startdate' => '1699398000',
-                    'enddate' => '1700002800',
+                    'startdate' => (string) ($startdate + $oneweek),
+                    'enddate' => (string) ($startdate + $oneweek * 2),
                     'session' => '2023',
                     'groupname' => 'group 8.2',
                 ],
                 [
-                    'startdate' => '1901973463', // Future time.
-                    'enddate' => '1902578263',
+                    'startdate' => (string) ($startdate + $onemonth * 12), // Future time.
+                    'enddate' => (string) ($startdate + $onemonth * 12 + $oneweek),
                     'session' => '2030',
                     'groupname' => 'group 8.1',
                 ],
@@ -438,8 +439,8 @@ $results['teacher1results'] = [
             [
 
                 [
-                    'startdate' => '1701385200',
-                    'enddate' => '1701990000',
+                    'startdate' => (string) ($startdate),
+                    'enddate' => (string) ($startdate + $oneweek * 2),
                     'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
@@ -457,14 +458,14 @@ $results['teacher1results'] = [
         'plannings' =>
             [
                 [
-                    'startdate' => '1703977200',
-                    'enddate' => '1704582000',
+                    'startdate' => (string) ($startdate),
+                    'enddate' => (string) ($startdate + $oneweek),
                     'session' => '2023',
                     'groupname' => 'group 8.1',
                 ],
                 [
-                    'startdate' => '1704582000',
-                    'enddate' => '1705186800',
+                    'startdate' => (string) ($startdate + $onemonth * 2 + $oneweek),
+                    'enddate' => (string) ($startdate + $onemonth * 2 + $oneweek * 2),
                     'session' => '2023',
                     'groupname' => 'group 8.2',
                 ],
