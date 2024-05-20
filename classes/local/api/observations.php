@@ -98,13 +98,13 @@ class observations {
         } else {
             $result['context'] = [
                 'comment' => '',
-                'commentformat' => FORMAT_HTML,
+                'commentformat' => FORMAT_PLAIN,
                 'userinfo' => utils::get_user_info($observation->get('studentid')),
             ];
         }
         $result['comments'] =
             array_values(
-                array_map(function($obscrit) {
+                array_map(function ($obscrit) {
                     $return = (array) $obscrit->to_record();
                     $return['userinfo'] = utils::get_user_info($return['usercreated']);
                     $return['commentlabel'] = ''; // TODO Fill this in with labels for comment/autoeval.
@@ -116,7 +116,7 @@ class observations {
             );
 
         $result['criteria'] = array_values(
-            array_map(function($obscrit) use ($criteria) {
+            array_map(function ($obscrit) use ($criteria) {
                 $criterioninfo = (array) $criteria[$obscrit->get('criterionid')]->to_record();
                 unset($criterioninfo['timecreated']);
                 unset($criterioninfo['timemodified']);
@@ -142,7 +142,7 @@ class observations {
                     $allcomments,
                     fn($comment) => in_array($comment->get('criterionid'), $allchildrencriteriaid)
                 ));
-            $criterion['subcriteria'] = array_map(function($obscrit) use ($criteria) {
+            $criterion['subcriteria'] = array_map(function ($obscrit) use ($criteria) {
                 $return = [
                     'criterioninfo' => (array) $criteria[$obscrit->get('criterionid')]->to_record(),
                     'comment' => $obscrit->get('comment'),
@@ -185,7 +185,7 @@ class observations {
         $contextcomment->set('observationid', $observation->get('id'));
         $contextcomment->set('type', observation_comment::OBSERVATION_CONTEXT);
         $contextcomment->set('comment', $context ?? '');
-        $contextcomment->set('commentformat', FORMAT_HTML);
+        $contextcomment->set('commentformat', FORMAT_PLAIN);
         $contextcomment->set('usercreated', $studentid);
         $contextcomment->create();
         foreach ($comments as $comment) {
@@ -195,11 +195,11 @@ class observations {
                 $obscomment = new observation_comment(0);
                 $obscomment->set('observationid', $observation->get('id'));
                 $obscomment->set('usercreated', $observerid ?? $USER->id);
-                $obscomment->set('type', observation_comment::OBSERVATION_COMMENT);
+                $obscomment->set('type', $comment['type'] ?? observation_comment::OBSERVATION_COMMENT);
                 $obscomment->create();
             }
             $obscomment->set('comment', $comment['comment']);
-            $obscomment->set('commentformat', FORMAT_HTML);
+            $obscomment->set('commentformat', FORMAT_PLAIN);
             $obscomment->update();
         }
         // Now create the criteria and subcriteria structure.
@@ -257,10 +257,16 @@ class observations {
      * @param object|null $context
      * @param array $comments
      * @param array $criteria
+     * @param bool $synccomments Synchronise comments so that we can delete the ones that are not in the list.
      * @return void
      */
-    public static function edit_observation(int $observationid, ?object $context = null, array $comments = [],
-        array $criteria = []) {
+    public static function edit_observation(
+        int $observationid,
+        ?object $context = null,
+        array $comments = [],
+        array $criteria = [],
+        bool $synccomments = false
+    ) {
         global $USER;
         $observation = observation::get_record(['id' => $observationid]);
         $observation->update();
@@ -275,15 +281,16 @@ class observations {
                 $contextcomment = observation_comment::get_record(['id' => $context->id]);
             }
             $contextcomment->set('comment', $context->comment);
-            $contextcomment->set('commentformat', FORMAT_HTML);
+            $contextcomment->set('commentformat', FORMAT_PLAIN);
             $contextcomment->update();
         }
-        $commentstodelete = observation_comment::get_records(['observationid' => $observationid,
-            'type' => observation_comment::OBSERVATION_COMMENT,]);
-        $commentstodelete = array_combine(
-            array_map(fn($comment) => $comment->get('id'), $commentstodelete),
-            $commentstodelete
-        );
+        if ($synccomments) {
+            $commentstodelete = observation_comment::get_records(['observationid' => $observationid]);
+            $commentstodelete = array_combine(
+                array_map(fn($comment) => $comment->get('id'), $commentstodelete),
+                $commentstodelete
+            );
+        }
         foreach ($comments as $comment) {
             if (!empty($comment['id'])) {
                 $obscomment = observation_comment::get_record(['id' => $comment['id']]);
@@ -291,18 +298,20 @@ class observations {
                 $obscomment = new observation_comment(0);
                 $obscomment->set('observationid', $observationid);
                 $obscomment->set('usercreated', $USER->id);
-                $obscomment->set('type', observation_comment::OBSERVATION_COMMENT);
+                $obscomment->set('type', $comment['type'] ?? observation_comment::OBSERVATION_COMMENT);
                 $obscomment->create();
             }
             $obscomment->set('comment', $comment['comment']);
-            $obscomment->set('commentformat', FORMAT_HTML);
+            $obscomment->set('commentformat', FORMAT_PLAIN);
             $obscomment->update();
-            if ($obscomment->get('id')) {
+            if ($synccomments) {
                 unset($commentstodelete[$obscomment->get('id')]);
             }
         }
-        foreach ($commentstodelete as $comment) {
-            $comment->delete();
+        if ($synccomments) {
+            foreach ($commentstodelete as $comment) {
+                $comment->delete();
+            }
         }
         // We are now sure we have the full structure of criteria.
         foreach ($criteria as $criterion) {
@@ -363,5 +372,4 @@ class observations {
         }
         $observation->delete();
     }
-
 }

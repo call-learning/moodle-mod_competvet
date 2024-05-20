@@ -110,6 +110,12 @@ $results['observer1results'] = [
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
+            [
+                'startdate' => (string) ($startdate + $oneweek),
+                'enddate' => (string) ($startdate + $oneweek * 2),
+                'session' => '2023',
+                'groupname' => 'group 8.2',
+            ],
         ],
     'SIT2' =>
         [
