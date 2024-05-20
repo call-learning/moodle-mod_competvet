@@ -123,7 +123,7 @@ class setup_test extends advanced_testcase {
         $newroledefs['responsibleucue']['permissions'][CONTEXT_COURSE]['mod/competvet:canaskobservation'] = CAP_ALLOW;
         $newroledefs['admincompetvet']['permissions'][CONTEXT_SYSTEM]['mod/competvet:candoeverything'] = CAP_PREVENT;
         setup::create_update_roles($newroledefs);
-
+        accesslib_clear_all_caches_for_unit_testing();
         $this->assert_context_capabilities($newroledefs, $course, $coursemodule);
     }
 

@@ -92,7 +92,7 @@ class eval_observation_edit extends dynamic_form {
             $criteria = eval_observation_helper::process_form_data_criteria($data, $situation);
             observations::edit_observation(
                 $data->id,
-                $context,
+                $context->comment,
                 $comments,
                 $criteria,
             );

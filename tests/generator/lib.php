@@ -140,7 +140,30 @@ class mod_competvet_generator extends testing_module_generator {
      */
     public function create_observation_with_comment($record = null) {
         $record = (object) (array) $record;
-        $comment = $record->comment;
+        // Either we provide the comments as an array [ 'comment' => 'value', 'type' => 'type' ] or as
+        // different fields in the record.
+
+        if ($record->comments) {
+            $comments =
+            array_combine(
+                array_column((array) $record->comments, 'type'),
+                array_column((array) $record->comments, 'comment'),
+            );
+        } else {
+            $comments = [];
+            foreach (
+                [
+                observation_comment::OBSERVATION_COMMENT => 'comment',
+                observation_comment::OBSERVATION_GENERAL_COMMENT => 'generalcomment',
+                observation_comment::OBSERVATION_PRIVATE_COMMENT => 'privatecomment',
+                ] as $key => $value
+            ) {
+                if ($record->{$value}) {
+                    $comments[$key] = $record->{$value};
+                }
+            }
+        }
+
         $context = $record->context;
         unset($record->comment);
         unset($record->context);
@@ -172,14 +195,16 @@ class mod_competvet_generator extends testing_module_generator {
             'type' => observation_comment::OBSERVATION_CONTEXT,
         ];
         $this->create_from_entity_name(observation_comment::class, $contextrecord);
-        $commentrecord = (object) [
-            'observationid' => $observation->id,
-            'comment' => $comment,
-            'commentformat' => 1,
-            'usercreated' => $record->observerid,
-            'type' => observation_comment::OBSERVATION_COMMENT,
-        ];
-        $this->create_from_entity_name(observation_comment::class, $commentrecord);
+        foreach ($comments as $commenttype => $comment) {
+            $commentrecord = (object) [
+                'observationid' => $observation->id,
+                'comment' => $comment,
+                'commentformat' => 1,
+                'usercreated' => $record->observerid,
+                'type' => $commenttype,
+            ];
+            $this->create_from_entity_name(observation_comment::class, $commentrecord);
+        }
         return $observation;
     }
 
@@ -191,7 +216,7 @@ class mod_competvet_generator extends testing_module_generator {
      */
     public function create_observation($record = null) {
         $record = (object) (array) $record;
-        if (is_string($record->status)) {
+        if (isset($record->status) && is_string($record->status)) {
             $statustoint = array_search($record->status, observation::STATUS);
             if ($statustoint !== false) {
                 $record->status = $statustoint;
@@ -199,7 +224,7 @@ class mod_competvet_generator extends testing_module_generator {
                 throw new moodle_exception('obs:invalidstatus', 'competvet', '', $record->status);
             }
         }
-        if (is_string($record->category)) {
+        if (isset($record->category) && is_string($record->category)) {
             $categorytoint = array_search($record->category, observation::CATEGORIES);
             if ($categorytoint !== false) {
                 $record->category = $categorytoint;
@@ -255,8 +280,10 @@ class mod_competvet_generator extends testing_module_generator {
         ];
         if (!$criterion->get('parentid')) {
             $valuerecord['level'] = intval($record->value);
-            if ($existingrecord = observation_criterion_level::get_record(['observationid' => $record->observationid,
-                'criterionid' => $record->criterionid])) {
+            if (
+                $existingrecord = observation_criterion_level::get_record(['observationid' => $record->observationid,
+                'criterionid' => $record->criterionid, ])
+            ) {
                 $existingrecord->set_many($valuerecord);
                 $existingrecord->update();
                 return $existingrecord->to_record();
@@ -265,8 +292,10 @@ class mod_competvet_generator extends testing_module_generator {
         } else {
             $valuerecord['comment'] = $record->value;
             $valuerecord['commentformat'] = 1;
-            if ($existingrecord = observation_criterion_comment::get_record(['observationid' => $record->observationid,
-                'criterionid' => $record->criterionid])) {
+            if (
+                $existingrecord = observation_criterion_comment::get_record(['observationid' => $record->observationid,
+                'criterionid' => $record->criterionid, ])
+            ) {
                 $existingrecord->set_many($valuerecord);
                 return $existingrecord->to_record();
             }

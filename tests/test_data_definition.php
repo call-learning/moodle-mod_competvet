@@ -303,4 +303,60 @@ trait test_data_definition {
             ],
         ];
     }
+    /**
+     * Data definition
+     */
+    private function get_data_definition_set_2(int $startdate): array {
+        $oneweek = 60 * 60 * 24 * 7; // 1 week in seconds.
+        $onemonth = $oneweek * 4; // 1 month in seconds.
+        return [
+            'course 1' => [
+                'users' => [
+                    'student' => ['student1', 'student2'],
+                    'observer' => ['observer1', 'observerandevaluator'],
+                    'teacher' => ['teacher1'],
+                    'manager' => ['manager'],
+                ],
+                'groups' => [
+                    'group 8.1' => [
+                        'users' => ['student1'],
+                    ],
+                    'group 8.2' => [
+                        'users' => ['student2'],
+                    ],
+                    'group 8.3' => [
+                        'users' => [],
+                    ],
+                    'group 8.4' => [
+                        'users' => [],
+                    ],
+                ],
+                'activities' => [
+                    'SIT1' => [
+                        'situationtags' => ['y:1'],
+                        'plannings' => [
+                            [
+                                'startdate' => $startdate,
+                                'enddate' => $startdate + $oneweek,
+                                'groupname' => 'group 8.1',
+                                'session' => '2023',
+                            ],
+                            [
+                                'startdate' => $startdate + $oneweek,
+                                'enddate' => $startdate + $oneweek * 2,
+                                'groupname' => 'group 8.2',
+                                'session' => '2023',
+                            ],
+                            [
+                                'startdate' => $startdate + $onemonth * 12, // Future time.
+                                'enddate' => $startdate + $onemonth * 12 + $oneweek,
+                                'groupname' => 'group 8.1',
+                                'session' => '2030',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
 }
