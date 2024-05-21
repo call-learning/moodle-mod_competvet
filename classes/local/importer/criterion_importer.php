@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\local\importer;
 
+use cache;
+use cache_store;
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\grid;
 
@@ -58,21 +60,21 @@ class criterion_importer extends base_persistent_importer {
      * @return object
      */
     protected function to_persistent_data(array $row, csv_iterator $reader): object {
-        static $evalgridnametoid = [];
+        $evalgridnametoid = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_myplugin', 'mycache');
         $data = parent::to_persistent_data($row, $reader);
         if (empty($data->grade)) {
             $data->grade = null;
         } else {
             $data->grade = floatval(str_replace(',', '.', $data->grade));
         }
-        if (empty($evalgridnametoid[$data->gridid])) {
+        if (!$evalgridnametoid->has($data->gridid)) {
             $evalgrid = grid::get_record(['idnumber' => $data->gridid]);
             if (empty($evalgrid)) {
                 throw new \moodle_exception('gridnotfound', 'mod_competvet', '', $data->gridid);
             }
-            $evalgridnametoid[$data->gridid] = $evalgrid->get('id');
+            $evalgridnametoid->set($data->gridid, $evalgrid->get('id'));
         }
-        $data->gridid = $evalgridnametoid[$data->gridid];
+        $data->gridid = $evalgridnametoid->get($data->gridid);
         $parentcriterionid = 0;
         if (!empty(trim($data->parentid))) {
             $parentcriterion = criterion::get_record(['idnumber' => $data->parentid, 'gridid' => $data->gridid]);

@@ -110,12 +110,6 @@ $results['observer1results'] = [
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
-            [
-                'startdate' => (string) ($startdate + $oneweek),
-                'enddate' => (string) ($startdate + $oneweek * 2),
-                'session' => '2023',
-                'groupname' => 'group 8.2',
-            ],
         ],
     'SIT2' =>
         [
@@ -160,29 +154,26 @@ $results['observer1resultswithfuture'] = [
         ],
     'SIT2' =>
         [
-            0 =>
-                [
-                    'startdate' => (string) $startdate,
-                    'enddate' => (string) ($startdate + $oneweek * 2),
-                    'session' => '2023',
-                    'groupname' => 'group 8.1',
-                ],
+            [
+                'startdate' => (string) $startdate,
+                'enddate' => (string) ($startdate + $oneweek * 2),
+                'session' => '2023',
+                'groupname' => 'group 8.1',
+            ],
         ],
     'SIT3' =>
         [
-            0 =>
-                [
-                    'startdate' => (string) ($startdate),
-                    'enddate' => (string) ($startdate + $oneweek),
-                    'session' => '2023',
-                    'groupname' => 'group 8.1',
-                ],
-            1 =>
-                [
-                    'startdate' => (string) ($startdate + $onemonth * 2 + $oneweek),
-                    'enddate' => (string) ($startdate + $onemonth * 2 + $oneweek * 2),
-                    'session' => '2023',
-                    'groupname' => 'group 8.2',
-                ],
+            [
+                'startdate' => (string) ($startdate),
+                'enddate' => (string) ($startdate + $oneweek),
+                'session' => '2023',
+                'groupname' => 'group 8.1',
+            ],
+            [
+                'startdate' => (string) ($startdate + $onemonth * 2 + $oneweek),
+                'enddate' => (string) ($startdate + $onemonth * 2 + $oneweek * 2),
+                'session' => '2023',
+                'groupname' => 'group 8.2',
+            ],
         ],
 ];
