@@ -39,7 +39,7 @@ class setup_test extends advanced_testcase {
      */
     public function test_roles_setup() {
         $existingroles = get_all_roles();
-        $existingrolesshortnames = array_map(function ($role) {
+        $existingrolesshortnames = array_map(function($role) {
             return $role->shortname;
         }, $existingroles); // Shortname to ID.
         foreach (competvet::COMPETVET_ROLES as $rolename => $roledef) {
@@ -66,7 +66,6 @@ class setup_test extends advanced_testcase {
         }
     }
 
-
     /**
      * Test default grid created and installed
      *
@@ -90,7 +89,6 @@ class setup_test extends advanced_testcase {
         }
     }
 
-
     /**
      * Test roles access.
      *
@@ -107,27 +105,6 @@ class setup_test extends advanced_testcase {
     }
 
     /**
-     * Test roles access if we change definition.
-     *
-     * @return void
-     *
-     * @covers \mod_competvet\setup::create_update_roles
-     */
-    public function test_roles_access_with_update() {
-        $this->resetAfterTest();
-        $generator = $this->getDataGenerator();
-        $course = $generator->create_course();
-        $coursemodule = $generator->create_module('competvet', ['course' => $course->id]);
-        // Now update roles.
-        $newroledefs = competvet::COMPETVET_ROLES;
-        $newroledefs['responsibleucue']['permissions'][CONTEXT_COURSE]['mod/competvet:canaskobservation'] = CAP_ALLOW;
-        $newroledefs['admincompetvet']['permissions'][CONTEXT_SYSTEM]['mod/competvet:candoeverything'] = CAP_PREVENT;
-        setup::create_update_roles($newroledefs);
-        accesslib_clear_all_caches_for_unit_testing();
-        $this->assert_context_capabilities($newroledefs, $course, $coursemodule);
-    }
-
-    /**
      * Utility function to assert that we have the right capabilities setup.
      *
      * @param array $roledefs
@@ -139,13 +116,13 @@ class setup_test extends advanced_testcase {
         $generator = $this->getDataGenerator();
         foreach ($roledefs as $rolename => $roledef) {
             $user = $generator->create_and_enrol($course, $rolename);
-            foreach ($roledef['permissions'] as $contextlevel => $permissions) {
+            foreach ($roledef['contextlevels'] as $contextlevel) {
                 if ($contextlevel == CONTEXT_SYSTEM) {
                     global $DB;
                     $roleid = $DB->get_field('role', 'id', ['shortname' => $rolename]);
                     role_assign($roleid, $user->id, context_system::instance()->id);
                 }
-                foreach ($permissions as $permissionname => $permissionvalue) {
+                foreach ($roledef['globalpermissions'] as $permissionname => $permissionvalue) {
                     switch ($contextlevel) {
                         case CONTEXT_COURSE:
                             $context = context_course::instance($course->id);
@@ -165,5 +142,26 @@ class setup_test extends advanced_testcase {
                 }
             }
         }
+    }
+
+    /**
+     * Test roles access if we change definition.
+     *
+     * @return void
+     *
+     * @covers \mod_competvet\setup::create_update_roles
+     */
+    public function test_roles_access_with_update() {
+        $this->resetAfterTest();
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $coursemodule = $generator->create_module('competvet', ['course' => $course->id]);
+        // Now update roles.
+        $newroledefs = competvet::COMPETVET_ROLES;
+        $newroledefs['responsibleucue']['globalpermissions']['mod/competvet:canaskobservation'] = CAP_ALLOW;
+        $newroledefs['admincompetvet']['globalpermissions']['mod/competvet:candoeverything'] = CAP_PREVENT;
+        setup::create_update_roles($newroledefs);
+        accesslib_clear_all_caches_for_unit_testing();
+        $this->assert_context_capabilities($newroledefs, $course, $coursemodule);
     }
 }

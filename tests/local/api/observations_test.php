@@ -50,7 +50,7 @@ class observations_test extends advanced_testcase {
                     'context' => 'A context',
                     'comments' => [
                         ['type' => observation_comment::OBSERVATION_COMMENT, 'comment' => 'A comment'],
-                        ['type' => observation_comment::OBSERVATION_GENERAL_COMMENT, 'comment' => 'Another comment'],
+                        ['type' => observation_comment::OBSERVATION_PRIVATE_COMMENT, 'comment' => 'Another comment'],
                     ],
                     'criteria' => [
                         ['id' => 'Q001', 'level' => 1],
@@ -120,7 +120,7 @@ class observations_test extends advanced_testcase {
         $this->assertEquals(1, observation_comment::count_records(['observationid' => $observationid,
             'type' => observation_comment::OBSERVATION_CONTEXT,]));
         $this->assertEquals(1, observation_comment::count_records(['observationid' => $observationid,
-            'type' => observation_comment::OBSERVATION_GENERAL_COMMENT,]));
+            'type' => observation_comment::OBSERVATION_PRIVATE_COMMENT,]));
         $this->assertEquals(7, observation_criterion_level::count_records(['observationid' => $observationid]));
         $this->assertEquals(33, observation_criterion_comment::count_records(['observationid' => $observationid]));
         foreach (array_filter($criteria, fn($crit) => isset($crit['level'])) as $critelevel) {

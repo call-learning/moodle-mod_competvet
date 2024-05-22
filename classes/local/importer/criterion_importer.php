@@ -60,21 +60,23 @@ class criterion_importer extends base_persistent_importer {
      * @return object
      */
     protected function to_persistent_data(array $row, csv_iterator $reader): object {
-        $evalgridnametoid = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_myplugin', 'mycache');
+        $evalgridnametoid = cache::make_from_params(cache_store::MODE_REQUEST, 'local_competvet', 'evalgridnametoid');
         $data = parent::to_persistent_data($row, $reader);
+        $gridname = trim($data->gridid);
         if (empty($data->grade)) {
             $data->grade = null;
         } else {
             $data->grade = floatval(str_replace(',', '.', $data->grade));
         }
-        if (!$evalgridnametoid->has($data->gridid)) {
-            $evalgrid = grid::get_record(['idnumber' => $data->gridid]);
+        $data->gridid = $evalgridnametoid->get($gridname);
+        if (empty($data->gridid)) {
+            $evalgrid = grid::get_record(['idnumber' => $gridname]);
             if (empty($evalgrid)) {
-                throw new \moodle_exception('gridnotfound', 'mod_competvet', '', $data->gridid);
+                throw new \moodle_exception('gridnotfound', 'mod_competvet', '', $gridname);
             }
-            $evalgridnametoid->set($data->gridid, $evalgrid->get('id'));
+            $evalgridnametoid->set($gridname, $evalgrid->get('id'));
+            $data->gridid = $evalgrid->get('id');
         }
-        $data->gridid = $evalgridnametoid->get($data->gridid);
         $parentcriterionid = 0;
         if (!empty(trim($data->parentid))) {
             $parentcriterion = criterion::get_record(['idnumber' => $data->parentid, 'gridid' => $data->gridid]);

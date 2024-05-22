@@ -273,7 +273,9 @@ class observations {
     ) {
         global $USER;
         $observation = observation::get_record(['id' => $observationid]);
-        $observation->update();
+        if (!$observation) {
+            throw new \moodle_exception('invalidobservationid', 'competvet');
+        }
         if ($context) {
             $existing = self::get_and_normalise_comments($observationid, observation_comment::OBSERVATION_CONTEXT);
             if (!$existing) {

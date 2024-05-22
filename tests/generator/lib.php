@@ -154,7 +154,6 @@ class mod_competvet_generator extends testing_module_generator {
             foreach (
                 [
                 observation_comment::OBSERVATION_COMMENT => 'comment',
-                observation_comment::OBSERVATION_GENERAL_COMMENT => 'generalcomment',
                 observation_comment::OBSERVATION_PRIVATE_COMMENT => 'privatecomment',
                 ] as $key => $value
             ) {

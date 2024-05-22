@@ -23,11 +23,11 @@ use core_reportbuilder\manager;
 use core_tag_area;
 use core_tag_tag;
 use mod_competvet\local\importer\criterion_importer;
+use mod_competvet\local\importer\fields_importer;
+use mod_competvet\local\persistent\case_field;
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\grid;
 use mod_competvet\reportbuilder\datasource\plannings;
-use mod_competvet\local\importer\fields_importer;
-use mod_competvet\local\persistent\case_field;
 
 /**
  * Setup routines
@@ -68,7 +68,7 @@ class setup {
             $roledefinitions = \mod_competvet\competvet::COMPETVET_ROLES;
         }
         $existingroles = get_all_roles();
-        $existingrolesshortnames = array_flip(array_map(function($role) {
+        $existingrolesshortnames = array_flip(array_map(function ($role) {
             return $role->shortname;
         }, $existingroles)); // Shortname to ID.
         $roles = [];
@@ -85,7 +85,7 @@ class setup {
                 $currentrole = $existingroles[$existingroleid];
             }
             $roles[$roleshortname] = $currentrole;
-            $contextlevels = array_keys($roledef['permissions']);
+            $contextlevels = $roledef['contextlevels'] ?? [];
             if (!empty($contextlevels)) {
                 set_role_contextlevels($currentrole->id, $contextlevels);
             }
@@ -95,12 +95,10 @@ class setup {
         // Then we assign capabilities to roles.
         foreach ($roles as $currentrole) {
             $roledef = $roledefinitions[$currentrole->shortname] ?? [];
-            foreach ($roledef['permissions'] as $contextlevel => $permissions) {
-                foreach ($permissions as $permissionname => $permissionvalue) {
-                    // Assign the capability to the role at context level and then this will be replicated to the children. This is mainly
-                    // for later assignments.
-                    assign_capability($permissionname, $permissionvalue, $currentrole->id, $contextsystemid, true);
-                }
+            foreach ($roledef['globalpermissions'] as $permissionname => $permissionvalue) {
+                // Assign the capability to the role at context level and then this will be replicated to the children. This is mainly
+                // for later assignments.
+                assign_capability($permissionname, $permissionvalue, $currentrole->id, $contextsystemid, true);
             }
         }
         accesslib_clear_all_caches(true);

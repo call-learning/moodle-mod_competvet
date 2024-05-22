@@ -37,7 +37,6 @@ class observation_comment extends persistent {
     const COMMENT_TYPES = [
         self::OBSERVATION_CONTEXT => 'context',
         self::OBSERVATION_COMMENT => 'comment',
-        self::OBSERVATION_GENERAL_COMMENT => 'generalcomment',
         self::OBSERVATION_PRIVATE_COMMENT => 'privatecomment',
         self::AUTOEVAL_PROGRESS => 'progress',
         self::AUTOEVAL_AMELIORATION => 'improvement',
@@ -51,10 +50,6 @@ class observation_comment extends persistent {
      * Observation comment types constants
      */
     const OBSERVATION_COMMENT = 2;
-    /**
-     * Private observation comment types constants
-     */
-    const OBSERVATION_GENERAL_COMMENT = 3;
     /**
      * Private observation comment types constants
      */
