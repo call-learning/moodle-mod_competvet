@@ -85,6 +85,9 @@ class mod_competvet_generator extends testing_module_generator {
                 $record->situationtags = explode(',', $record->situationtags);
             }
         }
+        $this->check_and_set_grid($record, 'evalgrid', grid::COMPETVET_CRITERIA_EVALUATION);
+        $this->check_and_set_grid($record, 'certifgrid', grid::COMPETVET_CRITERIA_CERTIFICATION);
+        $this->check_and_set_grid($record, 'listgrid', grid::COMPETVET_CRITERIA_LIST);
         return parent::create_instance($record, (array) $options);
     }
 
@@ -133,6 +136,26 @@ class mod_competvet_generator extends testing_module_generator {
     }
 
     /**
+     * Check grid value and set it to the right value.
+     *
+     * @param $record
+     * @param $property
+     * @param $grid_type
+     * @return void
+     */
+    private function check_and_set_grid(&$record, $property, $gridtype) {
+        if (empty($record->$property)) {
+            $grid = grid::get_default_grid($gridtype);
+            $record->$property = $grid->get('id');
+        } else {
+            if (is_string($record->$property)) {
+                $grid = grid::get_record(['idnumber' => $record->$property]);
+                $record->$property = $grid->get('id');
+            }
+        }
+    }
+
+    /**
      * Create a new instance of observation.
      *
      * @param array|stdClass|null $record
@@ -145,16 +168,16 @@ class mod_competvet_generator extends testing_module_generator {
 
         if ($record->comments) {
             $comments =
-            array_combine(
-                array_column((array) $record->comments, 'type'),
-                array_column((array) $record->comments, 'comment'),
-            );
+                array_combine(
+                    array_column((array) $record->comments, 'type'),
+                    array_column((array) $record->comments, 'comment'),
+                );
         } else {
             $comments = [];
             foreach (
                 [
-                observation_comment::OBSERVATION_COMMENT => 'comment',
-                observation_comment::OBSERVATION_PRIVATE_COMMENT => 'privatecomment',
+                    observation_comment::OBSERVATION_COMMENT => 'comment',
+                    observation_comment::OBSERVATION_PRIVATE_COMMENT => 'privatecomment',
                 ] as $key => $value
             ) {
                 if ($record->{$value}) {
@@ -163,8 +186,7 @@ class mod_competvet_generator extends testing_module_generator {
             }
         }
 
-        $context = $record->context;
-        unset($record->comment);
+        $context = $record->context ?? '';
         unset($record->context);
         $planning = planning::get_record(['id' => $record->planningid]);
         if (!$planning) {
@@ -182,6 +204,13 @@ class mod_competvet_generator extends testing_module_generator {
         );
 
         if ($existingobservation) {
+            $this->check_and_set_observation_status($record);
+            $this->check_and_set_observation_category($record);
+            $existingobservation->set_many(array_intersect_key(
+                (array) $record,
+                array_fill_keys(['studentid', 'observerid', 'planningid', 'status', 'category'], 1)
+            ));
+            $existingobservation->update();
             $observation = $existingobservation->to_record();
         } else {
             $observation = $this->create_observation($record);
@@ -202,7 +231,26 @@ class mod_competvet_generator extends testing_module_generator {
                 'usercreated' => $record->observerid,
                 'type' => $commenttype,
             ];
-            $this->create_from_entity_name(observation_comment::class, $commentrecord);
+            $existingcomments = observation_comment::get_records(
+                [
+                    'observationid' => $observation->id,
+                    'type' => $commenttype,
+                ]
+            );
+            $existingcomment = false;
+            if ($existingcomments) {
+                $existingcomment = array_shift($existingcomments);
+                // Somewhat we got too many.
+                foreach ($existingcomments as $commenttodelete) {
+                    $commenttodelete->delete();
+                }
+            }
+            if ($existingcomment) {
+                $existingcomment->set_many((array) $commentrecord);
+                $existingcomment->update();
+            } else {
+                $this->create_from_entity_name(observation_comment::class, $commentrecord);
+            }
         }
         return $observation;
     }
@@ -215,6 +263,19 @@ class mod_competvet_generator extends testing_module_generator {
      */
     public function create_observation($record = null) {
         $record = (object) (array) $record;
+        $this->check_and_set_observation_status($record);
+        $this->check_and_set_observation_category($record);
+        return $this->create_from_entity_name(observation::class, $record);
+    }
+
+    /**
+     * Observation status
+     *
+     * @param $record
+     * @return void
+     * @throws moodle_exception
+     */
+    private function check_and_set_observation_status($record) {
         if (isset($record->status) && is_string($record->status)) {
             $statustoint = array_search($record->status, observation::STATUS);
             if ($statustoint !== false) {
@@ -223,6 +284,16 @@ class mod_competvet_generator extends testing_module_generator {
                 throw new moodle_exception('obs:invalidstatus', 'competvet', '', $record->status);
             }
         }
+    }
+
+    /**
+     * Observation category
+     *
+     * @param $record
+     * @return void
+     * @throws moodle_exception
+     */
+    private function check_and_set_observation_category($record) {
         if (isset($record->category) && is_string($record->category)) {
             $categorytoint = array_search($record->category, observation::CATEGORIES);
             if ($categorytoint !== false) {
@@ -231,9 +302,7 @@ class mod_competvet_generator extends testing_module_generator {
                 throw new moodle_exception('obs:invalidcategory', 'competvet', '', $record->category);
             }
         }
-        return $this->create_from_entity_name(observation::class, $record);
     }
-
     /**
      * Create a new instance of the Competvet activity.
      *
@@ -281,7 +350,7 @@ class mod_competvet_generator extends testing_module_generator {
             $valuerecord['level'] = intval($record->value);
             if (
                 $existingrecord = observation_criterion_level::get_record(['observationid' => $record->observationid,
-                'criterionid' => $record->criterionid, ])
+                    'criterionid' => $record->criterionid,])
             ) {
                 $existingrecord->set_many($valuerecord);
                 $existingrecord->update();
@@ -293,7 +362,7 @@ class mod_competvet_generator extends testing_module_generator {
             $valuerecord['commentformat'] = 1;
             if (
                 $existingrecord = observation_criterion_comment::get_record(['observationid' => $record->observationid,
-                'criterionid' => $record->criterionid, ])
+                    'criterionid' => $record->criterionid,])
             ) {
                 $existingrecord->set_many($valuerecord);
                 return $existingrecord->to_record();

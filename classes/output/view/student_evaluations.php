@@ -77,7 +77,7 @@ class student_evaluations extends base {
                             'viewurl' => (new moodle_url(
                                 $this->views['eval'],
                                 ['evalid' => $observation['id']]
-                            ))->out(false)
+                            ))->out(false),
                         ];
                     }
                 }

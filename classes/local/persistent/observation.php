@@ -192,7 +192,7 @@ class observation extends persistent {
                 FROM {' . $persistentname::TABLE . '} ocl
                 JOIN {' . criterion::TABLE . '} c ON c.id = ocl.criterionid
                 WHERE ocl.observationid = :observationid
-                ORDER BY c.sort, c.parentid ASC';
+                ORDER BY c.sort ASC, c.parentid DESC';
         $params = [
             'observationid' => $this->raw_get('id'),
         ];

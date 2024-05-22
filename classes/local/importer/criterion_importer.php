@@ -86,7 +86,7 @@ class criterion_importer extends base_persistent_importer {
             $parentcriterionid = $parentcriterion->get('id');
         }
         $data->parentid = $parentcriterionid;
-        $data->sort = criterion::count_records(['gridid' => $data->gridid, 'parentid' => $data->parentid]) + 1;
+        $data->sort = $this->currentindex;
         return $data;
     }
 

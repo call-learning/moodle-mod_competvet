@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\observation;
+use mod_competvet\local\persistent\observation_comment;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
 
@@ -37,7 +38,7 @@ class behat_mod_competvet_generator extends behat_generator_base {
             'observations' => [
                 'singular' => 'observation',
                 'datagenerator' => 'observation_with_comment',
-                'required' => ['student', 'observer', 'planning', 'context', 'comment'],
+                'required' => ['student', 'observer', 'planning'],
                 'switchids' => ['student' => 'studentid', 'observer' => 'observerid', 'planning' => 'planningid'],
             ],
             'observation_comments' => [
@@ -200,5 +201,28 @@ class behat_mod_competvet_generator extends behat_generator_base {
      */
     protected function get_observer_id(string $username): int {
         return $this->get_user_id($username);
+    }
+
+    /**
+     * Preprocess the data so to split the comments into the different types.
+     *
+     * @param array $data
+     * @return array
+     */
+    protected function preprocess_observation_with_comment(array $data): array {
+        $data['comments'] = [];
+        foreach (observation_comment::COMMENT_TYPES as $typekey => $typestring) {
+            if ($typekey === observation_comment::OBSERVATION_CONTEXT) {
+                continue;
+            }
+            if (isset($data[$typestring])) {
+                $data['comments'][] = [
+                    'type' => $typekey,
+                    'comment' => $data[$typestring],
+                ];
+                unset($data[$typestring]);
+            }
+        }
+        return $data;
     }
 }

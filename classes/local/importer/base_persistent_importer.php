@@ -26,6 +26,10 @@ use moodle_exception;
  */
 abstract class base_persistent_importer {
     /**
+     * Current row index. Used for sorting.
+     */
+    protected $currentindex = 0;
+    /**
      * Persistent class
      *
      * @param string $persistenclass
@@ -48,9 +52,11 @@ abstract class base_persistent_importer {
      */
     public function import(string $filepath, string $delimiter = 'semicolon', string $encoding = 'utf-8') {
         $csvreader = new csv_iterator($filepath, $delimiter, $encoding);
+        $this->currentindex = 0;
         foreach ($csvreader as $row) {
             $data = $this->to_persistent_data($row, $csvreader);
             $this->persist_data($data);
+            $this->currentindex++;
         }
     }
 

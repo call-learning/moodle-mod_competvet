@@ -140,6 +140,12 @@ class situations {
             $criterion['parentid'] = intval($criterion['parentid']);
             $criterion['sort'] = intval($criterion['sort']);
         }
+        usort($criteria, function ($a, $b) {
+            if ($a['parentid'] == $b['parentid']) {
+                return $a['sort'] <=> $b['sort'];
+            }
+            return $a['parentid'] <=> $b['parentid'];
+        });
         return $criteria;
     }
 
