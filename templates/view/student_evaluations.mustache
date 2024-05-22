@@ -24,6 +24,13 @@
     }
 }}
 <div class="competvet-view-evaluations">
+    <div class="autoevalutation">
+        {{#isstudent}}
+        <div>
+            <button class="btn btn-outline-secondary my-3" data-cmid="{{cmid}}" data-planning-id="{{planningid}}" data-student-id="{{studentid}}" data-action="eval-observation-auto">{{#str}}observation:auto, mod_competvet{{/str}}</button>
+        </div>
+        {{/isstudent}}
+    </div>
     <div class="accordion" id="evaluations-accordion">
         <div class="row no-gutters">
             <div class="col-4 criterionlabel">
@@ -31,7 +38,11 @@
             {{#userevals.0}}
                 {{#grades}}
                     <div class="col-1 evaluator font-weight-bold text-center d-flex">
-                        {{graderinfo.fullname}}
+                        <div class="th rotatecontainer">
+                            <div class="transformed">
+                                <span class="gradername">{{graderinfo.fullname}}</span>
+                            </div>
+                        </div>
                         <a href="{{{viewurl}}}" class="btn btn-icon icon-no-margin d-flex align-items-center justify-content-center">
                             {{#pix}}i/search, core{{/pix}}
                         </a>
@@ -39,42 +50,22 @@
                 {{/grades}}
             {{/userevals.0}}
         </div>
-            {{#userevals}}
-                <div class="row no-gutters mb-2">
-                    <div class="col-4 criterionlabel font-weight-bold">
-                        {{criterion.label}}
-                    </div>
-                    {{#grades}}
-                        <div class="col-1 grade text-center">
-                            {{level}}
-                            <div class="sr-only">
-                                {{graderinfo.fullname}}
-                            </div>
+
+        {{#userevals}}
+            <div class="row no-gutters mb-2">
+                <div class="col-4 criterionlabel font-weight-bold">
+                    {{criterion.label}}
+                </div>
+                {{#grades}}
+                    <div class="col-1 grade text-center">
+                        {{level}}
+                        <div class="sr-only">
+                            {{graderinfo.fullname}}
                         </div>
-                    {{/grades}}
-                </div>
-            {{/userevals}}
-        {{#observationsold}}
-        </div>
-            <div class="card">
-                <div class="card-header" id="competvet-view-evaluations-cat-heading-{{category}}">
-                    <h2 class="mb-0">
-                        <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#competvet-view-evaluations-cat-{{category}}"
-                                aria-expanded="true" aria-controls="competvet-view-evaluations-cat-{{category}}">
-                            {{categorytext}}
-                        </button>
-                    </h2>
-                </div>
-                <div id="competvet-view-evaluations-cat-{{category}}" class="collapse show" aria-labelledby="competvet-view-evaluations-cat-heading-{{category}}"
-                        data-parent="#evaluations-accordion">
-                    <div class="card-body">
-                        {{#list}}
-                            {{> mod_competvet/view/observation_card}}
-                        {{/list}}
                     </div>
-                </div>
+                {{/grades}}
             </div>
-        {{/observationsold}}
+        {{/userevals}}
     </div>
     {{#isstudent}}
     <div>
@@ -92,6 +83,9 @@ require(['mod_competvet/local/forms/eval_observation_ask'], function(Form) {
     Form.init('mod_competvet');
 });
 require(['mod_competvet/local/forms/eval_observation_add'], function(Form) {
+    Form.init('mod_competvet');
+});
+require(['mod_competvet/local/forms/eval_observation_auto'], function(Form) {
     Form.init('mod_competvet');
 });
 {{/js}}

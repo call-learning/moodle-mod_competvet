@@ -42,17 +42,34 @@ const stateTemplate = () => {
         }
         Templates.render(template, context).then(async(html) => {
             region.innerHTML = html;
-            const canvas = document.getElementById('evaluation-chart');
+
+            // Render the Evaluation Chart.
+            const evalchart = document.getElementById('evaluation-chart');
             const config = await chartConfig();
             config.data = transformContext(context);
-            new ChartJS(canvas, config);
+            new ChartJS(evalchart, config);
+
+            // Render the Auto Evaluation Chart.
+            const autoeval = document.getElementById('auto-evaluation-chart');
+            const autoevalConfig = await chartConfig(true);
+            autoevalConfig.data = transformContext(context, true);
+            new ChartJS(autoeval, autoevalConfig);
+
             return;
         }).catch(Notification.exception);
     };
     CompetState.subscribe(templateName, regionRenderer);
 };
 
-const transformContext = (context) => {
+/**
+ * Transform the context to a format that can be used by the chart.
+ * @param {Object} context The context object.
+ * @param {Boolean} autoeval The autoeval flag.
+ * @return {Object} The transformed context.
+ */
+const transformContext = (context, autoeval) => {
+    const currentUser = CompetState.getValue('user');
+    const self = currentUser.id;
     const data = context['evaluation-results'];
     const labels = data.evaluations.map(criterion => criterion.name);
     const graders = [];
@@ -67,6 +84,12 @@ const transformContext = (context) => {
 
     data.evaluations.forEach(criterion => {
         criterion.grades.forEach(grade => {
+            if (autoeval && grade.userid !== self) {
+                return;
+            } else if (!autoeval && grade.userid === self) {
+                return;
+            }
+
             if (!graders[grade.userid]) {
                 const color = colors.shift();
                 graders[grade.userid] = {
@@ -87,8 +110,11 @@ const transformContext = (context) => {
     };
 };
 
-const chartConfig = async() => {
-    const title = await getString('supervisorchart', 'mod_competvet');
+const chartConfig = async(autoeval) => {
+    let title = await getString('supervisorchart', 'mod_competvet');
+    if (autoeval) {
+        title = await getString('selfevaluation', 'mod_competvet');
+    }
     return {
         type: 'radar',
         options: {

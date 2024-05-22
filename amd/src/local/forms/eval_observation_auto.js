@@ -14,15 +14,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Javascript adding a new observation.
+ * TODO describe module eval_observation_auto
  *
- * @module     mod_competvet/local/forms/eval_observation_add
- * @copyright  2023 Laurent David <laurent@call-learning.fr>
+ * @module     mod_competvet/local/forms/eval_observation_auto
+ * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 import {genericForm} from './generic_form_helper';
 
 export const init = (modulename, submitEventHandler) => {
-    genericForm('add', modulename, submitEventHandler);
+    genericForm('auto', modulename, submitEventHandler);
 };
