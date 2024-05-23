@@ -41,6 +41,7 @@ class observation_comment extends persistent {
         self::AUTOEVAL_PROGRESS => 'progress',
         self::AUTOEVAL_AMELIORATION => 'improvement',
         self::AUTOEVAL_MANQUE => 'missing',
+        self::AUTOEVAL_OBSERVER_COMMENT => 'observercomment',
     ];
     /**
      * Observation context types constants
@@ -66,6 +67,10 @@ class observation_comment extends persistent {
      * Auto-evaluation missing types constants
      */
     const AUTOEVAL_MANQUE = 12;
+    /**
+     * Auto-evaluation observer comment
+     */
+    const AUTOEVAL_OBSERVER_COMMENT = 13;
 
     /**
      * Get comment type from ID
