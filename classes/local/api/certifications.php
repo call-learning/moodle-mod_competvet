@@ -190,8 +190,6 @@ class certifications {
         }
         $planning = planning::get_record(['id' => $cert->get('planningid')]);
         $situation = $planning->get_situation();
-        $competvet = competvet::get_from_situation($situation);
-        $PAGE->set_context($competvet->get_context());
 
         $certrecord = [];
         $certrecord['declid'] = $cert->get('id');
@@ -228,8 +226,6 @@ class certifications {
         // Get the page context. Needed because the webservice does not have the context set.
         $planning = planning::get_record(['id' => $planningid]);
         $situation = $planning->get_situation();
-        $competvet = competvet::get_from_situation($situation);
-        $PAGE->set_context($competvet->get_context());
 
         $gridid = criteria::get_grid_for_planning($planningid, 'cert')->get('id');
         $criteria = criteria::get_criteria_for_grid($gridid);

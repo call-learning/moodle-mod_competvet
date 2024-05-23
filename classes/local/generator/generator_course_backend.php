@@ -449,13 +449,13 @@ class generator_course_backend extends tool_generator_course_backend {
                             $this->fixeddataset ? min($observationcount, $observerscount - 1) :
                                 random_int(0, $observerscount - 1);
                         $observerid = $observers[$observerindex];
-                        $this->create_observation($situation, $planning, $studentid, $observerid);
+                        $this->create_observation(observation::CATEGORY_EVAL_OBSERVATION, $situation, $planning, $studentid, $observerid);
                     }
                     // Autoevaluations.
                     $maxcount = $situation->get('autoevalnum');
                     $observationcount = $this->fixeddataset ? $maxcount : random_int(1, $maxcount + 1 ?? 2);
                     for (; $observationcount > 0; $observationcount--) {
-                        $this->create_observation($situation, $planning, $studentid, $studentid);
+                        $this->create_observation(observation::CATEGORY_EVAL_AUTOEVAL, $situation, $planning, $studentid, $studentid);
                     }
                     $this->dot($done++, $count);
                 }
@@ -468,6 +468,7 @@ class generator_course_backend extends tool_generator_course_backend {
     /**
      * Create an observation for a given student
      *
+     * @param int $category
      * @param situation $situation
      * @param planning $planning
      * @param int $studentid
@@ -475,6 +476,7 @@ class generator_course_backend extends tool_generator_course_backend {
      * @return void
      */
     private function create_observation(
+        int $category,
         situation $situation,
         planning $planning,
         int $studentid,
@@ -492,6 +494,7 @@ class generator_course_backend extends tool_generator_course_backend {
             $status = $this->fixeddataset ? $statustoset : random_int(0, observation::STATUS_ARCHIVED);
         }
         $observation = $competvetgenerator->create_observation([
+            'category' => $category,
             'situationid' => $situation->get('id'),
             'studentid' => $studentid,
             'observerid' => $observerid,
@@ -502,7 +505,7 @@ class generator_course_backend extends tool_generator_course_backend {
             $competvetgenerator->create_observation_comment([
                 'observationid' => $observation->id,
                 'comment' => $this->generate_text(100),
-                'commentformat' => FORMAT_HTML,
+                'commentformat' => FORMAT_PLAIN,
                 'usercreated' => $observerid,
                 'type' => $type,
             ]);
@@ -514,7 +517,7 @@ class generator_course_backend extends tool_generator_course_backend {
                     'criterionid' => $criterion->get('id'),
                     'observationid' => $observation->id,
                     'comment' => $this->generate_text(100),
-                    'commentformat' => FORMAT_HTML,
+                    'commentformat' => FORMAT_PLAIN,
                 ]);
             } else {
                 $competvetgenerator->create_observation_criterion_level([

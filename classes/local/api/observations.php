@@ -64,7 +64,6 @@ class observations {
      * Get observation information
      *
      * @param int $observationid
-     * @param int $userid
      * @return array
      */
     public static function get_observation_information(int $observationid): array {

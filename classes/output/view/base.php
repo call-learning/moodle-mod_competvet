@@ -72,9 +72,9 @@ abstract class base implements renderable, named_templatable {
             // App as we are just looking at one situation.
             $pagetype = optional_param('pagetype', 'plannings', PARAM_ALPHANUMEXT);
         }
-        $class = __NAMESPACE__ . '\\' . $pagetype;
+        $class = "{$currentmodule}\\output\\view\\" . $pagetype;
         if (!class_exists($class)) {
-            $class = __CLASS__;
+            $class = "mod_competvet\\output\\view\\" . $pagetype;
         }
         return new $class($userid, $pagetype, $baseurl, $currentuserid, $currentmodule, $backurl);
     }

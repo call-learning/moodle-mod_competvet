@@ -16,12 +16,10 @@
 namespace mod_competvet\output\view;
 
 use mod_competvet\competvet;
+use mod_competvet\local\api\criteria;
 use mod_competvet\local\api\observations;
-use mod_competvet\local\api\certifications;
 use mod_competvet\local\api\plannings;
 use mod_competvet\local\api\user_role;
-use mod_competvet\local\api\criteria;
-use mod_competvet\local\persistent\situation;
 use mod_competvet\utils;
 use moodle_url;
 use renderer_base;
@@ -51,9 +49,9 @@ class student_evaluations extends base {
     protected array $planninginfo;
 
     /**
-     * @var moodle_url[] $view The url to view different evaluation types.
+     * @var moodle_url $vieweval The url to view different evaluation types.
      */
-    protected array $views;
+    protected $vieweval;
 
     /**
      * Export this data so it can be used in a mustache template.
@@ -63,7 +61,6 @@ class student_evaluations extends base {
      */
     public function export_for_template(renderer_base $output) {
         $data = parent::export_for_template($output);
-
         $gradedcriteria = [];
         foreach ($this->criteria as $criterion) {
             $grades = [];
@@ -75,7 +72,7 @@ class student_evaluations extends base {
                             'level' => $obscrit['level'],
                             'graderinfo' => utils::get_user_info($observation['grader']),
                             'viewurl' => (new moodle_url(
-                                $this->views['eval'],
+                                $this->vieweval,
                                 ['evalid' => $observation['id']]
                             ))->out(false),
                         ];
@@ -136,12 +133,10 @@ class student_evaluations extends base {
             ];
             $data = [
                 $planninginfo,
-                [
-                    'eval' => new moodle_url(
-                        $this->baseurl,
-                        array_merge(['pagetype' => 'student_eval', 'currenttab' => 'eval'], $urlparams)
-                    ),
-                ],
+                new moodle_url(
+                    $this->baseurl,
+                    array_merge(['pagetype' => 'student_eval', 'currenttab' => 'eval'], $urlparams)
+                ),
                 $userevals,
                 $criteria,
             ];
@@ -150,6 +145,6 @@ class student_evaluations extends base {
                 ['pagetype' => 'planning', 'id' => $competvet->get_course_module_id(), 'planningid' => $planningid]
             ));
         }
-        [$this->planninginfo, $this->views, $this->observations, $this->criteria] = $data;
+        [$this->planninginfo, $this->vieweval, $this->observations, $this->criteria] = $data;
     }
 }
