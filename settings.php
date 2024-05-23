@@ -42,6 +42,26 @@ if ($hassiteconfig) {
                 PARAM_INT,
             )
         );
+        // Set the grade calculation constant K1
+        $settings->add(
+            new admin_setting_configtext(
+                'mod_competvet/gradeK1',
+                get_string('gradeK1', 'mod_competvet'),
+                get_string('gradeK1', 'mod_competvet'),
+                5,
+                PARAM_FLOAT,
+            )
+        );
+        // Set the grade calculation constant K2
+        $settings->add(
+            new admin_setting_configtext(
+                'mod_competvet/gradeK2',
+                get_string('gradeK2', 'mod_competvet'),
+                get_string('gradeK2', 'mod_competvet'),
+                5,
+                PARAM_FLOAT,
+            )
+        );
         // Add a link to the manage criteria page.
         $renderer = $PAGE->get_renderer('mod_competvet');
         $widget = base::factory($USER->id, 'managecriteria');

@@ -192,4 +192,20 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/competvet:view',
     ],
+    'mod_competvet_get_suggested_grade' => [
+        'classname' => \mod_competvet\external\get_suggested_grade::class,
+        'methodname' => 'execute',
+        'description' => 'Get the suggested grade',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:view',
+    ],
+    'mod_competvet_set_subgrade' => [
+        'classname' => \mod_competvet\external\set_subgrade::class,
+        'methodname' => 'execute',
+        'description' => 'Set a subgrade',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:cangrade',
+    ],
 ];

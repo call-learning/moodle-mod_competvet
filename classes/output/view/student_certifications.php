@@ -62,7 +62,7 @@ class student_certifications extends base {
         $situation = $planning->get_situation();
         $userrole = user_role::get_top($this->currentuserid, $situation->get('id'));
         $data['isstudent'] = $userrole == 'student';
-        $data['isevaluator'] = $userrole == 'evaluator';
+        $data['isevaluator'] = $userrole == 'evaluator' || $userrole == 'observer';
         return $data;
     }
 

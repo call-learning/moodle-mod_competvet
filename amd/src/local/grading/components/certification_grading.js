@@ -28,6 +28,7 @@ import Repository from '../../new-repository';
 
 const gradingApp = document.querySelector('[data-region="grading-app"]');
 
+const CERTIFICATION_GRADE = 2;
 /**
  * Define the user navigation.
  */
@@ -61,6 +62,7 @@ const formCalculation = () => {
     const formData = new FormData(form);
     const formObject = Object.fromEntries(formData);
     grading.comment = formObject.comment;
+    grading.subgrade = formObject.evaluatordecision == '3' ? 1 : 0;
     grading.evaloptions.forEach((option) => {
         if (option.key == Number(formObject.evaluatordecision)) {
             option.selected = true;
@@ -100,6 +102,18 @@ const formEvents = () => {
 
         await Repository.saveFormData(args);
         CompetState.setValue('certification-grading', context);
+
+        // Now set the sub grade that will be used for the suggested grade.
+        const subgradeArgs = {
+            studentid: user.id,
+            planningid: planning.id,
+            grade: context.grading.subgrade,
+            type: CERTIFICATION_GRADE
+        };
+        await Repository.setSubGrade(subgradeArgs);
+
+        const customEvent = new CustomEvent('setSuggestedGrade', {});
+        gradingApp.dispatchEvent(customEvent);
     });
     form.dataset.events = true;
 };

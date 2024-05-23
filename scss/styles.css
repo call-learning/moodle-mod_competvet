@@ -406,17 +406,4 @@
     border-radius: 0.25rem;
     margin: 0.5rem 0; }
 
-.path-mod-competvet .rotatecontainer {
-  height: 140px;
-  width: 50px;
-  white-space: nowrap;
-  padding: 5px 10px; }
-  .path-mod-competvet .rotatecontainer .transformed {
-    transform: translate(25px, 101px) rotate(315deg);
-    width: 30px; }
-    .path-mod-competvet .rotatecontainer .transformed .gradername {
-      border-bottom: 1px solid #ccc;
-      padding: 9px 10px 5px 2px;
-      background-color: #FFF; }
-
 /*# sourceMappingURL=styles.css.map */

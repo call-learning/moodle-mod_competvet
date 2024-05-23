@@ -28,6 +28,7 @@ import Repository from '../../new-repository';
 
 const gradingApp = document.querySelector('[data-region="grading-app"]');
 
+const EVALUATION_GRADE = 1;
 /**
  * Define the user navigation.
  */
@@ -100,6 +101,18 @@ const formEvents = () => {
         const result = await Repository.saveFormData(args);
         context.result = result;
         CompetState.setValue('evaluations-grading', context);
+
+        // Now set the sub grade that will be used for the suggested grade.
+        const subgradeArgs = {
+            studentid: user.id,
+            planningid: planning.id,
+            grade: context.grading.scoreevaluator,
+            type: EVALUATION_GRADE
+        };
+        await Repository.setSubGrade(subgradeArgs);
+        // Fire an event to update the global grade.
+        const customEvent = new CustomEvent('setSuggestedGrade', {});
+        gradingApp.dispatchEvent(customEvent);
     });
     form.dataset.events = true;
 };

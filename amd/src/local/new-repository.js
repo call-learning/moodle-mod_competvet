@@ -172,6 +172,25 @@ class Repository {
     async deleteEntry(args) {
         return Ajax.call([{methodname: 'mod_competvet_delete_entry', args}])[0];
     }
+
+    /**
+     *
+     * Save a subgrade for a user.
+     * @param {Object} data The data to save.
+     * @return {Promise} The promise.
+     */
+    async setSubGrade(data) {
+        return Ajax.call([{methodname: 'mod_competvet_set_subgrade', args: data}])[0];
+    }
+
+    /**
+     * Get the suggested grade for a user.
+     * @param {Object} args The arguments.
+     * @return {Promise} The promise.
+     */
+    async getSuggestedGrade(args) {
+        return Ajax.call([{methodname: 'mod_competvet_get_suggested_grade', args}])[0];
+    }
 }
 
 const RepositoryInstance = new Repository();

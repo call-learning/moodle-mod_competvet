@@ -103,8 +103,10 @@ class Competvet {
 
         await this.setListGrading();
 
-        this.setGlobalGrade();
-        this.setForms();
+        await this.setGlobalGrade();
+        this.setSuggestedGrade();
+        await this.setForms();
+        this.setStateFormValues();
     }
 
     async setEvalResults() {
@@ -152,6 +154,11 @@ class Competvet {
                 'criteria': response.grids[0].criteria
             }
         };
+        context.grading.criteria.forEach(criterion => {
+            // Set the option with the lowest sortorder as the default selected option.
+            criterion.options.sort((a, b) => a.sortorder - b.sortorder);
+            criterion.options[0].selected = true;
+        });
         CompetState.setValue('list-grading', context);
     }
 
@@ -186,11 +193,26 @@ class Competvet {
     }
 
     /**
+     * Set the suggested grade.
+     */
+    async setSuggestedGrade() {
+        const suggestedArgs = {
+            studentid: this.currentUser.id,
+            planningid: this.planning.id,
+        };
+        const globalGrade = CompetState.getValue('globalgrade');
+        const response = await Repository.getSuggestedGrade(suggestedArgs);
+        globalGrade.suggestedgrade = response.suggestedgrade;
+        globalGrade.gradecalculation = response.gradecalculation;
+        CompetState.setValue('globalgrade', globalGrade);
+    }
+
+    /**
      * Set the forms.
      */
     async setForms() {
         const forms = ['evaluations-grading', 'certification-grading', 'list-grading'];
-        forms.forEach(async(formname) => {
+        await Promise.all(forms.map(async(formname) => {
             const args = {
                 userid: this.currentUser.id,
                 planningid: this.gradingApp.dataset.planningid,
@@ -204,7 +226,41 @@ class Competvet {
                 grading: JSON.parse(response.data)
             };
             CompetState.setValue(formname, context);
+        }));
+    }
+
+    /**
+     * Specific form values fetched from other state values.
+     */
+    setStateFormValues() {
+        const certifGrading = CompetState.getValue('certification-grading');
+        const certifResults = CompetState.getValue('certification-results');
+        // Update the values numcertifvalidated and maxcertifvalidated based on the certification-results
+        certifGrading.grading.maxcertifvalidated = certifResults.certifications.length;
+        certifGrading.grading.numcertifvalidated = certifResults.certifications.filter(cert => cert.validated === true).length;
+        certifGrading.grading.statusproposed = false;
+        if (certifGrading.grading.maxcertifvalidated === certifGrading.grading.numcertifvalidated
+            && certifGrading.grading.maxcertifvalidated > 0) {
+                certifGrading.grading.statusproposed = true;
+        }
+
+        const evalGrading = CompetState.getValue('evaluations-grading');
+        const evalResults = CompetState.getValue('evaluation-results');
+        // Update the values numberofobservations and maxobservations based on the evaluation-results
+        evalGrading.grading.maxobservations = evalResults.evaluations.length;
+        let totalEvalScore = 0;
+        let totalGrades = 0;
+        if (evalResults.evaluations.length > 0) {
+            evalGrading.grading.numberofobservations = evalResults.evaluations[0].grades.length;
+        }
+        evalResults.evaluations.forEach(evaluation => {
+            evaluation.grades.forEach(grade => {
+                totalEvalScore += grade.value;
+                totalGrades++;
+            });
         });
+        evalGrading.grading.evalscore = totalGrades > 0 ? Math.round(totalEvalScore / totalGrades) : 0;
+        // Set the average evalscore based on the evaluation-results
     }
 
     /**
@@ -245,6 +301,10 @@ class Competvet {
         });
         this.gradingApp.addEventListener('certAdded', () => {
             this.setCertifResults();
+        });
+        this.gradingApp.addEventListener('setSuggestedGrade', async() => {
+            // Update the suggested grade.
+            this.setSuggestedGrade();
         });
     }
 }

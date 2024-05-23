@@ -27,6 +27,13 @@
 }}
 {{#list-grading}}
     {{#grading}}
+        <div class="mb-3 d-none">
+            <div class="custom-control custom-checkbox">
+                <input type="checkbox" name="listgrade" id="nolistgrade" class="custom-control-input">
+                <label class="custom-control-label font-weight-bold" for="nolistgrade">{{#str}}nolistgrade, mod_competvet{{/str}}</label>
+            </div>
+            <div>{{#str}}nolistgrade_desc, mod_competvet{{/str}}</div>
+        </div>
         {{#criteria}}
             <section>
                 <h4 class="criterion-title h6">{{{title}}}</h4>

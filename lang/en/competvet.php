@@ -265,6 +265,8 @@ $string['realised'] = 'Realised';
 $string['verified'] = 'Verified';
 $string['notrealised'] = 'Not realised';
 $string['notverified'] = 'Not verified';
+$string['validated'] = 'Validated';
+$string['notvalidated'] = 'Not validated';
 
 $string['evaluation'] = 'Global Evaluation';
 $string['suggestedgrade'] = 'Suggested grade';
@@ -304,8 +306,9 @@ $string['gridnotfound'] = 'The grid with id {$a} was not found';
 // Case form
 $string['case:add'] = 'Add a clinical case';
 $string['case:add:save'] = 'Save';
-
 $string['error:accessdenied'] = 'Access denied';
+$string['nolistgrade'] = 'I do not want to grade the logbook';
+$string['nolistgrade_desc'] = 'If you decide not to grade the logbook, the coefficient for this block will be reduced to 0 in the calculation of the overall grade.';
 
 // Entry form
 $string['declarelevel'] = 'Declare your confidence level';
@@ -323,4 +326,10 @@ $string['supervisorsection'] = 'Supervisors';
 $string['statusconfirmed'] = 'I confirm that this essential has been achieved';
 $string['statusnotseen'] = 'I do not validate because I did not see this essential';
 $string['statusnotreached'] = 'I do not validate because the level is not reached';
+
+// Suggested grade
+$string['gradeK1'] = 'Grade calculation constant K1';
+$string['gradeK1_help'] = 'The weight of the evaluation grade, default is 5';
+$string['gradeK2'] = 'Grade calculation constant K2';
+$string['gradeK2_help'] = 'The weight of the list grade, default is 2';
 

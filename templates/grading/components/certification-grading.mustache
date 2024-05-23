@@ -29,7 +29,7 @@
             <div class="d-flex justify-content-between mb-2">
                 {{#str}}numcertifvalidated, mod_competvet{{/str}}
                 <div class="ml-auto">
-                    <span class="calculatedgrade" data-field="numcertifvalidated">{{numcertifvalidated}}</span>/
+                    <span class="calculatedgrade" data-field="numcertifvalidated">{{numcertifvalidated}}</span> / 
                     <span class="maxgrade" data-field="maxcertifvalidated">{{maxcertifvalidated}}</span>
                 </div>
             </div>
@@ -37,7 +37,14 @@
             <div class="d-flex justify-content-between mb-5">
                 {{#str}}statusproposed, mod_competvet{{/str}}
                 <div class="ml-auto">
-                    <span data-field="statusproposed">{{statusproposed}}</span>
+                    <span data-field="statusproposed">
+                        {{#statusproposed}}
+                            {{#str}}validated, mod_competvet{{/str}}
+                        {{/statusproposed}}
+                        {{^statusproposed}}
+                            {{#str}}notvalidated, mod_competvet{{/str}}
+                        {{/statusproposed}}
+                    </span>
                 </div>
             </div>
 

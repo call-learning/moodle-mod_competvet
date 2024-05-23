@@ -142,8 +142,9 @@ class manage_grade extends external_api {
         $usergrade = intval($grades->items[0]->grades[$userid]->grade);
 
         $grade = new stdClass();
-        $grade->suggestedgrade = 'C';
+        $grade->suggestedgrade = '';
         $grade->comment = 'test';
+        // If this is to be used, use the configured grade scale from moodle core.
         $grade->finalgradeoptions = [
             ['key' => 90, 'value' => 'A', 'selected' => false],
             ['key' => 80, 'value' => 'B', 'selected' => false],
@@ -158,6 +159,7 @@ class manage_grade extends external_api {
         ];
 
         $grade->selectedgrade = 'D';
+        $grade->finalgrade = $usergrade;
 
         if ($usergrade) {
             foreach ($grade->finalgradeoptions as &$option) {
@@ -193,6 +195,7 @@ class manage_grade extends external_api {
                         )
                     ),
                     'selectedgrade' => new external_value(PARAM_TEXT, 'The selected grade'),
+                    'finalgrade' => new external_value(PARAM_INT, 'The final grade'),
                 ]
             ),
             'warnings' => new external_warnings(),

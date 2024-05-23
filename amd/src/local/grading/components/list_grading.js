@@ -29,6 +29,8 @@ import Repository from '../../new-repository';
 
 const gradingApp = document.querySelector('[data-region="grading-app"]');
 
+const LIST_GRADE = 3;
+
 /**
  * Define the user navigation.
  */
@@ -56,6 +58,7 @@ const formCalculation = () => {
     const formObject = Object.fromEntries(formData);
     const {'list-grading': listGrading} = CompetState.getData();
     const grading = listGrading.grading;
+    grading.subgrade = 0;
     grading.criteria.forEach((criterion) => {
         const criterionId = criterion.criterionid;
         criterion.grade = formObject[`criterion-${criterionId}`];
@@ -63,6 +66,7 @@ const formCalculation = () => {
         criterion.options.forEach((option) => {
             if (option.grade == criterion.grade) {
                 option.selected = true;
+                grading.subgrade += option.grade;
             } else {
                 option.selected = false;
             }
@@ -94,6 +98,19 @@ const formEvents = () => {
         const result = await Repository.saveFormData(args);
         context.result = result;
         CompetState.setValue('list-grading', context);
+
+        // Now set the sub grade that will be used for the suggested grade.
+        const subgradeArgs = {
+            studentid: user.id,
+            planningid: planning.id,
+            grade: context.grading.subgrade,
+            type: LIST_GRADE
+        };
+        await Repository.setSubGrade(subgradeArgs);
+
+        const customEvent = new CustomEvent('setSuggestedGrade', {});
+        gradingApp.dispatchEvent(customEvent);
+
     });
     form.dataset.events = true;
 };
