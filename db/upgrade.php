@@ -975,71 +975,40 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2024050800, 'competvet');
     }
 
-    if ($oldversion < 2024052200) {
 
-        // Define field planningid to be added to competvet_grades.
+    if ($oldversion < 2024052400) {
+
+        // Define table competvet_grades to be created.
         $table = new xmldb_table('competvet_grades');
-        $field = new xmldb_field('planningid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'grade');
 
-        // Conditionally launch add field planningid.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
+        // Adding fields to table competvet_grades.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('competvet', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('itemnumber', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('studentid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('grade', XMLDB_TYPE_NUMBER, '10, 5', null, null, null, null);
+        $table->add_field('planningid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
 
-        $field = new xmldb_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timemodified');
+        // Adding keys to table competvet_grades.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('competvet_fk', XMLDB_KEY_FOREIGN, ['competvet'], 'competvet', ['id']);
+        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+        $table->add_key('planningid_fk', XMLDB_KEY_FOREIGN, ['planningid'], 'competvet_planning', ['id']);
 
-        // Conditionally launch add field usermodified.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
+        // Adding indexes to table competvet_grades.
+        $table->add_index('competvetusergrade_ux', XMLDB_INDEX_UNIQUE, ['competvet', 'itemnumber']);
+        $table->add_index('studentid_ux', XMLDB_INDEX_NOTUNIQUE, ['studentid']);
 
-        $key = new xmldb_key('planningid_fk', XMLDB_KEY_FOREIGN, ['planningid'], 'competvet_planning', ['id']);
-
-        // Launch add key planningid_fk.
-        $dbman->add_key($table, $key);
-
-        // Competvet savepoint reached.
-        upgrade_mod_savepoint(true, 2024052200, 'competvet');
-    }
-
-    if ($oldversion < 2024052202) {
-
-        // Define index studentid_ux (not unique) to be dropped form competvet_grades.
-        $table = new xmldb_table('competvet_grades');
-        $index = new xmldb_index('userid_ux', XMLDB_INDEX_NOTUNIQUE, ['userid']);
-
-        // Conditionally launch drop index userid_ux.
-        if ($dbman->index_exists($table, $index)) {
-            $dbman->drop_index($table, $index);
-        }
-
-        $field = new xmldb_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'itemnumber');
-
-        // Launch rename field studentid.
-        $dbman->rename_field($table, $field, 'studentid');
-
-        $index = new xmldb_index('studentid_ux', XMLDB_INDEX_NOTUNIQUE, ['studentid']);
-
-        // Conditionally launch add index studentid_ux.
-        if (!$dbman->index_exists($table, $index)) {
-            $dbman->add_index($table, $index);
+        // Conditionally launch create table for competvet_grades.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
         }
 
         // Competvet savepoint reached.
-        upgrade_mod_savepoint(true, 2024052202, 'competvet');
-    }
-
-    if ($oldversion < 2024052203) {
-
-        // Rename field itemnumber on table competvet_grades to NEWNAMEGOESHERE.
-        $table = new xmldb_table('competvet_grades');
-        $field = new xmldb_field('itemnumber', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'competvet');
-
-        // Launch rename field itemnumber.
-        $dbman->rename_field($table, $field, 'type');
-
-        // Competvet savepoint reached.
-        upgrade_mod_savepoint(true, 2024052203, 'competvet');
+        upgrade_mod_savepoint(true, 2024052400, 'competvet');
     }
 
     return true;
