@@ -238,6 +238,7 @@ class certifications {
             $certrecord['label'] = $criterion->get('label');
             $certrecord['grade'] = $criterion->get('grade');
             $certrecord['criterionid'] = $criterion->get('id');
+            $certrecord['status'] = self::STATUS_DECL_NOTSEEN;
             $certrecord['declid'] = 0;
             $certrecord['validated'] = false;
             $certrecord['notvalidated'] = false;
@@ -254,7 +255,7 @@ class certifications {
                 $certrecord['total'] = 5; // TODO: get the total from the criterion? maybe change to grade.
                 $certrecord['status'] = $certdecl->get('status');
                 $certrecord['realised'] = ($certdecl->get('status') == self::STATUS_DECL_SEENDONE);
-                $certrecord['notrealised'] = ($certdecl->get('status') == self::STATUS_DECL_NOTSEEN);
+                $certrecord['notreached'] = ($certdecl->get('status') == self::STATUS_DECL_NOTSEEN);
                 $certrecord['feedback'] = [
                     'picture' => $student['userpictureurl'],
                     'fullname' => $student['fullname'],
