@@ -18,10 +18,12 @@ namespace mod_competvet\external;
 
 use external_api;
 use external_function_parameters;
-use external_single_structure;
 use external_multiple_structure;
+use external_single_structure;
 use external_value;
+use mod_competvet\competvet;
 use mod_competvet\local\api\certifications;
+use mod_competvet\local\persistent\planning;
 
 /**
  * External webservice class to get all certifition validations
@@ -31,23 +33,10 @@ use mod_competvet\local\api\certifications;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_certifications extends external_api {
-
     /**
-    * Returns description of method parameters
-    *
-    * @return external_function_parameters
-    */
-    public static function execute_parameters(): external_function_parameters {
-        return new external_function_parameters([
-            'studentid' => new external_value(PARAM_INT, 'The user id', VALUE_REQUIRED),
-            'planningid' => new external_value(PARAM_INT, 'The planning id', VALUE_REQUIRED),
-        ]);
-    }
-
-    /**
-    * Returns description of method return value
-    *
-    */
+     * Returns description of method return value
+     *
+     */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'certifications' => new external_multiple_structure(
@@ -68,7 +57,7 @@ class get_certifications extends external_api {
                         'fullname' => new external_value(PARAM_TEXT, 'The fullname'),
                         'comments' => new external_single_structure([
                             'commenttext' => new external_value(PARAM_TEXT, 'The comment'),
-                        ], 'The comments', VALUE_OPTIONAL)
+                        ], 'The comments', VALUE_OPTIONAL),
                     ], 'The feedback', VALUE_OPTIONAL),
                     'validations' => new external_multiple_structure(
                         new external_single_structure([
@@ -78,10 +67,12 @@ class get_certifications extends external_api {
                                 'fullname' => new external_value(PARAM_TEXT, 'The fullname'),
                                 'comments' => new external_single_structure([
                                     'commenttext' => new external_value(PARAM_TEXT, 'The comment'),
-                                ])
+                                ]),
                             ]),
                             'status' => new external_value(PARAM_INT, 'The status'),
-                        ]), 'The validations', VALUE_OPTIONAL
+                        ]),
+                        'The validations',
+                        VALUE_OPTIONAL
                     ),
                 ])
             ),
@@ -91,13 +82,24 @@ class get_certifications extends external_api {
     }
 
     /**
-    * Get all certifications
-    *
-    * @param int $studentid The student id
-    * @param int $planningid The planning id
-    * @return array
-    */
-    public static function execute($studentid, $planningid): array {
+     * Get all certifications
+     *
+     * @param int $studentid The student id
+     * @param int $planningid The planning id
+     * @return array
+     */
+    public static function execute(int $studentid, int $planningid): array {
+        ['studentid' => $studentid, 'planningid' => $planningid] = self::validate_parameters(
+            self::execute_parameters(),
+            ['studentid' => $studentid, 'planningid' => $planningid]
+        );
+        $planning = planning::get_record(['id' => $planningid]);
+        if (!$planning) {
+            throw new \moodle_exception('planningnotfound', 'mod_competvet', '', $planningid);
+        }
+        $situation = $planning->get_situation();
+        $competvet = competvet::get_from_situation($situation);
+        self::validate_context($competvet->get_context());
         $certifications = certifications::get_certifications($studentid, $planningid);
         // Get an array of all validations
         $validations = 0;
@@ -112,5 +114,17 @@ class get_certifications extends external_api {
             'numcertifications' => count($certifications),
             'numvalidated' => $validations,
         ];
+    }
+
+    /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     */
+    public static function execute_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'studentid' => new external_value(PARAM_INT, 'The user id', VALUE_REQUIRED),
+            'planningid' => new external_value(PARAM_INT, 'The planning id', VALUE_REQUIRED),
+        ]);
     }
 }

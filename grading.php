@@ -27,14 +27,12 @@ use mod_competvet\output\grading\app;
 use mod_competvet\utils;
 require(__DIR__ . '/../../config.php');
 global $DB, $PAGE, $OUTPUT, $USER;
-require_login();
 
 [$cm, $course, $moduleinstance] = utils::page_requirements('view');
 
 $modulecontext = context_module::instance($cm->id);
 
 $PAGE->set_pagelayout('embedded');
-
 $PAGE->activityheader->disable();
 
 $courseshortname = $modulecontext->get_course_context()->get_context_name(false, true);

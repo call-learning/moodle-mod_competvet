@@ -138,6 +138,7 @@ class manage_grade extends external_api {
         $cmid = $params['cmid'];
         $userid = $params['userid'];
         $competvet = competvet::get_from_cmid($cmid);
+        self::validate_context($competvet->get_context());
         $grades = grade_get_grades($competvet->get_course_id(), 'mod', 'competvet', $competvet->get_instance_id(), $userid);
         $usergrade = intval($grades->items[0]->grades[$userid]->grade);
 
