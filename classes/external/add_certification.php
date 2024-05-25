@@ -20,6 +20,8 @@ use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use mod_competvet\competvet;
+use mod_competvet\local\persistent\planning;
 use stdClass;
 use mod_competvet\local\api\certifications;
 
@@ -84,6 +86,12 @@ class add_certification extends external_api {
             'commentformat' => $commentformat,
             'status' => $status,
         ]);
+        // Validate context : important as it also require the user to be logged in.
+        $planning  = planning::get_record(['id' => $planningid]);
+        // Check if we can add.
+        $competvet = competvet::get_from_situation($planning->get('situationid'));
+        self::validate_context($competvet->get_context());
+
         if ($declid) {
             certifications::update_certification($declid, $level, $comment, $commentformat, $status);
             return ['declid' => $declid];

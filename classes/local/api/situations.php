@@ -33,18 +33,6 @@ use mod_competvet\reportbuilder\local\systemreports\situations as situations_rep
  */
 class situations {
     /**
-     * Situation fields
-     */
-    const SITUATION_FIELDS = [
-        'situation:shortname' => 'shortname',
-        'situation:name' => 'name',
-        'situation:evalnum' => 'evalnum',
-        'situation:autoevalnum' => 'autoevalnum',
-        'situation:intro' => 'intro',
-        'id' => 'id',
-    ];
-
-    /**
      * Get all situations with plannings for a given user
      *
      * @param int $userid

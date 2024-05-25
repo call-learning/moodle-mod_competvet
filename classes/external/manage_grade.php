@@ -67,6 +67,7 @@ class manage_grade extends external_api {
         $cmid = $params['cmid'];
         $userid = $params['userid'];
         $competvet = competvet::get_from_cmid($cmid);
+        self::validate_context($competvet->get_context());
 
         $grades = [];
         $grades[$userid] = [

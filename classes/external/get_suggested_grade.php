@@ -17,11 +17,12 @@
 namespace mod_competvet\external;
 
 use external_api;
-use external_description;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use mod_competvet\competvet;
 use mod_competvet\local\api\grades;
+use mod_competvet\local\persistent\planning;
 
 /**
  * Class get_suggested_grade
@@ -31,18 +32,6 @@ use mod_competvet\local\api\grades;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_suggested_grade extends external_api {
-
-    /**
-     * Returns description of method parameters
-     *
-     * @return external_function_parameters
-     */
-    public static function execute_parameters(): external_function_parameters {
-        return new external_function_parameters([
-            'planningid' => new external_value(PARAM_INT, 'Planning instance id', VALUE_REQUIRED),
-            'studentid' => new external_value(PARAM_INT, 'Student id', VALUE_REQUIRED),
-        ]);
-    }
 
     /**
      * Returns description of method return value
@@ -58,11 +47,33 @@ class get_suggested_grade extends external_api {
 
     /**
      * Execute and get a suggested grade
+     *
      * @param int $planningid - Planning instance id
      * @param int $studentid - Student id
      * @return array
      */
-    public static function execute($planningid, $studentid): array {
+    public static function execute(int $planningid, int $studentid): array {
+        ['planningid' => $planningid, 'studentid' => $studentid] =
+            self::validate_parameters(self::execute_parameters(), ['planningid' => $planningid, 'studentid' => $studentid]);
+        $planning = planning::get_record(['id' => $planningid]);
+        if (!$planning) {
+            throw new \moodle_exception('planningnotfound', 'mod_competvet', '', $planningid);
+        }
+        $competvet = competvet::get_from_situation_id($planning->get('situationid'));
+        self::validate_context($competvet->get_context());
+
         return grades::get_suggested_grade($studentid, $planningid);
+    }
+
+    /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     */
+    public static function execute_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'planningid' => new external_value(PARAM_INT, 'Planning instance id', VALUE_REQUIRED),
+            'studentid' => new external_value(PARAM_INT, 'Student id', VALUE_REQUIRED),
+        ]);
     }
 }

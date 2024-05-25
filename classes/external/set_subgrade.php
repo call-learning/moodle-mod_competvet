@@ -20,7 +20,9 @@ use external_api;
 use external_description;
 use external_function_parameters;
 use external_value;
+use mod_competvet\competvet;
 use mod_competvet\local\api\grades;
+use mod_competvet\local\persistent\planning;
 
 /**
  * Class set_suggested_grade
@@ -61,7 +63,17 @@ class set_subgrade extends external_api {
      * @param int $type - Grade type
      * @param int $grade - The grade
      */
-    public static function execute($planningid, $studentid, $type, $grade) {
+    public static function execute(int $planningid, int $studentid, int $type, int $grade) {
+        ['planningid' => $planningid, 'studentid' => $studentid, 'type' => $type, 'grade' => $grade] = self::validate_parameters(
+            self::execute_parameters(),
+            ['planningid' => $planningid, 'studentid' => $studentid, 'type' => $type, 'grade' => $grade]
+        );
+        $planning  = planning::get_record(['id' => $planningid]);
+        // Check if we can delete.
+        $competvet = competvet::get_from_situation($planning->get('situationid'));
+
+        self::validate_context($competvet->get_context());
+
         return grades::set_grade($studentid, $planningid, $type, $grade);
     }
 }

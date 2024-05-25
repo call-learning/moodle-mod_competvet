@@ -28,11 +28,6 @@ use mod_competvet\competvet;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class grades {
-
-    const EVALUATION_GRADE = 1;
-    const CERTIFICATION_GRADE = 2;
-    const LIST_GRADE = 3;
-
     /**
      * Get the local competvet grades for a student, these are not gradebook
      * grades but the grades stored from the grading UI.
@@ -99,14 +94,14 @@ class grades {
      * @return array
      */
     public static function get_suggested_grade($studentid, $planningid) {
-        $evaluationgrade = self::get_grades($studentid, $planningid, self::EVALUATION_GRADE);
-        $certificationgrade = self::get_grades($studentid, $planningid, self::CERTIFICATION_GRADE);
-        $listgrade = self::get_grades($studentid, $planningid, self::LIST_GRADE);
+        $evaluationgrade = self::get_grades($studentid, $planningid, grade::EVALUATION_GRADE);
+        $certificationgrade = self::get_grades($studentid, $planningid, grade::CERTIFICATION_GRADE);
+        $listgrade = self::get_grades($studentid, $planningid, grade::LIST_GRADE);
 
         if (empty($evaluationgrade) || empty($certificationgrade) || empty($listgrade)) {
             return [
                 'suggestedgrade' => 0,
-                'gradecalculation' => 'Not enough data to calculate the suggested grade'
+                'gradecalculation' => 'Not enough data to calculate the suggested grade',
             ];
         }
 
@@ -132,7 +127,7 @@ class grades {
         // Return an object with the suggested grade and the gradecalculation.
         return [
             'suggestedgrade' => round($suggestedgrade),
-            'gradecalculation' => $gradecalculation
+            'gradecalculation' => $gradecalculation,
         ];
     }
 }

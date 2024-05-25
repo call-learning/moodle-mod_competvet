@@ -23,8 +23,9 @@ use external_function_parameters;
 use external_value;
 use external_single_structure;
 use external_multiple_structure;
+use mod_competvet\competvet;
 use mod_competvet\local\api\observations;
-
+use mod_competvet\local\persistent\planning;
 
 /**
  * Class get_evaluations
@@ -96,6 +97,13 @@ class get_evaluations extends external_api {
 
         ['planningid' => $planningid, 'studentid' => $studentid] =
         self::validate_parameters(self::execute_parameters(), ['planningid' => $planningid, 'studentid' => $studentid]);
+
+        $planning = planning::get_record(['id' => $planningid]);
+        if (!$planning) {
+            throw new \moodle_exception('planningnotfound', 'mod_competvet', '', $planningid);
+        }
+        $competvet = competvet::get_from_situation_id($planning->get('situationid'));
+        self::validate_context($competvet->get_context());
 
         // Set the page context to be able to call get_user_observations. It is required for fetching the
         // user images.

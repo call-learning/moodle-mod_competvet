@@ -20,6 +20,10 @@ use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use mod_competvet\competvet;
+use mod_competvet\local\persistent\case_entry;
+use mod_competvet\local\persistent\cert_decl;
+use mod_competvet\local\persistent\planning;
 use stdClass;
 use mod_competvet\local\api\cases;
 
@@ -31,7 +35,6 @@ use mod_competvet\local\api\cases;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class delete_entry extends external_api {
-
         /**
          * Returns description of method parameters
          *
@@ -60,7 +63,14 @@ class delete_entry extends external_api {
          * @param int $entryid The case id
          * @return stdClass
          */
-    public static function execute($entryid) : stdClass {
+    public static function execute(int $entryid): stdClass {
+        self::validate_parameters(self::execute_parameters(), ['entryid' => $entryid]);
+        $decl = case_entry::get_record(['id' => $entryid]);
+        $planning  = planning::get_record(['id' => $decl->get('planningid')]);
+        // Check if we can delete.
+        $competvet = competvet::get_from_situation($planning->get('situationid'));
+        self::validate_context($competvet->get_context());
+
         if (cases::delete_case($entryid)) {
             return (object) ['success' => true];
         }

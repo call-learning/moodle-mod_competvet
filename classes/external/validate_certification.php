@@ -20,6 +20,9 @@ use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use mod_competvet\competvet;
+use mod_competvet\local\persistent\cert_decl;
+use mod_competvet\local\persistent\planning;
 use stdClass;
 use mod_competvet\local\api\certifications;
 
@@ -31,7 +34,6 @@ use mod_competvet\local\api\certifications;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class validate_certification extends external_api {
-
     /**
      * Returns description of method parameters
      *
@@ -71,7 +73,17 @@ class validate_certification extends external_api {
      * @return array
      */
     public static function execute($validid, $declid, $level, $comment, $commentformat, $status): array {
-        self::validate_parameters(self::execute_parameters(), ['declid' => $declid, 'level' => $level, 'comment' => $comment, 'commentformat' => $commentformat, 'status' => $status]);
+        ['declid' => $declid, 'level' => $level, 'comment' => $comment, 'commentformat' => $commentformat, 'status' => $status] =
+            self::validate_parameters(
+                self::execute_parameters(),
+                ['declid' => $declid, 'level' => $level, 'comment' => $comment, 'commentformat' => $commentformat, 'status' => $status]
+            );
+        $decl = cert_decl::get_record(['id' => $declid]);
+        $planning  = planning::get_record(['id' => $decl->get('planningid')]);
+        // Check if we can delete.
+        $competvet = competvet::get_from_situation($planning->get('situationid'));
+        self::validate_context($competvet->get_context());
+
         if (certifications::validate_certification($validid, $declid, $level, $comment, $commentformat, $status)) {
             return ['success' => true];
         }

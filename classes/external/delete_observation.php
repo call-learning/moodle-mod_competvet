@@ -20,7 +20,9 @@ use external_description;
 use external_function_parameters;
 use external_value;
 use mod_competvet\competvet;
+use mod_competvet\local\persistent\case_entry;
 use mod_competvet\local\persistent\observation;
+use mod_competvet\local\persistent\planning;
 
 /**
  * Class delete_observation
@@ -50,6 +52,12 @@ class delete_observation extends external_api {
         ['observationid' => $observationid] =
             self::validate_parameters(self::execute_parameters(), ['observationid' => $observationid]);
         $observation = observation::get_record(['id' => $observationid]);
+        $planning = planning::get_record(['id' => $observation->get('planningid')]);
+        $competvet = competvet::get_from_situation($planning->get('situationid'));
+        self::validate_context($competvet->get_context());
+
+
+
         // Check if we can delete.
         $situation = $observation->get_situation();
         $competvet = competvet::get_from_situation($situation);

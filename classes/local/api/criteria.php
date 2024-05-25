@@ -31,7 +31,6 @@ use mod_competvet\local\persistent\planning;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class criteria {
-
     /**
      * Update the grid
      *
@@ -45,13 +44,13 @@ class criteria {
         $grid = grid::get_record(['id' => $gridid]);
         if (!$grid) {
             $grid = new grid(0);
-            $grid->set('name' , $gridname);
+            $grid->set('name', $gridname);
             $grid->set('idnumber', grid::DEFAULT_GRID_SHORTNAME[$type]);
             $grid->set('sortorder', $sortorder);
             $grid->set('type', $type);
             $grid->create();
         } else {
-            $grid->set('name' , $gridname);
+            $grid->set('name', $gridname);
             $grid->set('idnumber', grid::DEFAULT_GRID_SHORTNAME[$type]);
             $grid->set('sortorder', $sortorder);
             $grid->set('type', $type);
@@ -186,7 +185,7 @@ class criteria {
         if (!$criterion) {
             $criterion = new criterion(0);
         }
-        $criterion->set('label' , $criterionname);
+        $criterion->set('label', $criterionname);
         $criterion->set('idnumber', $idnumber);
         $criterion->set('sort', $sortorder);
         $criterion->set('gridid', $gridid);
