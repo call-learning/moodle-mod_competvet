@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\external;
+use context_system;
 use external_api;
 use external_function_parameters;
 use external_value;
@@ -129,6 +130,7 @@ class save_plannings extends external_api {
     public static function execute(array $categories): array {
         global $USER;
         ['categories' => $categories] = self::validate_parameters(self::execute_parameters(), ['categories' => $categories]);
+        self::validate_context(context_system::instance());
         return ['categories' => $categories];
     }
 

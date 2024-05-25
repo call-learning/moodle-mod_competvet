@@ -16,6 +16,7 @@
 
 namespace mod_competvet\external;
 
+use context_system;
 use external_api;
 use external_description;
 use external_function_parameters;
@@ -69,9 +70,8 @@ class manage_plannings extends external_api {
      * @return array
      */
     public static function update($plannings): array {
-        global $DB;
         $params = self::validate_parameters(self::update_parameters(), ['plannings' => $plannings]);
-
+        self::validate_context(context_system::instance());
         $plannings = $params['plannings'];
         $result = true;
 

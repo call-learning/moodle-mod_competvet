@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\external;
+use context_system;
 use external_api;
 use external_function_parameters;
 use external_value;
@@ -53,7 +54,7 @@ class get_json extends external_api {
                 'filename' => $filename,
             ]
         );
-
+        self::validate_context(context_system::instance());
         $filename = $params['filename'];
 
         $filelocation = $CFG->dirroot . '/mod/competvet/json/' . $filename . '.json';

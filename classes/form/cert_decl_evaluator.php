@@ -19,6 +19,7 @@ namespace mod_competvet\form;
 use context;
 use mod_competvet\competvet;
 use mod_competvet\local\api\certifications;
+use mod_competvet\local\persistent\cert_valid;
 
 /**
  * Class cert_decl_evaluator
@@ -87,17 +88,17 @@ class cert_decl_evaluator extends cert_decl_student {
         $mform->addElement('radio', 'statussuper',
             '',
             get_string('statusconfirmed', 'mod_competvet'),
-            certifications::STATUS_VALID_CONFIRMED
+            cert_valid::STATUS_VALID_CONFIRMED
         );
         $mform->addElement('radio', 'statussuper',
             '',
             get_string('statusnotseen', 'mod_competvet'),
-            certifications::STATUS_VALID_NOTSEEN
+            cert_valid::STATUS_VALID_NOTSEEN
         );
         $mform->addElement('radio', 'statussuper',
             '',
             get_string('statusnotreached', 'mod_competvet'),
-            certifications::STATUS_VALID_NOTREACHED
+            cert_valid::STATUS_VALID_NOTREACHED
         );
         $mform->addElement('textarea', 'supervisorcomment', get_string('comment', 'competvet'));
     }

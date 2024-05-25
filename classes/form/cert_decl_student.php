@@ -78,13 +78,13 @@ class cert_decl_student extends dynamic_form {
         $mform->addElement('radio', 'status',
             get_string('status', 'competvet'),
             get_string('seendone', 'competvet', $userdate),
-            certifications::STATUS_DECL_SEENDONE
+            \mod_competvet\local\persistent\cert_decl::STATUS_DECL_SEENDONE
         );
 
         $mform->addElement('radio', 'status',
             '',
             get_string('notseen', 'competvet'),
-            certifications::STATUS_DECL_NOTSEEN
+            \mod_competvet\local\persistent\cert_decl::STATUS_DECL_NOTSEEN
         );
         $mform->addRule('status', get_string('required'), 'required', null, 'client');
 

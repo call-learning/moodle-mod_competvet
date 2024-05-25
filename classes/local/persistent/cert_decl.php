@@ -32,6 +32,9 @@ class cert_decl extends persistent {
      */
     const TABLE = 'competvet_cert_decl';
 
+    /**
+     * Decl status types
+     */
     const STATUS_DECL_SEENDONE = 1;
     const STATUS_DECL_NOTSEEN = 2;
 

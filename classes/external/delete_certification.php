@@ -20,6 +20,9 @@ use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use mod_competvet\competvet;
+use mod_competvet\local\persistent\cert_decl;
+use mod_competvet\local\persistent\planning;
 use stdClass;
 use mod_competvet\local\api\certifications;
 
@@ -62,6 +65,12 @@ class delete_certification extends external_api {
      */
     public static function execute($declid) {
         self::validate_parameters(self::execute_parameters(), ['declid' => $declid]);
+        $decl = cert_decl::get_record(['id' => $declid]);
+        $planning  = planning::get_record(['id' => $decl->get('planningid')]);
+        // Check if we can delete.
+        $competvet = competvet::get_from_situation($planning->get('situationid'));
+        self::validate_context($competvet->get_context());
+        // Now delete.
         if (certifications::delete_certification($declid)) {
             return ['success' => true];
         }

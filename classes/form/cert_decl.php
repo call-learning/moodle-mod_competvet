@@ -17,6 +17,7 @@
 namespace mod_competvet\form;
 
 use context;
+use mod_competvet\local\persistent\cert_valid;
 use moodle_url;
 use html_writer;
 use core_form\dynamic_form;
@@ -89,13 +90,13 @@ class cert_decl extends dynamic_form {
         $mform->addElement('radio', 'status',
             get_string('status', 'competvet'),
             get_string('seendone', 'competvet', $userdate),
-            certifications::STATUS_DECL_SEENDONE
+            \mod_competvet\local\persistent\cert_decl::STATUS_DECL_SEENDONE
         );
 
         $mform->addElement('radio', 'status',
             '',
             get_string('notseen', 'competvet'),
-            certifications::STATUS_DECL_NOTSEEN
+            \mod_competvet\local\persistent\cert_decl::STATUS_DECL_NOTSEEN
         );
         $mform->addRule('status', get_string('required'), 'required', null, 'client');
 
@@ -142,17 +143,17 @@ class cert_decl extends dynamic_form {
         $mform->addElement('radio', 'statussuper',
             '',
             get_string('statusconfirmed', 'mod_competvet'),
-            certifications::STATUS_VALID_CONFIRMED
+            cert_valid::STATUS_VALID_CONFIRMED
         );
         $mform->addElement('radio', 'statussuper',
             '',
             get_string('statusnotseen', 'mod_competvet'),
-            certifications::STATUS_VALID_NOTSEEN
+            cert_valid::STATUS_VALID_NOTSEEN
         );
         $mform->addElement('radio', 'statussuper',
             '',
             get_string('statusnotreached', 'mod_competvet'),
-            certifications::STATUS_VALID_NOTREACHED
+            cert_valid::STATUS_VALID_NOTREACHED
         );
         $mform->addElement('textarea', 'supervisorcomment', get_string('comment', 'competvet'));
 

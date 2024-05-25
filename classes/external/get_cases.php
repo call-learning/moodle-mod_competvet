@@ -22,7 +22,9 @@ use external_multiple_structure;
 use external_single_structure;
 use external_value;
 
+use mod_competvet\competvet;
 use mod_competvet\local\api\cases;
+use mod_competvet\local\persistent\planning;
 use stdClass;
 
 /**
@@ -89,6 +91,18 @@ class get_cases extends external_api {
      * @throws \invalid_parameter_exception
      */
     public static function execute(int $userid, int $planningid): stdClass {
+        [
+            'userid' => $userid,
+            'planningid' => $planningid,
+        ] = self::validate_parameters(self::execute_parameters(), [
+            'userid' => $userid,
+            'planningid' => $planningid,
+        ]);
+        $planning  = planning::get_record(['id' => $planningid]);
+        // Check if we can delete.
+        $competvet = competvet::get_from_situation($planning->get('situationid'));
+        self::validate_context($competvet->get_context());
+
         $cases = cases::get_entries($userid, $planningid);
         return $cases;
     }

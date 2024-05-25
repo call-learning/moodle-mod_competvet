@@ -16,6 +16,7 @@
 
 namespace mod_competvet\local\api;
 
+use core\invalid_persistent_exception;
 use mod_competvet\local\persistent\case_cat;
 use mod_competvet\local\persistent\case_field;
 use mod_competvet\local\persistent\case_data;
@@ -30,18 +31,17 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cases {
-
     /**
      * Get the case user entries
-     * $param int $studentid The user id
-     * $param int $planningid The planning id
-     * @return Object
+     * @param int $studentid The user id
+     * @param int $planningid The planning id
+     * @return stdClass
      */
-    public static function get_entries($studentid = null, $planningid = null) : stdClass {
+    public static function get_entries(?int $studentid = null, ?int $planningid = null): stdClass {
         $structure = self::get_case_structure();
         $entries = case_entry::get_records(['studentid' => $studentid, 'planningid' => $planningid]);
         $cases = [];
-        foreach($entries as $entry) {
+        foreach ($entries as $entry) {
             $data = case_data::get_records(['entryid' => $entry->get('id')]);
             // Now we need to map the data to the structure.
             $case = [];
@@ -50,10 +50,10 @@ class cases {
             foreach ($structure as $category) {
                 $fields = [];
                 foreach ($category->fields as $field) {
-                    $field_data = null;
+                    $fielddata = null;
                     foreach ($data as $d) {
                         if ($d->get('fieldid') == $field->id) {
-                            $field_data = $d;
+                            $fielddata = $d;
                             break;
                         }
                     }
@@ -64,14 +64,14 @@ class cases {
                         'type' => $field->type,
                         'configdata' => $field->configdata,
                         'description' => $field->description,
-                        'value' => $field_data ? $field_data->get('value') : '',
-                        'displayvalue' => $field_data ? $field_data->get_displayvalue($field) : ''
+                        'value' => $fielddata ? $fielddata->get('value') : '',
+                        'displayvalue' => $fielddata ? $fielddata->get_displayvalue($field) : '',
                     ];
                 }
                 $case[] = (object) [
                     'id' => $category->id,
                     'name' => $category->name,
-                    'fields' => $fields
+                    'fields' => $fields,
                 ];
             }
             $cases[] = (object) [
@@ -80,11 +80,11 @@ class cases {
                 'studentid' => $entry->get('studentid'),
                 'timecreated' => $entry->get('timecreated'),
                 'usermodified' => $entry->get('usermodified'),
-                'categories' => $case
+                'categories' => $case,
             ];
         }
         return (object) [
-            'cases' => $cases
+            'cases' => $cases,
         ];
     }
 
@@ -93,7 +93,7 @@ class cases {
      *
      * @return array
      */
-    public static function get_case_structure() : array {
+    public static function get_case_structure(): array {
         $categories = case_cat::get_records();
         $fields = case_field::get_records();
         $data = [];
@@ -101,7 +101,7 @@ class cases {
             $data[$category->get('id')] = (object) [
                 'id' => $category->get('id'),
                 'name' => $category->get('name'),
-                'fields' => []
+                'fields' => [],
             ];
         }
         foreach ($fields as $field) {
@@ -111,7 +111,7 @@ class cases {
                 'name' => $field->get('name'),
                 'type' => $field->get('type'),
                 'configdata' => $field->get('configdata'),
-                'description' => $field->get('description')
+                'description' => $field->get('description'),
             ];
         }
         return array_values($data);
@@ -125,7 +125,7 @@ class cases {
      *
      * @return void
      */
-    public static function create_case($planningid, $studentid, $fields) {
+    public static function create_case(int $planningid, int $studentid, array $fields): void {
         // Create the case.
         $case = new case_entry();
         $case->set('planningid', $planningid);
@@ -153,7 +153,7 @@ class cases {
      * @param array $fields The fields
      * @return void
      */
-    public static function update_case($entryid, $fields) {
+    public static function update_case(int $entryid, array $fields): void {
         // Update the case.
         $case = new case_entry($entryid);
         foreach ($fields as $fieldid => $value) {
@@ -179,14 +179,20 @@ class cases {
     /**
      * Delete a case entry
      * @param int $entryid The entry id
-     * @return void
+     * @return bool
      */
-    public static function delete_case($entryid) {
-        $case = new case_entry($entryid);
-        $case->delete();
-        $data = case_data::get_records(['entryid' => $entryid]);
-        foreach ($data as $d) {
-            $d->delete();
+    public static function delete_case(int $entryid): bool {
+        try {
+            $case = new case_entry($entryid);
+            $case->delete();
+            $data = case_data::get_records(['entryid' => $entryid]);
+            foreach ($data as $d) {
+                $d->delete();
+            }
+        } catch (invalid_persistent_exception $e) {
+            debugging('Could not delete case entry: ' . $e->getMessage());
+            return false;
         }
+        return true;
     }
 }

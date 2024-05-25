@@ -16,6 +16,7 @@
 
 namespace mod_competvet\local\api;
 
+use core\invalid_persistent_exception;
 use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\cert_decl_asso;
 use mod_competvet\local\persistent\cert_valid;
@@ -33,15 +34,6 @@ use context_module;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class certifications {
-
-    const STATUS_DECL_SEENDONE = 1;
-    const STATUS_DECL_NOTSEEN = 2;
-
-    const STATUS_VALID_ASKED = 0;
-    const STATUS_VALID_CONFIRMED = 1;
-    const STATUS_VALID_NOTSEEN = 2;
-    const STATUS_VALID_NOTREACHED = 3;
-
     /**
      * Add a certification
      * @param int $criterionid The criterion id
@@ -144,14 +136,20 @@ class certifications {
      * @param string $comment The comment
      * @param int $commentformat The comment format
      */
-    public static function validate_certification($declid, $supervisorid, $status, $comment, $commentformat) {
-        $cert = new cert_valid();
-        $cert->set('declid', $declid);
-        $cert->set('supervisorid', $supervisorid);
-        $cert->set('status', $status);
-        $cert->set('comment', $comment);
-        $cert->set('commentformat', $commentformat);
-        return $cert->save();
+    public static function validate_certification($declid, $supervisorid, $status, $comment, $commentformat): ?int {
+        try {
+            $cert = new cert_valid();
+            $cert->set('declid', $declid);
+            $cert->set('supervisorid', $supervisorid);
+            $cert->set('status', $status);
+            $cert->set('comment', $comment);
+            $cert->set('commentformat', $commentformat);
+            $cert->create();
+        } catch (invalid_persistent_exception $e) {
+            debugging($e->getMessage());
+            return null;
+        }
+        return $cert->get('id');
     }
 
     /**
@@ -162,11 +160,16 @@ class certifications {
      * @param int $commentformat The comment format
      */
     public static function update_validation($validid, $status, $comment, $commentformat) {
-        $cert = new cert_valid($validid);
-        $cert->set('status', $status);
-        $cert->set('comment', $comment);
-        $cert->set('commentformat', $commentformat);
-        return $cert->save();
+        try {
+            $cert = new cert_valid($validid);
+            $cert->set('status', $status);
+            $cert->set('comment', $comment);
+            $cert->set('commentformat', $commentformat);
+        } catch (invalid_persistent_exception $e) {
+            debugging($e->getMessage());
+            return null;
+        }
+        return $cert->get('id');
     }
 
     /**
@@ -188,9 +191,6 @@ class certifications {
         if (!$cert->get('id')) {
             return [];
         }
-        $planning = planning::get_record(['id' => $cert->get('planningid')]);
-        $situation = $planning->get_situation();
-
         $certrecord = [];
         $certrecord['declid'] = $cert->get('id');
         $certrecord['criterionid'] = $cert->get('criterionid');
@@ -222,11 +222,6 @@ class certifications {
      * @return array The certifications
      */
     public static function get_certifications($studentid, $planningid) : array {
-        global $PAGE;
-        // Get the page context. Needed because the webservice does not have the context set.
-        $planning = planning::get_record(['id' => $planningid]);
-        $situation = $planning->get_situation();
-
         $gridid = criteria::get_grid_for_planning($planningid, 'cert')->get('id');
         $criteria = criteria::get_criteria_for_grid($gridid);
 
@@ -238,7 +233,7 @@ class certifications {
             $certrecord['label'] = $criterion->get('label');
             $certrecord['grade'] = $criterion->get('grade');
             $certrecord['criterionid'] = $criterion->get('id');
-            $certrecord['status'] = self::STATUS_DECL_NOTSEEN;
+            $certrecord['status'] = cert_decl::STATUS_DECL_NOTSEEN;
             $certrecord['declid'] = 0;
             $certrecord['validated'] = false;
             $certrecord['notvalidated'] = false;
@@ -254,8 +249,8 @@ class certifications {
                 $certrecord['level'] = $certdecl->get('level');
                 $certrecord['total'] = 5; // TODO: get the total from the criterion? maybe change to grade.
                 $certrecord['status'] = $certdecl->get('status');
-                $certrecord['realised'] = ($certdecl->get('status') == self::STATUS_DECL_SEENDONE);
-                $certrecord['notreached'] = ($certdecl->get('status') == self::STATUS_DECL_NOTSEEN);
+                $certrecord['realised'] = ($certdecl->get('status') == cert_decl::STATUS_DECL_SEENDONE);
+                $certrecord['notreached'] = ($certdecl->get('status') == cert_decl::STATUS_DECL_NOTSEEN);
                 $certrecord['feedback'] = [
                     'picture' => $student['userpictureurl'],
                     'fullname' => $student['fullname'],
@@ -278,9 +273,9 @@ class certifications {
                     ];
                     $validrecord['status'] = $valid->get('status');
                     $certrecord['validations'][] = $validrecord;
-                    $certrecord['validated'] = ($valid->get('status') == self::STATUS_VALID_CONFIRMED);
-                    $certrecord['notvalidated'] = ($valid->get('status') == self::STATUS_VALID_NOTSEEN);
-                    $certrecord['notreached'] = ($valid->get('status') == self::STATUS_VALID_NOTREACHED);
+                    $certrecord['validated'] = ($valid->get('status') == cert_valid::STATUS_VALID_CONFIRMED);
+                    $certrecord['notvalidated'] = ($valid->get('status') == cert_valid::STATUS_VALID_NOTSEEN);
+                    $certrecord['notreached'] = ($valid->get('status') == cert_valid::STATUS_VALID_NOTREACHED);
                 }
             }
             $returnarray[] = $certrecord;

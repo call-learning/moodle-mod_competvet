@@ -97,9 +97,9 @@ class get_certifications extends external_api {
         if (!$planning) {
             throw new \moodle_exception('planningnotfound', 'mod_competvet', '', $planningid);
         }
-        $situation = $planning->get_situation();
-        $competvet = competvet::get_from_situation($situation);
+        $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
+        
         $certifications = certifications::get_certifications($studentid, $planningid);
         // Get an array of all validations
         $validations = 0;

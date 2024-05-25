@@ -74,6 +74,7 @@ class get_planning_info extends external_api {
         $cm = get_coursemodule_from_id('competvet', $cmid, 0, false, MUST_EXIST);
         $context = \context_module::instance($cm->id);
         self::validate_context(\context_module::instance($cmid));
+
         $user = core_user::get_user($userid);
         // Now, can this user view other users.
         course_require_view_participants($context->get_parent_context());

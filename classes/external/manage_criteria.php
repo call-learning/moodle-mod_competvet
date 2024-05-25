@@ -16,6 +16,7 @@
 
 namespace mod_competvet\external;
 
+use context_system;
 use external_api;
 use external_description;
 use external_function_parameters;
@@ -91,6 +92,7 @@ class manage_criteria extends external_api {
      */
     public static function update($grids, $type): array {
         $params = self::validate_parameters(self::update_parameters(), ['grids' => $grids, 'type' => $type]);
+        self::validate_context(context_system::instance());
 
         $grids = $params['grids'];
         $type = $params['type'];

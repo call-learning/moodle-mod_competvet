@@ -20,6 +20,9 @@ use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use mod_competvet\competvet;
+use mod_competvet\local\persistent\cert_decl;
+use mod_competvet\local\persistent\planning;
 use stdClass;
 use mod_competvet\local\api\certifications;
 
@@ -65,6 +68,13 @@ class add_certification_invite extends external_api {
      */
     public static function execute($declid, $supervisorid): stdClass {
         self::validate_parameters(self::execute_parameters(), ['declid' => $declid, 'supervisorid' => $supervisorid]);
+        // Validate context : important as it also require the user to be logged in.
+        $decl = cert_decl::get_record(['id' => $declid]);
+        $planning  = planning::get_record(['id' => $decl->get('planningid')]);
+        // Check if we can act.
+        $competvet = competvet::get_from_situation($planning->get('situationid'));
+        self::validate_context($competvet->get_context());
+
         if (certifications::certification_supervisor_invite($declid, $supervisorid)) {
             return (object) ['success' => true];
         }
