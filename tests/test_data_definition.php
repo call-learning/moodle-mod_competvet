@@ -313,7 +313,7 @@ trait test_data_definition {
             'course 1' => [
                 'users' => [
                     'student' => ['student1', 'student2'],
-                    'observer' => ['observer1', 'observerandevaluator'],
+                    'observer' => ['observer1', 'observer2'],
                     'teacher' => ['teacher1'],
                     'manager' => ['manager'],
                 ],

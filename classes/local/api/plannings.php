@@ -283,7 +283,7 @@ class plannings {
         $gridid = criteria::get_grid_for_planning($planningid, 'cert')->get('id');
         $criteria = criteria::get_sorted_parent_criteria($gridid);
         $certifcations = certifications::get_certifications($studentid, $planningid);
-        $numvalidated = array_reduce($certifcations, fn($carry, $certification) => $carry + $certification['validated'], 0);
+        $numvalidated = array_reduce($certifcations, fn($carry, $certification) => $carry + $certification['confirmed'], 0);
         $info[] = [
             'type' => 'cert',
             'nbdone' => $numvalidated,

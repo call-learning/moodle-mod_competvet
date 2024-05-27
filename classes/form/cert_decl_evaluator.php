@@ -87,18 +87,18 @@ class cert_decl_evaluator extends cert_decl_student {
 
         $mform->addElement('radio', 'statussuper',
             '',
-            get_string('statusconfirmed', 'mod_competvet'),
-            cert_valid::STATUS_VALID_CONFIRMED
+            get_string('valid:confirmed', 'mod_competvet'),
+            cert_valid::STATUS_CONFIRMED
         );
         $mform->addElement('radio', 'statussuper',
             '',
-            get_string('statusnotseen', 'mod_competvet'),
-            cert_valid::STATUS_VALID_NOTSEEN
+            get_string('valid:notseen', 'mod_competvet'),
+            cert_valid::STATUS_OBSERVER_NOTSEEN
         );
         $mform->addElement('radio', 'statussuper',
             '',
-            get_string('statusnotreached', 'mod_competvet'),
-            cert_valid::STATUS_VALID_NOTREACHED
+            get_string('valid:levelnotreached', 'mod_competvet'),
+            cert_valid::STATUS_LEVEL_NOT_REACHED
         );
         $mform->addElement('textarea', 'supervisorcomment', get_string('comment', 'competvet'));
     }

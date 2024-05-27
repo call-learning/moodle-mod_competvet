@@ -31,10 +31,10 @@
             <div class="description mb-2 d-flex justify-content-end"><strong>{{#str}}confidencelevel, mod_competvet{{/str}}</strong></div>
         </div>
         <div class="col3">
-            <div class="description mb-2"><strong>{{#str}}realised, mod_competvet{{/str}}</strong></div>
+            <div class="description mb-2"><strong>{{#str}}seendone, mod_competvet{{/str}}</strong></div>
         </div>
         <div class="col4">
-            <div class="description mb-2"><strong>{{#str}}verified, mod_competvet{{/str}}</strong></div>
+            <div class="description mb-2"><strong>{{#str}}confirmed, mod_competvet{{/str}}</strong></div>
         </div>
     </div>
     {{#certifications}}
@@ -79,28 +79,28 @@
                 {{#level}}<span class="font-weight-bold">{{level}}</span><span class="mx-2">/</span><span>{{total}}</span>{{/level}}
             </div>
             <div class="col3">
-                {{#realised}}
+                {{#seendone}}
                     <i class="fa fa-check text-success" aria-hidden="true"></i>
-                    <span class="sr-only">{{#str}}realised, competvet{{/str}}</span>
-                {{/realised}}
-                {{#notrealised}}
+                    <span class="sr-only">{{#str}}seendone, competvet{{/str}}</span>
+                {{/seendone}}
+                {{#notseen}}
                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                    <span class="sr-only">{{#str}}notrealised, competvet{{/str}}</span>
-                {{/notrealised}}
+                    <span class="sr-only">{{#str}}notseen, competvet{{/str}}</span>
+                {{/notseen}}
             </div>
             <div class="col4">
-                {{#validated}}
+                {{#confirmed}}
                     <i class="fa fa-check text-success" aria-hidden="true"></i>
-                    <span class="sr-only">{{#str}}verified, competvet{{/str}}</span>
-                {{/validated}}
-                {{#notvalidated}}
+                    <span class="sr-only">{{#str}}valid:confirmed, competvet{{/str}}</span>
+                {{/confirmed}}
+                {{#observernotseen}}
                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                    <span class="sr-only">{{#str}}notverified, competvet{{/str}}</span>
-                {{/notvalidated}}
-                {{#notreached}}
+                    <span class="sr-only">{{#str}}valid:observernotseen, competvet{{/str}}</span>
+                {{/observernotseen}}
+                {{#levelnotreached}}
                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                    <span class="sr-only">{{#str}}notrealised, competvet{{/str}}</span>
-                {{/notreached}}
+                    <span class="sr-only">{{#str}}valid:levelnotreached, competvet{{/str}}</span>
+                {{/levelnotreached}}
             </div>
         </div>
     {{/certifications}}

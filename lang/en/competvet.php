@@ -261,12 +261,9 @@ $string['evaluatordecision'] = 'Evaluator decision';
 $string['evaluatordecision_help'] = 'Non-validation being a deal breaker, you can manually change this grade. If you force the validation, please comment.';
 $string['evalcomment'] = 'Free commentary on the essential clinical aspects';
 $string['confidencelevel'] = 'Confidence level';
-$string['realised'] = 'Realised';
-$string['verified'] = 'Verified';
-$string['notrealised'] = 'Not realised';
-$string['notverified'] = 'Not verified';
-$string['validated'] = 'Validated';
-$string['notvalidated'] = 'Not validated';
+$string['seendone'] = 'Seen and done';
+$string['confirmed'] = 'Confirmed';
+$string['notseen'] = 'Not seen';
 
 $string['evaluation'] = 'Global Evaluation';
 $string['suggestedgrade'] = 'Suggested grade';
@@ -318,14 +315,14 @@ $string['declaredlevel'] = 'Stated confidence level';
 $string['declareddate'] = 'Declared having achieved this essential on {$a}';
 $string['level_help'] = 'Indicate here with what level of confidence (from 0 to 100%) you would feel able to reproduce this gesture or procedure in the future.';
 $string['status'] = 'Status';
-$string['seendone'] = 'I declare that I have carried out the essential clinic above on {$a} and ask the teachers below who supervised me on this procedure to confirm this.';
-$string['notseen'] = 'I have not encountered this situation yet.';
+$string['decl:seendone'] = 'I declare that I have carried out the essential clinic above on {$a} and ask the teachers below who supervised me on this procedure to confirm this.';
+$string['decl:notseen'] = 'I have not encountered this situation yet.';
 $string['certdecl'] = 'Certification declaration';
 $string['addsupervisor'] = 'Add a supervisor to validate this certification';
 $string['supervisorsection'] = 'Supervisors';
-$string['statusconfirmed'] = 'I confirm that this essential has been achieved';
-$string['statusnotseen'] = 'I do not validate because I did not see this essential';
-$string['statusnotreached'] = 'I do not validate because the level is not reached';
+$string['valid:confirmed'] = 'I confirm that this essential has been achieved';
+$string['valid:notseen'] = 'I do not validate because I did not see this essential';
+$string['valid:levelnotreached'] = 'I do not validate because the level is not reached';
 
 // Suggested grade
 $string['gradeK1'] = 'Grade calculation constant K1';

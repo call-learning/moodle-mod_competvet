@@ -20,11 +20,7 @@ use core\invalid_persistent_exception;
 use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\cert_decl_asso;
 use mod_competvet\local\persistent\cert_valid;
-use mod_competvet\local\persistent\planning;
-use mod_competvet\local\persistent\situation;
-use mod_competvet\competvet;
 use mod_competvet\utils;
-use context_module;
 
 /**
  * Class certifications
@@ -69,9 +65,8 @@ class certifications {
         $cert->set('comment', $comment);
         $cert->set('commentformat', $commentformat);
         $cert->set('status', $status);
-        if ($cert->save()) {
-            return true;
-        }
+        $cert->save();
+        return !empty($cert->get('id'));
     }
 
     /**
@@ -92,9 +87,9 @@ class certifications {
      * @return array The supervisor ids
      */
     public static function get_certification_supervisors($declid) {
-        $certs = cert_decl_asso::get_records(['declid' => $declid]);
+        $certsdecl = cert_decl_asso::get_records(['declid' => $declid]);
         $supervisors = [];
-        foreach ($certs as $cert) {
+        foreach ($certsdecl as $cert) {
             $supervisors[] = $cert->get('supervisorid');
         }
         return $supervisors;
@@ -186,7 +181,6 @@ class certifications {
      * @param int $declid The declaration id
      */
     public static function get_certification($declid) {
-        global $PAGE;
         $cert = new cert_decl($declid);
         if (!$cert->get('id')) {
             return [];
@@ -233,11 +227,15 @@ class certifications {
             $certrecord['label'] = $criterion->get('label');
             $certrecord['grade'] = $criterion->get('grade');
             $certrecord['criterionid'] = $criterion->get('id');
-            $certrecord['status'] = cert_decl::STATUS_DECL_NOTSEEN;
+            $certrecord['status'] = 0; // Status is set to 0 by default, and it is not a real status as such but
+            // it is used to determine if the certification is declared or not.
+            $certrecord['isdeclared'] = false; // This is the flag to determine if the certification is declared or not.
             $certrecord['declid'] = 0;
-            $certrecord['validated'] = false;
-            $certrecord['notvalidated'] = false;
-            $certrecord['notreached'] = false;
+            $certrecord['seendone'] = false;
+            $certrecord['notseen'] = false;
+            $certrecord['observernotseen'] = false;
+            $certrecord['confirmed'] = false;
+            $certrecord['levelnotreached'] = false;
 
             $certdecl = cert_decl::get_record([
                 'studentid' => $studentid,
@@ -246,11 +244,12 @@ class certifications {
             ]);
             if ($certdecl) {
                 $certrecord['declid'] = $certdecl->get('id');
+                $certrecord['isdeclared'] = true;
                 $certrecord['level'] = $certdecl->get('level');
                 $certrecord['total'] = 5; // TODO: get the total from the criterion? maybe change to grade.
                 $certrecord['status'] = $certdecl->get('status');
-                $certrecord['realised'] = ($certdecl->get('status') == cert_decl::STATUS_DECL_SEENDONE);
-                $certrecord['notreached'] = ($certdecl->get('status') == cert_decl::STATUS_DECL_NOTSEEN);
+                $certrecord['seendone'] = ($certdecl->get('status') == cert_decl::STATUS_DECL_SEENDONE);
+                $certrecord['notseen'] = ($certdecl->get('status') == cert_decl::STATUS_STUDENT_NOTSEEN);
                 $certrecord['feedback'] = [
                     'picture' => $student['userpictureurl'],
                     'fullname' => $student['fullname'],
@@ -273,9 +272,9 @@ class certifications {
                     ];
                     $validrecord['status'] = $valid->get('status');
                     $certrecord['validations'][] = $validrecord;
-                    $certrecord['validated'] = ($valid->get('status') == cert_valid::STATUS_VALID_CONFIRMED);
-                    $certrecord['notvalidated'] = ($valid->get('status') == cert_valid::STATUS_VALID_NOTSEEN);
-                    $certrecord['notreached'] = ($valid->get('status') == cert_valid::STATUS_VALID_NOTREACHED);
+                    $certrecord['confirmed'] = ($valid->get('status') == cert_valid::STATUS_CONFIRMED);
+                    $certrecord['observernotseen'] = ($valid->get('status') == cert_valid::STATUS_OBSERVER_NOTSEEN);
+                    $certrecord['levelnotreached'] = ($valid->get('status') == cert_valid::STATUS_LEVEL_NOT_REACHED);
                 }
             }
             $returnarray[] = $certrecord;

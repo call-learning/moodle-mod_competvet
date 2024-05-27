@@ -47,11 +47,12 @@ class get_certifications extends external_api {
                     'level' => new external_value(PARAM_INT, 'The level', VALUE_OPTIONAL),
                     'total' => new external_value(PARAM_INT, 'The total', VALUE_OPTIONAL),
                     'status' => new external_value(PARAM_INT, 'The status', VALUE_OPTIONAL),
-                    'realised' => new external_value(PARAM_BOOL, 'Is realised', VALUE_OPTIONAL),
-                    'notrealised' => new external_value(PARAM_BOOL, 'Is not realised', VALUE_OPTIONAL),
-                    'validated' => new external_value(PARAM_BOOL, 'Is validated', VALUE_OPTIONAL),
-                    'notvalidated' => new external_value(PARAM_BOOL, 'Is not validated', VALUE_OPTIONAL),
-                    'notreached' => new external_value(PARAM_BOOL, 'Is not reached', VALUE_OPTIONAL),
+                    'isdeclared' => new external_value(PARAM_BOOL, 'Is declared', VALUE_OPTIONAL),
+                    'seendone' => new external_value(PARAM_BOOL, 'Is seen by an student', VALUE_OPTIONAL),
+                    'notseen' => new external_value(PARAM_BOOL, 'Is not seen by a student', VALUE_OPTIONAL),
+                    'observernotseen' => new external_value(PARAM_BOOL, 'Observer not seen', VALUE_OPTIONAL),
+                    'confirmed' => new external_value(PARAM_BOOL, 'Confirmed by an observer', VALUE_OPTIONAL),
+                    'levelnotreached' => new external_value(PARAM_BOOL, 'Observer stated level not reached', VALUE_OPTIONAL),
                     'feedback' => new external_single_structure([
                         'picture' => new external_value(PARAM_TEXT, 'The picture'),
                         'fullname' => new external_value(PARAM_TEXT, 'The fullname'),
@@ -99,12 +100,12 @@ class get_certifications extends external_api {
         }
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
-        
+
         $certifications = certifications::get_certifications($studentid, $planningid);
-        // Get an array of all validations
+        // Get an array of all validations.
         $validations = 0;
         foreach ($certifications as $certification) {
-            if ($certification['validated']) {
+            if ($certification['confirmed']) {
                 $validations++;
             }
         }

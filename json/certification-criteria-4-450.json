@@ -8,8 +8,7 @@
             "sortorder": 1,
             "niveau": 1,
             "total": 5,
-            "notrealised": true,
-            "realised": false,
+            "seendone": false,
             "notverified": true,
             "verified": false,
             "feedback": [
@@ -32,8 +31,7 @@
             "sortorder": 2,
             "niveau": 4,
             "total": 5,
-            "notrealised": false,
-            "realised": true,
+            "seendone": true,
             "notverified": false,
             "verified": true
         },
@@ -43,8 +41,7 @@
             "sortorder": 3,
             "niveau": 3,
             "total": 5,
-            "notrealised": false,
-            "realised": true,
+            "seendone": true,
             "notverified": false,
             "verified": true
         },
@@ -54,8 +51,7 @@
             "sortorder": 4,
             "niveau": 4,
             "total": 5,
-            "notrealised": false,
-            "realised": true,
+            "seendone": true,
             "notverified": false,
             "verified": true
         },
@@ -65,8 +61,7 @@
             "sortorder": 5,
             "niveau": 2,
             "total": 5,
-            "notrealised": true,
-            "realised": false,
+            "seendone": false,
             "notverified": true,
             "verified": false
         }
