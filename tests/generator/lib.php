@@ -14,7 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+use mod_competvet\local\api\certifications;
 use mod_competvet\local\persistent\cert_decl;
+use mod_competvet\local\persistent\cert_decl_asso;
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\grid;
 use mod_competvet\local\persistent\observation;
@@ -256,19 +258,6 @@ class mod_competvet_generator extends testing_module_generator {
     }
 
     /**
-     * Create a new instance of observation.
-     *
-     * @param array|stdClass|null $record
-     * @return stdClass
-     */
-    public function create_observation($record = null) {
-        $record = (object) (array) $record;
-        $this->check_and_set_observation_status($record);
-        $this->check_and_set_observation_category($record);
-        return $this->create_from_entity_name(observation::class, $record);
-    }
-
-    /**
      * Observation status
      *
      * @param $record
@@ -303,6 +292,20 @@ class mod_competvet_generator extends testing_module_generator {
             }
         }
     }
+
+    /**
+     * Create a new instance of observation.
+     *
+     * @param array|stdClass|null $record
+     * @return stdClass
+     */
+    public function create_observation($record = null) {
+        $record = (object) (array) $record;
+        $this->check_and_set_observation_status($record);
+        $this->check_and_set_observation_category($record);
+        return $this->create_from_entity_name(observation::class, $record);
+    }
+
     /**
      * Create a new instance of the Competvet activity.
      *
@@ -454,6 +457,23 @@ class mod_competvet_generator extends testing_module_generator {
                 throw new moodle_exception('cert:invalidstatus', 'competvet', '', $record->status);
             }
         }
-        return $this->create_from_entity_name(cert_decl::class, $record);
+        $decls = $record->decls ?? null;
+        unset($record->decls);
+        $certification = $this->create_from_entity_name(cert_decl::class, $record);
+        if (!empty($decls)) {
+            foreach ($decls as $decl) {
+                $decl = (object) (array) $decl;
+                certifications::validate_certification($certification->id, $decl->supervisorid, $decl->status, $decl->comment,
+                    FORMAT_PLAIN);
+                $association = new cert_decl_asso(0,
+                    (object) [
+                        'supervisorid' => $decl->supervisorid,
+                        'declid' => $certification->id,
+                    ]
+                );
+                $association->create();
+            }
+        }
+        return $certification;
     }
 }

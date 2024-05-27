@@ -87,16 +87,20 @@ class cert_decl extends dynamic_form {
         $mform->addElement('static', 'rangeheader', get_string('level', 'mod_competvet'), $range);
 
         $userdate = userdate(time(), get_string('strftimedatetime', 'core_langconfig'));
-        $mform->addElement('radio', 'status',
+        $mform->addElement(
+            'radio',
+            'status',
             get_string('status', 'competvet'),
-            get_string('seendone', 'competvet', $userdate),
+            get_string('decl:seendone', 'competvet', $userdate),
             \mod_competvet\local\persistent\cert_decl::STATUS_DECL_SEENDONE
         );
 
-        $mform->addElement('radio', 'status',
+        $mform->addElement(
+            'radio',
+            'status',
             '',
-            get_string('notseen', 'competvet'),
-            \mod_competvet\local\persistent\cert_decl::STATUS_DECL_NOTSEEN
+            get_string('decl:notseen', 'competvet'),
+            \mod_competvet\local\persistent\cert_decl::STATUS_STUDENT_NOTSEEN
         );
         $mform->addRule('status', get_string('required'), 'required', null, 'client');
 
@@ -132,7 +136,7 @@ class cert_decl extends dynamic_form {
         $mform->addElement('static', 'usercomment', '');
         $mform->setType('usercomment', PARAM_RAW);
 
-        // Check if user is supervisor for this declaration
+        // Check if user is supervisor for this declaration.
         $supervisors = certifications::get_certification_supervisors($declid);
         $issupervisor = in_array($USER->id, $supervisors);
         if (!$issupervisor) {
@@ -142,18 +146,18 @@ class cert_decl extends dynamic_form {
 
         $mform->addElement('radio', 'statussuper',
             '',
-            get_string('statusconfirmed', 'mod_competvet'),
-            cert_valid::STATUS_VALID_CONFIRMED
+            get_string('valid:confirmed', 'mod_competvet'),
+            cert_valid::STATUS_CONFIRMED
         );
         $mform->addElement('radio', 'statussuper',
             '',
-            get_string('statusnotseen', 'mod_competvet'),
-            cert_valid::STATUS_VALID_NOTSEEN
+            get_string('valid:notseen', 'mod_competvet'),
+            cert_valid::STATUS_OBSERVER_NOTSEEN
         );
         $mform->addElement('radio', 'statussuper',
             '',
-            get_string('statusnotreached', 'mod_competvet'),
-            cert_valid::STATUS_VALID_NOTREACHED
+            get_string('valid:levelnotreached', 'mod_competvet'),
+            cert_valid::STATUS_LEVEL_NOT_REACHED
         );
         $mform->addElement('textarea', 'supervisorcomment', get_string('comment', 'competvet'));
 

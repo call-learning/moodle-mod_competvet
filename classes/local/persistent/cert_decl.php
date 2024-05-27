@@ -36,14 +36,14 @@ class cert_decl extends persistent {
      * Decl status types
      */
     const STATUS_DECL_SEENDONE = 1;
-    const STATUS_DECL_NOTSEEN = 2;
+    const STATUS_STUDENT_NOTSEEN = 2;
 
     /**
      * Decl status types
      */
     const STATUS_TYPES = [
         self::STATUS_DECL_SEENDONE => 'cert:seendone',
-        self::STATUS_DECL_NOTSEEN => 'cert:notseen',
+        self::STATUS_STUDENT_NOTSEEN => 'cert:notseen',
     ];
 
     /**
