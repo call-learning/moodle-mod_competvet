@@ -62,7 +62,7 @@ const formCalculation = () => {
     const formData = new FormData(form);
     const formObject = Object.fromEntries(formData);
     grading.comment = formObject.comment;
-    grading.subgrade = formObject.evaluatordecision == '3' ? 1 : 0;
+    grading.subgrade = formObject.evaluatordecision == '2' ? 1 : 0;
     grading.evaloptions.forEach((option) => {
         if (option.key == Number(formObject.evaluatordecision)) {
             option.selected = true;

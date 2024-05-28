@@ -67,7 +67,7 @@ class ask_eval_observation extends external_api {
             ]);
         $planning = planning::get_record(['id' => $planningid]);
         // Check if we can act.
-        $competvet = competvet::get_from_situation($planning->get('situationid'));
+        $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
         return [
             'todoid' => todos::ask_for_observation($context, $planningid, $observerid, $studentid),

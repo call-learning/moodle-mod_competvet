@@ -321,6 +321,9 @@ class observations {
             }
             $updates = false;
             if (isset($criterion['level'])) {
+                if ($criterion['level'] === 'skip') {
+                    $criterion['level'] = null;
+                }
                 $obscrit->set('level', $criterion['level']);
                 $obscrit->set('isactive', true);
                 $updates = true;

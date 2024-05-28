@@ -208,4 +208,12 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/competvet:cangrade',
     ],
+    'mod_competvet_get_subgrades' => [
+        'classname' => \mod_competvet\external\get_subgrades::class,
+        'methodname' => 'execute',
+        'description' => 'Get the subgrades',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:view',
+    ],
 ];

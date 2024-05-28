@@ -64,11 +64,13 @@
 {{#list-results}}
     {{#cases}}
         <div class="case mb-3">
-            <div class="deletecase">
-                <button class="btn btn-icon icon-no-margin mx-2" data-action="delete-case" data-id="{{id}}">
-                    {{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}
-                </button>
-            </div>
+            {{#isstudent}}
+                <div class="deletecase">
+                    <button class="btn btn-icon icon-no-margin mx-2" data-action="delete-case" data-id="{{id}}">
+                        {{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}
+                    </button>
+                </div>
+            {{/isstudent}}
             <div class="case-header d-flex align-items-center position-relative">
                 {{> mod_competvet/expandcollapse}}
                 <div class="case-title">

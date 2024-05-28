@@ -53,7 +53,7 @@ class delete_observation extends external_api {
             self::validate_parameters(self::execute_parameters(), ['observationid' => $observationid]);
         $observation = observation::get_record(['id' => $observationid]);
         $planning = planning::get_record(['id' => $observation->get('planningid')]);
-        $competvet = competvet::get_from_situation($planning->get('situationid'));
+        $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
 
 

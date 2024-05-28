@@ -32,6 +32,7 @@ import './components/certification_results';
 import './components/list_results';
 import './components/evaluation_results';
 import './components/evaluation_chart';
+import './components/subgrades';
 
 /**
  * Constants for eval certif and list.
@@ -102,7 +103,7 @@ class Competvet {
         this.setListResults();
 
         await this.setListGrading();
-
+        await this.setSubGrades();
         await this.setGlobalGrade();
         this.setSuggestedGrade();
         await this.setForms();
@@ -193,6 +194,18 @@ class Competvet {
     }
 
     /**
+     * Set the subgrades.
+     */
+    async setSubGrades() {
+        const args = {
+            studentid: this.currentUser.id,
+            planningid: this.planning.id
+        };
+        const response = await Repository.getSubGrades(args);
+        CompetState.setValue('subgrades', response);
+    }
+
+    /**
      * Set the suggested grade.
      */
     async setSuggestedGrade() {
@@ -250,11 +263,21 @@ class Competvet {
         evalGrading.grading.maxobservations = evalResults.evaluations.length;
         let totalEvalScore = 0;
         let totalGrades = 0;
+        let numberofobservations = 0;
         if (evalResults.evaluations.length > 0) {
-            evalGrading.grading.numberofobservations = evalResults.evaluations[0].grades.length;
+            evalResults.evaluations[0].grades.forEach(grade => {
+                if (grade.userid == this.currentUser.id) {
+                    return;
+                }
+                numberofobservations++;
+            });
         }
+        evalGrading.grading.numberofobservations = numberofobservations;
         evalResults.evaluations.forEach(evaluation => {
             evaluation.grades.forEach(grade => {
+                if (grade.value === null || grade.userid == this.currentUser.id) {
+                    return;
+                }
                 totalEvalScore += grade.value;
                 totalGrades++;
             });
@@ -304,6 +327,7 @@ class Competvet {
         });
         this.gradingApp.addEventListener('setSuggestedGrade', async() => {
             // Update the suggested grade.
+            this.setSubGrades();
             this.setSuggestedGrade();
         });
     }

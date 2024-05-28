@@ -70,7 +70,7 @@ class remove_certification_invite extends external_api {
         self::validate_parameters(self::execute_parameters(), ['declid' => $declid, 'supervisorid' => $supervisorid]);
         $decl = case_entry::get_record(['id' => $declid]);
         $planning  = planning::get_record(['id' => $decl->get('planningid')]);
-        $competvet = competvet::get_from_situation($planning->get('situationid'));
+        $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
 
         if (certifications::certification_supervisor_remove($declid, $supervisorid)) {

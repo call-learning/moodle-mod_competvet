@@ -191,6 +191,15 @@ class Repository {
     async getSuggestedGrade(args) {
         return Ajax.call([{methodname: 'mod_competvet_get_suggested_grade', args}])[0];
     }
+
+    /**
+     * Get the subgrades for a user.
+     * @param {Object} args The arguments.
+     * @return {Promise} The promise.
+     */
+    async getSubGrades(args) {
+        return Ajax.call([{methodname: 'mod_competvet_get_subgrades', args}])[0];
+    }
 }
 
 const RepositoryInstance = new Repository();

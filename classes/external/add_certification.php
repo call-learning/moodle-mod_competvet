@@ -89,7 +89,7 @@ class add_certification extends external_api {
         // Validate context : important as it also require the user to be logged in.
         $planning  = planning::get_record(['id' => $planningid]);
         // Check if we can add.
-        $competvet = competvet::get_from_situation($planning->get('situationid'));
+        $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
 
         if ($declid) {

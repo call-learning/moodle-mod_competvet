@@ -103,6 +103,23 @@
             display: flex;
             flex: 1 0 auto;
         }
+        .grade-tab-indicator {
+            min-width: 1.7rem;
+            height: 1.7rem;
+            margin-left: 1rem;
+        }
+        .grade-tab-indicator:not(:empty) {
+            color: #fff;
+            background-color: var(--primary);
+            border-radius: 1rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     }
     .tab-main {
         padding: 1rem;
