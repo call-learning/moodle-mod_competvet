@@ -10,11 +10,6 @@
         },
         {
             "key": 2,
-            "value": "proposed",
-            "selected": false
-        },
-        {
-            "key": 3,
             "value": "validated",
             "selected": false
         }

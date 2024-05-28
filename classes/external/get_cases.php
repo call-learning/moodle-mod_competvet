@@ -100,7 +100,7 @@ class get_cases extends external_api {
         ]);
         $planning  = planning::get_record(['id' => $planningid]);
         // Check if we can delete.
-        $competvet = competvet::get_from_situation($planning->get('situationid'));
+        $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
 
         $cases = cases::get_entries($userid, $planningid);

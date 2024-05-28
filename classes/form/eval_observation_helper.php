@@ -38,7 +38,7 @@ class eval_observation_helper {
         foreach ($criteria as $criterion) {
             $mform->addElement('header', 'criterion_header_' . $criterion->id, $criterion->label);
             $gradeelements = [];
-            foreach ([0, 25, 50, 75, 100] as $grade) {
+            foreach ([0, 25, 50, 75, 100, 'skip'] as $grade) {
                 $gradeelement = $mform->createElement('radio', "criterion_levels[{$criterion->id}]", '', $grade, $grade);
                 $gradeelement->updateAttributes(['class' => $gradeelement->getAttribute('class') . ' ml-3']);
                 $gradeelements[] = $gradeelement;

@@ -71,6 +71,9 @@ class eval_observation_edit extends dynamic_form {
                 $criterioninfo = $criterion['criterioninfo'];
                 $data['criterion_levels_id'][$criterioninfo['id']] = $criterion['id'];
                 $data['criterion_levels'][$criterioninfo['id']] = $criterion['level'];
+                if ($criterion['level'] === null) {
+                    $data['criterion_levels'][$criterioninfo['id']] = 'skip';
+                }
                 foreach ($criterion['subcriteria'] as $subcriterion) {
                     $subcriterioninfo = $subcriterion['criterioninfo'];
                     $data['criterion_comments_id'][$subcriterioninfo['id']] = $subcriterion['id'];

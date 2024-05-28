@@ -1011,5 +1011,32 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2024052400, 'competvet');
     }
 
+    if ($oldversion < 2024052800) {
+
+        // Define index competvetusergrade_ux (not unique) to be dropped form competvet_grades.
+        $table = new xmldb_table('competvet_grades');
+        $index = new xmldb_index('competvetusergrade_ux', XMLDB_INDEX_NOTUNIQUE, ['competvetusergrade']);
+
+        // Conditionally launch drop index competvetusergrade_ux.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        $field = new xmldb_field('itemnumber', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'competvet');
+
+        // Launch rename field type.
+        $dbman->rename_field($table, $field, 'type');
+
+        $index = new xmldb_index('competvetusergrade_ux', XMLDB_INDEX_UNIQUE, ['competvet', 'type']);
+
+        // Conditionally launch add index competvetusergrade_ux.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024052800, 'competvet');
+    }
+
     return true;
 }

@@ -12,20 +12,45 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * CLI script to import.
  *
  * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+define('CLI_SCRIPT', true);
+require(__DIR__ . '/../../../config.php');
+debugging() || defined('BEHAT_SITE_RUNNING') || die();
 
-$plugin->component = 'mod_competvet';
-$plugin->release = '0.4.1';
-$plugin->version = 2024052801;
-$plugin->requires = 2022112800;
-$plugin->maturity = MATURITY_ALPHA;
+global $CFG;
+require_once($CFG->libdir . '/clilib.php');
+
+// Get the cli options.
+list($options, $unrecognised) = cli_get_params([
+    'help' => false,
+], [
+    'h' => 'help',
+]);
+
+$usage = "Setup eval grid
+
+Usage:
+    # php create_grid.php [--help|-h]
+
+Options:
+    -h --help                   Print this help.
+";
+if ($unrecognised) {
+    $unrecognised = implode("\n\t", $unrecognised);
+    cli_error(get_string('cliunknowoption', 'admin', $unrecognised));
+}
+
+if ($options['help']) {
+    cli_writeln($usage);
+    die();
+}
+\mod_competvet\setup::create_default_cases();

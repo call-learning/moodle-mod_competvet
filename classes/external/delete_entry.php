@@ -68,7 +68,7 @@ class delete_entry extends external_api {
         $decl = case_entry::get_record(['id' => $entryid]);
         $planning  = planning::get_record(['id' => $decl->get('planningid')]);
         // Check if we can delete.
-        $competvet = competvet::get_from_situation($planning->get('situationid'));
+        $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
 
         if (cases::delete_case($entryid)) {

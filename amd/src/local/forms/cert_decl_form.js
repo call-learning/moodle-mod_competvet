@@ -97,6 +97,18 @@ export const init = () => {
                 saveButtonText: getString('save'),
             });
             modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, submitEventHandler);
+
+            // This sets the level field to the value of the range input.
+            modalForm.addEventListener(modalForm.events.LOADED, () => {
+                // Get the value of the range input and set it to the hidden level field.
+                modalForm.modal.getRoot().on('modal:bodyRendered', () => {
+                    const rangeInput = modalForm.modal.getRoot().find('input[type="range"]');
+                    const levelInput = modalForm.modal.getRoot().find('input[name="level"]');
+                    const currentLevel = modalForm.modal.getRoot().find('[data-region="current-level"]');
+                    rangeInput.val(levelInput.val());
+                    currentLevel.text(levelInput.val());
+                });
+            });
             modalForm.show();
         }
     });

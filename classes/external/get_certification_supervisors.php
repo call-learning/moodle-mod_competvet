@@ -67,7 +67,7 @@ class get_certification_supervisors extends external_api {
         $decl = cert_decl::get_record(['id' => $declid]);
         $planning  = planning::get_record(['id' => $decl->get('planningid')]);
         // Check if we can delete.
-        $competvet = competvet::get_from_situation($planning->get('situationid'));
+        $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
 
         $supervisors = certifications::get_certification_supervisors($declid);

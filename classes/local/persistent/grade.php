@@ -37,6 +37,15 @@ class grade extends persistent {
     const LIST_GRADE = 3;
 
     /**
+     * DEFAULT GRADE SHORTNAME
+     */
+    const DEFAULT_GRADE_SHORTNAME = [
+        self::EVALUATION_GRADE => 'EVALUATION_GRADE',
+        self::CERTIFICATION_GRADE => 'CERTIFICATION_GRADE',
+        self::LIST_GRADE => 'LIST_GRADE',
+    ];
+
+    /**
      * Grade types
      */
     const GRADE_TYPES = [
