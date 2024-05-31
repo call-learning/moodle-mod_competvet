@@ -24,84 +24,91 @@
     }
 }}
 {{#certification-results}}
-    <div class="certif header">
-        <div class="col1">
+    {{^isdeclared}}
+        <div class="alert alert-info w-50 mx-auto " role="alert">
+            {{#str}}nocertifications, mod_competvet{{/str}}
         </div>
-        <div class="col2">
-            <div class="description mb-2 d-flex justify-content-end"><strong>{{#str}}confidencelevel, mod_competvet{{/str}}</strong></div>
-        </div>
-        <div class="col3">
-            <div class="description mb-2"><strong>{{#str}}seendone, mod_competvet{{/str}}</strong></div>
-        </div>
-        <div class="col4">
-            <div class="description mb-2"><strong>{{#str}}confirmed, mod_competvet{{/str}}</strong></div>
-        </div>
-    </div>
-    {{#certifications}}
-        <div class="certif">
+    {{/isdeclared}}
+    {{#isdeclared}}
+        <div class="certif header">
             <div class="col1">
-                <div class="description mb-2 position-relative d-flex align-items-center">
-                    {{#declid}}
-                        {{< mod_competvet/expandcollapse}}
-                            {{$id}}{{declid}}{{/id}}
-                        {{/ mod_competvet/expandcollapse}}
-                    {{/declid}}
-                    <strong>{{label}}</strong>
-                </div>
-                <div class="collapse pl-5 ml-2 show" id="collapse{{declid}}">
-                    <div>
-                        {{#feedback}}
-                            {{> mod_competvet/comment}}
-                        {{/feedback}}
+            </div>
+            <div class="col2">
+                <div class="description mb-2 d-flex justify-content-end"><strong>{{#str}}confidencelevel, mod_competvet{{/str}}</strong></div>
+            </div>
+            <div class="col3">
+                <div class="description mb-2"><strong>{{#str}}seendone, mod_competvet{{/str}}</strong></div>
+            </div>
+            <div class="col4">
+                <div class="description mb-2"><strong>{{#str}}confirmed, mod_competvet{{/str}}</strong></div>
+            </div>
+        </div>
+        {{#certifications}}
+            <div class="certif">
+                <div class="col1">
+                    <div class="description mb-2 position-relative d-flex align-items-center">
+                        {{#declid}}
+                            {{< mod_competvet/expandcollapse}}
+                                {{$id}}{{declid}}{{/id}}
+                            {{/ mod_competvet/expandcollapse}}
+                        {{/declid}}
+                        <strong>{{label}}</strong>
                     </div>
-                    <div>
-                        {{#validations}}
+                    <div class="collapse pl-5 ml-2 show" id="collapse{{declid}}">
+                        <div>
                             {{#feedback}}
                                 {{> mod_competvet/comment}}
                             {{/feedback}}
-                        {{/validations}}
-                    </div>
-                    <div class="actions d-flex justify-content-end">
-                    {{#isstudent}}
-                        <button class="btn btn-sm btn-outline-secondary" data-action="cert-decl-student" data-id="{{criterionid}}" data-decl-id="{{declid}}">
-                            {{#str}}declarelevel, competvet{{/str}}
-                        </button>
-                    {{/isstudent}}
-                    {{#isevaluator}}
-                        <button class="btn btn-sm btn-outline-secondary" data-action="cert-decl-evaluator" data-id="{{criterionid}}" data-decl-id="{{declid}}">
-                            {{#str}}validate, competvet{{/str}}
-                        </button>
-                    {{/isevaluator}}
+                        </div>
+                        <div>
+                            {{#validations}}
+                                {{#feedback}}
+                                    {{> mod_competvet/comment}}
+                                {{/feedback}}
+                            {{/validations}}
+                        </div>
+                        <div class="actions d-flex justify-content-end">
+                        {{#isstudent}}
+                            <button class="btn btn-sm btn-outline-secondary" data-action="cert-decl-student" data-id="{{criterionid}}" data-decl-id="{{declid}}">
+                                {{#str}}declarelevel, competvet{{/str}}
+                            </button>
+                        {{/isstudent}}
+                        {{#isevaluator}}
+                            <button class="btn btn-sm btn-outline-secondary" data-action="cert-decl-evaluator" data-id="{{criterionid}}" data-decl-id="{{declid}}">
+                                {{#str}}validate, competvet{{/str}}
+                            </button>
+                        {{/isevaluator}}
+                        </div>
                     </div>
                 </div>
+                <div class="col2 d-flex justify-content-end">
+                    {{#level}}<span class="font-weight-bold">{{level}}</span><span class="mx-2">/</span><span>{{total}}</span>{{/level}}
+                </div>
+                <div class="col3">
+                    {{#seendone}}
+                        <i class="fa fa-check text-success" aria-hidden="true"></i>
+                        <span class="sr-only">{{#str}}seendone, competvet{{/str}}</span>
+                    {{/seendone}}
+                    {{#notseen}}
+                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                        <span class="sr-only">{{#str}}notseen, competvet{{/str}}</span>
+                    {{/notseen}}
+                </div>
+                <div class="col4">
+                    {{#confirmed}}
+                        <i class="fa fa-check text-success" aria-hidden="true"></i>
+                        <span class="sr-only">{{#str}}valid:confirmed, competvet{{/str}}</span>
+                    {{/confirmed}}
+                    {{#observernotseen}}
+                        <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i>
+                        <span class="sr-only">{{#str}}valid:observernotseen, competvet{{/str}}</span>
+                    {{/observernotseen}}
+                    {{#levelnotreached}}
+                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                        <span class="sr-only">{{#str}}valid:levelnotreached, competvet{{/str}}</span>
+                    {{/levelnotreached}}
+                </div>
             </div>
-            <div class="col2 d-flex justify-content-end">
-                {{#level}}<span class="font-weight-bold">{{level}}</span><span class="mx-2">/</span><span>{{total}}</span>{{/level}}
-            </div>
-            <div class="col3">
-                {{#seendone}}
-                    <i class="fa fa-check text-success" aria-hidden="true"></i>
-                    <span class="sr-only">{{#str}}seendone, competvet{{/str}}</span>
-                {{/seendone}}
-                {{#notseen}}
-                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                    <span class="sr-only">{{#str}}notseen, competvet{{/str}}</span>
-                {{/notseen}}
-            </div>
-            <div class="col4">
-                {{#confirmed}}
-                    <i class="fa fa-check text-success" aria-hidden="true"></i>
-                    <span class="sr-only">{{#str}}valid:confirmed, competvet{{/str}}</span>
-                {{/confirmed}}
-                {{#observernotseen}}
-                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                    <span class="sr-only">{{#str}}valid:observernotseen, competvet{{/str}}</span>
-                {{/observernotseen}}
-                {{#levelnotreached}}
-                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                    <span class="sr-only">{{#str}}valid:levelnotreached, competvet{{/str}}</span>
-                {{/levelnotreached}}
-            </div>
-        </div>
-    {{/certifications}}
+        {{/certifications}}
+    {{/isdeclared}}
 {{/certification-results}}

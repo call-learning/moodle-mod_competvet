@@ -79,6 +79,7 @@ class get_certifications extends external_api {
             ),
             'numcertifications' => new external_value(PARAM_INT, 'The number of certifications'),
             'numvalidated' => new external_value(PARAM_INT, 'The number of validated certifications'),
+            'isdeclared' => new external_value(PARAM_BOOL, 'Is declared'),
         ]);
     }
 
@@ -104,9 +105,13 @@ class get_certifications extends external_api {
         $certifications = certifications::get_certifications($studentid, $planningid);
         // Get an array of all validations.
         $validations = 0;
+        $declared = 0;
         foreach ($certifications as $certification) {
             if ($certification['confirmed']) {
                 $validations++;
+            }
+            if ($certification['isdeclared']) {
+                $declared++;
             }
         }
 
@@ -114,6 +119,7 @@ class get_certifications extends external_api {
             'certifications' => $certifications,
             'numcertifications' => count($certifications),
             'numvalidated' => $validations,
+            'isdeclared' => $declared > 0 ? true : false,
         ];
     }
 

@@ -16,11 +16,14 @@
 namespace mod_competvet\external;
 
 use external_api;
+use context_system;
 use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use tool_brickfield\local\areas\core_course\fullname;
+use mod_competvet\local\api\plannings;
+
 
 /**
  * Class get_
@@ -30,13 +33,6 @@ use tool_brickfield\local\areas\core_course\fullname;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_user_list extends external_api {
-    /**
-     * @var string[] Valid role archetypes
-     */
-    const VALID_ROLE_ARCHETYPES = [
-        'student',
-        'teacher',
-    ];
 
     /**
      * Returns description of method parameters
@@ -45,8 +41,7 @@ class get_user_list extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'cmid' => new external_value(PARAM_INT, 'Course Module Id', VALUE_REQUIRED),
-            'roletype' => new external_value(PARAM_TEXT, 'Role type', VALUE_OPTIONAL, 'student'),
+            'planningid' => new external_value(PARAM_INT, 'The planning id', VALUE_REQUIRED),
         ]);
     }
 
@@ -59,12 +54,10 @@ class get_user_list extends external_api {
         return new external_single_structure([
             'users' => new external_multiple_structure(
                 new external_single_structure([
-                    'id' => new external_value(PARAM_INT, 'User id'),
-                    'firstname' => new external_value(PARAM_TEXT, 'User firstname'),
-                    'lastname' => new external_value(PARAM_TEXT, 'User lastname'),
-                    'fullname' => new external_value(PARAM_TEXT, 'User lastname'),
-                    'email' => new external_value(PARAM_TEXT, 'User email'),
-                    'pictureurl' => new external_value(PARAM_URL, 'User picture url'),
+                    'id' => new external_value(PARAM_INT, 'The user id'),
+                    'fullname' => new external_value(PARAM_TEXT, 'The user full name'),
+                    'userpictureurl' => new external_value(PARAM_TEXT, 'The user picture url'),
+                    'role' => new external_value(PARAM_TEXT, 'The user role'),
                 ])
             ),
         ]);
@@ -73,43 +66,25 @@ class get_user_list extends external_api {
     /**
      * Execute and return student list
      *
-     * @param int $cmid - Course Module Id
-     * @param string|null $roletype - Role type
+     * @param int $planningid - The planning id
      * @return array|array[]
      * @throws \invalid_parameter_exception
      */
-    public static function execute(int $cmid, ?string $roletype) {
-
-        $cm = get_coursemodule_from_id('competvet', $cmid, 0, false, MUST_EXIST);
-        $context = \context_module::instance($cm->id);
-        self::validate_context(\context_module::instance($cmid));
-        // Validate roles.
-        if (!in_array($roletype, self::VALID_ROLE_ARCHETYPES)) {
-            throw new \invalid_parameter_exception('Invalid role type');
-        }
-        // Now, can this user view other users.
-        course_require_view_participants($context->get_parent_context());
-        $roles = get_archetype_roles($roletype ?? 'student');
-        $users = get_role_users(array_keys($roles), $context, true);
-        $parsedusers = array_map(function ($user) {
-            global $PAGE;
-            $user = \core_user::get_user($user->id);
-            $userpicture = new \user_picture($user);
-            $userpicture->size = 100;
-            $userpicture->link = false;
-            $userpicture->alttext = false;
-            $pictureurl = $userpicture->get_url($PAGE);
-            return [
-                'id' => $user->id,
-                'firstname' => $user->firstname,
-                'lastname' => $user->lastname,
-                'fullname' => fullname($user),
-                'email' => $user->email,
-                'pictureurl' => $pictureurl->out(),
+    public static function execute(int $planningid) {
+        self::validate_context(context_system::instance());
+        $userswithinfo = plannings::get_users_infos_for_planning_id($planningid);
+        $users = [];
+        foreach ($userswithinfo['students'] as $user) {
+            $users[] = [
+                'id' => $user['userinfo']['id'],
+                'fullname' => $user['userinfo']['fullname'],
+                'userpictureurl' => $user['userinfo']['userpictureurl'],
+                'role' => $user['userinfo']['role'],
             ];
-        }, $users);
+        }
+
         return [
-            'users' => $parsedusers,
+            'users' => $users,
         ];
     }
 }

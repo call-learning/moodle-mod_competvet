@@ -47,13 +47,21 @@ const stateTemplate = () => {
             const evalchart = document.getElementById('evaluation-chart');
             const config = await chartConfig();
             config.data = transformContext(context);
-            new ChartJS(evalchart, config);
+            if (config.data.datasets.length > 0) {
+                new ChartJS(evalchart, config);
+            }
 
             // Render the Auto Evaluation Chart.
             const autoeval = document.getElementById('auto-evaluation-chart');
             const autoevalConfig = await chartConfig(true);
             autoevalConfig.data = transformContext(context, true);
-            new ChartJS(autoeval, autoevalConfig);
+            if (autoevalConfig.data.datasets.length > 0) {
+                new ChartJS(autoeval, autoevalConfig);
+            }
+
+            if (config.data.datasets.length === 0 && autoevalConfig.data.datasets.length === 0) {
+                region.innerHTML = '';
+            }
 
             return;
         }).catch(Notification.exception);
@@ -74,12 +82,12 @@ const transformContext = (context, autoeval) => {
     const labels = data.evaluations.map(criterion => criterion.name);
     const graders = [];
     const colors = [
-        'rgba(255, 99, 132, 0.2)',
-        'rgba(54, 162, 235, 0.2)',
-        'rgba(255, 206, 86, 0.2)',
-        'rgba(75, 192, 192, 0.2)',
-        'rgba(153, 102, 255, 0.2)',
-        'rgba(255, 159, 64, 0.2)',
+        'rgba(255, 99, 132, 0.6)',
+        'rgba(54, 162, 235, 0.6)',
+        'rgba(255, 206, 86, 0.6)',
+        'rgba(75, 192, 192, 0.6)',
+        'rgba(153, 102, 255, 0.6)',
+        'rgba(255, 159, 64, 0.6)',
     ];
 
     data.evaluations.forEach(criterion => {

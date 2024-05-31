@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 $functions = [
     'mod_competvet_get_user_list' => [
-        'classname' => 'mod_competvet\\external\\get_user_list',
+        'classname' => mod_competvet\external\get_user_list::class,
         'methodname' => 'execute',
         'description' => 'Get get_user_list for the given activity',
         'type' => 'read',

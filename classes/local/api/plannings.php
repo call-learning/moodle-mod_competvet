@@ -219,7 +219,7 @@ class plannings {
      * @return array
      */
     public static function get_planning_info_for_student(int $planningid, int $userid): array {
-        $params = ['planningid' => $planningid, 'status' => observation::STATUS_COMPLETED, 'studentid' => $userid];
+        $params = ['planningid' => $planningid, 'studentid' => $userid];
         $observations =
             observation::get_records($params, 'studentid, observerid');
         $planning = planning::get_record(['id' => $planningid]);
@@ -316,7 +316,7 @@ class plannings {
             $userinfo = [];
             $userinfo['userinfo'] = utils::get_user_info($studentid);
             $userinfo['userinfo']['role'] = 'student';
-            $params = ['planningid' => $planningid, 'status' => observation::STATUS_COMPLETED, 'studentid' => $studentid];
+            $params = ['planningid' => $planningid, 'studentid' => $studentid];
             $observations =
                 observation::get_records($params, 'studentid, observerid');
             $userinfo['planninginfo'] = self::create_planning_info_for_student($studentid, $situation, $observations, $planningid);

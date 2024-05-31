@@ -62,6 +62,11 @@
     }
 }}
 {{#list-results}}
+    {{^cases}}
+        <div class="alert alert-info w-50 mx-auto ">
+            {{#str}}nocases, mod_competvet{{/str}}
+        </div>
+    {{/cases}}
     {{#cases}}
         <div class="case mb-3">
             {{#isstudent}}

@@ -50,7 +50,7 @@ class formdata {
             $form->set('json', $json);
             $form->update();
         }
-        return true;
+        return $form->get('id') > 0;
     }
 
     /**

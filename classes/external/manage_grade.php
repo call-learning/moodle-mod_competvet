@@ -23,6 +23,7 @@ use external_value;
 use external_single_structure;
 use external_warnings;
 use mod_competvet\competvet;
+use mod_competvet\local\api\formdata;
 use stdClass;
 
 require_once($CFG->dirroot . '/lib/gradelib.php');
@@ -120,6 +121,7 @@ class manage_grade extends external_api {
         return new external_function_parameters([
             'userid' => new external_value(PARAM_INT, 'The user id', VALUE_REQUIRED),
             'cmid' => new external_value(PARAM_INT, 'The course module id', VALUE_REQUIRED),
+            'planningid' => new external_value(PARAM_INT, 'The planning id', VALUE_REQUIRED),
         ]);
     }
 
@@ -128,13 +130,15 @@ class manage_grade extends external_api {
      *
      * @param int $userid
      * @param int $cmid
+     * @param int $planningid
      * @return array
      */
-    public static function get($userid, $cmid): array {
+    public static function get($userid, $cmid, $planningid): array {
         global $DB;
         $params = self::validate_parameters(self::get_parameters(), [
             'userid' => $userid,
             'cmid' => $cmid,
+            'planningid' => $planningid,
         ]);
         $cmid = $params['cmid'];
         $userid = $params['userid'];
@@ -142,32 +146,12 @@ class manage_grade extends external_api {
         self::validate_context($competvet->get_context());
         $grades = grade_get_grades($competvet->get_course_id(), 'mod', 'competvet', $competvet->get_instance_id(), $userid);
         $usergrade = intval($grades->items[0]->grades[$userid]->grade);
+        $userdata = formdata::get($userid, $planningid, 'globalgrade');
 
         $grade = new stdClass();
         $grade->suggestedgrade = '';
-        $grade->comment = 'test';
-        // If this is to be used, use the configured grade scale from moodle core.
-        $grade->finalgradeoptions = [
-            ['key' => 90, 'value' => 'A', 'selected' => false],
-            ['key' => 80, 'value' => 'B', 'selected' => false],
-            ['key' => 70, 'value' => 'C', 'selected' => false],
-            ['key' => 60, 'value' => 'D', 'selected' => false],
-            ['key' => 50, 'value' => 'E', 'selected' => false],
-            ['key' => 40, 'value' => 'F', 'selected' => false],
-            ['key' => 30, 'value' => 'G', 'selected' => false],
-            ['key' => 20, 'value' => 'H', 'selected' => false],
-            ['key' => 10, 'value' => 'I', 'selected' => false],
-            ['key' => 0, 'value' => 'J', 'selected' => false],
-        ];
-
-        $grade->selectedgrade = 'D';
         $grade->finalgrade = $usergrade;
-
-        if ($usergrade) {
-            foreach ($grade->finalgradeoptions as &$option) {
-                $option['selected'] = $option['key'] === $usergrade;
-            }
-        }
+        $grade->comment = $userdata['json'];
 
         return [
             'result' => $grade,
@@ -185,18 +169,8 @@ class manage_grade extends external_api {
         return new external_single_structure([
             'result' => new external_single_structure(
                 [
-                    'suggestedgrade' => new external_value(PARAM_TEXT, 'The suggested grade'),
                     'comment' => new external_value(PARAM_TEXT, 'The comment'),
-                    'finalgradeoptions' => new external_multiple_structure(
-                        new external_single_structure(
-                            [
-                                'key' => new external_value(PARAM_TEXT, 'The key'),
-                                'value' => new external_value(PARAM_TEXT, 'The value'),
-                                'selected' => new external_value(PARAM_BOOL, 'The selected value'),
-                            ]
-                        )
-                    ),
-                    'selectedgrade' => new external_value(PARAM_TEXT, 'The selected grade'),
+                    'suggestedgrade' => new external_value(PARAM_TEXT, 'The suggested grade'),
                     'finalgrade' => new external_value(PARAM_INT, 'The final grade'),
                 ]
             ),

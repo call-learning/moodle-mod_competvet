@@ -49,16 +49,18 @@ class student_certifications extends base {
      * @return array|array[]|stdClass
      */
     public function export_for_template(renderer_base $output) {
+        global $USER;
         $data = parent::export_for_template($output);
 
         // Get the certifiation criteria.
         $data['certification-results'] = [
-            'certifications' => $this->certifications
+            'certifications' => $this->certifications,
         ];
         $planning = planning::get_record(['id' => $this->planninginfo['planningid']]);
         $data['cmid'] = competvet::get_from_situation_id($planning->get('situationid'))->get_course_module_id();
         $data['planningid'] = $this->planninginfo['planningid'];
         $data['studentid'] = $this->planninginfo['id'];
+        $data['certification-results']['isdeclared'] = true;
         $situation = $planning->get_situation();
         $userrole = user_role::get_top($this->currentuserid, $situation->get('id'));
         $data['isstudent'] = $userrole == 'student';
