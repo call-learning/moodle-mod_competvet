@@ -56,7 +56,7 @@ class app implements named_templatable, renderable {
      * @return stdClass - Flat list of exported data.
      */
     public function export_for_template(renderer_base $output) {
-        global $USER;
+        global $USER, $CFG;
 
         $export = new stdClass();
         $export->userid = $this->userid;
@@ -73,6 +73,7 @@ class app implements named_templatable, renderable {
         $export->planningid = optional_param('planningid', 0, PARAM_INT);
         $export->studentid = optional_param('studentid', 0, PARAM_INT);
         $export->returnurl = optional_param('returnurl', '', PARAM_URL);
+        $export->debugging = $CFG->debugdisplay;
         return $export;
     }
 

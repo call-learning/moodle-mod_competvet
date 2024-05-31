@@ -52,7 +52,16 @@
 
             <div class="form-group mb-2">
                 <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="deactivatepenalty" name="deactivatepenalty" data-field="deactivatepenalty" {{#deactivatepenalty}}checked{{/deactivatepenalty}} />
+                    <input
+                        type="checkbox"
+                        class="custom-control-input{{!
+                            }}{{#isvalid}} is-valid{{/isvalid}}{{!
+                            }}{{#isinvalid}} is-invalid{{/isinvalid}}"
+                        id="deactivatepenalty"
+                        name="deactivatepenalty"
+                        data-field="deactivatepenalty"
+                        {{#deactivatepenalty}}checked{{/deactivatepenalty}}
+                    />
                     <label class="custom-control-label" for="deactivatepenalty">
                         {{#str}}deactivatepenalty, mod_competvet{{/str}}
                     </label>
@@ -62,7 +71,14 @@
                 <label for="selfevaluation">
                     {{#str}}selfevaluation, mod_competvet{{/str}}
                 </label>
-                <select class="custom-select ml-auto" id="selfevaluation" name="selfevaluation" data-field="selfevaluation">
+                <select
+                    class="custom-select ml-auto{{!
+                        }}{{#isvalid}} is-valid{{/isvalid}}{{!
+                        }}{{#isinvalid}} is-invalid{{/isinvalid}}"
+                    id="selfevaluation"
+                    name="selfevaluation"
+                    data-field="selfevaluation"
+                >
                     {{#selfevalselectoptions}}
                     <option value="{{key}}" {{#selected}}selected{{/selected}}>{{#str}}selfevalbonus, mod_competvet, {{value}}{{/str}}</option>
                     {{/selfevalselectoptions}}
@@ -88,7 +104,19 @@
                     </div>
                 </div>
                 <div class="col-3 pr-0">
-                    <input type="number" data-field="scoreevaluator" class="form-control" id="scoreevaluator" name="scoreevaluator" value="{{scoreevaluator}}" min="0" max="{{maxfinalscore}}" step="1" />
+                    <input
+                        type="number"
+                        data-field="scoreevaluator"
+                        class="form-control{{!
+                            }}{{#isvalid}} is-valid{{/isvalid}}{{!
+                            }}{{#isinvalid}} is-invalid{{/isinvalid}}"
+                        id="scoreevaluator"
+                        name="scoreevaluator"
+                        value="{{scoreevaluator}}"
+                        min="0"
+                        max="{{maxfinalscore}}"
+                        step="1"
+                    />
                 </div>
             </div>
         </div>
@@ -97,7 +125,16 @@
                 <label for="freecommenteval">
                     {{#str}}freecommenteval, mod_competvet{{/str}}
                 </label>
-                <textarea data-field="comment" class="form-control" id="comment" name="comment" rows="3">{{comment}}</textarea>
+                <textarea
+                    data-field="comment"
+                    class="form-control{{!
+                        }}{{#comment}}{{!
+                            }}{{#isvalid}} is-valid{{/isvalid}}{{!
+                            }}{{#isinvalid}} is-invalid{{/isinvalid}}{{!
+                        }}{{/comment}}"
+                    id="comment"
+                    name="comment"
+                    rows="3">{{comment}}</textarea>
             </div>
         </div>
         <div class="d-flex justify-content-center">

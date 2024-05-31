@@ -96,7 +96,8 @@ const formEvents = () => {
             json: JSON.stringify(context.grading)
         };
         const result = await Repository.saveFormData(args);
-        context.result = result;
+        context.isvalid = result.result;
+        context.isinvalid = !result.result;
         CompetState.setValue('list-grading', context);
 
         // Now set the sub grade that will be used for the suggested grade.

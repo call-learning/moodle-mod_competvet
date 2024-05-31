@@ -57,7 +57,14 @@
                         {{#str}}evaluatordecision_help, mod_competvet{{/str}}
                     </div>
                 </div>
-                <select class="custom-select ml-auto" id="evaluatordecision" name="evaluatordecision" data-field="evaluatordecision">
+                <select
+                    class="custom-select ml-auto{{!
+                        }}{{#isvalid}} is-valid{{/isvalid}}{{!
+                        }}{{#isinvalid}} is-invalid{{/isinvalid}}"
+                    id="evaluatordecision"
+                    name="evaluatordecision"
+                    data-field="evaluatordecision"
+                >
                     {{#evaloptions}}
                         <option value="{{key}}" {{#selected}}selected{{/selected}}>{{value}}</option>
                     {{/evaloptions}}
@@ -69,7 +76,16 @@
                 <label for="evalcomment">
                     {{#str}}evalcomment, mod_competvet{{/str}}
                 </label>
-                <textarea data-field="comment" class="form-control" id="comment" name="comment" rows="3">{{comment}}</textarea>
+                <textarea
+                    data-field="comment"
+                    class="form-control{{!
+                        }}{{#comment}}{{!
+                            }}{{#isvalid}} is-valid{{/isvalid}}{{!
+                            }}{{#isinvalid}} is-invalid{{/isinvalid}}{{!
+                        }}{{/comment}}"
+                    id="comment"
+                    name="comment"
+                    rows="3">{{comment}}</textarea>
             </div>
         </div>
         <div class="d-flex justify-content-center">

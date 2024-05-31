@@ -22,6 +22,7 @@ use mod_competvet\local\api\plannings;
 use mod_competvet\local\api\user_role;
 use mod_competvet\utils;
 use moodle_url;
+use single_button;
 use renderer_base;
 use stdClass;
 
@@ -146,5 +147,18 @@ class student_evaluations extends base {
             ));
         }
         [$this->planninginfo, $this->vieweval, $this->observations, $this->criteria] = $data;
+    }
+
+    public function get_button(): ?single_button {
+        $query = [];
+        parse_str(parse_url($_SERVER['REQUEST_URI'])['query'], $query);
+        $query['returnurl'] = $_SERVER['REQUEST_URI'];
+        return new single_button(
+            new moodle_url(
+                '/mod/competvet/grading.php',
+                $query
+            ),
+            get_string('gradeverb')
+        );
     }
 }

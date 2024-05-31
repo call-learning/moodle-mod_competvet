@@ -105,8 +105,8 @@ class Competvet {
         await this.setListGrading();
         await this.setSubGrades();
         await this.setGlobalGrade();
-        this.setSuggestedGrade();
         await this.setForms();
+        this.setSuggestedGrade();
         this.setStateFormValues();
     }
 
@@ -156,9 +156,9 @@ class Competvet {
             }
         };
         context.grading.criteria.forEach(criterion => {
-            // Set the option with the lowest sortorder as the default selected option.
+            // Set the option with the second sortorder as the default selected option.
             criterion.options.sort((a, b) => a.sortorder - b.sortorder);
-            criterion.options[0].selected = true;
+            criterion.options[1].selected = true;
         });
         CompetState.setValue('list-grading', context);
     }
@@ -168,8 +168,7 @@ class Competvet {
      */
     async getUsers() {
         const args = {
-            cmid: this.cmId,
-            roletype: 'student'
+            planningid: this.planning.id
         };
         const response = await Repository.getUserList(args);
         if (!response.users) {
@@ -184,6 +183,7 @@ class Competvet {
     async setGlobalGrade() {
         const args = {
             cmid: this.cmId,
+            planningid: this.planning.id,
             userid: this.currentUser.id
         };
         const response = await Repository.getGlobalGrade(args);

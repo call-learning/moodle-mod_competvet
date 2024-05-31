@@ -160,6 +160,7 @@ class certifications {
             $cert->set('status', $status);
             $cert->set('comment', $comment);
             $cert->set('commentformat', $commentformat);
+            $cert->save();
         } catch (invalid_persistent_exception $e) {
             debugging($e->getMessage());
             return null;

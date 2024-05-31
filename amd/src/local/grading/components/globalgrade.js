@@ -52,19 +52,15 @@ const formCalculation = () => {
     const {globalgrade, user} = CompetState.getData();
     globalgrade.userid = user.id;
     globalgrade.finalgrade = formObject.finalgrade;
-    globalgrade.finalgradeoptions.forEach(element => {
-        if (element.key == formObject.finalgrade) {
-            element.selected = true;
-        } else {
-            element.selected = false;
-        }
-    });
     globalgrade.comment = formObject.comment;
     return globalgrade;
 };
 
 const formEvents = () => {
     const form = document.querySelector('[data-region="globalgrade"]');
+    if (form.dataset.events) {
+        return;
+    }
     form.addEventListener('submit', async(e) => {
         e.preventDefault();
         const globalgrade = formCalculation();
@@ -75,9 +71,23 @@ const formEvents = () => {
             cmid: planning.cmid,
             grade: globalgrade.finalgrade,
         };
-        await Repository.saveGlobalGrade(args);
+        const result = await Repository.saveGlobalGrade(args);
+        globalgrade.gradesuccess = result.result;
+        globalgrade.gradeerror = !result.result;
+
+        const formDataArgs = {
+            userid: user.id,
+            planningid: planning.id,
+            formname: 'globalgrade',
+            json: globalgrade.comment,
+        };
+        const resultForm = await Repository.saveFormData(formDataArgs);
+        globalgrade.commentsuccess = resultForm.result;
+        globalgrade.commenterror = !resultForm.result;
+
         CompetState.setValue('globalgrade', globalgrade);
     });
+    form.dataset.events = true;
 };
 
 stateTemplate();

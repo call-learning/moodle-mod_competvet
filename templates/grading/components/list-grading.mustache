@@ -40,14 +40,33 @@
                 <div class="criterion-options">
                     {{#options}}
                         <div class="custom-control custom-checkbox">
-                            <input type="radio" class="custom-control-input" id="criterion-{{criterionid}}-option-{{optionid}}" name="criterion-{{criterionid}}" value="{{grade}}" {{#selected}}checked{{/selected}}>
+                            <input
+                                type="radio"
+                                class="custom-control-input{{!
+                                    }}{{#selected}}{{!
+                                        }}{{#isvalid}} is-valid{{/isvalid}}{{!
+                                        }}{{#isinvalid}} is-invalid{{/isinvalid}}{{!
+                                    }}{{/selected}}"
+                                id="criterion-{{criterionid}}-option-{{optionid}}"
+                                name="criterion-{{criterionid}}"
+                                value="{{grade}}"
+                                {{#selected}}checked{{/selected}}
+                            >
                             <label class="custom-control-label" for="criterion-{{criterionid}}-option-{{optionid}}">{{{title}}} (<strong>{{#str}}points, mod_competvet, {{grade}}{{/str}}</strong>)</label>
                         </div>
                     {{/options}}
                 </div>
                 <div class="mb-3">
                     <label class="mt-2 mb-0" for="criterion-{{criterionid}}-comment">{{#str}}comment, mod_competvet{{/str}}</label>
-                    <textarea class="form-control" id="criterion-{{criterionid}}-comment" name="criterion-{{criterionid}}-comment" rows="1">{{comment}}</textarea>
+                    <textarea
+                        class="form-control{{!
+                            }}{{#comment}}{{!
+                                }}{{#isvalid}} is-valid{{/isvalid}}{{!
+                                }}{{#isinvalid}} is-invalid{{/isinvalid}}{{!
+                            }}{{/comment}}"
+                        id="criterion-{{criterionid}}-comment"
+                        name="criterion-{{criterionid}}-comment"
+                        rows="1">{{comment}}</textarea>
                 </div>
             </section>
         {{/criteria}}

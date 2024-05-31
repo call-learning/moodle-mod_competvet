@@ -252,6 +252,7 @@ $string['freecommenteval'] = 'Free comment for the Eval part';
 $string['selfevalnone'] = '+ 0 No relevant self-evaluation';
 $string['selfevalbonus'] = '+{$a} realised and relevant';
 $string['supervisorchart'] = 'Supervisor chart';
+$string['noevaluations'] = 'No evaluations';
 
 // Certif
 $string['certifevaluation'] = 'Certif evaluation';
@@ -264,6 +265,8 @@ $string['confidencelevel'] = 'Confidence level';
 $string['seendone'] = 'Seen and done';
 $string['confirmed'] = 'Confirmed';
 $string['notseen'] = 'Not seen';
+$string['validated'] = 'Validated';
+$string['nocertifications'] = 'No certifications';
 
 $string['evaluation'] = 'Global Evaluation';
 $string['suggestedgrade'] = 'Suggested grade';
@@ -296,6 +299,7 @@ $string['animalsex'] = 'Sex';
 $string['animalsexunknown'] = 'Unknown Sex';
 $string['animalage'] = 'Age';
 $string['animalageunknown'] = 'Unknown Age';
+$string['nocases'] = 'No cases';
 
 // Webservice warnings
 $string['gridnotfound'] = 'The grid with id {$a} was not found';
@@ -323,6 +327,7 @@ $string['supervisorsection'] = 'Supervisors';
 $string['valid:confirmed'] = 'I confirm that this essential has been achieved';
 $string['valid:notseen'] = 'I do not validate because I did not see this essential';
 $string['valid:levelnotreached'] = 'I do not validate because the level is not reached';
+$string['valid:observernotseen'] = 'The observer did not see this essential';
 
 // Suggested grade
 $string['gradeK1'] = 'Grade calculation constant K1';
