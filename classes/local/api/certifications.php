@@ -30,6 +30,23 @@ use mod_competvet\utils;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class certifications {
+
+    /**
+     * Decl status types
+     */
+    const GLOBAL_CERT_STATUS_NOT_SEEN = 1;
+    const GLOBAL_CERT_STATUS_WAITING = 2;
+    const GLOBAL_CERT_STATUS_VALIDATED = 3;
+
+    /**
+     * Decl status types
+     */
+    const GLOBAL_CERT_STATUS_TYPES = [
+        self::GLOBAL_CERT_STATUS_NOT_SEEN => 'cert:global:notseen',
+        self::GLOBAL_CERT_STATUS_WAITING => 'cert:global:waiting',
+        self::GLOBAL_CERT_STATUS_VALIDATED => 'cert:global:validated',
+    ];
+
     /**
      * Add a certification
      * @param int $criterionid The criterion id
@@ -212,11 +229,12 @@ class certifications {
      * Get the certifications and validations for a student
      *
      * Get the list of certifications for a student and add the level and comment provided by the student and the supervisor(s)
-     * @param int $studentid The student id
+     *
      * @param int $planningid The planning id
+     * @param int $studentid The student id
      * @return array The certifications
      */
-    public static function get_certifications($studentid, $planningid) : array {
+    public static function get_certifications(int $planningid, int $studentid): array {
         $gridid = criteria::get_grid_for_planning($planningid, 'cert')->get('id');
         $criteria = criteria::get_criteria_for_grid($gridid);
 
@@ -281,5 +299,34 @@ class certifications {
             $returnarray[] = $certrecord;
         }
         return $returnarray;
+    }
+
+    /**
+     * Get the certifications and validations for a student by status
+     *
+     *
+     * @param int $planningid The planning id
+     * @param int $studentid The student id
+     * @return array The certifications classified by status
+     */
+    public static function get_certifications_by_status(int $planningid, int $studentid): array {
+        $certifications = self::get_certifications($planningid, $studentid);
+        $certsbystatus = [
+            self::GLOBAL_CERT_STATUS_NOT_SEEN => [],
+            self::GLOBAL_CERT_STATUS_WAITING => [],
+            self::GLOBAL_CERT_STATUS_VALIDATED => [],
+        ];
+        foreach ($certifications as $cert) {
+            if ($cert['status'] == cert_decl::STATUS_STUDENT_NOTSEEN) {
+                $certsbystatus[self::GLOBAL_CERT_STATUS_NOT_SEEN][] = $cert;
+            } else {
+                if ($cert['confirmed']) {
+                    $certsbystatus[self::GLOBAL_CERT_STATUS_VALIDATED][] = $cert;
+                } else {
+                    $certsbystatus[self::GLOBAL_CERT_STATUS_WAITING][] = $cert;
+                }
+            }
+        }
+        return $certsbystatus;
     }
 }

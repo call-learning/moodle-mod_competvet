@@ -74,7 +74,7 @@ class student_evaluations extends base {
                             'graderinfo' => utils::get_user_info($observation['grader']),
                             'viewurl' => (new moodle_url(
                                 $this->vieweval,
-                                ['evalid' => $observation['id']]
+                                ['obsid' => $observation['id']]
                             ))->out(false),
                         ];
                     }
