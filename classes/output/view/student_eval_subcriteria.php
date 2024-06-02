@@ -66,7 +66,7 @@ class student_eval_subcriteria extends base {
     public function set_data(...$data) {
         if (empty($data)) {
             global $PAGE;
-            $evaluationid = required_param('evalid', PARAM_INT);
+            $evaluationid = required_param('obsid', PARAM_INT);
             $criterionid = required_param('criterionid', PARAM_INT);
             $userevaluations = observations::get_observation_information($evaluationid);
             $criterion = null;
@@ -84,7 +84,7 @@ class student_eval_subcriteria extends base {
             $cmid = $competvet->get_course_module_id();
             $this->set_backurl(new moodle_url(
                 $this->baseurl,
-                ['pagetype' => 'student_eval', 'id' => $cmid, 'evalid' => $evaluationid]
+                ['pagetype' => 'student_eval', 'id' => $cmid, 'obsid' => $evaluationid]
             ));
         }
         [$this->subcriteria] = $data;

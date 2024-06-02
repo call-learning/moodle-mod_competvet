@@ -75,7 +75,7 @@ class student_eval extends base {
         }
         $data['canedit'] = $this->evaluation['canedit'];
         $data['candelete'] = $this->evaluation['candelete'];
-        $data['editreturnurl'] = (new moodle_url($this->baseurl, ['evalid' => $this->evaluation['id']]))->out(true);
+        $data['editreturnurl'] = (new moodle_url($this->baseurl, ['obsid' => $this->evaluation['id']]))->out(true);
         $data['id'] = $this->evaluation['id'];
         $observation  = observation::get_record(['id' => $this->evaluation['id']]);
         $competvet = competvet::get_from_situation($observation->get_situation());
@@ -99,19 +99,19 @@ class student_eval extends base {
             global $PAGE;
             $context = $PAGE->context;
             $competvet = competvet::get_from_context($context);
-            $evaluationid = required_param('evalid', PARAM_INT);
-            $userevaluations = observations::get_observation_information($evaluationid);
+            $observationid = required_param('obsid', PARAM_INT);
+            $userevaluations = observations::get_observation_information($observationid);
             $data = [$userevaluations,
                 new moodle_url(
                     $this->baseurl,
                     [
                         'pagetype' => 'student_eval_subcriteria',
                         'id' => $competvet->get_course_module_id(),
-                        'evalid' => $evaluationid,
+                        'obsid' => $observationid,
                     ]
                 ),
             ];
-            $observation = observation::get_record(['id' => $evaluationid]);
+            $observation = observation::get_record(['id' => $observationid]);
             $planningid = $observation->get('planningid');
             $studentid = $observation->get('studentid');
             $this->set_backurl(

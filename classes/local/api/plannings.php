@@ -269,10 +269,14 @@ class plannings {
         }
         $info[] = $eval;
         $info[] = $autoeval;
+        $gridid = criteria::get_grid_for_planning($planningid, 'cert')->get('id');
+        $criteria = criteria::get_sorted_parent_criteria($gridid);
+        $certifcations = certifications::get_certifications($planningid, $studentid);
+        $numvalidated = array_reduce($certifcations, fn($carry, $certification) => $carry + $certification['confirmed'], 0);
         $info[] = [
             'type' => 'cert',
-            'nbdone' => 0,
-            'nbrequired' => 0,
+            'nbdone' => $numvalidated,
+            'nbrequired' => count($criteria),
         ];
         $entries = case_entry::get_records(['studentid' => $studentid, 'planningid' => $planningid]);
         $info[] = [
@@ -280,15 +284,7 @@ class plannings {
             'nbdone' => count($entries),
             'nbrequired' => 0,
         ];
-        $gridid = criteria::get_grid_for_planning($planningid, 'cert')->get('id');
-        $criteria = criteria::get_sorted_parent_criteria($gridid);
-        $certifcations = certifications::get_certifications($studentid, $planningid);
-        $numvalidated = array_reduce($certifcations, fn($carry, $certification) => $carry + $certification['confirmed'], 0);
-        $info[] = [
-            'type' => 'cert',
-            'nbdone' => $numvalidated,
-            'nbrequired' => count($criteria),
-        ];
+
         return $info;
     }
 

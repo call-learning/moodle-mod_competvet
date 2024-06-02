@@ -1023,14 +1023,27 @@ function xmldb_competvet_upgrade($oldversion) {
         }
 
         $field = new xmldb_field('itemnumber', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'competvet');
+        if ($dbman->field_exists($table, $field)) // Launch rename field type.
+        {
+            $dbman->rename_field($table, $field, 'type');
+        }
 
-        // Launch rename field type.
-        $dbman->rename_field($table, $field, 'type');
 
         $index = new xmldb_index('competvetusergrade_ux', XMLDB_INDEX_UNIQUE, ['competvet', 'type']);
 
         // Conditionally launch add index competvetusergrade_ux.
         if (!$dbman->index_exists($table, $index)) {
+            // Check duplicat entries.
+            $records = $DB->get_records('competvet_grades', null, 'competvet, type', 'id, competvet, type');
+            $existingrecords = [];
+            foreach ($records as $record) {
+                $hash = $record->competvet . '-' . $record->type;
+                if (isset($existingrecords[$hash])) {
+                    $DB->delete_records('competvet_grades', ['id' => $record->id]);
+                    continue;
+                }
+                $existingrecords[$hash] = true;
+            }
             $dbman->add_index($table, $index);
         }
 
