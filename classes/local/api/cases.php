@@ -33,11 +33,12 @@ use stdClass;
 class cases {
     /**
      * Get the case user entries
-     * @param int $studentid The user id
-     * @param int $planningid The planning id
+     *
+     * @param int|null $planningid The planning id
+     * @param int|null $studentid The user id
      * @return stdClass
      */
-    public static function get_entries(?int $studentid = null, ?int $planningid = null): stdClass {
+    public static function get_entries(?int $planningid = null, ?int $studentid = null): stdClass {
         $structure = self::get_case_structure();
         $entries = case_entry::get_records(['studentid' => $studentid, 'planningid' => $planningid]);
         $cases = [];
@@ -194,5 +195,51 @@ class cases {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Get the case user entries
+     *
+     * @param int $planningid The planning id
+     * @param int $studentid The user id
+     * @return array
+     */
+    public static function get_case_list(int $planningid, int $studentid): array {
+        $entries = self::get_entries($planningid, $studentid);
+        $caselist = [];
+        foreach($entries->cases as $case) {
+            $casetrans = [
+                'id' => $case->id,
+                'timecreated' => $case->timecreated,
+            ];
+            $casetrans['espece'] = self::get_case_field_value($case, 'espece') ?? '';
+            $casetrans['animal'] = self::get_case_field_value($case, 'nom_animal') ?? '';
+            $casetrans['date'] = self::get_case_field_value($case, 'date_cas', true) ?? 0;
+            $casetrans['label'] = self::get_case_field_value($case, 'motif_presentation') ?? '';
+            $caselist[] = $casetrans;
+        }
+        return $caselist;
+    }
+
+    /**
+     * Get case field value accross categories
+     *
+     * @param mixed $case
+     * @param string $string
+     * @return mixed|null
+     */
+    private static function get_case_field_value(mixed $case, string $string, bool $rawvalue = false) {
+        foreach ($case->categories as $category) {
+            foreach ($category->fields as $field) {
+                if ($field->idnumber == $string) {
+                    if ($rawvalue) {
+                        return $field->value;
+                    } else {
+                        return $field->displayvalue;
+                    }
+                }
+            }
+        }
+        return null;
     }
 }

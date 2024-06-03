@@ -87,7 +87,7 @@ class student_list extends base  {
             $planningid = required_param('planningid', PARAM_INT);
             $studentid = required_param('studentid', PARAM_INT);
             $planninginfo = plannings::get_planning_info_for_student($planningid, $studentid);
-            $cases = cases::get_entries($studentid, $planningid);
+            $cases = cases::get_entries($planningid, $studentid);
             $situationid = $planninginfo['situationid'];
             $competvet = competvet::get_from_situation_id($situationid);
             $data = [
