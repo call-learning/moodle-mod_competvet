@@ -289,6 +289,9 @@ $string['addoption'] = 'Add an option';
 $string['newcriterion'] = 'New criterion';
 $string['newoption'] = 'New option';
 $string['newgrid'] = 'New grid';
+$string['cert:global:notseen'] = 'Not seen';
+$string['cert:global:validated'] = 'Validated';
+$string['cert:global:waiting'] = 'Waiting';
 
 // English list
 $string['animal'] = 'Animal';
