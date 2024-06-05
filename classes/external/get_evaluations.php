@@ -26,6 +26,8 @@ use external_multiple_structure;
 use mod_competvet\competvet;
 use mod_competvet\local\api\observations;
 use mod_competvet\local\persistent\planning;
+use mod_competvet\local\api\criteria;
+use mod_competvet\utils;
 
 /**
  * Class get_evaluations
@@ -48,14 +50,23 @@ class get_evaluations extends external_api {
                 'evaluations' => new external_multiple_structure(
                     new external_single_structure(
                         [
-                            'id' => new external_value(PARAM_INT, 'Evaluation id'),
-                            'name' => new external_value(PARAM_TEXT, 'Evaluation name'),
+                            'criterion' => new external_single_structure(
+                                [
+                                    'id' => new external_value(PARAM_INT, 'Criterion id'),
+                                    'label' => new external_value(PARAM_TEXT, 'Criterion name'),
+                                ]
+                            ),
                             'grades' => new external_multiple_structure(
                                 new external_single_structure(
                                     [
-                                        'userid' => new external_value(PARAM_INT, 'User id'),
-                                        'gradername' => new external_value(PARAM_TEXT, 'Grader name'),
-                                        'value' => new external_value(PARAM_INT, 'Grade'),
+                                        'level' => new external_value(PARAM_INT, 'Grade', VALUE_OPTIONAL),
+                                        'graderinfo' => new external_single_structure(
+                                            [
+                                                'id' => new external_value(PARAM_INT, 'Grader id'),
+                                                'fullname' => new external_value(PARAM_TEXT, 'Grader full name'),
+                                                'userpictureurl' => new external_value(PARAM_URL, 'Grader picture url'),
+                                            ]
+                                        , 'grader info', VALUE_OPTIONAL),
                                     ]
                                 )
                             ),
@@ -119,35 +130,26 @@ class get_evaluations extends external_api {
             $userevals[] = observations::get_observation_information($number);
         }
 
-        // The $userevals array looks like the $example array. We need to transform it to the $return array.
-        // The $return array is the data that will be returned by this function. each $userevals item uses the same criteria
-        // and the same context. The only difference is the user id and the grade. We need to group the grades by criteria
-        // and return the data in the $return array.
-
-        $evals = [];
-        foreach ($userevals as $usereval) {
-            // get the grader name from the comments. ASK LAURENT FOR A BETTER WAY TO DO THIS.
-            $gradername = $usereval['comments'][0]['userinfo']['fullname'];
-            foreach ($usereval['criteria'] as $criterion) {
-                $criterionid = $criterion['criterioninfo']['id'];
-                $criterionname = $criterion['criterioninfo']['label'];
-                $grade = $criterion['level'];
-                $userid = $usereval['context']['usermodified'];
-
-                if (!isset($evals[$criterionid])) {
-                    $evals[$criterionid] = [
-                        'name' => $criterionname,
-                        'id' => $criterionid,
-                        'grades' => [],
-                    ];
+        $gridid = criteria::get_grid_for_planning($planningid, 'eval')->get('id');
+        $criteria = criteria::get_sorted_parent_criteria($gridid);
+        $gradedcriteria = [];
+        foreach ($criteria as $criterion) {
+            $grades = [];
+            foreach ($userevals as $observation) {
+                $grades[$observation['grader']] = [];
+                foreach ($observation['criteria'] as $obscrit) {
+                    if ($criterion['id'] == $obscrit['criterioninfo']['id']) {
+                        $grades[$observation['grader']] = [
+                            'level' => $obscrit['level'],
+                            'graderinfo' => utils::get_user_info($observation['grader'])
+                        ];
+                    }
                 }
-
-                $evals[$criterionid]['grades'][] = [
-                    'userid' => $userid,
-                    'gradername' => $gradername,
-                    'value' => $grade,
-                ];
             }
+            $gradedcriteria[] = [
+                'criterion' => $criterion,
+                'grades' => array_values($grades),
+            ];
         }
 
         $comments = [];
@@ -179,7 +181,7 @@ class get_evaluations extends external_api {
 
         // The data returned by this function is a grid containing the criteria and the evaluations by others.
         return [
-            'evaluations' => array_values($evals),
+            'evaluations' => array_values($gradedcriteria),
             'comments' => array_values($comments),
         ];
     }

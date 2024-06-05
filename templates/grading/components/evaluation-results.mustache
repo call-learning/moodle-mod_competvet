@@ -29,29 +29,38 @@
             {{#str}} noevaluations, mod_competvet {{/str}}
         </div>
     {{/evaluations}}
-    <div class="eval header">
-        <div class="col1">
-        </div>
-        {{#evaluations.0}}
-            {{#grades}}
-                <span class="col3">
-                    {{{gradername}}}
-                </span>
-            {{/grades}}
-        {{/evaluations.0}}
-    </div>
-    {{#evaluations}}
-        <div class="eval">
-            <div class="col1">
-                <div class="description mb-2"><strong>{{name}}</strong></div>
+    <div class="evaltable" data-region="evaluations-table">
+        <div class="row no-gutters flex-nowrap">
+            <div class="col1 criterionlabel">
             </div>
-            {{#grades}}
-                <div class="col3">
-                    {{value}}
-                </div>
-            {{/grades}}
+            {{#evaluations.0}}
+                {{#grades}}
+                    <div class="col3 evaluator font-weight-bold text-center d-flex">
+                        <div class="th rotatecontainer">
+                            <div class="transformed">
+                                <span class="gradername">{{graderinfo.fullname}}</span>
+                            </div>
+                        </div>
+                    </div>
+                {{/grades}}
+            {{/evaluations.0}}
         </div>
-    {{/evaluations}}
+        {{#evaluations}}
+            <div class="row no-gutters flex-nowrap mb-2">
+                <div class="col1 criterionlabel font-weight-bold">
+                    {{criterion.label}}
+                </div>
+                {{#grades}}
+                    <div class="col3 grade text-center">
+                        {{level}}
+                        <div class="sr-only">
+                            {{graderinfo.fullname}}
+                        </div>
+                    </div>
+                {{/grades}}
+            </div>
+        {{/evaluations}}
+    </div>
     <div class="evalcomments d-flex row">
         <div class="col-md-6">
             {{#comments}}

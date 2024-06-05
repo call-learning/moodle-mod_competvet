@@ -127,6 +127,26 @@
     flex: 1 0 auto;
 }
 
+.gradingapp .grade-tabs .grade-tab-indicator {
+    min-width: 1.7rem;
+    height: 1.7rem;
+    margin-left: 1rem;
+}
+
+.gradingapp .grade-tabs .grade-tab-indicator:not(:empty) {
+    color: #fff;
+    background-color: var(--primary);
+    border-radius: 1rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+}
+
+.gradingapp .grade-tabs .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .gradingapp .tab-main {
     padding: 1rem;
 }
@@ -227,18 +247,22 @@
 
 .gradingapp .evaluation .eval {
     display: flex;
-    margin-bottom: 1rem;
 }
 
 .gradingapp .evaluation .col1 {
-    flex: 1 1 50%;
-    max-width: 50%;
+    flex: 1 0 350px;
+    max-width: 350px;
 }
 
 .gradingapp .evaluation .col3 {
-    flex: 1 1 12%;
-    max-width: 12%;
+    flex: 1 0 75px;
+    max-width: 75px;
     text-align: center;
+}
+
+.gradingapp .evaluation .cellborder {
+    border-bottom: 1px solid #ccc;
+    border-left: 1px solid #ccc;
 }
 
 .gradingapp .opacity-0 {

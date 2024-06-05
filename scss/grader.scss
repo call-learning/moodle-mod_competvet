@@ -205,22 +205,29 @@
             height: 3px;
         }
     }
-    .evaluation {
+    .evaltable {
+        overflow: auto;
         .header {
             font-weight: 700;
+            .col3 {
+                padding-bottom: 0.5rem;
+            }
         }
         .eval {
             display: flex;
-            margin-bottom: 1rem;
         }
         .col1 {
-            flex: 1 1 50%;
-            max-width: 50%;
+            flex: 1 0 350px;
+            max-width: 350px;
         }
         .col3 {
-            flex: 1 1 12%;
-            max-width: 12%;
+            flex: 1 0 75px;
+            max-width: 75px;
             text-align: center;
+        }
+        .cellborder {
+            border-bottom: 1px solid #ccc;
+            border-left: 1px solid #ccc;
         }
     }
     .opacity-0 {

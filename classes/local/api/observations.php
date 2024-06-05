@@ -235,12 +235,13 @@ class observations {
                 $obscrit = new observation_criterion_level(0);
                 $obscrit->set('observationid', $observationid);
                 $obscrit->set('criterionid', $criterionmodel->get('id'));
-                $obscrit->set('level',
-                        $criteriadict[$criterionmodel->get('id')]['level'] ?? $category == observation::CATEGORY_EVAL_AUTOEVAL ? 0 :
-                        50);
                 $obscrit->set('isactive', $criteriadict[$criterionmodel->get('id')]['isactive'] ?? true);
                 if (isset($criteriadict[$criterionmodel->get('id')])) {
-                    $obscrit->set('level', $criteriadict[$criterionmodel->get('id')]['level'] ?? null);
+                    if ($criteriadict[$criterionmodel->get('id')]['level'] === 'skip') {
+                        $obscrit->set('level', null);
+                    } else {
+                        $obscrit->set('level', $criteriadict[$criterionmodel->get('id')]['level'] ?? 50);
+                    }
                     $obscrit->set('isactive', $criteriadict[$criterionmodel->get('id')]['isactive'] ?? true);
                 }
                 $obscrit->create();
