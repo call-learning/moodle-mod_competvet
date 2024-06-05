@@ -151,18 +151,24 @@
     text-align: center; }
   .gradingapp .certification .progress {
     height: 3px; }
-  .gradingapp .evaluation .header {
-    font-weight: 700; }
-  .gradingapp .evaluation .eval {
-    display: flex;
-    margin-bottom: 1rem; }
-  .gradingapp .evaluation .col1 {
-    flex: 1 1 50%;
-    max-width: 50%; }
-  .gradingapp .evaluation .col3 {
-    flex: 1 1 12%;
-    max-width: 12%;
-    text-align: center; }
+  .gradingapp .evaltable {
+    overflow: auto; }
+    .gradingapp .evaltable .header {
+      font-weight: 700; }
+      .gradingapp .evaltable .header .col3 {
+        padding-bottom: 0.5rem; }
+    .gradingapp .evaltable .eval {
+      display: flex; }
+    .gradingapp .evaltable .col1 {
+      flex: 1 0 350px;
+      max-width: 350px; }
+    .gradingapp .evaltable .col3 {
+      flex: 1 0 75px;
+      max-width: 75px;
+      text-align: center; }
+    .gradingapp .evaltable .cellborder {
+      border-bottom: 1px solid #ccc;
+      border-left: 1px solid #ccc; }
   .gradingapp .opacity-0 {
     opacity: 0; }
 

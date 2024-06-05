@@ -79,7 +79,7 @@ const transformContext = (context, autoeval) => {
     const currentUser = CompetState.getValue('user');
     const self = currentUser.id;
     const data = context['evaluation-results'];
-    const labels = data.evaluations.map(criterion => criterion.name);
+    const labels = data.evaluations.map(criterion => criterion.criterion.label);
     const graders = [];
     const colors = [
         'rgba(255, 99, 132, 0.6)',
@@ -92,23 +92,26 @@ const transformContext = (context, autoeval) => {
 
     data.evaluations.forEach(criterion => {
         criterion.grades.forEach(grade => {
-            if (autoeval && grade.userid !== self) {
+            if (!grade.graderinfo || !grade.graderinfo.id) {
                 return;
-            } else if (!autoeval && grade.userid === self) {
+            }
+            if (autoeval && grade.graderinfo.id !== self) {
+                return;
+            } else if (!autoeval && grade.graderinfo.id === self) {
                 return;
             }
 
-            if (!graders[grade.userid]) {
+            if (!graders[grade.graderinfo.id]) {
                 const color = colors.shift();
-                graders[grade.userid] = {
-                    label: grade.gradername,
+                graders[grade.graderinfo.id] = {
+                    label: grade.graderinfo.fullname,
                     data: [],
                     fill: false,
                     backgroundColor: color,
                     // add other properties as needed
                 };
             }
-            graders[grade.userid].data.push(grade.value);
+            graders[grade.graderinfo.id].data.push(grade.level);
         });
     });
 
