@@ -78,7 +78,7 @@ class cert_decl_evaluator extends cert_decl_student {
         $mform->setType('usercomment', PARAM_RAW);
 
         // Check if user is supervisor for this declaration
-        $supervisors = certifications::get_certification_supervisors($declid);
+        $supervisors = certifications::get_declaration_supervisors($declid);
         $issupervisor = in_array($USER->id, $supervisors);
         if (!$issupervisor) {
             $mform->addElement('static', 'notsupervisor', 'You are not a supervisor for this declaration');
@@ -116,7 +116,7 @@ class cert_decl_evaluator extends cert_decl_student {
                 FORMAT_HTML
             );
         } else {
-            $data->validid = certifications::validate_certification(
+            $data->validid = certifications::validate_cert_declaration(
                 $data->declid,
                 $data->supervisorid,
                 $data->statussuper,
@@ -143,9 +143,7 @@ class cert_decl_evaluator extends cert_decl_student {
      */
     protected function check_access_for_dynamic_submission(): void {
         $context = $this->get_context_for_dynamic_submission();
-        if (!has_capability('mod/competvet:view', $context)) {
-            throw new \Exception(get_string('error:accessdenied', 'mod_competvet'));
-        }
+        require_capability('mod/competvet:view', $context);
     }
 
 }

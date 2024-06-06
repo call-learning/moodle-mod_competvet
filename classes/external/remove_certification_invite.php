@@ -73,7 +73,7 @@ class remove_certification_invite extends external_api {
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
 
-        if (certifications::certification_supervisor_remove($declid, $supervisorid)) {
+        if (certifications::declaration_supervisor_remove($declid, $supervisorid)) {
             return (object) ['success' => true];
         }
         return (object) ['success' => false];

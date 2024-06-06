@@ -62,6 +62,9 @@ class cert_decl extends dynamic_form {
             $mform->addElement('hidden', 'declid', $declid);
             $mform->setType('declid', PARAM_INT);
         }
+        $returnurl = $this->optional_param('returnurl', null, PARAM_URL);
+        $mform->addElement('hidden', 'returnurl', $returnurl);
+        $mform->setType('returnurl', PARAM_URL);
 
         // TODO - find a better way to handle this
         if ($USER->id != $studentid && !$declid) {
@@ -73,6 +76,7 @@ class cert_decl extends dynamic_form {
         } else {
             $this->add_supervisor_fields();
         }
+
     }
 
     /**
@@ -137,7 +141,7 @@ class cert_decl extends dynamic_form {
         $mform->setType('usercomment', PARAM_RAW);
 
         // Check if user is supervisor for this declaration.
-        $supervisors = certifications::get_certification_supervisors($declid);
+        $supervisors = certifications::get_declaration_supervisors($declid);
         $issupervisor = in_array($USER->id, $supervisors);
         if (!$issupervisor) {
             $mform->addElement('static', 'notsupervisor', 'You are not a supervisor for this declaration');
@@ -160,7 +164,6 @@ class cert_decl extends dynamic_form {
             cert_valid::STATUS_LEVEL_NOT_REACHED
         );
         $mform->addElement('textarea', 'supervisorcomment', get_string('comment', 'competvet'));
-
     }
 
     /**
@@ -235,7 +238,7 @@ class cert_decl extends dynamic_form {
     public function process_student_submission() {
         $data = $this->get_data();
         if ($data->declid) {
-            certifications::update_certification(
+            certifications::update_cert_declaration(
                 $data->declid,
                 $data->level,
                 $data->comment,
@@ -243,7 +246,7 @@ class cert_decl extends dynamic_form {
                 $data->status
             );
         } else {
-            $data->declid = certifications::add_certification(
+            $data->declid = certifications::add_cert_declaration(
                 $data->criterionid,
                 $data->studentid,
                 $data->planningid,
@@ -254,15 +257,15 @@ class cert_decl extends dynamic_form {
             );
         }
         if ($data->supervisors) {
-            $setsupervisors = certifications::get_certification_supervisors($data->declid);
+            $setsupervisors = certifications::get_declaration_supervisors($data->declid);
             foreach ($data->supervisors as $supervisorid) {
                 if (!in_array($supervisorid, $setsupervisors)) {
-                    certifications::certification_supervisor_invite($data->declid, $supervisorid);
+                    certifications::declaration_supervisor_invite($data->declid, $supervisorid);
                 }
             }
             foreach ($setsupervisors as $supervisorid) {
                 if (!in_array($supervisorid, $data->supervisors)) {
-                    certifications::certification_supervisor_remove($data->declid, $supervisorid);
+                    certifications::declaration_supervisor_remove($data->declid, $supervisorid);
                 }
             }
         }
@@ -281,7 +284,7 @@ class cert_decl extends dynamic_form {
                 FORMAT_HTML
             );
         } else {
-            $data->validid = certifications::validate_certification(
+            $data->validid = certifications::validate_cert_declaration(
                 $data->declid,
                 $data->supervisorid,
                 $data->statussuper,
@@ -308,9 +311,7 @@ class cert_decl extends dynamic_form {
      */
     protected function check_access_for_dynamic_submission(): void {
         $context = $this->get_context_for_dynamic_submission();
-        if (!has_capability('mod/competvet:view', $context)) {
-            throw new \Exception(get_string('error:accessdenied', 'mod_competvet'));
-        }
+        require_capability('mod/competvet:view', $context);
     }
 
     /**
@@ -340,7 +341,7 @@ class cert_decl extends dynamic_form {
             'declid' => $this->optional_param('declid', null, PARAM_INT),
         ];
         $certification = certifications::get_certification($data['declid']);
-        $supervisors = certifications::get_certification_supervisors($data['declid']);
+        $supervisors = certifications::get_declaration_supervisors($data['declid']);
         if ($certification) {
             $data['studentinfo'] = $this->get_student_info_html($data['studentid'], $certification['timecreated']);
             $data['comment'] = $certification['comment'];

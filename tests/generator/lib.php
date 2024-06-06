@@ -463,7 +463,7 @@ class mod_competvet_generator extends testing_module_generator {
         if (!empty($decls)) {
             foreach ($decls as $decl) {
                 $decl = (object) (array) $decl;
-                certifications::validate_certification($certification->id, $decl->supervisorid, $decl->status, $decl->comment,
+                certifications::validate_cert_declaration($certification->id, $decl->supervisorid, $decl->status, $decl->comment,
                     FORMAT_PLAIN);
                 $association = new cert_decl_asso(0,
                     (object) [

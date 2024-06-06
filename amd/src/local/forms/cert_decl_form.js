@@ -13,8 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-import ModalForm from 'core_form/modalform';
-import {get_string as getString} from 'core/str';
+import {genericFormCreate} from "./generic_form_helper";
 
 /**
  * Create a Modal Form to add a Certificate Declaration
@@ -26,7 +25,14 @@ import {get_string as getString} from 'core/str';
 
 const getDataset = (element) => {
     const gradingApp = document.querySelector('[data-region="grading-app"]');
-    const data = gradingApp.dataset;
+    let data;
+    if (!gradingApp) {
+        // We take the data directly from the element.;
+        data = element.dataset;
+    } else {
+        data = gradingApp.dataset;
+    }
+
     const datasetLowercase = Object.entries(data).reduce((acc, [key, value]) => {
         acc[key.toLowerCase()] = value;
         return acc;
@@ -38,29 +44,25 @@ const getDataset = (element) => {
     return datasetLowercase;
 };
 
-const submitEventHandler = () => {
+const defaultSubmitEventHandler = () => {
     location.reload();
 };
 
-export const init = () => {
-    document.addEventListener('click', function(event) {
+/**
+ * Initialize module
+ * @param {string} modulename
+ * @param {function} submitEventHandler
+ */
+export const init = (modulename, submitEventHandler = null) => {
+    document.addEventListener('click', function (event) {
         if (event.target.closest('[data-action="cert-decl-student"]')) {
             event.preventDefault();
 
             const button = event.target.closest('[data-action="cert-decl-student"]');
             const dataset = getDataset(button);
 
-            const modalForm = new ModalForm({
-                modalConfig: {
-                    title: getString('certdecl', 'mod_competvet'),
-                },
-                formClass: `mod_competvet\\form\\cert_decl_student`,
-                args: {
-                    ...dataset,
-                    currenturl: window.location.href,
-                },
-                saveButtonText: getString('save'),
-            });
+            const modalForm = genericFormCreate(dataset, 'certdecl', modulename, 'cert_decl_student');
+            modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, submitEventHandler ?? defaultSubmitEventHandler);
 
             // This sets the level field to the value of the range input.
             modalForm.addEventListener(modalForm.events.LOADED, () => {
@@ -77,26 +79,14 @@ export const init = () => {
                     });
                 });
             });
-
-            modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, submitEventHandler);
             modalForm.show();
         }
         if (event.target.closest('[data-action="cert-decl-evaluator"]')) {
             const button = event.target.closest('[data-action="cert-decl-evaluator"]');
             const dataset = getDataset(button);
-
-            const modalForm = new ModalForm({
-                modalConfig: {
-                    title: getString('certdecl', 'mod_competvet'),
-                },
-                formClass: `mod_competvet\\form\\cert_decl_evaluator`,
-                args: {
-                    ...dataset,
-                    currenturl: window.location.href,
-                },
-                saveButtonText: getString('save'),
-            });
-            modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, submitEventHandler);
+            const modalForm = genericFormCreate(dataset, 'certdecl', modulename, 'cert_decl_evaluator');
+            modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, submitEventHandler ?? defaultSubmitEventHandler);
+            modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, submitEventHandler ?? defaultSubmitEventHandler);
 
             // This sets the level field to the value of the range input.
             modalForm.addEventListener(modalForm.events.LOADED, () => {

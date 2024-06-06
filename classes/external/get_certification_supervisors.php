@@ -70,7 +70,7 @@ class get_certification_supervisors extends external_api {
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
 
-        $supervisors = certifications::get_certification_supervisors($declid);
+        $supervisors = certifications::get_declaration_supervisors($declid);
         return ['supervisors' => $supervisors];
     }
 }

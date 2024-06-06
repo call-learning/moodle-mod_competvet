@@ -325,6 +325,7 @@ $string['status'] = 'Status';
 $string['decl:seendone'] = 'I declare that I have carried out the essential clinic above on {$a} and ask the teachers below who supervised me on this procedure to confirm this.';
 $string['decl:notseen'] = 'I have not encountered this situation yet.';
 $string['certdecl'] = 'Certification declaration';
+$string['certdecl:save'] = 'Save';
 $string['addsupervisor'] = 'Add a supervisor to validate this certification';
 $string['supervisorsection'] = 'Supervisors';
 $string['valid:confirmed'] = 'I confirm that this essential has been achieved';

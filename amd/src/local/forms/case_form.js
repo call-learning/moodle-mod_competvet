@@ -13,8 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-import ModalForm from 'core_form/modalform';
-import {get_string as getString} from 'core/str';
+import {genericFormCreate} from "./generic_form_helper";
 
 /**
  * Create a Modal Form to add a case
@@ -23,14 +22,21 @@ import {get_string as getString} from 'core/str';
  * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-export const init = () => {
-    const action = 'add';
-    const modulename = 'mod_competvet';
-    const submitEventHandler = () => {
+
+/**
+ * Initialize module
+ * @param {string} modulename
+ * @param {function} submitEventHandler
+ */
+export const init = (modulename, submitEventHandler = null) => {
+    const onSubmitHandler = (event) => {
         // Fire a custom event to notify the grading app that a case has been added.
         const gradingApp = document.querySelector('[data-region="grading-app"]');
         const customEvent = new CustomEvent('caseAdded', {});
         gradingApp.dispatchEvent(customEvent);
+        if (submitEventHandler) {
+            submitEventHandler(event);
+        }
     };
     const button = document.querySelector('[data-action="case-add"]');
     if (!button) {
@@ -40,22 +46,8 @@ export const init = () => {
         event.preventDefault();
         const gradingApp = document.querySelector('[data-region="grading-app"]');
         const data = gradingApp.dataset;
-        const datasetLowercase = Object.entries(data).reduce((acc, [key, value]) => {
-            acc[key.toLowerCase()] = value;
-            return acc;
-        }, {});
-        const modalForm = new ModalForm({
-            modalConfig: {
-                title: getString(`case:${action}`, modulename),
-            },
-            formClass: `${modulename}\\form\\case_form_${action}`,
-            args: {
-                ...datasetLowercase,
-                currenturl: window.location.href,
-            },
-            saveButtonText: getString(`case:${action}:save`, modulename),
-        });
-        modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, submitEventHandler);
+        const modalForm = genericFormCreate(data, 'case:add', modulename, 'case_form_add');
+        modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, onSubmitHandler);
         modalForm.show();
     });
 };

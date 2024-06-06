@@ -64,7 +64,7 @@ class certifications_test extends advanced_testcase {
         $grid = grid::get_record(['type' => grid::COMPETVET_CRITERIA_CERTIFICATION]);
         $criterion = criterion::get_record(['idnumber' => 'CERT1', 'gridid' => $grid->get('id')]);
         // Act: Call the method under test.
-        $certificationid = certifications::add_certification(
+        $certificationid = certifications::add_cert_declaration(
             $criterion->get('id'),
             $student->id,
             $planning['id'],
@@ -91,7 +91,7 @@ class certifications_test extends advanced_testcase {
     public function test_update_certification() {
         $certification = $this->create_certification();
         // Act: Call the method under test.
-        $success = certifications::update_certification(
+        $success = certifications::update_cert_declaration(
             $certification->id,
             3,
             'A new comment',
@@ -112,7 +112,7 @@ class certifications_test extends advanced_testcase {
     public function test_delete_certification() {
         $certification = $this->create_certification();
         // Act: Call the method under test.
-        $success = certifications::delete_certification($certification->id);
+        $success = certifications::delete_cert_declaration($certification->id);
 
         // Assert: Check that the results are as expected.
         $this->assertFalse(cert_decl::get_record(['id' => $certification->id]), "Certification was not deleted");
@@ -160,7 +160,7 @@ class certifications_test extends advanced_testcase {
      */
     public function test_get_certification_supervisors() {
         $certification = $this->create_certification();
-        $supervisors = certifications::get_certification_supervisors($certification->id);
+        $supervisors = certifications::get_declaration_supervisors($certification->id);
 
         // Assert: Check that the results are as expected
         $this->assertIsArray($supervisors, "Should return an array of supervisor ids");
@@ -176,7 +176,7 @@ class certifications_test extends advanced_testcase {
         $supervisorid = 2;
 
         // Act: Call the method under test
-        $success = certifications::certification_supervisor_invite($declid, $supervisorid);
+        $success = certifications::declaration_supervisor_invite($declid, $supervisorid);
 
         // Assert: Check that the results are as expected
         $this->assertTrue($success, "Inviting supervisor should return true");
@@ -192,7 +192,7 @@ class certifications_test extends advanced_testcase {
         $supervisorid = 2;
 
         // Act: Call the method under test
-        $success = certifications::certification_supervisor_remove($declid, $supervisorid);
+        $success = certifications::declaration_supervisor_remove($declid, $supervisorid);
 
         // Assert: Check that the results are as expected
         $this->assertTrue($success, "Removing supervisor should return true");

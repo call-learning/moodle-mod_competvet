@@ -93,10 +93,10 @@ class add_certification extends external_api {
         self::validate_context($competvet->get_context());
 
         if ($declid) {
-            certifications::update_certification($declid, $level, $comment, $commentformat, $status);
+            certifications::update_cert_declaration($declid, $level, $comment, $commentformat, $status);
             return ['declid' => $declid];
         }
-        $certid = certifications::add_certification(
+        $certid = certifications::add_cert_declaration(
             $criterionid,
             $studentid,
             $planningid,

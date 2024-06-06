@@ -84,7 +84,7 @@ class validate_certification extends external_api {
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
 
-        if (certifications::validate_certification($validid, $declid, $level, $comment, $commentformat, $status)) {
+        if (certifications::validate_cert_declaration($validid, $declid, $level, $comment, $commentformat, $status)) {
             return ['success' => true];
         }
         return ['success' => false];

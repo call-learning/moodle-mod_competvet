@@ -153,9 +153,7 @@ class eval_observation_edit extends dynamic_form {
 
     protected function check_access_for_dynamic_submission(): void {
         $context = $this->get_context_for_dynamic_submission();
-        if (!has_capability('mod/competvet:canobserve', $context)) {
-            throw new \moodle_exception('nopermission', 'error', '', get_string('nopermission', 'error'));
-        }
+        require_capability('mod/competvet:canobserve', $context);
     }
 
     protected function get_context_for_dynamic_submission(): context {
