@@ -32,12 +32,15 @@
 <div data-region="criterion" data-id="{{criterionid}}">
     <div class="row criterion-item">
         <div class="tcell move">
+            {{#canedit}}
             <span class="drag-handle">{{#pix}}i/move_2d, core, {{#str}}move{{/str}}{{/pix}}</span>
+            {{/canedit}}
         </div>
         <div class="col-9 tcell font-weight-bold{{#edit}} editable{{/edit}}">
-            {{#edit}}<input type="text" class="form-control" value="{{{title}}}" placeholder="{{{placeholder}}}" data-field="title">{{/edit}}{{^edit}}{{{title}}}{{/edit}}
+            {{#edit}}<input type="text" class="form-control" value="{{{label}}}" placeholder="{{{placeholder}}}" data-field="label">{{/edit}}{{^edit}}{{{label}}}{{/edit}}
         </div>
         <div class="col-2 tcell">
+            {{#canedit}}
             {{^edit}}
             <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-grid-id="{{gridid}}" data-id="{{criterionid}}" data-action="edit" data-type="criterion">{{#pix}}i/edit, core, {{#str}}edit{{/str}}{{/pix}}</button>
             {{/edit}}
@@ -48,6 +51,7 @@
             </button>
             {{/edit}}
             <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-grid-id="{{gridid}}" data-id="{{criterionid}}" data-action="delete" data-type="criterion">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
+            {{/canedit}}
         </div>
     </div>
     {{#hasoptions}}
@@ -59,7 +63,7 @@
                         {{#edit}}<span class="drag-handle">{{#pix}}i/move_2d, core, {{#str}}move{{/str}}{{/pix}}</span>{{/edit}}
                     </div>
                     <div class="{{#hasgrade}}col-7{{/hasgrade}}{{^hasgrade}}col-9{{/hasgrade}} subitem tcell{{#edit}} editable{{/edit}}" >
-                        {{#edit}}<input type="text" class="form-control" value="{{{title}}}" placeholder="{{{placeholder}}}" data-field="title">{{/edit}}{{^edit}}{{{title}}}{{/edit}}
+                        {{#edit}}<input type="text" class="form-control" value="{{{label}}}" placeholder="{{{placeholder}}}" data-field="label">{{/edit}}{{^edit}}{{{label}}}{{/edit}}
                     </div>
                     {{#hasgrade}}
                         <div class="col-2 tcell{{#edit}} editable{{/edit}}">
@@ -67,24 +71,28 @@
                         </div>
                     {{/hasgrade}}
                     <div class="col-2 tcell">
-                        {{#edit}}
-                        <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-grid-id="{{gridid}}" data-criterion-id="{{criterionid}}" data-id="{{optionid}}" data-action="delete" data-type="option">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
-                        {{/edit}}
+                        {{#canedit}}
+                            {{#edit}}
+                            <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-grid-id="{{gridid}}" data-criterion-id="{{criterionid}}" data-id="{{optionid}}" data-action="delete" data-type="option">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
+                            {{/edit}}
+                        {{/canedit}}
                     </div>
                 </div>
             {{/deleted}}
         {{/options}}
     </div>
     {{/hasoptions}}
-    {{#edit}}
-        {{#hasoptions}}
-            <div class="row justify-content-end">
-                <div class="col-2 ">
-                    <a class="btn btn-link jsbutton" href="#" data-grid-id="{{gridid}}" data-criterion-id="{{criterionid}}" data-action="add" data-type="option">
-                        {{#str}}addoption, mod_competvet{{/str}}
-                    </a>
+    {{#canedit}}
+        {{#edit}}
+            {{#hasoptions}}
+                <div class="row justify-content-end">
+                    <div class="col-2 ">
+                        <a class="btn btn-link jsbutton" href="#" data-grid-id="{{gridid}}" data-criterion-id="{{criterionid}}" data-action="add" data-type="option">
+                            {{#str}}addoption, mod_competvet{{/str}}
+                        </a>
+                    </div>
                 </div>
-            </div>
-        {{/hasoptions}}
-    {{/edit}}
+            {{/hasoptions}}
+        {{/edit}}
+    {{/canedit}}
 </div>

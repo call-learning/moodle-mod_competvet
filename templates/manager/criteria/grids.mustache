@@ -64,16 +64,18 @@
             {{#edit}}<input type="text" class="form-control" value="{{{gridname}}}" data-field="gridname">{{/edit}}{{^edit}}{{{gridname}}}{{/edit}}
         </h3>
         <div class="col-2 p-3 d-flex">
-            {{^edit}}
-                <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-action="edit" data-id="{{gridid}}" data-type="grid">{{#pix}}i/edit, core, {{#str}}edit{{/str}}{{/pix}}</button>
-            {{/edit}}
-            {{#edit}}
-                <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-action="save" data-id="{{gridid}}" data-type="grid">
-                    <span class="defaulticon">{{#pix}}e/save, core, {{#str}}save{{/str}}{{/pix}}</span>
-                    <span class="savingicon">{{#pix}}i/loading, core, {{#str}}saving, mod_competvet{{/str}}{{/pix}}</span>
-                </button>
-            {{/edit}}
-            <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-action="delete" data-id="{{gridid}}" data-type="grid">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
+            {{#canedit}}
+                {{^edit}}
+                    <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-action="edit" data-id="{{gridid}}" data-type="grid">{{#pix}}i/edit, core, {{#str}}edit{{/str}}{{/pix}}</button>
+                {{/edit}}
+                {{#edit}}
+                    <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-action="save" data-id="{{gridid}}" data-type="grid">
+                        <span class="defaulticon">{{#pix}}e/save, core, {{#str}}save{{/str}}{{/pix}}</span>
+                        <span class="savingicon">{{#pix}}i/loading, core, {{#str}}saving, mod_competvet{{/str}}{{/pix}}</span>
+                    </button>
+                {{/edit}}
+                <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-action="delete" data-id="{{gridid}}" data-type="grid">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
+            {{/canedit}}
         </div>
     </div>
     <div class="collapse show" id="grid{{gridid}}">
@@ -92,9 +94,11 @@
                 </div>
             </div>
             <div class="d-flex justify-content-end">
+                {{#canedit}}
                 <a class="btn btn-link jsbutton" href="#" data-grid-id="{{gridid}}" data-action="add" data-type="criterion">
                     {{#str}}addcriterion, mod_competvet{{/str}}
                 </a>
+                {{/canedit}}
             </div>
         </div>
     </div>

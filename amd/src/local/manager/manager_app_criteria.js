@@ -49,10 +49,16 @@ class Manager {
         this.app = document.querySelector('[data-region="criteria"]');
         this.cmId = this.app.dataset.cmId;
         this.sets = [COMPETVET_CRITERIA_EVALUATION, COMPETVET_CRITERIA_CERTIFICATION, COMPETVET_CRITERIA_LIST];
-        this.dataset = COMPETVET_CRITERIA_EVALUATION;
+        if (this.cmId) {
+            this.dataset = COMPETVET_CRITERIA_CERTIFICATION;
+        } else {
+            this.dataset = COMPETVET_CRITERIA_EVALUATION;
+        }
         this.addEventListeners();
         this.getData();
-        this.setNavigation();
+        if (!this.cmId) {
+            this.setNavigation();
+        }
     }
 
     /**
@@ -65,31 +71,6 @@ class Manager {
         };
         const response = await Repository.getCriteria(args);
         CompetState.setValue('datatree', response);
-    }
-
-    /**
-     * Get the grid object keys that can be accepted by the server.
-     */
-    get gridObjectKeys() {
-        return ['gridid', 'gridname', 'sortorder', 'criteria', 'haschanged', 'deleted', 'updatesortorder'];
-    }
-
-    /**
-     * Get the criterion object keys that can be accepted by the server.
-     * @return {Array} The keys.
-     */
-    get criterionObjectKeys() {
-        return [
-            'criterionid', 'idnumber', 'sortorder', 'title', 'options', 'haschanged', 'hasoptions', 'deleted', 'updatesortorder'
-        ];
-    }
-
-    /**
-     * Get the option object keys that can be accepted by the server.
-     * @return {Array} The keys.
-     */
-    get optionObjectKeys() {
-        return ['optionid', 'idnumber', 'sortorder', 'title', 'grade', 'haschanged', 'deleted', 'updatesortorder'];
     }
 
     /**
@@ -119,6 +100,9 @@ class Manager {
                 e.preventDefault();
                 this.actions(btn);
             }
+        });
+        document.addEventListener('saveState', async() => {
+            this.save();
         });
         this.app.classList.add('jsenabled');
     }
@@ -166,17 +150,17 @@ class Manager {
         let state = CompetState.getValue('datatree');
 
         if (btn.dataset.type === 'grid') {
-            let newGridId = 1;
             let newGridSortOrder = 1;
             if (state.grids.length > 0) {
-                newGridId = Math.max(...state.grids.map((element) => element.gridid)) + 1;
                 newGridSortOrder = Math.max(...state.grids.map((element) => element.sortorder)) + 1;
             }
             state.grids.push({
                 gridname: '',
                 edit: true,
+                canedit: true,
+                type: this.dataset,
                 placeholder: await getString('newgrid', 'mod_competvet'),
-                gridid: newGridId,
+                gridid: -1,
                 sortorder: newGridSortOrder,
                 criteria: [],
             });
@@ -268,6 +252,8 @@ class Manager {
             criterion.edit = true;
             if (this.dataset == COMPETVET_CRITERIA_LIST || this.dataset == COMPETVET_CRITERIA_EVALUATION) {
                 criterion.hasoptions = true;
+            } else {
+                criterion.hasoptions = false;
             }
         }
         CompetState.setValue('datatree', state);
@@ -300,7 +286,7 @@ class Manager {
                 if (element.edit && !element.deleted) {
                     // Update the criterion with the new values from the UI.
                     element.haschanged = true;
-                    element.title = this.getValue('criterion', 'title', element.criterionid);
+                    element.label = this.getValue('criterion', 'label', element.criterionid);
                     if (!element.hasoptions) {
                         return;
                     }
@@ -308,7 +294,7 @@ class Manager {
                         if (element.deleted) {
                             return;
                         }
-                        element.title = this.getValue('option', 'title', element.optionid);
+                        element.label = this.getValue('option', 'label', element.optionid);
                         if (this.dataset === COMPETVET_CRITERIA_LIST) {
                             element.grade = this.getValue('option', 'grade', element.optionid);
                             element.grade = parseFloat(element.grade);
@@ -321,10 +307,34 @@ class Manager {
     }
 
     /**
-     * Save the state to the server.
+     * Get the grid object keys that can be accepted by the server.
      */
-    async save() {
-        this.update();
+    get gridObjectKeys() {
+        return ['gridid', 'gridname', 'type', 'sortorder', 'criteria', 'haschanged', 'deleted', 'updatesortorder'];
+    }
+
+    /**
+     * Get the criterion object keys that can be accepted by the server.
+     * @return {Array} The keys.
+     */
+    get criterionObjectKeys() {
+        return [
+            'criterionid', 'idnumber', 'sortorder', 'label', 'options', 'haschanged', 'hasoptions', 'deleted', 'updatesortorder'
+        ];
+    }
+
+    /**
+     * Get the option object keys that can be accepted by the server.
+     * @return {Array} The keys.
+     */
+    get optionObjectKeys() {
+        return ['optionid', 'idnumber', 'sortorder', 'label', 'grade', 'haschanged', 'deleted', 'updatesortorder'];
+    }
+
+    /**
+     * Get the clean state.
+     */
+    cleanState() {
         const state = CompetState.getValue('datatree');
         // Clone the state, remove the edit flags.
         const saveState = {
@@ -362,8 +372,17 @@ class Manager {
         });
 
         saveState.type = Number(this.dataset);
-        await Repository.saveCriteria(saveState);
+        return saveState;
+    }
 
+
+    /**
+     * Save the state to the server.
+     */
+    async save() {
+        this.update();
+        const saveState = this.cleanState();
+        await Repository.saveCriteria(saveState);
         this.getData();
     }
 
