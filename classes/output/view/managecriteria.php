@@ -29,9 +29,9 @@ use stdClass;
  */
 class managecriteria extends base {
     /**
-     * @var competvet $competvet The competvet object.
+     * @var $competvet The competvet object.
      */
-    protected competvet $competvet;
+    protected $competvet;
 
     /**
      * Export this data so it can be used in a mustache template.
@@ -41,6 +41,7 @@ class managecriteria extends base {
      */
     public function export_for_template(renderer_base $output) {
         $data = parent::export_for_template($output);
+        $data['cmid'] = $this->competvet ? $this->competvet->get_course_module_id() : null;
         $data['version'] = time();
         return $data;
     }
@@ -57,6 +58,18 @@ class managecriteria extends base {
      * @return void
      */
     public function set_data(...$data) {
+        if (empty($data)) {
+            global $PAGE;
+            if ($PAGE->context->contextlevel === CONTEXT_MODULE) {
+                $context = $PAGE->context;
+                $PAGE->set_secondary_active_tab('managecriteria');
+                $competvet = competvet::get_from_context($context);
+                $data = [$competvet];
+            } else {
+                $data = [null];
+            }
+        }
+        [$this->competvet] = $data;
     }
 
     /**

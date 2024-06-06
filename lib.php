@@ -278,7 +278,24 @@ function competvet_extend_settings_navigation($settingsnav, $competvetnode = nul
 
     if (has_capability('mod/competvet:editplanning', $PAGE->cm->context)) {
         $url = new moodle_url('/mod/competvet/view.php', ['pagetype' => 'manageplanning', 'id' => $PAGE->cm->id]);
-        $node = navigation_node::create(get_string('entity:planning', 'mod_competvet'), $url, navigation_node::TYPE_SETTING);
+        $node = navigation_node::create(
+            get_string('entity:planning', 'mod_competvet'),
+            $url,
+            navigation_node::TYPE_SETTING,
+            '',
+            'manageplanning'
+        );
+        $competvetnode->add_node($node, $beforekey);
+    }
+    if (has_capability('mod/competvet:editcriteria', $PAGE->cm->context)) {
+        $url = new moodle_url('/mod/competvet/view.php', ['pagetype' => 'managecriteria', 'id' => $PAGE->cm->id]);
+        $node = navigation_node::create(
+            get_string('entity:criteria', 'mod_competvet'),
+            $url,
+            navigation_node::TYPE_SETTING,
+            '',
+            'managecriteria'
+        );
         $competvetnode->add_node($node, $beforekey);
     }
 }

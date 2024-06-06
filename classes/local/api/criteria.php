@@ -20,6 +20,7 @@ use mod_competvet\local\persistent\grid;
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\local\persistent\planning;
+use tool_monitor\output\managesubs\subs;
 
 /**
  * Criteria API
@@ -45,13 +46,14 @@ class criteria {
         if (!$grid) {
             $grid = new grid(0);
             $grid->set('name', $gridname);
-            $grid->set('idnumber', grid::DEFAULT_GRID_SHORTNAME[$type]);
+            // Generate a unique idnumber
+            $idnumber = time();
+            $grid->set('idnumber', $idnumber);
             $grid->set('sortorder', $sortorder);
             $grid->set('type', $type);
             $grid->create();
         } else {
             $grid->set('name', $gridname);
-            $grid->set('idnumber', grid::DEFAULT_GRID_SHORTNAME[$type]);
             $grid->set('sortorder', $sortorder);
             $grid->set('type', $type);
             $grid->update();
@@ -121,8 +123,9 @@ class criteria {
                     'label' => $option->get('label'),
                     'idnumber' => $option->get('idnumber'),
                     'grade' => $option->get('grade'),
+                    'hasgrade' => $option->get('grade') != null,
                     'parentid' => $option->get('parentid'),
-                    'sort' => $option->get('sort'),
+                    'sortorder' => $option->get('sort'),
                 ];
             }
             $criteria[] = [
@@ -131,13 +134,12 @@ class criteria {
                 'idnumber' => $criterion->get('idnumber'),
                 'grade' => $criterion->get('grade'),
                 'parentid' => $criterion->get('parentid'),
-                'sort' => $criterion->get('sort'),
-                'subcriteria' => $subcriteria,
+                'sortorder' => $criterion->get('sort'),
+                'hasoptions' => !empty($subcriteria),
+                'options' => $subcriteria,
             ];
         }
-        return [
-            'criteria' => $criteria,
-        ];
+        return $criteria;
     }
 
     /**
@@ -155,7 +157,7 @@ class criteria {
                 'idnumber' => $criterion->get('idnumber'),
                 'grade' => $criterion->get('grade'),
                 'parentid' => $criterion->get('parentid'),
-                'sort' => $criterion->get('sort'),
+                'sortorder' => $criterion->get('sort'),
             ];
         }
         return $criteria;

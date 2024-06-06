@@ -23,7 +23,6 @@
 import CompetState from 'mod_competvet/local/competstate';
 import Notification from 'core/notification';
 import Templates from 'core/templates';
-import Sort from './sortable';
 
 const App = document.querySelector('[data-region="planning"]');
 
@@ -40,7 +39,6 @@ const stateTemplate = () => {
         }
         Templates.render(template, context).then((html) => {
             region.innerHTML = html;
-            Sort.sortable();
             return;
         }).catch(Notification.exception);
     };

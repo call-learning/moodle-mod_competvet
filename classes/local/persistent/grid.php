@@ -116,5 +116,12 @@ class grid extends persistent {
             throw new \moodle_exception('gridalreadyexists', 'mod_competvet', '', $this->get('idnumber'));
         }
     }
-}
 
+    public function canedit() {
+        if ($this->get('idnumber') == self::DEFAULT_GRID_SHORTNAME[$this->get('type')]) {
+            return false;
+        }
+        return true;
+    }
+
+}

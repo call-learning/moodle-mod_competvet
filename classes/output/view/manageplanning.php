@@ -61,6 +61,7 @@ class manageplanning extends base {
         if (empty($data)) {
             global $PAGE;
             $context = $PAGE->context;
+            $PAGE->set_secondary_active_tab('manageplanning');
             $competvet = competvet::get_from_context($context);
             $data = [$competvet];
         }
