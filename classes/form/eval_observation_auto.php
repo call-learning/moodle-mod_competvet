@@ -115,9 +115,7 @@ class eval_observation_auto extends dynamic_form {
 
     protected function check_access_for_dynamic_submission(): void {
         $context = $this->get_context_for_dynamic_submission();
-        if (!has_capability('mod/competvet:view', $context)) {
-            throw new \Exception(get_string('error:accessdenied', 'mod_competvet'));
-        }
+        require_capability('mod/competvet:canaskobservation', $context);
     }
 
     protected function get_context_for_dynamic_submission(): context {

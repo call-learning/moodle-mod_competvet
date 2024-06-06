@@ -97,6 +97,9 @@ class cert_decl_student extends dynamic_form {
             'multiple' => true,
         ];
         $mform->addElement('autocomplete', 'supervisors', get_string('addsupervisor', 'mod_competvet'), $options, $attributes);
+        $currenturl = $this->optional_param('currenturl', null, PARAM_URL);
+        $mform->addElement('hidden', 'currenturl', $currenturl);
+        $mform->setType('currenturl', PARAM_URL);
     }
 
     /**
@@ -130,7 +133,7 @@ class cert_decl_student extends dynamic_form {
             return;
         }
         if ($data->declid) {
-            certifications::update_certification(
+            certifications::update_cert_declaration(
                 $data->declid,
                 $data->level,
                 $data->comment,
@@ -138,7 +141,7 @@ class cert_decl_student extends dynamic_form {
                 $data->status
             );
         } else {
-            $data->declid = certifications::add_certification(
+            $data->declid = certifications::add_cert_declaration(
                 $data->criterionid,
                 $data->studentid,
                 $data->planningid,
@@ -149,17 +152,7 @@ class cert_decl_student extends dynamic_form {
             );
         }
         if ($data->supervisors) {
-            $setsupervisors = certifications::get_certification_supervisors($data->declid);
-            foreach ($data->supervisors as $supervisorid) {
-                if (!in_array($supervisorid, $setsupervisors)) {
-                    certifications::certification_supervisor_invite($data->declid, $supervisorid);
-                }
-            }
-            foreach ($setsupervisors as $supervisorid) {
-                if (!in_array($supervisorid, $data->supervisors)) {
-                    certifications::certification_supervisor_remove($data->declid, $supervisorid);
-                }
-            }
+            certifications::set_declaration_supervisors($data->declid, $data->supervisors);
         }
     }
 
@@ -180,9 +173,7 @@ class cert_decl_student extends dynamic_form {
      */
     protected function check_access_for_dynamic_submission(): void {
         $context = $this->get_context_for_dynamic_submission();
-        if (!has_capability('mod/competvet:view', $context)) {
-            throw new \Exception(get_string('error:accessdenied', 'mod_competvet'));
-        }
+        require_capability('mod/competvet:view', $context);
     }
 
     /**
@@ -211,9 +202,9 @@ class cert_decl_student extends dynamic_form {
             'criterionid' => $this->optional_param('criterionid', null, PARAM_INT),
             'declid' => $this->optional_param('declid', null, PARAM_INT),
         ];
-        $certification = certifications::get_certification($data['declid']);
-        $supervisors = certifications::get_certification_supervisors($data['declid']);
-        if ($certification) {
+        if ($data['declid']) {
+            $certification = certifications::get_certification($data['declid']);
+            $supervisors = certifications::get_declaration_supervisors($data['declid']);
             $data['studentinfo'] = $this->get_student_info_html($data['studentid'], $certification['timecreated']);
             $data['comment'] = $certification['comment'];
             $data['usercomment'] = html_writer::tag('div', $certification['comment'], ['class' => 'usercomment']);

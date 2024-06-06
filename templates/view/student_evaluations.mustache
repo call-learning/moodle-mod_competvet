@@ -27,7 +27,7 @@
     <div class="autoevalutation">
         {{#isstudent}}
         <div>
-            <button class="btn btn-outline-secondary my-3" data-cmid="{{cmid}}" data-planning-id="{{planningid}}" data-student-id="{{studentid}}" data-action="eval-observation-auto">{{#str}}observation:auto, mod_competvet{{/str}}</button>
+            <button class="btn btn-outline-secondary my-3" data-cmid="{{cmid}}" data-planning-id="{{planningid}}" data-student-id="{{studentid}}" data-action="observation-auto">{{#str}}observation:auto, mod_competvet{{/str}}</button>
         </div>
         {{/isstudent}}
     </div>
@@ -69,23 +69,23 @@
     </div>
     {{#isstudent}}
     <div>
-        <button class="btn btn-outline-secondary my-3" data-cmid="{{cmid}}" data-planning-id="{{planningid}}" data-student-id="{{studentid}}" data-action="eval-observation-ask">{{#str}}observation:ask, mod_competvet{{/str}}</button>
+        <button class="btn btn-outline-secondary my-3" data-cmid="{{cmid}}" data-planning-id="{{planningid}}" data-student-id="{{studentid}}" data-action="observation-ask">{{#str}}observation:ask, mod_competvet{{/str}}</button>
     </div>
     {{/isstudent}}
     {{^isstudent}}
     <div>
-        <button class="btn btn-outline-secondary my-3" data-cmid="{{cmid}}" data-planning-id="{{planningid}}" data-student-id="{{studentid}}" data-action="eval-observation-add">{{#str}}observation:add, mod_competvet{{/str}}</button>
+        <button class="btn btn-outline-secondary my-3" data-cmid="{{cmid}}" data-planning-id="{{planningid}}" data-student-id="{{studentid}}" data-action="observation-add">{{#str}}observation:add, mod_competvet{{/str}}</button>
     </div>
     {{/isstudent}}
 </div>
 {{#js}}
 require(['mod_competvet/local/forms/eval_observation_ask'], function(Form) {
-    Form.init('mod_competvet');
+    Form.init('{{modulename}}');
 });
 require(['mod_competvet/local/forms/eval_observation_add'], function(Form) {
-    Form.init('mod_competvet');
+    Form.init('{{modulename}}');
 });
 require(['mod_competvet/local/forms/eval_observation_auto'], function(Form) {
-    Form.init('mod_competvet');
+    Form.init('{{modulename}}');
 });
 {{/js}}

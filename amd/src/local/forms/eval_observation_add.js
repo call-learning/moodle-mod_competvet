@@ -24,5 +24,5 @@
 import {genericForm} from './generic_form_helper';
 
 export const init = (modulename, submitEventHandler) => {
-    genericForm('add', modulename, submitEventHandler);
+    genericForm('observation:add', modulename, 'eval_observation_add', submitEventHandler);
 };

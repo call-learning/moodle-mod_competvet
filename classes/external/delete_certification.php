@@ -71,7 +71,7 @@ class delete_certification extends external_api {
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
         // Now delete.
-        if (certifications::delete_certification($declid)) {
+        if (certifications::delete_cert_declaration($declid)) {
             return ['success' => true];
         }
         return ['success' => false];

@@ -44,9 +44,10 @@ const defaultSubmitEventHandler = (event) => {
  * Initialize module
  * @param {string} action
  * @param {string} modulename
+ * @param {string} formname
  * @param {function} submitEventHandler
  */
-export const genericForm = (action, modulename, submitEventHandler) => {
+export const genericForm = (action, modulename, formname, submitEventHandler) => {
     const selectedElements = getSelectedElement(action);
     if (!selectedElements) {
         return;
@@ -58,7 +59,9 @@ export const genericForm = (action, modulename, submitEventHandler) => {
         element.addEventListener('click', (event) => {
             event.preventDefault();
             const data = event.target.closest('[data-action]').dataset; // Event can be sent by subelements.
-            genericFormCreate(data, action, modulename, submitEventHandler);
+            const modal = genericFormCreate(data, action, modulename, formname);
+            modal.addEventListener(modal.events.FORM_SUBMITTED, submitEventHandler);
+            modal.show();
         });
     });
 };
@@ -68,9 +71,9 @@ export const genericForm = (action, modulename, submitEventHandler) => {
  * @param {object} data
  * @param {string} action
  * @param {string} modulename
- * @param {callback} submitEventHandler
+ * @param {string} formname
  */
-export const genericFormCreate = (data, action, modulename, submitEventHandler) => {
+export const genericFormCreate = (data, action, modulename, formname) => {
     const datasetLowercase = Object.entries(data).reduce((acc, [key, value]) => {
         acc[key.toLowerCase()] = value; // Convert key to lowercase
         return acc;
@@ -78,17 +81,16 @@ export const genericFormCreate = (data, action, modulename, submitEventHandler) 
 
     const modalForm = new ModalForm({
         modalConfig: {
-            title: getString(`observation:${action}`, modulename),
+            title: getString(`${action}`, modulename),
         },
-        formClass: `${modulename}\\form\\eval_observation_${action}`,
+        formClass: `${modulename}\\form\\${formname}`,
         args: {
             ...datasetLowercase,
             currenturl: window.location.href,
         },
-        saveButtonText: getString(`observation:${action}:save`, modulename),
+        saveButtonText: getString(`${action}:save`, modulename),
     });
-    modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, submitEventHandler);
-    modalForm.show();
+    return modalForm;
 };
 
 /**
@@ -97,7 +99,8 @@ export const genericFormCreate = (data, action, modulename, submitEventHandler) 
  * @return {*}
  */
 export const getSelectedElement = (actionName) => {
-    return document.querySelectorAll(`[data-action="eval-observation-${actionName}"]`);
+    actionName = actionName.replace(':', '-');
+    return document.querySelectorAll(`[data-action="${actionName}"]`);
 };
 
 // Create a simplified version of the above code in a single function.

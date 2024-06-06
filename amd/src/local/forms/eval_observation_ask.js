@@ -49,7 +49,7 @@ export const init = (modulename) => {
             await Notification.exception(error);
         }
     };
-    genericForm('ask', modulename, handleAskSubmit);
+    genericForm('observation:ask', modulename, 'eval_observation_ask', handleAskSubmit);
 };
 
 export const initUsersAction = (modulename, planningId, studentId, context) => {

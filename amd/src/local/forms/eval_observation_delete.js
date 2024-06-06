@@ -29,11 +29,11 @@ import Ajax from 'core/ajax';
 import {getSelectedElement} from './generic_form_helper';
 
 export const init = async (modulename) => {
-    const selectedElements = getSelectedElement('delete');
+    const selectedElements = getSelectedElement('observation:delete');
     if (!selectedElements) {
         return;
     }
-    const [deleteTitle, deleteConfirm]  = await getStrings([
+    const [deleteTitle, deleteConfirm] = await getStrings([
         {key: 'observation:delete', component: modulename},
         {key: 'observation:delete:confirm', component: modulename},
     ]);

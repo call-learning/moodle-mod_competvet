@@ -49,7 +49,8 @@ class certifications {
     ];
 
     /**
-     * Add a certification
+     * Add a declaration
+     *
      * @param int $criterionid The criterion id
      * @param int $studentid The student id
      * @param int $planningid The planning id
@@ -59,7 +60,8 @@ class certifications {
      * @param int $status The status
      * @return int The certification declaration id
      */
-    public static function add_certification($criterionid, $studentid, $planningid, $level, $comment, $commentformat, $status) {
+    public static function add_cert_declaration(int $criterionid, int $studentid, int $planningid, int $level, string $comment,
+        int $commentformat, int $status) {
         $cert = new cert_decl();
         $cert->set('criterionid', $criterionid);
         $cert->set('studentid', $studentid);
@@ -73,26 +75,36 @@ class certifications {
     }
 
     /**
-     * Update a certification
+     * Update a declaration
+     *
      * @param int $declid The declaration id
-     * @param bool success
+     * @param int $level
+     * @param string $comment
+     * @param int $commentformat
+     * @param int $status
+     * @return bool
      */
-    public static function update_certification($declid, $level, $comment, $commentformat, $status) {
+    public static function update_cert_declaration(int $declid, ?int $level = null, ?string $comment = null,
+        ?int $commentformat = null, ?int $status = null) {
+        $arguments = compact('level', 'comment', 'commentformat', 'status');
+        $arguments = array_filter($arguments, function($value) {
+            return $value !== null;
+        });
         $cert = new cert_decl($declid);
-        $cert->set('level', $level);
-        $cert->set('comment', $comment);
-        $cert->set('commentformat', $commentformat);
-        $cert->set('status', $status);
+        foreach ($arguments as $key => $value) {
+            $cert->set($key, $value);
+        }
         $cert->save();
         return !empty($cert->get('id'));
     }
 
     /**
      * Delete a certification
+     *
      * @param int $declid The declaration id
      * @return bool success
      */
-    public static function delete_certification($declid) {
+    public static function delete_cert_declaration($declid) {
         $cert = new cert_decl($declid);
         if ($cert->delete()) {
             return true;
@@ -101,10 +113,11 @@ class certifications {
 
     /**
      * Get the supervisor invitations for a certification
+     *
      * @param int $declid The declaration id
      * @return array The supervisor ids
      */
-    public static function get_certification_supervisors($declid) {
+    public static function get_declaration_supervisors($declid) {
         $certsdecl = cert_decl_asso::get_records(['declid' => $declid]);
         $supervisors = [];
         foreach ($certsdecl as $cert) {
@@ -115,11 +128,12 @@ class certifications {
 
     /**
      * Invite supervisor to reply on a certification
+     *
      * @param int $declid The declaration id
      * @param int $supervisorid The supervisor id
      * @return bool success
      */
-    public static function certification_supervisor_invite($declid, $supervisorid) {
+    public static function declaration_supervisor_invite($declid, $supervisorid) {
         $cert = new cert_decl_asso();
         $cert->set('declid', $declid);
         $cert->set('supervisorid', $supervisorid);
@@ -130,11 +144,12 @@ class certifications {
 
     /**
      * Remove the invitation for a supervisor to reply on a certification
+     *
      * @param int $declid The declaration id
      * @param int $supervisorid The supervisor id
      * @return bool success
      */
-    public static function certification_supervisor_remove($declid, $supervisorid) {
+    public static function declaration_supervisor_remove($declid, $supervisorid) {
         $cert = cert_decl_asso::get_record(['declid' => $declid, 'supervisorid' => $supervisorid]);
         if ($cert->delete()) {
             return true;
@@ -143,13 +158,14 @@ class certifications {
 
     /**
      * Validate the certification, this is done by an supervisor who was invited to reply
+     *
      * @param int $declid The declaration id
      * @param int $supervisorid The supervisor id
      * @param int $status The status
      * @param string $comment The comment
      * @param int $commentformat The comment format
      */
-    public static function validate_certification($declid, $supervisorid, $status, $comment, $commentformat): ?int {
+    public static function validate_cert_declaration($declid, $supervisorid, $status, $comment, $commentformat): ?int {
         try {
             $cert = new cert_valid();
             $cert->set('declid', $declid);
@@ -167,6 +183,7 @@ class certifications {
 
     /**
      * Update the validation of a certification
+     *
      * @param int $validid The validation id
      * @param int $status The status
      * @param string $comment The comment
@@ -188,6 +205,7 @@ class certifications {
 
     /**
      * Delete the validation of a certification
+     *
      * @param int $validid The validation id
      */
     public static function delete_validation($validid) {
@@ -196,67 +214,32 @@ class certifications {
     }
 
     /**
-     * Get a single certification
-     * @param int $declid The declaration id
+     * Get the certifications and validations for a student by status
+     *
+     *
+     * @param int $planningid The planning id
+     * @param int $studentid The student id
+     * @return array The certifications classified by status
      */
-    public static function get_certification(int $declid, bool $withfeedback = false) {
-        $cert = new cert_decl($declid);
-        if (!$cert->get('id')) {
-            return [];
-        }
-        $certrecord = [];
-        $student = utils::get_user_info($cert->get('studentid'));
-        $certrecord['declid'] = $cert->get('id');
-        $certrecord['criterionid'] = $cert->get('criterionid');
-        $criterion = criterion::get_record(['id' => $cert->get('criterionid')]);
-        $certrecord['label'] = $criterion->get('label');
-        $certrecord['grade'] = $criterion->get('grade');
-
-        $certrecord['status'] = $cert->get('status');
-        $certrecord['seendone'] = ($cert->get('status') == cert_decl::STATUS_DECL_SEENDONE);
-        $certrecord['notseen'] = ($cert->get('status') == cert_decl::STATUS_STUDENT_NOTSEEN);
-        $certrecord['total'] = 5; // TODO: get the total from the criterion? maybe change to grade.
-        $certrecord['timecreated'] = $cert->get('timecreated');
-        $certrecord['isdeclared'] = true; // This is the flag to determine if the certification is declared or not.
-        $certrecord['comment'] = $cert->get('comment');
-        $certrecord['commentformat'] = $cert->get('commentformat');
-
-        if ($withfeedback) {
-            $certrecord['feedback'] = [
-                'picture' => $student['userpictureurl'],
-                'fullname' => $student['fullname'],
-                'comments' => [
-                    'commenttext' => format_text($cert->get('comment'), $cert->get('commentformat')),
-                ],
-            ];
-        }
-        $certrecord['validations'] = [];
-        $valids = cert_valid::get_records(['declid' => $cert->get('id')]);
-        foreach ($valids as $valid) {
-            $validrecord = [];
-            $validrecord['id'] = $valid->get('id');
-            $validrecord['supervisor'] = utils::get_user_info($valid->get('supervisorid'));
-            $validrecord['status'] = $valid->get('status');
-
-            $certrecord['confirmed'] = ($valid->get('status') == cert_valid::STATUS_CONFIRMED);
-            $certrecord['observernotseen'] = ($valid->get('status') == cert_valid::STATUS_OBSERVER_NOTSEEN);
-            $certrecord['levelnotreached'] = ($valid->get('status') == cert_valid::STATUS_LEVEL_NOT_REACHED);
-            $supervisor = $validrecord['supervisor'];
-            if ($withfeedback) {
-                $validrecord['feedback'] = [
-                    'picture' => $supervisor['userpictureurl'],
-                    'fullname' => $supervisor['fullname'],
-                    'comments' => [
-                        'commenttext' => format_text($valid->get('comment'), $valid->get('commentformat')),
-                    ],
-                ];
+    public static function get_certifications_by_status(int $planningid, int $studentid): array {
+        $certifications = self::get_certifications($planningid, $studentid);
+        $certsbystatus = [
+            self::GLOBAL_CERT_STATUS_NOT_SEEN => [],
+            self::GLOBAL_CERT_STATUS_WAITING => [],
+            self::GLOBAL_CERT_STATUS_VALIDATED => [],
+        ];
+        foreach ($certifications as $cert) {
+            if ($cert['status'] == cert_decl::STATUS_STUDENT_NOTSEEN) {
+                $certsbystatus[self::GLOBAL_CERT_STATUS_NOT_SEEN][] = $cert;
+            } else {
+                if ($cert['confirmed']) {
+                    $certsbystatus[self::GLOBAL_CERT_STATUS_VALIDATED][] = $cert;
+                } else {
+                    $certsbystatus[self::GLOBAL_CERT_STATUS_WAITING][] = $cert;
+                }
             }
-            $validrecord['comment'] = $valid->get('comment');
-            $validrecord['commentformat'] = $valid->get('commentformat');
-
-            $certrecord['validations'][] = $validrecord;
         }
-        return $certrecord;
+        return $certsbystatus;
     }
 
     /**
@@ -304,31 +287,94 @@ class certifications {
     }
 
     /**
-     * Get the certifications and validations for a student by status
+     * Get a single certification
      *
-     *
-     * @param int $planningid The planning id
-     * @param int $studentid The student id
-     * @return array The certifications classified by status
+     * @param int $declid The declaration id
      */
-    public static function get_certifications_by_status(int $planningid, int $studentid): array {
-        $certifications = self::get_certifications($planningid, $studentid);
-        $certsbystatus = [
-            self::GLOBAL_CERT_STATUS_NOT_SEEN => [],
-            self::GLOBAL_CERT_STATUS_WAITING => [],
-            self::GLOBAL_CERT_STATUS_VALIDATED => [],
-        ];
-        foreach ($certifications as $cert) {
-            if ($cert['status'] == cert_decl::STATUS_STUDENT_NOTSEEN) {
-                $certsbystatus[self::GLOBAL_CERT_STATUS_NOT_SEEN][] = $cert;
-            } else {
-                if ($cert['confirmed']) {
-                    $certsbystatus[self::GLOBAL_CERT_STATUS_VALIDATED][] = $cert;
-                } else {
-                    $certsbystatus[self::GLOBAL_CERT_STATUS_WAITING][] = $cert;
-                }
+    public static function get_certification(int $declid, bool $withfeedback = false) {
+        $cert = new cert_decl($declid);
+        if (!$cert->get('id')) {
+            return [];
+        }
+        $certrecord = [];
+        $student = utils::get_user_info($cert->get('studentid'));
+        $certrecord['declid'] = $cert->get('id');
+        $certrecord['criterionid'] = $cert->get('criterionid');
+        $criterion = criterion::get_record(['id' => $cert->get('criterionid')]);
+        $certrecord['label'] = $criterion->get('label');
+        $certrecord['grade'] = $criterion->get('grade');
+
+        $certrecord['status'] = $cert->get('status');
+        $certrecord['seendone'] = ($cert->get('status') == cert_decl::STATUS_DECL_SEENDONE);
+        $certrecord['notseen'] = ($cert->get('status') == cert_decl::STATUS_STUDENT_NOTSEEN);
+        $certrecord['total'] = 5; // TODO: get the total from the criterion? maybe change to grade.
+        $certrecord['timecreated'] = $cert->get('timecreated');
+        $certrecord['isdeclared'] = true; // This is the flag to determine if the certification is declared or not.
+        $certrecord['comment'] = $cert->get('comment');
+        $certrecord['commentformat'] = $cert->get('commentformat');
+        $certrecord['confirmed'] = false;
+        $certrecord['observernotseen'] = false;
+        $certrecord['levelnotreached'] = false;
+
+        if ($withfeedback) {
+            $certrecord['feedback'] = [
+                'picture' => $student['userpictureurl'],
+                'fullname' => $student['fullname'],
+                'comments' => [
+                    'commenttext' => format_text($cert->get('comment'), $cert->get('commentformat')),
+                ],
+            ];
+        }
+        $certrecord['validations'] = [];
+        $valids = cert_valid::get_records(['declid' => $cert->get('id')]);
+        foreach ($valids as $valid) {
+            $validrecord = [];
+            $validrecord['id'] = $valid->get('id');
+            $validrecord['supervisor'] = utils::get_user_info($valid->get('supervisorid'));
+            $validrecord['status'] = $valid->get('status');
+
+            $certrecord['confirmed'] = ($valid->get('status') == cert_valid::STATUS_CONFIRMED);
+            $certrecord['observernotseen'] = ($valid->get('status') == cert_valid::STATUS_OBSERVER_NOTSEEN);
+            $certrecord['levelnotreached'] = ($valid->get('status') == cert_valid::STATUS_LEVEL_NOT_REACHED);
+            $supervisor = $validrecord['supervisor'];
+            if ($withfeedback) {
+                $validrecord['feedback'] = [
+                    'picture' => $supervisor['userpictureurl'],
+                    'fullname' => $supervisor['fullname'],
+                    'comments' => [
+                        'commenttext' => format_text($valid->get('comment'), $valid->get('commentformat')),
+                    ],
+                ];
+            }
+            $validrecord['comment'] = $valid->get('comment');
+            $validrecord['commentformat'] = $valid->get('commentformat');
+
+            $certrecord['validations'][] = $validrecord;
+        }
+        return $certrecord;
+    }
+
+    /**
+     * Set the supervisors for a certification
+     *
+     * This remove previously set supervisors.
+     *
+     * @param int $declid
+     * @param array $supervisors
+     * @return array a set of supervisor ids.
+     */
+    public static function set_declaration_supervisors(int $declid, array $supervisors): array {
+        $setsupervisors = self::get_declaration_supervisors($declid);
+        foreach ($supervisors as $supervisorid) {
+            if (!in_array($supervisorid, $setsupervisors)) {
+                self::declaration_supervisor_invite($declid, $supervisorid);
             }
         }
-        return $certsbystatus;
+        foreach ($setsupervisors as $supervisorid) {
+            if (!in_array($supervisorid, $supervisors)) {
+                self::declaration_supervisor_remove($declid, $supervisorid);
+            }
+        }
+        return self::get_declaration_supervisors($declid);
     }
 }
