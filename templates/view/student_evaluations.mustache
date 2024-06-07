@@ -33,11 +33,11 @@
     </div>
     <div class="accordion" id="evaluations-accordion">
         <div class="row no-gutters">
-            <div class="col-4 criterionlabel">
+            <div class="span4 col-4 criterionlabel">
             </div>
             {{#userevals.0}}
                 {{#grades}}
-                    <div class="col-1 evaluator font-weight-bold text-center d-flex">
+                    <div class="span1 col-1 evaluator font-weight-bold text-center d-flex">
                         <div class="th rotatecontainer">
                             <div class="transformed">
                                 <span class="gradername">{{graderinfo.fullname}}</span>
@@ -53,11 +53,11 @@
 
         {{#userevals}}
             <div class="row no-gutters mb-2">
-                <div class="col-4 criterionlabel font-weight-bold">
+                <div class="span4 col-4 criterionlabel font-weight-bold">
                     {{criterion.label}}
                 </div>
                 {{#grades}}
-                    <div class="col-1 grade text-center">
+                    <div class="span1 col-1 grade text-center">
                         {{level}}
                         <div class="sr-only">
                             {{graderinfo.fullname}}

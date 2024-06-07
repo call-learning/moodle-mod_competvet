@@ -31,16 +31,16 @@
     }
 }}
 <div class="row" data-region="planitem" data-id="{{id}}">
-    <div class="col-1 tcell">
+    <div class="span1 col-1 tcell">
         {{{id}}}
     </div>
-    <div class="col-2 tcell {{#edit}}editable{{/edit}}">
+    <div class="span2 col-2 tcell {{#edit}}editable{{/edit}}">
         <input type="date" name="startdate" value="{{startdate}}" data-field="startdate" class="form-control {{#errorstartdate}}error{{/errorstartdate}}" {{^edit}}disabled{{/edit}}>
     </div>
-    <div class="col-2 tcell {{#edit}}editable{{/edit}}">
+    <div class="span2 col-2 tcell {{#edit}}editable{{/edit}}">
         <input type="date" name="enddate" value="{{enddate}}" data-field="enddate" class="form-control {{#errorenddate}}error{{/errorenddate}}" {{^edit}}disabled{{/edit}}>
     </div>
-    <div class="col-2 tcell {{#edit}}editable{{/edit}}">
+    <div class="span2 col-2 tcell {{#edit}}editable{{/edit}}">
         {{#edit}}
             <select name="groupname" class="form-control {{#errorgroupid}}error{{/errorgroupid}}" data-field="groupid">
                 {{#groups}}
@@ -49,10 +49,10 @@
             </select>
         {{/edit}}{{^edit}}{{{groupname}}}{{/edit}}
     </div>
-    <div class="col-2 tcell {{#edit}}editable{{/edit}}">
+    <div class="span2 col-2 tcell {{#edit}}editable{{/edit}}">
         {{#edit}}<input type="text" class="form-control" value="{{{session}}}" placeholder="{{{placeholder}}}" data-field="session">{{/edit}}{{^edit}}{{{session}}}{{/edit}}
     </div>
-    <div class="col-3 tcell">
+    <div class="span3 col-3 tcell">
         {{^edit}}
         <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-id="{{id}}" data-action="edit" data-type="planning">{{#pix}}i/edit, core, {{#str}}edit{{/str}}{{/pix}}</button>
         {{/edit}}
