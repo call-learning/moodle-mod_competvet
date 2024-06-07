@@ -69,6 +69,16 @@ class generator_course_backend extends tool_generator_course_backend {
     const EVAL_AUTOEVAL = 2;
 
     /**
+     * Percentage of certif
+     */
+    const CERTIF_PNUM = 80;
+
+    /**
+     * Number of case
+     */
+    const CASE_NUM = 2;
+
+    /**
      * @var string LOREM_IPSUM
      */
     const LOREM_IPSUM = '<p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit '
@@ -255,10 +265,13 @@ class generator_course_backend extends tool_generator_course_backend {
         $this->log('createcompetvets', $number, true);
         $this->situations = [];
         for ($i = 0; $i < $number; $i++) {
-            $record =
-                ['course' => $this->course,
+            $record = [
+                    'course' => $this->course,
                     'autoevalnum' => $this->fixeddataset ? self::EVAL_AUTOEVAL : random_int(1, self::EVAL_AUTOEVAL),
-                    'evalnum' => $this->fixeddataset ? self::EVAL_COUNT : random_int(1, self::EVAL_COUNT), ];
+                    'evalnum' => $this->fixeddataset ? self::EVAL_COUNT : random_int(1, self::EVAL_COUNT),
+                    'certifpnum' => $this->fixeddataset ? self::CERTIF_PNUM : random_int(1, self::CERTIF_PNUM),
+                    'casenum' => $this->fixeddataset ? self::CASE_NUM : random_int(1, self::CASE_NUM),
+            ];
             $options = ['section' => $generatoreflection->getMethod('get_target_section')->invoke($this)];
             $instance = $competvetgenerator->create_instance($record, $options);
             $this->situations[] = situation::get_record(['id' => $instance->id]);

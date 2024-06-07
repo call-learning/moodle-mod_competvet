@@ -39,7 +39,7 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
         $situations = new backup_nested_element('competvet_situation');
 
         $situation = new backup_nested_element('competvet_situation', ['competvetid'], [
-            'shortname', 'evalnum', 'autoevalnum', ]);
+            'shortname', 'evalnum', 'autoevalnum', 'certifpnum', 'casenum', 'haseval', 'hascertif', 'hascase',]);
 
         $recordings = new backup_nested_element('recordings');
 

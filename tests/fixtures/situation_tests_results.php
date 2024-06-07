@@ -41,6 +41,11 @@ $results['student1results'] = [
         'name' => 'SIT1',
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
     ],
     [
         'plannings' =>
@@ -59,6 +64,11 @@ $results['student1results'] = [
         'name' => 'SIT2',
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
     ],
     [
         'plannings' =>
@@ -77,6 +87,11 @@ $results['student1results'] = [
         'name' => 'SIT3',
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
     ],
     [
         'plannings' =>
@@ -95,6 +110,11 @@ $results['student1results'] = [
         'name' => 'SIT4',
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
     ],
     [
         'plannings' =>
@@ -113,6 +133,11 @@ $results['student1results'] = [
         'name' => 'SIT7',
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
     ],
 ];
 $results['student2results'] = [
@@ -133,6 +158,11 @@ $results['student2results'] = [
         'name' => 'SIT1',
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
 
     ],
     [
@@ -152,6 +182,11 @@ $results['student2results'] = [
         'name' => 'SIT3',
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
 
     ],
     [
@@ -171,6 +206,11 @@ $results['student2results'] = [
         'name' => 'SIT4',
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
 
     ],
     [
@@ -190,6 +230,11 @@ $results['student2results'] = [
         'name' => 'SIT7',
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
 
     ],
 ];
@@ -222,6 +267,11 @@ $results['observer1results'] = [
         'name' => 'SIT1',
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
 
     ],
     [
@@ -241,6 +291,11 @@ $results['observer1results'] = [
         'name' => 'SIT2',
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
 
     ],
     [
@@ -265,6 +320,11 @@ $results['observer1results'] = [
         'name' => 'SIT3',
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
 
     ],
 ];
@@ -293,6 +353,11 @@ $results['observer2results'] = [
         'name' => 'SIT4',
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
     ],
     [
         'plannings' =>
@@ -318,6 +383,11 @@ $results['observer2results'] = [
         'name' => 'SIT5',
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
     ],
     [
         'plannings' =>
@@ -336,6 +406,11 @@ $results['observer2results'] = [
         'name' => 'SIT6',
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
     ],
     [
         'plannings' =>
@@ -354,6 +429,11 @@ $results['observer2results'] = [
         'name' => 'SIT7',
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
     ],
     [
         'plannings' =>
@@ -378,6 +458,11 @@ $results['observer2results'] = [
         'name' => 'SIT8',
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
     ],
     [
         'plannings' =>
@@ -401,6 +486,11 @@ $results['observer2results'] = [
         'name' => 'SIT9',
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
     ],
 ];
 $results['teacher1results'] = [
@@ -432,6 +522,11 @@ $results['teacher1results'] = [
         'name' => 'SIT1',
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
 
     ],
     [
@@ -452,6 +547,11 @@ $results['teacher1results'] = [
 
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
 
     ],
     [
@@ -476,6 +576,11 @@ $results['teacher1results'] = [
         'name' => 'SIT3',
         'evalnum' => 1,
         'autoevalnum' => 1,
+        'certifpnum' => 80,
+        'casenum' => 2,
+        'haseval' => 1,
+        'hascertif' => 1,
+        'hascase' => 1,
 
     ],
 ];

@@ -117,7 +117,33 @@ class situation extends persistent {
             'autoevalnum' => [
                 'type' => PARAM_INT,
                 'default' => 1,
+                'formtype' => 'hidden', // We kept this field even if we know that it will always be equal to 1. But we
+                // could have maybe other requirements later.
+            ],
+            'certifpnum' => [
+                'type' => PARAM_INT,
+                'default' => 80,
                 'formtype' => 'text',
+            ],
+            'casenum' => [
+                'type' => PARAM_INT,
+                'default' => 5,
+                'formtype' => 'text',
+            ],
+            'haseval' => [
+                'type' => PARAM_BOOL,
+                'default' => true,
+                'formtype' => 'advcheckbox',
+            ],
+            'hascertif' => [
+                'type' => PARAM_BOOL,
+                'default' => true,
+                'formtype' => 'advcheckbox',
+            ],
+            'hascase' => [
+                'type' => PARAM_BOOL,
+                'default' => true,
+                'formtype' => 'advcheckbox',
             ],
             'evalgrid' => [
                 'type' => PARAM_INT,

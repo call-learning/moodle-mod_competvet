@@ -276,13 +276,13 @@ class plannings {
         $info[] = [
             'type' => 'cert',
             'nbdone' => $numvalidated,
-            'nbrequired' => count($criteria),
+            'nbrequired' => round(count($criteria) * $situation->get('certifpnum') / 100),
         ];
         $entries = case_entry::get_records(['studentid' => $studentid, 'planningid' => $planningid]);
         $info[] = [
             'type' => 'list',
             'nbdone' => count($entries),
-            'nbrequired' => 0,
+            'nbrequired' => $situation->get('casenum'),
         ];
 
         return $info;

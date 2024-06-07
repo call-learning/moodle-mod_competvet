@@ -1051,5 +1051,50 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2024052800, 'competvet');
     }
 
+    if ($oldversion < 2024052803) {
+
+        // Define field certifpnum to be added to competvet_situation.
+        $table = new xmldb_table('competvet_situation');
+        $field = new xmldb_field('certifpnum', XMLDB_TYPE_INTEGER, '10', null, null, null, '80', 'autoevalnum');
+        // Conditionally launch add field certifpnum.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('casenum', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'certifpnum');
+        // Conditionally launch add field casenum.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024052803, 'competvet');
+    }
+
+    if ($oldversion < 2024052804) {
+
+        // Define field haseval to be added to competvet_situation.
+        $table = new xmldb_table('competvet_situation');
+        $field = new xmldb_field('haseval', XMLDB_TYPE_INTEGER, '1', null, null, null, '1', 'casenum');
+
+        // Conditionally launch add field haseval.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('hascertif', XMLDB_TYPE_INTEGER, '1', null, null, null, '1', 'haseval');
+
+        // Conditionally launch add field hascertif.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('hascase', XMLDB_TYPE_INTEGER, '1', null, null, null, '1', 'hascertif');
+
+        // Conditionally launch add field hascase.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024052804, 'competvet');
+    }
+
     return true;
 }
