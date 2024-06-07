@@ -34,4 +34,11 @@ $definitions = [
             'mod_competvet/usersituationschanged',
         ],
     ],
+    'casestructures' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simpledata' => true,
+        'invalidationevents' => [
+            'mod_competvet/casestructures',
+        ],
+    ],
 ];

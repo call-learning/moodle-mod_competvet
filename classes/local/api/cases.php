@@ -16,11 +16,12 @@
 
 namespace mod_competvet\local\api;
 
+use cache;
 use core\invalid_persistent_exception;
 use mod_competvet\local\persistent\case_cat;
-use mod_competvet\local\persistent\case_field;
 use mod_competvet\local\persistent\case_data;
 use mod_competvet\local\persistent\case_entry;
+use mod_competvet\local\persistent\case_field;
 use stdClass;
 
 /**
@@ -34,59 +35,13 @@ class cases {
     /**
      * Get the case user entries
      *
-     * @param int|null $planningid The planning id
-     * @param int|null $studentid The user id
+     * @param int $caseid
      * @return stdClass
      */
-    public static function get_entries(?int $planningid = null, ?int $studentid = null): stdClass {
+    public static function get_entry(int $caseid): stdClass {
         $structure = self::get_case_structure();
-        $entries = case_entry::get_records(['studentid' => $studentid, 'planningid' => $planningid]);
-        $cases = [];
-        foreach ($entries as $entry) {
-            $data = case_data::get_records(['entryid' => $entry->get('id')]);
-            // Now we need to map the data to the structure.
-            $case = [];
-            // The structure holds the form structure, the data holds the from values.
-            // We need to match the data->fieldid to the field->id object in the fields array for each category.
-            foreach ($structure as $category) {
-                $fields = [];
-                foreach ($category->fields as $field) {
-                    $fielddata = null;
-                    foreach ($data as $d) {
-                        if ($d->get('fieldid') == $field->id) {
-                            $fielddata = $d;
-                            break;
-                        }
-                    }
-                    $fields[] = (object) [
-                        'id' => $field->id,
-                        'idnumber' => $field->idnumber,
-                        'name' => $field->name,
-                        'type' => $field->type,
-                        'configdata' => $field->configdata,
-                        'description' => $field->description,
-                        'value' => $fielddata ? $fielddata->get('value') : '',
-                        'displayvalue' => $fielddata ? $fielddata->get_displayvalue($field) : '',
-                    ];
-                }
-                $case[] = (object) [
-                    'id' => $category->id,
-                    'name' => $category->name,
-                    'fields' => $fields,
-                ];
-            }
-            $cases[] = (object) [
-                'id' => $entry->get('id'),
-                'planningid' => $entry->get('planningid'),
-                'studentid' => $entry->get('studentid'),
-                'timecreated' => $entry->get('timecreated'),
-                'usermodified' => $entry->get('usermodified'),
-                'categories' => $case,
-            ];
-        }
-        return (object) [
-            'cases' => $cases,
-        ];
+        $caseentry = case_entry::get_record(['id' => $caseid]);
+        return self::do_get_entry_content($structure, $caseentry);
     }
 
     /**
@@ -95,6 +50,10 @@ class cases {
      * @return array
      */
     public static function get_case_structure(): array {
+        $casestructure = cache::make('mod_competvet', 'casestructures');
+        if ($casestructure->get('casestructure')) {
+            return $casestructure->get('casestructure');
+        }
         $categories = case_cat::get_records();
         $fields = case_field::get_records();
         $data = [];
@@ -115,11 +74,64 @@ class cases {
                 'description' => $field->get('description'),
             ];
         }
+        $casestructure->set('casestructures', array_values($data));
         return array_values($data);
     }
 
     /**
+     * Entry structure content
+     *
+     * @param array $casestructure
+     * @param case_entry $caseentry
+     * @return object
+     */
+    private static function do_get_entry_content(array $casestructure, case_entry $caseentry): object {
+        $data = case_data::get_records(['entryid' => $caseentry->get('id')]);
+        // Now we need to map the data to the structure.
+        $case = [];
+        // The structure holds the form structure, the data holds the from values.
+        // We need to match the data->fieldid to the field->id object in the fields array for each category.
+        foreach ($casestructure as $category) {
+            $fields = [];
+            foreach ($category->fields as $field) {
+                $fielddata = null;
+                foreach ($data as $d) {
+                    if ($d->get('fieldid') == $field->id) {
+                        $fielddata = $d;
+                        break;
+                    }
+                }
+                $fields[] = (object) [
+                    'id' => $field->id,
+                    'idnumber' => $field->idnumber,
+                    'name' => $field->name,
+                    'type' => $field->type,
+                    'configdata' => $field->configdata,
+                    'description' => $field->description,
+                    'value' => $fielddata ? $fielddata->get('value') : '',
+                    'displayvalue' => $fielddata ? $fielddata->get_displayvalue($field) : '',
+                ];
+            }
+            $case[] = (object) [
+                'id' => $category->id,
+                'name' => $category->name,
+                'fields' => $fields,
+            ];
+        }
+        $record = (object) [
+            'id' => $caseentry->get('id'),
+            'planningid' => $caseentry->get('planningid'),
+            'studentid' => $caseentry->get('studentid'),
+            'timecreated' => $caseentry->get('timecreated'),
+            'usermodified' => $caseentry->get('usermodified'),
+            'categories' => $case,
+        ];
+        return $record;
+    }
+
+    /**
      * Create a case entry
+     *
      * @param int $planningid The planning id
      * @param int $studentid The student id
      * @param array $fields The fields
@@ -150,6 +162,7 @@ class cases {
 
     /**
      * Update a case entry
+     *
      * @param int $entryid The entry id
      * @param array $fields The fields
      * @return void
@@ -179,6 +192,7 @@ class cases {
 
     /**
      * Delete a case entry
+     *
      * @param int $entryid The entry id
      * @return bool
      */
@@ -207,7 +221,7 @@ class cases {
     public static function get_case_list(int $planningid, int $studentid): array {
         $entries = self::get_entries($planningid, $studentid);
         $caselist = [];
-        foreach($entries->cases as $case) {
+        foreach ($entries->cases as $case) {
             $casetrans = [
                 'id' => $case->id,
                 'timecreated' => $case->timecreated,
@@ -219,6 +233,26 @@ class cases {
             $caselist[] = $casetrans;
         }
         return $caselist;
+    }
+
+    /**
+     * Get the case user entries
+     *
+     * @param int $planningid The planning id
+     * @param int $studentid The user id
+     * @return stdClass
+     */
+    public static function get_entries(int $planningid, int $studentid): stdClass {
+        $structure = self::get_case_structure();
+        $entries = case_entry::get_records(['studentid' => $studentid, 'planningid' => $planningid]);
+        $cases = [];
+        foreach ($entries as $entry) {
+            $case = self::do_get_entry_content($structure, $entry);
+            $cases[] = $case;
+        }
+        return (object) [
+            'cases' => $cases,
+        ];
     }
 
     /**

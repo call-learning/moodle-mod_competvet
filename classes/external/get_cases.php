@@ -43,8 +43,8 @@ class get_cases extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'userid' => new external_value(PARAM_INT, 'The user id', VALUE_OPTIONAL),
-            'planningid' => new external_value(PARAM_INT, 'The planning id', VALUE_OPTIONAL),
+            'userid' => new external_value(PARAM_INT, 'The user id'),
+            'planningid' => new external_value(PARAM_INT, 'The planning id'),
         ]);
     }
 
