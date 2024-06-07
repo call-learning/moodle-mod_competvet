@@ -22,62 +22,115 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_competvet_activity_structure_step extends restore_activity_structure_step {
-    /**
-     * Structure step to restore one competvet activity.
-     *
-     * @return array
-     */
     protected function define_structure() {
-        $paths = [];
-        $paths[] = new restore_path_element('competvet', '/activity/competvet');
-        // Return the paths wrapped into standard activity structure.
-        return $this->prepare_activity_structure($paths);
+        // Define each element separated
+        $competvet = new restore_path_element('competvet', '/activity/competvet');
+        $situation = new restore_path_element('situation', '/activity/competvet/situations/situation');
+        $planning = new restore_path_element('planning', '/activity/competvet/situations/situation/plannings/planning');
+        $grid = new restore_path_element('grid', '/activity/competvet/situations/situation/grids/grid');
+        $criterion = new restore_path_element('criterion', '/activity/situations/situation/grids/grid/criteria/criterion');
+        $observation = new restore_path_element('observation', '/activity/competvet/situations/situation/plannings/planning/observations/observation');
+        $obs_comment = new restore_path_element('obs_comment', '/activity/competvet/situations/situation/plannings/planning/observations/observation/obs_comments/obs_comment');
+        $grade = new restore_path_element('grade', '/activity/competvet/grades/grade');
+
+
+        // Return the paths wrapped into standard activity structure
+        return $this->prepare_activity_structure(array($competvet, $situation, $planning, $grid, $criterion, $observation, $obs_comment, $grade));
     }
 
-    /**
-     * Process a competvet restore.
-     *
-     * @param array $data The data in object form
-     * @return void
-     */
-    protected function process_competvet(array $data) {
+    protected function process_competvet($data) {
         global $DB;
-        $data = (object) $data;
-        $data->course = $this->get_courseid();
-        $data->timemodified = $this->apply_date_offset($data->timemodified);
-        // Insert the competvet record.
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        // Insert the competvet record
         $newitemid = $DB->insert_record('competvet', $data);
-        // Immediately after inserting "activity" record, call this.
         $this->apply_activity_instance($newitemid);
     }
 
-    /**
-     * Process a competvet_situations( restore (additional table).
-     *
-     * @param array $data The data in object form
-     * @return void
-     */
-    protected function process_competvet_situations(array $data) {
+    protected function process_situation($data) {
         global $DB;
-        $data = (object) $data;
-        // Apply modifications.
-        $data->courseid = $this->get_mappingid('course', $data->courseid);
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        // Get the parent module id
         $data->competvetid = $this->get_new_parentid('competvet');
-        $data->userid = $this->get_mappingid('user', $data->userid);
-        $data->timecreated = $this->apply_date_offset($data->timecreated);
-        // Insert the competvet_logs record.
-        $newitemid = $DB->insert_record('competvet_situation', $data);
-        // Immediately after inserting associated record, call this.
-        $this->set_mapping('competvet_situation', $data->id, $newitemid);
+
+        // Insert the situation record
+        $DB->insert_record('competvet_situation', $data);
     }
 
-    /**
-     * Actions to be executed after the restore is completed
-     *
-     * @return void
-     */
+    protected function process_planning($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        // Insert the planning record
+        $DB->insert_record('competvet_planning', $data);
+    }
+
+
+    protected function process_grid($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        // Check if the grid already exists
+        if (!$DB->record_exists('competvet_grid', array('idnumber' => $data->idnumber))) {
+            // Insert the grid record
+            $DB->insert_record('competvet_grid', $data);
+        }
+    }
+
+    protected function process_criterion($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        // Check if the criterion already exists
+        if (!$DB->record_exists('competvet_criterion', array('idnumber' => $data->idnumber, 'gridid' => $data->gridid))) {
+            // Insert the criterion record
+            $DB->insert_record('competvet_criterion', $data);
+        }
+    }
+
+    protected function process_observation($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        // Insert the observation record
+        $DB->insert_record('competvet_observation', $data);
+    }
+
+    protected function process_obs_comment($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        // Insert the observation comment record
+        $DB->insert_record('competvet_obs_comment', $data);
+    }
+
+    protected function process_grade($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        // Insert the grade record
+        $DB->insert_record('competvet_grades', $data);
+    }
+
     protected function after_execute() {
-        // Add competvet related files, no need to match by itemname (just internally handled context).
+        // Add competvet related files, no need to match by itemname (just internally handled context)
         $this->add_related_files('mod_competvet', 'intro', null);
     }
 }

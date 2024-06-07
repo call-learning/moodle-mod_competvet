@@ -29,38 +29,102 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
      */
     protected function define_structure() {
 
-        // To know if we are including userinfo.
-        $userinfo = $this->get_setting_value('userinfo');
+        // Define each element separated
+        $competvet = new backup_nested_element('competvet', array('id'), array(
+            'course', 'name', 'intro', 'introformat', 'grade', 'usermodified',
+            'timecreated', 'timemodified'
+        ));
 
-        // Define each element separated.
-        $competvet = new backup_nested_element('competvet', ['id'], [
-            'type', 'course', 'name', 'intro', 'introformat', ]);
+        $situations = new backup_nested_element('situations');
 
-        $situations = new backup_nested_element('competvet_situation');
+        $situation = new backup_nested_element('situation', array('id'), array(
+            'competvetid', 'shortname', 'evalnum', 'autoevalnum', 'certifpnum',
+            'casenum', 'haseval', 'hascertif', 'hascase', 'evalgrid',
+            'certifgrid', 'listgrid', 'usermodified', 'timecreated', 'timemodified'
+        ));
 
-        $situation = new backup_nested_element('competvet_situation', ['competvetid'], [
-            'shortname', 'evalnum', 'autoevalnum', 'certifpnum', 'casenum', 'haseval', 'hascertif', 'hascase',]);
+        $grids = new backup_nested_element('grids');
+        $grid = new backup_nested_element('grid', array('id'), array(
+            'name', 'idnumber', 'sortorder', 'type', 'usermodified',
+            'timecreated', 'timemodified'
+        ));
 
-        $recordings = new backup_nested_element('recordings');
+        $criteria = new backup_nested_element('criteria');
+        $criterion = new backup_nested_element('criterion', array('id'), array(
+            'label', 'grade', 'idnumber', 'parentid', 'sort', 'gridid',
+            'usermodified', 'timecreated', 'timemodified'
+        ));
 
-        $recording = new backup_nested_element('recording', ['id'], [
-            'courseid', 'competvetid', 'groupid', 'recordingid', 'headlesss', 'imported', 'status', 'importeddata',
-            'timecreated', ]);
+        $plannings = new backup_nested_element('plannings');
+        $planning = new backup_nested_element('planning', array('id'), array(
+            'situationid', 'groupid', 'startdate', 'enddate', 'session',
+            'usermodified', 'timecreated', 'timemodified'
+        ));
 
-        // Build the tree.
+        $observations = new backup_nested_element('observations');
+        $observation = new backup_nested_element('observation', array('id'), array(
+            'studentid', 'observerid', 'planningid', 'status', 'category',
+            'usermodified', 'timecreated', 'timemodified'
+        ));
+
+        $obs_comments = new backup_nested_element('obs_comments');
+        $obs_comment = new backup_nested_element('obs_comment', array('id'), array(
+            'observationid', 'type', 'comment', 'commentformat', 'usercreated',
+            'usermodified', 'timecreated', 'timemodified'
+        ));
+
+        $grades = new backup_nested_element('grades');
+        $grade = new backup_nested_element('grade', array('id'), array(
+            'competvet', 'type', 'studentid', 'grade', 'planningid',
+            'timecreated', 'timemodified', 'usermodified'
+        ));
+
+        // Build the tree
         $competvet->add_child($situations);
         $situations->add_child($situation);
 
-        // Define sources.
-        $competvet->set_source_table('competvet', ['id' => backup::VAR_ACTIVITYID]);
+        $competvet->add_child($plannings);
+        $plannings->add_child($planning);
 
-        // This source definition only happen if we are including user info.
-        if ($userinfo) {
-            $situation->set_source_table('competvet_situation', ['competvetid' => backup::VAR_PARENTID]);
-        }
+        $planning->add_child($observations);
+        $observations->add_child($observation);
+
+        $observation->add_child($obs_comments);
+        $obs_comments->add_child($obs_comment);
+
+        $situation->add_child($grids);
+        $grids->add_child($grid);
+
+        $grid->add_child($criteria);
+        $criteria->add_child($criterion);
+
+        $competvet->add_child($grades);
+        $grades->add_child($grade);
+
+        // Define sources.
+        $competvet->set_source_table('competvet', array('id' => backup::VAR_ACTIVITYID));
+        $situation->set_source_table('competvet_situation', array('competvetid' => backup::VAR_PARENTID));
+        $planning->set_source_table('competvet_planning', array('situationid' => backup::VAR_PARENTID));
+        $grid->set_source_table('competvet_grid', array());
+        $criterion->set_source_table('competvet_criterion', array());
+        $observation->set_source_table('competvet_observation', array('planningid' => backup::VAR_PARENTID));
+        $obs_comment->set_source_table('competvet_obs_comment', array('observationid' => backup::VAR_PARENTID));
 
         // Define id annotations.
-        $situation->annotate_ids('user', 'userid');
+        $competvet->annotate_ids('user', 'usermodified');
+        $situation->annotate_ids('user', 'usermodified');
+        $planning->annotate_ids('user', 'usermodified');
+        $planning->annotate_ids('group', 'groupid');
+        $observation->annotate_ids('user', 'usermodified');
+        $observation->annotate_ids('user', 'observerid');
+        $observation->annotate_ids('user', 'studentid');
+        $obs_comment->annotate_ids('user', 'usermodified');
+        $obs_comment->annotate_ids('user', 'usercreated');
+
+        $criterion->annotate_ids('competvet_grid', 'gridid');
+
+        // Define file annotations.
+        $competvet->annotate_files('mod_competvet', 'intro', null);
 
         // Return the root element (competvet), wrapped into standard activity structure.
         return $this->prepare_activity_structure($competvet);
