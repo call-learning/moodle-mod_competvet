@@ -48,6 +48,11 @@ class situations extends datasource {
             'situation:shortname',
             'situation:evalnum',
             'situation:autoevalnum',
+            'situation:certifpnum',
+            'situation:casenum',
+            'situation:haseval',
+            'situation:hascertif',
+            'situation:hascase',
         ];
     }
 

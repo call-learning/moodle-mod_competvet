@@ -64,12 +64,19 @@ class situations {
                     'name' => format_string($competvetinstance->name),
                     'evalnum' => $situation->get('evalnum'),
                     'autoevalnum' => $situation->get('autoevalnum'),
+                    'certifpnum' => $situation->get('certifpnum'),
+                    'casenum' => $situation->get('casenum'),
+                    'haseval' => $situation->get('haseval'),
+                    'hascertif' => $situation->get('hascertif'),
+                    'hascase' => $situation->get('hascase'),
                     'intro' => format_text($competvetinstance->intro, $competvetinstance->introformat),
                     'id' => $situationid,
                 ];
             $newsituation['plannings'] = $allplannings;
             $newsituation['evalnum'] = intval($newsituation['evalnum']);
             $newsituation['autoevalnum'] = intval($newsituation['autoevalnum']);
+            $newsituation['certifpnum'] = intval($newsituation['certifpnum']);
+            $newsituation['casenum'] = intval($newsituation['casenum']);
             $tagsobjects = \core_tag_tag::get_item_tags('mod_competvet', 'competvet_situation', $competvetinstance->id);
             $tags = array_map(function ($tag) {
                 return $tag->name;

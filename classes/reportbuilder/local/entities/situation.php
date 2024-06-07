@@ -20,7 +20,7 @@ namespace mod_competvet\reportbuilder\local\entities;
 
 use context_helper;
 use core_reportbuilder\local\entities\base;
-use core_reportbuilder\local\filters\{number};
+use core_reportbuilder\local\filters\{boolean_select, number};
 use core_reportbuilder\local\helpers\database;
 use core_reportbuilder\local\report\{column, filter};
 use html_writer;
@@ -118,6 +118,55 @@ class situation extends base {
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_INTEGER)
             ->add_fields("{$situationalias}.autoevalnum")
+            ->set_is_sortable(true);
+
+        $columns[] = (new column(
+            'certifpnum',
+            new lang_string('situation:certifpnum', 'mod_competvet'),
+            $this->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->set_type(column::TYPE_INTEGER)
+            ->add_fields("{$situationalias}.certifpnum")
+            ->set_is_sortable(true);
+
+        $columns[] = (new column(
+            'casenum',
+            new lang_string('situation:casenum', 'mod_competvet'),
+            $this->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->set_type(column::TYPE_INTEGER)
+            ->add_fields("{$situationalias}.casenum")
+            ->set_is_sortable(true);
+
+        $columns[] = (new column(
+            'haseval',
+            new lang_string('situation:haseval', 'mod_competvet'),
+            $this->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->set_type(column::TYPE_BOOLEAN)
+            ->add_fields("{$situationalias}.haseval")
+            ->set_is_sortable(true);
+
+        $columns[] = (new column(
+            'hascertif',
+            new lang_string('situation:hascertif', 'mod_competvet'),
+            $this->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->set_type(column::TYPE_BOOLEAN)
+            ->add_fields("{$situationalias}.hascertif")
+            ->set_is_sortable(true);
+        $columns[] = (new column(
+            'hascase',
+            new lang_string('situation:hascase', 'mod_competvet'),
+            $this->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->set_type(column::TYPE_BOOLEAN)
+            ->add_fields("{$situationalias}.hascase")
             ->set_is_sortable(true);
 
         $columns[] = (new column(
@@ -264,6 +313,45 @@ class situation extends base {
             new lang_string('situation:autoevalnum', 'mod_competvet'),
             $this->get_entity_name(),
             "{$situationalias}.autoevalnum"
+        ))->add_joins($this->get_joins());
+
+        $filters[] = (new filter(
+            number::class,
+            'certifpnum',
+            new lang_string('situation:certifpnum', 'mod_competvet'),
+            $this->get_entity_name(),
+            "{$situationalias}.certifpnum"
+        ))->add_joins($this->get_joins());
+
+        $filters[] = (new filter(
+            number::class,
+            'casenum',
+            new lang_string('situation:casenum', 'mod_competvet'),
+            $this->get_entity_name(),
+            "{$situationalias}.casenum"
+        ))->add_joins($this->get_joins());
+
+        $filters[] = (new filter(
+            boolean_select::class,
+            'hascase',
+            new lang_string('situation:hascase', 'mod_competvet'),
+            $this->get_entity_name(),
+            "{$situationalias}.hascase"
+        ))->add_joins($this->get_joins());
+        $filters[] = (new filter(
+            boolean_select::class,
+            'hascertif',
+            new lang_string('situation:hascertif', 'mod_competvet'),
+            $this->get_entity_name(),
+            "{$situationalias}.hascertif"
+        ))->add_joins($this->get_joins());
+
+        $filters[] = (new filter(
+            boolean_select::class,
+            'hascase',
+            new lang_string('situation:hascase', 'mod_competvet'),
+            $this->get_entity_name(),
+            "{$situationalias}.hascase"
         ))->add_joins($this->get_joins());
 
         $filters[] = (new filter(
