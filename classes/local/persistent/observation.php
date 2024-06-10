@@ -198,9 +198,11 @@ class observation extends persistent {
         ];
 
         $records = $DB->get_records_sql($sql, $params);
-        return array_map(function($record) use ($persistentname) {
-            return new $persistentname($record->id, $record);
-        }, $records);
+        return array_values(
+            array_map(function($record) use ($persistentname) {
+                return new $persistentname($record->id, $record);
+            }, $records)
+        );
     }
 
     /**

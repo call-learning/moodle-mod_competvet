@@ -41,16 +41,22 @@ define('COMPETVET_CRITERIA_LIST', 3);
  * @return true | null True if the feature is supported, null otherwise.
  */
 function competvet_supports($feature) {
-    switch ($feature) {
-        case FEATURE_GRADE_HAS_GRADE:
-            return true;
-        case FEATURE_MOD_INTRO:
-            return true;
-        case FEATURE_GROUPS:
-            return true;
-        default:
-            return null;
+    if (!$feature) {
+        return null;
     }
+    $features = [
+        FEATURE_GROUPS => true,
+        FEATURE_MOD_INTRO => true,
+        FEATURE_BACKUP_MOODLE2 => true,
+        FEATURE_GRADE_HAS_GRADE => false,
+        FEATURE_GRADE_OUTCOMES => false,
+        FEATURE_SHOW_DESCRIPTION => true,
+        FEATURE_MOD_PURPOSE => MOD_PURPOSE_ASSESSMENT
+    ];
+    if (isset($features[(string) $feature])) {
+        return $features[$feature];
+    }
+    return null;
 }
 
 /**

@@ -40,9 +40,9 @@ class cert_valid extends persistent {
      * Decl status types
      */
     const STATUS_TYPES = [
-        self::STATUS_CONFIRMED,
-        self::STATUS_OBSERVER_NOTSEEN,
-        self::STATUS_LEVEL_NOT_REACHED,
+        self::STATUS_CONFIRMED => 'certvalid:confirmed',
+        self::STATUS_OBSERVER_NOTSEEN => 'certvalid:notseen',
+        self::STATUS_LEVEL_NOT_REACHED => 'certvalid:notreached',
     ];
 
     /**
@@ -68,7 +68,7 @@ class cert_valid extends persistent {
                 'null' => NULL_NOT_ALLOWED,
                 'type' => PARAM_INT,
                 'message' => new lang_string('invaliddata', 'competvet', 'status'),
-                'choices' => self::STATUS_TYPES,
+                'choices' => array_keys(self::STATUS_TYPES),
             ],
             'comment' => [
                 'null' => NULL_ALLOWED,

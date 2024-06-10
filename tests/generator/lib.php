@@ -17,6 +17,7 @@
 use mod_competvet\local\api\certifications;
 use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\cert_decl_asso;
+use mod_competvet\local\persistent\cert_valid;
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\grid;
 use mod_competvet\local\persistent\observation;
@@ -197,13 +198,11 @@ class mod_competvet_generator extends testing_module_generator {
         if (!groups_is_member($planning->get('groupid'), $record->studentid)) {
             throw new moodle_exception('studentnotingroup', 'competvet', '', $record->studentid);
         }
-        $existingobservation = observation::get_record(
-            [
+        $existingobservation = observation::get_record([
                 'studentid' => $record->studentid,
                 'observerid' => $record->observerid,
                 'planningid' => $record->planningid,
-            ]
-        );
+        ]);
 
         if ($existingobservation) {
             $this->check_and_set_observation_status($record);
@@ -233,12 +232,10 @@ class mod_competvet_generator extends testing_module_generator {
                 'usercreated' => $record->observerid,
                 'type' => $commenttype,
             ];
-            $existingcomments = observation_comment::get_records(
-                [
+            $existingcomments = observation_comment::get_records([
                     'observationid' => $observation->id,
                     'type' => $commenttype,
-                ]
-            );
+            ]);
             $existingcomment = false;
             if ($existingcomments) {
                 $existingcomment = array_shift($existingcomments);
@@ -352,8 +349,10 @@ class mod_competvet_generator extends testing_module_generator {
         if (!$criterion->get('parentid')) {
             $valuerecord['level'] = intval($record->value);
             if (
-                $existingrecord = observation_criterion_level::get_record(['observationid' => $record->observationid,
-                    'criterionid' => $record->criterionid,])
+                $existingrecord = observation_criterion_level::get_record([
+                    'observationid' => $record->observationid,
+                    'criterionid' => $record->criterionid,
+                ])
             ) {
                 $existingrecord->set_many($valuerecord);
                 $existingrecord->update();
@@ -364,8 +363,10 @@ class mod_competvet_generator extends testing_module_generator {
             $valuerecord['comment'] = $record->value;
             $valuerecord['commentformat'] = 1;
             if (
-                $existingrecord = observation_criterion_comment::get_record(['observationid' => $record->observationid,
-                    'criterionid' => $record->criterionid,])
+                $existingrecord = observation_criterion_comment::get_record([
+                    'observationid' => $record->observationid,
+                    'criterionid' => $record->criterionid,
+                ])
             ) {
                 $existingrecord->set_many($valuerecord);
                 return $existingrecord->to_record();
@@ -442,7 +443,7 @@ class mod_competvet_generator extends testing_module_generator {
     }
 
     /**
-     * Create a new instance of planning.
+     * Create a new instance of a certification declaration.
      *
      * @param array|stdClass|null $record
      * @return stdClass
@@ -459,21 +460,55 @@ class mod_competvet_generator extends testing_module_generator {
         }
         $decls = $record->decls ?? null;
         unset($record->decls);
+        $record->commentformat = $record->commentformat ?? FORMAT_PLAIN;
         $certification = $this->create_from_entity_name(cert_decl::class, $record);
         if (!empty($decls)) {
             foreach ($decls as $decl) {
                 $decl = (object) (array) $decl;
-                certifications::validate_cert_declaration($certification->id, $decl->supervisorid, $decl->status, $decl->comment,
-                    FORMAT_PLAIN);
-                $association = new cert_decl_asso(0,
-                    (object) [
-                        'supervisorid' => $decl->supervisorid,
-                        'declid' => $certification->id,
-                    ]
-                );
-                $association->create();
+                $decl->certificationid = $certification->id;
+                if (isset($decl->supervisor)) {
+                    // In this case get the supervisorid.
+                    $decl->supervisorid = core_user::get_user_by_username($decl->supervisor);
+                    unset($decl->supervisor);
+                }
+                $this->create_certification_validation($decl);
             }
         }
         return $certification;
+    }
+    /**
+     * Create a new instance of planning.
+     *
+     * @param array|stdClass|null $record
+     * @return stdClass
+     */
+    public function create_certification_validation($record = null) {
+        $record = (object) (array) $record;
+        $certification = cert_decl::get_record(['id' => $record->certificationid]);
+        if (is_string($record->status)) {
+            $statustoint = array_search($record->status, cert_valid::STATUS_TYPES);
+            if ($statustoint !== false) {
+                $record->status = $statustoint;
+            } else {
+                throw new moodle_exception('certvalid:invalidstatus', 'competvet', '', $record->status);
+            }
+        }
+        $validid = certifications::validate_cert_declaration(
+            $record->certificationid,
+            $record->supervisorid,
+            $record->status,
+            $record->comment,
+            FORMAT_PLAIN
+        );
+        $decl = cert_valid::get_record(['id' => $validid]);
+        $association = new cert_decl_asso(
+            0,
+            (object) [
+                'supervisorid' => $record->supervisorid,
+                'declid' => $record->certificationid,
+            ]
+        );
+        $association->create();
+        return $decl->to_record();
     }
 }

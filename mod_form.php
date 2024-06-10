@@ -158,21 +158,6 @@ class mod_competvet_mod_form extends moodleform_mod {
     public function definition_after_data() {
         parent::definition_after_data();
         $mform = $this->_form;
-        $itemnumber = 0;
-        $component = "mod_{$this->_modname}";
-        $gradecatfieldname = component_gradeitems::get_field_name_for_itemnumber($component, $itemnumber, 'gradecat');
-        $gradecatelement = $mform->getElement($gradecatfieldname);
-        if (!empty($this->get_current()->id)) {
-            $targetcategory = grade_category::fetch(
-                ['courseid' => $this->get_course()->id, 'fullname' => clean_param($this->get_current()->name, PARAM_NOTAGS)]
-            );
-            $coursecategory = grade_category::fetch_course_category($this->get_course()->id);
-            $currentvalue = $gradecatelement->getValue();
-            // If the current value is the course category, then set the target category.
-            if ($targetcategory && !empty($currentvalue) && $currentvalue[0] == $coursecategory->id) {
-                $gradecatelement->setValue($targetcategory->id);
-            }
-        }
         if ($this->get_current()->id) {
             $competvetidel = $mform->getElement('competvetid');
             $competvetidel->setValue($this->get_current()->id);
