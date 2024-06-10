@@ -14,6 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 use mod_competvet\competvet;
+use mod_competvet\local\api\observations;
+use mod_competvet\local\persistent\criterion;
+use mod_competvet\local\persistent\observation;
+use mod_competvet\local\persistent\observation_comment;
+use mod_competvet\local\persistent\situation;
 
 /**
  * Competvet Trait for data test definition.
@@ -72,16 +77,63 @@ trait test_data_definition {
                 $module = $generator->create_module('competvet', $situationmodule);
                 $competvet = competvet::get_from_instance_id($module->id);
                 $situation = $competvet->get_situation();
-                foreach ($situationinfo['plannings'] as $planning) {
-                    $groupid = groups_get_group_by_name($course->id, $planning['groupname']);
-                    $competvetevalgenerator->create_planning([
+                foreach ($situationinfo['plannings'] as $planningdef) {
+                    $groupid = groups_get_group_by_name($course->id, $planningdef['groupname']);
+                    $planning = $competvetevalgenerator->create_planning([
                         'courseid' => $course->id,
-                        'startdate' => $planning['startdate'],
-                        'enddate' => $planning['enddate'],
+                        'startdate' => $planningdef['startdate'],
+                        'enddate' => $planningdef['enddate'],
                         'groupid' => $groupid,
                         'situationid' => $situation->get('id'),
-                        'session' => $planning['session'],
+                        'session' => $planningdef['session'],
                     ]);
+                    if (!empty($planningdef['observations'])) {
+                        foreach ($planningdef['observations'] as $observationdef) {
+                            $student = $users[$observationdef['student']];
+                            $observer = $users[$observationdef['observer']];
+                            $record = [
+                                'category' => $observationdef['category'],
+                                'status' => $observationdef['status'] ?? observation::STATUS_INPROGRESS,
+                                'planningid' => $planning->id,
+                                'studentid' => $student->id,
+                                'observerid' => $observer->id,
+                                'context' => $observationdef['context'] ?? '',
+                                'comments' => $observationdef['comments'] ?? [],
+                            ];
+                            $observation = $competvetevalgenerator->create_observation_with_comment($record);
+                            // Now create criteria values.
+                            if (!empty($observationdef['criteria'])) {
+                                foreach ($observationdef['criteria'] as $criteriondef) {
+                                    $criterion = criterion::get_record(['idnumber' => $criteriondef['id']]);
+                                    $competvetevalgenerator->create_observation_criterion_value([
+                                        'observationid' => $observation->id,
+                                        'criterionid' => $criterion->get('id'),
+                                        'value' => $criteriondef['value'],
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                    if (!empty($planningdef['certifications'])) {
+                        foreach ($planningdef['certifications'] as $certificationdef) {
+                            $student = $users[$certificationdef['student']];
+                            $criterion = criterion::get_record(['idnumber' => $certificationdef['criterion']]);
+                            $certification = $competvetevalgenerator->create_certification([
+                                'studentid' => $student->id,
+                                'planningid' => $planning->id,
+                                'criterionid' => $criterion->get('id'),
+                                'level' => $certificationdef['level'],
+                                'comment' => $certificationdef['comment'],
+                                'status' => $certificationdef['status'],
+                            ]);
+                            $competvetevalgenerator->create_certification_validation([
+                                'certificationid' => $certification->id,
+                                'status' => $certificationdef['validations'][0]['status'],
+                                'comment' => $certificationdef['validations'][0]['comment'],
+                                'supervisorid' => $users[$certificationdef['validations'][0]['supervisor']]->id,
+                            ]);
+                        }
+                    }
                 }
             }
         }
@@ -303,6 +355,7 @@ trait test_data_definition {
             ],
         ];
     }
+
     /**
      * Data definition
      */
@@ -340,6 +393,111 @@ trait test_data_definition {
                                 'enddate' => $startdate + $oneweek,
                                 'groupname' => 'group 8.1',
                                 'session' => '2023',
+                            ],
+                            [
+                                'startdate' => $startdate + $oneweek,
+                                'enddate' => $startdate + $oneweek * 2,
+                                'groupname' => 'group 8.2',
+                                'session' => '2023',
+                            ],
+                            [
+                                'startdate' => $startdate + $onemonth * 12, // Future time.
+                                'enddate' => $startdate + $onemonth * 12 + $oneweek,
+                                'groupname' => 'group 8.1',
+                                'session' => '2030',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Data definition
+     */
+    private function get_data_definition_set_3(int $startdate): array {
+        $oneweek = 60 * 60 * 24 * 7; // 1 week in seconds.
+        $onemonth = $oneweek * 4; // 1 month in seconds.
+        return [
+            'course 1' => [
+                'users' => [
+                    'student' => ['student1', 'student2'],
+                    'observer' => ['observer1', 'observer2'],
+                    'teacher' => ['teacher1'],
+                    'manager' => ['manager'],
+                ],
+                'groups' => [
+                    'group 8.1' => [
+                        'users' => ['student1'],
+                    ],
+                    'group 8.2' => [
+                        'users' => ['student2'],
+                    ],
+                    'group 8.3' => [
+                        'users' => [],
+                    ],
+                    'group 8.4' => [
+                        'users' => [],
+                    ],
+                ],
+                'activities' => [
+                    'SIT1' => [
+                        'situationtags' => ['y:1'],
+                        'plannings' => [
+                            [
+                                'startdate' => $startdate,
+                                'enddate' => $startdate + $oneweek,
+                                'groupname' => 'group 8.1',
+                                'session' => '2023',
+                                'observations' => [
+                                    [
+                                        'category' => observation::CATEGORY_EVAL_AUTOEVAL,
+                                        'student' => 'student1',
+                                        'observer' => 'student1',
+                                        'context' => 'A context for autoeval',
+                                        'comments' => [
+                                            ['type' => observation_comment::OBSERVATION_COMMENT, 'comment' => 'A comment'],
+                                            ['type' => observation_comment::AUTOEVAL_OBSERVER_COMMENT,
+                                                'comment' => 'Another comment', ],
+                                        ],
+                                        'criteria' => [
+                                            ['id' => 'Q001', 'value' => 1],
+                                            ['id' => 'Q002', 'value' => 'Comment autoeval 1'],
+                                            ['id' => 'Q003', 'value' => 'Comment autoeval 2'],
+                                        ],
+                                    ],
+                                    [
+                                        'category' => observation::CATEGORY_EVAL_OBSERVATION,
+                                        'student' => 'student1',
+                                        'observer' => 'observer1',
+                                        'context' => 'A context for observation',
+                                        'comments' => [
+                                            ['type' => observation_comment::OBSERVATION_COMMENT, 'comment' => 'A comment'],
+                                            ['type' => observation_comment::OBSERVATION_PRIVATE_COMMENT,
+                                                'comment' => 'Another comment', ],
+                                        ],
+                                        'criteria' => [
+                                            ['id' => 'Q001', 'value' => 5],
+                                            ['id' => 'Q002', 'value' => 'Comment eval 1'],
+                                            ['id' => 'Q003', 'value' => 'Comment eval 2'],
+                                        ],
+                                    ],
+                                ],
+                                'certifications' => [
+                                    [
+                                        'student' => 'student1',
+                                        'planning' => 'planning1',
+                                        'criterion' => 'CERT1',
+                                        'level' => 50,
+                                        'comment' => 'A comment',
+                                        'status' => 'cert:seendone',
+                                        'validations' => [
+                                            ['status' => 'certvalid:confirmed', 'comment' => 'A comment', 'supervisor' => 'observer1'],
+                                            ['status' => 'certvalid:notseen', 'comment' => 'A comment', 'supervisor' => 'observer2'],
+                                        ],
+                                    ],
+                                ],
                             ],
                             [
                                 'startdate' => $startdate + $oneweek,
