@@ -13,7 +13,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+<<<<<<< HEAD
 import {genericFormCreate} from "./generic_form_helper";
+=======
+import ModalForm from 'core_form/modalform';
+import {get_string as getString} from 'core/str';
+import Repository from '../new-repository';
+
+>>>>>>> 64ec799 (Multiple improvements)
 
 /**
  * Create a Modal Form to add a case
@@ -30,13 +37,7 @@ import {genericFormCreate} from "./generic_form_helper";
  */
 export const init = (modulename, submitEventHandler = null) => {
     const onSubmitHandler = (event) => {
-        // Fire a custom event to notify the grading app that a case has been added.
-        const gradingApp = document.querySelector('[data-region="grading-app"]');
-        const customEvent = new CustomEvent('caseAdded', {});
-        gradingApp.dispatchEvent(customEvent);
-        if (submitEventHandler) {
-            submitEventHandler(event);
-        }
+        window.location.reload();
     };
     const button = document.querySelector('[data-action="case-add"]');
     if (!button) {
@@ -49,5 +50,12 @@ export const init = (modulename, submitEventHandler = null) => {
         const modalForm = genericFormCreate(data, 'case:add', modulename, 'case_form_add');
         modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, onSubmitHandler);
         modalForm.show();
+    });
+    document.addEventListener('click', async(event) => {
+        if (event.target.closest('[data-action="delete-case"]')) {
+            const button = event.target.closest('[data-action="delete-case"]');
+            await Repository.deleteEntry({'entryid': button.dataset.id});
+            window.location.reload();
+        }
     });
 };

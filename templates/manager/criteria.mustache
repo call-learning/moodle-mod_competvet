@@ -73,7 +73,7 @@
     }
 }}
 <link rel="stylesheet" href="{{config.wwwroot}}/mod/competvet/scss/styles.css?v={{version}}" />
-<div id="managecriteria" data-locked="{{locked}}" class="managecriteria manage" data-region="criteria" data-cm-id="{{cmid}}">
+<div id="managecriteria" data-locked="{{locked}}" class="managecriteria manage" data-region="criteria" data-situation-id="{{situationid}}" data-cm-id="{{cmid}}">
     {{#inuse}}
         <div class="alert alert-warning">
             {{#str}}inuse, mod_competvet{{/str}}
@@ -96,7 +96,9 @@
         </a>
     </div>
 </div>
+{{#debug}}
 <pre id="debug"></pre>
+{{/debug}}
 {{#js}}
 require(['mod_competvet/local/manager/manager_app_criteria'], function(manager) {
     manager.init();

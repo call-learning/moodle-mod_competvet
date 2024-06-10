@@ -32,6 +32,10 @@ global $DB, $PAGE, $OUTPUT, $USER;
 
 $modulecontext = context_module::instance($cm->id);
 
+if (!has_capability('mod/competvet:cangrade', $modulecontext)) {
+    throw new moodle_exception('nopermission', 'error');
+}
+
 $PAGE->set_pagelayout('embedded');
 $PAGE->activityheader->disable();
 

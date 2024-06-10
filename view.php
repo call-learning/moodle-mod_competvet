@@ -54,13 +54,13 @@ parse_str(parse_url($_SERVER['REQUEST_URI'])['query'], $query);
 $query['returnurl'] = $_SERVER['REQUEST_URI'];
 
 echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
-$button = $widget->get_button();
+$button = $widget->get_button($modulecontext);
 if (!empty($button)) {
     echo $OUTPUT->render($button);
 }
 $backbutton = $widget->get_back_button();
 if (!empty($backbutton)) {
-    echo $OUTPUT->container($OUTPUT->render($backbutton), 'float-right');
+    echo $OUTPUT->container($OUTPUT->render($backbutton), 'd-flex justify-content-end');
 }
 echo $OUTPUT->box_end('generalbox boxaligncenter', 'intro');
 echo $renderer->render($widget);

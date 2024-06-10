@@ -67,7 +67,7 @@ class Competvet {
         this.listgrid = this.gradingApp.dataset.listgrid;
         this.planning = {
             id: this.gradingApp.dataset.planningid,
-            cmid: this.cmId
+            cmid: this.cmId,
         };
         CompetState.setValue('planning', this.planning);
         this.userlist = [];
@@ -152,12 +152,12 @@ class Competvet {
         }
         const context = {
             grading: {
-                'criteria': response.grids[0].criteria
+                'criteria': response.grids[0].criteria,
+                'timemodified': response.grids[0].timemodified,
             }
         };
         context.grading.criteria.forEach(criterion => {
             // Set the option with the second sortorder as the default selected option.
-            criterion.options.sort((a, b) => a.sortorder - b.sortorder);
             criterion.options[1].selected = true;
         });
         CompetState.setValue('list-grading', context);
@@ -238,6 +238,16 @@ class Competvet {
             const context = {
                 grading: JSON.parse(response.data)
             };
+            // For the list-grading we need to check the timemodified against the stored form timemodified.
+            if (formname === 'list-grading') {
+                const listGrading = CompetState.getValue('list-grading');
+                if (listGrading.grading.timemodified > response.timemodified) {
+                    window.console.log('List grading form is outdated:' + listGrading.grading.timemodified +
+                        ' ' + response.timemodified);
+                    return;
+                }
+            }
+
             CompetState.setValue(formname, context);
         }));
     }
@@ -312,11 +322,6 @@ class Competvet {
             }
             if (event.target.closest('[data-action="reload"]')) {
                 this.getEvaluations();
-            }
-            if (event.target.closest('[data-action="delete-case"]')) {
-                const button = event.target.closest('[data-action="delete-case"]');
-                await Repository.deleteEntry({'entryid': button.dataset.id});
-                this.setListResults();
             }
         });
         this.gradingApp.addEventListener('caseAdded', () => {

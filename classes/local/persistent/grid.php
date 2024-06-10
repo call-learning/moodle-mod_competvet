@@ -91,6 +91,11 @@ class grid extends persistent {
                 'type' => PARAM_INT,
                 'default' => 0,
             ],
+            'situationid' => [
+                'null' => NULL_ALLOWED,
+                'type' => PARAM_INT,
+                'message' => new lang_string('invaliddata', 'competvet', 'situationid'),
+            ],
             'type' => [
                 'type' => PARAM_INT,
                 'default' => 0,

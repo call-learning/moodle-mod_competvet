@@ -53,6 +53,7 @@ class manage_criteria extends external_api {
                     'gridid' => new external_value(PARAM_INT, 'The grid id', VALUE_REQUIRED),
                     'gridname' => new external_value(PARAM_TEXT, 'The name of the grid', VALUE_OPTIONAL),
                     'sortorder' => new external_value(PARAM_INT, 'The sort order of the grid', VALUE_OPTIONAL),
+                    'situationid' => new external_value(PARAM_INT, 'The situation id', VALUE_OPTIONAL),
                     'type' => new external_value(PARAM_INT, 'The type of criteria to manage', VALUE_REQUIRED),
                     'haschanged' => new external_value(PARAM_BOOL, 'Has the grid changed', VALUE_OPTIONAL),
                     'updatesortorder' => new external_value(PARAM_BOOL, 'Update the sort order of the criteria', VALUE_OPTIONAL),
@@ -101,6 +102,7 @@ class manage_criteria extends external_api {
         $type = $params['type'];
         $warnings = [];
         $results = [];
+        $setgridmodified = false;
 
         // Loop through the grids, if a grid has the haschanged flag set to true,
         // update or insert the grid by calling the correct API.
@@ -115,6 +117,7 @@ class manage_criteria extends external_api {
                     $grid['gridid'],
                     $grid['gridname'],
                     $grid['sortorder'],
+                    $grid['situationid'],
                     $type
                 );
             }
@@ -125,6 +128,9 @@ class manage_criteria extends external_api {
                 criteria::update_criteria_sortorder($criteriaorder);
             }
             foreach ($grid['criteria'] as $criterion) {
+                if ($criterion['deleted'] || $criterion['updatesortorder'] || $criterion['haschanged']) {
+                    $setgridmodified = true;
+                }
                 if ($criterion['deleted']) {
                     criteria::delete_criterion($criterion['criterionid']);
                     continue;
@@ -164,8 +170,11 @@ class manage_criteria extends external_api {
                     }
                 }
             }
-
+            if ($setgridmodified) {
+                criteria::set_grid_modified($gridid);
+            }
         }
+
 
         if (count($results) === 0) {
             $result = true;
@@ -207,6 +216,7 @@ class manage_criteria extends external_api {
         return new external_function_parameters([
             'type' => new external_value(PARAM_INT, 'The type of criteria to manage', VALUE_REQUIRED),
             'gridid' => new external_value(PARAM_INT, 'The grid id', VALUE_OPTIONAL),
+            'situationid' => new external_value(PARAM_INT, 'The situation id', VALUE_OPTIONAL),
         ]);
     }
 
@@ -215,17 +225,24 @@ class manage_criteria extends external_api {
      *
      * @param int $type - The type of criteria to manage
      * @param int $gridid - The grid id
+     * @param int $situationid - The situation id
      * @return array
      */
-    public static function get($type, $gridid): array {
-        global $DB;
-        $params = self::validate_parameters(self::get_parameters(), ['type' => $type, 'gridid' => $gridid]);
+    public static function get($type, $gridid, $situationid = null): array {
+        $params = self::validate_parameters(self::get_parameters(), [
+            'type' => $type,
+            'gridid' => $gridid,
+            'situationid' => $situationid,
+        ]);
 
         $type = $params['type'];
         $gridid = $params['gridid'];
-        $results = [];
+        $situationid = $params['situationid'];
 
         $queryparams = ['type' => $type];
+        if ($situationid || $situationid === 0) {
+            $queryparams['situationid'] = $situationid;
+        }
         if ($gridid) {
             $queryparams['id'] = $gridid;
         }
@@ -238,6 +255,7 @@ class manage_criteria extends external_api {
                 'type' => $grid->get('type'),
                 'sortorder' => $grid->get('sortorder'),
                 'haschanged' => false,
+                'timemodified' => $grid->get('timemodified'),
                 'canedit' => $grid->canedit(),
                 'criteria' => criteria::get_sorted_criteria($grid->get('id'))
             ];
@@ -260,6 +278,7 @@ class manage_criteria extends external_api {
                     'gridid' => new external_value(PARAM_INT, 'The grid id'),
                     'gridname' => new external_value(PARAM_TEXT, 'The name of the grid'),
                     'type' => new external_value(PARAM_INT, 'The type of grid'),
+                    'timemodified' => new external_value(PARAM_INT, 'The time modified'),
                     'canedit' => new external_value(PARAM_BOOL, 'Can the grid be edited'),
                     'sortorder' => new external_value(PARAM_INT, 'The sort order of the grid'),
                     'criteria' => new external_multiple_structure(

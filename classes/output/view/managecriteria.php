@@ -40,9 +40,12 @@ class managecriteria extends base {
      * @return array|array[]|stdClass
      */
     public function export_for_template(renderer_base $output) {
+        global $CFG;
         $data = parent::export_for_template($output);
         $data['cmid'] = $this->competvet ? $this->competvet->get_course_module_id() : null;
+        $data['situationid'] = $this->competvet ? $this->competvet->get_situation()->get('id') : 0;
         $data['version'] = time();
+        $data['debug'] = $CFG->debugdisplay;
         return $data;
     }
 
