@@ -133,7 +133,15 @@ class planning extends base {
         [$this->userswithinfo, $this->currentgroupname, $this->viewstudent] = $data;
     }
 
-    public function get_button(): ?single_button {
+    /**
+     * Adds the grade button to the page.
+     * @param object $context The context object.
+     * @return single_button|null
+     */
+    public function get_button($context): ?single_button {
+        if (!has_capability('mod/competvet:cangrade', $context)) {
+            return null;
+        }
         $query = [];
         parse_str(parse_url($_SERVER['REQUEST_URI'])['query'], $query);
         $query['returnurl'] = $_SERVER['REQUEST_URI'];

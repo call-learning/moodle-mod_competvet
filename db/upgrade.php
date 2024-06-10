@@ -1096,5 +1096,23 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2024052804, 'competvet');
     }
 
+    if ($oldversion < 2024060700) {
+
+        // Define field situationid to be added to competvet_grid.
+        $table = new xmldb_table('competvet_grid');
+        $field = new xmldb_field('situationid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'type');
+
+        // Conditionally launch add field situationid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Set a default value for the situationid field.
+        $DB->execute('UPDATE {competvet_grid} SET situationid = 0');
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024060700, 'competvet');
+    }
+
     return true;
 }

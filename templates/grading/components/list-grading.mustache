@@ -36,7 +36,7 @@
         </div>
         {{#criteria}}
             <section>
-                <h4 class="criterion-title h6">{{{title}}}</h4>
+                <h4 class="criterion-title h6">{{{label}}}</h4>
                 <div class="criterion-options">
                     {{#options}}
                         <div class="custom-control custom-checkbox">
@@ -52,7 +52,7 @@
                                 value="{{grade}}"
                                 {{#selected}}checked{{/selected}}
                             >
-                            <label class="custom-control-label" for="criterion-{{criterionid}}-option-{{optionid}}">{{{title}}} (<strong>{{#str}}points, mod_competvet, {{grade}}{{/str}}</strong>)</label>
+                            <label class="custom-control-label" for="criterion-{{criterionid}}-option-{{optionid}}">{{{label}}} (<strong>{{#str}}points, mod_competvet, {{grade}}{{/str}}</strong>)</label>
                         </div>
                     {{/options}}
                 </div>

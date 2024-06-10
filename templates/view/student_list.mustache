@@ -43,17 +43,6 @@
     <div class="certification">
         {{> mod_competvet/grading/components/list-results}}
     </div>
-    {{#isstudent}}
-    <div class="actions d-flex justify-content-end mt-5">
-        <button class="btn btn-outline-secondary btn-sm"
-            data-studentid="4"
-            data-cmid="{{cmid}}"
-            data-action="case-add"
-        >
-            {{#str}}case:add, mod_competvet{{/str}}
-        </button>
-    </div>
-    {{/isstudent}}
 </div>
 {{#js}}
 require(['mod_competvet/local/forms/case_form'], function(caseForm) {

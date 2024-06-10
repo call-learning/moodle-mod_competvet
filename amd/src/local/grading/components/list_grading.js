@@ -56,7 +56,7 @@ const formCalculation = () => {
     const form = document.querySelector('[data-region="list-grading"]');
     const formData = new FormData(form);
     const formObject = Object.fromEntries(formData);
-    const {'list-grading': listGrading} = CompetState.getData();
+    const listGrading = CompetState.getValue('list-grading');
     const grading = listGrading.grading;
     grading.subgrade = 0;
     grading.criteria.forEach((criterion) => {

@@ -38,10 +38,11 @@ class criteria {
      * @param int $gridid - The grid id
      * @param string $gridname - The grid name
      * @param int $sortorder - The sort order
+     * @param int $situationid - The situation id
      * @param int $type - The type
      * @return int - The grid id
      */
-    public static function update_grid(int $gridid, string $gridname, int $sortorder, int $type): int {
+    public static function update_grid(int $gridid, string $gridname, int $sortorder, int $situationid, int $type): int {
         $grid = grid::get_record(['id' => $gridid]);
         if (!$grid) {
             $grid = new grid(0);
@@ -49,6 +50,7 @@ class criteria {
             // Generate a unique idnumber
             $idnumber = time();
             $grid->set('idnumber', $idnumber);
+            $grid->set('situationid', $situationid);
             $grid->set('sortorder', $sortorder);
             $grid->set('type', $type);
             $grid->create();
@@ -59,6 +61,18 @@ class criteria {
             $grid->update();
         }
         return $grid->get('id');
+    }
+
+    /**
+     * Set the grid modified date
+     * @param int $gridid - The grid id
+     */
+    public static function set_grid_modified(int $gridid): void {
+        $grid = grid::get_record(['id' => $gridid]);
+        if ($grid) {
+            $grid->set('timemodified', time());
+            $grid->update();
+        }
     }
 
     /**
@@ -123,7 +137,7 @@ class criteria {
                     'label' => $option->get('label'),
                     'idnumber' => $option->get('idnumber'),
                     'grade' => $option->get('grade'),
-                    'hasgrade' => $option->get('grade') != null,
+                    'hasgrade' => true,
                     'parentid' => $option->get('parentid'),
                     'sortorder' => $option->get('sort'),
                 ];

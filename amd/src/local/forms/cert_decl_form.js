@@ -70,9 +70,15 @@ export const init = (modulename, submitEventHandler = null) => {
                 modalForm.modal.getRoot().on('modal:bodyRendered', () => {
                     const rangeInput = modalForm.modal.getRoot().find('input[type="range"]');
                     const levelInput = modalForm.modal.getRoot().find('input[name="level"]');
+                    let levelVal = levelInput.val();
+                    if (!levelInput.val()) {
+                        levelVal = 3;
+                        levelInput.val(levelVal);
+                    }
+
                     const currentLevel = modalForm.modal.getRoot().find('[data-region="current-level"]');
-                    rangeInput.val(levelInput.val());
-                    currentLevel.text(levelInput.val());
+                    rangeInput.val(levelVal);
+                    currentLevel.text(levelVal);
                     rangeInput.on('input', () => {
                         levelInput.val(rangeInput.val());
                         currentLevel.text(rangeInput.val());

@@ -23,6 +23,7 @@ use mod_competvet\local\persistent\planning;
 use mod_competvet\local\api\user_role;
 use mod_competvet\local\api\cases;
 use moodle_url;
+use single_button;
 
 /**
  * Class student_list
@@ -100,5 +101,26 @@ class student_list extends base  {
             ));
         }
         [$this->planninginfo, $this->cases] = $data;
+    }
+
+    /**
+     * Adds the grade button to the page.
+     * @param object $context The context object.
+     * @return single_button|null
+     */
+    public function get_button($context): ?single_button {
+        if (!has_capability('mod/competvet:cangrade', $context)) {
+            return null;
+        }
+        $query = [];
+        parse_str(parse_url($_SERVER['REQUEST_URI'])['query'], $query);
+        $query['returnurl'] = $_SERVER['REQUEST_URI'];
+        return new single_button(
+            new moodle_url(
+                '/mod/competvet/grading.php',
+                $query
+            ),
+            get_string('gradeverb')
+        );
     }
 }

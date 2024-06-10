@@ -66,6 +66,6 @@ class formdata {
         if (!$formdata) {
             return ['success' => false, 'json' => false];
         }
-        return ['success' => true, 'json' => $formdata->get('json')];
+        return ['success' => true, 'json' => $formdata->get('json'), 'timemodified' => $formdata->get('timemodified')];
     }
 }

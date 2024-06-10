@@ -1,6 +1,9 @@
 .gradingapp {
     display: flex;
     flex-direction: column;
+}
+
+.gradingapp.full-height {
     height: 100vh;
 }
 
@@ -241,26 +244,34 @@
     height: 3px;
 }
 
-.gradingapp .evaluation .header {
+.gradingapp .evaltable {
+    overflow: auto;
+}
+
+.gradingapp .evaltable .header {
     font-weight: 700;
 }
 
-.gradingapp .evaluation .eval {
+.gradingapp .evaltable .header .col3 {
+    padding-bottom: 0.5rem;
+}
+
+.gradingapp .evaltable .eval {
     display: flex;
 }
 
-.gradingapp .evaluation .col1 {
+.gradingapp .evaltable .col1 {
     flex: 1 0 350px;
     max-width: 350px;
 }
 
-.gradingapp .evaluation .col3 {
+.gradingapp .evaltable .col3 {
     flex: 1 0 75px;
     max-width: 75px;
     text-align: center;
 }
 
-.gradingapp .evaluation .cellborder {
+.gradingapp .evaltable .cellborder {
     border-bottom: 1px solid #ccc;
     border-left: 1px solid #ccc;
 }

@@ -30,6 +30,9 @@ const App = document.querySelector('[data-region="criteria"]');
  * Define the situation renderer and subscribe to the state.
  */
 const stateTemplate = () => {
+    if (!App) {
+        return;
+    }
     const regionName = 'navigation';
     const region = App.querySelector(`[data-region="${regionName}"]`);
     const template = `mod_competvet/manager/criteria/${regionName}`;

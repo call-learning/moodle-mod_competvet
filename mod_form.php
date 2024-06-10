@@ -130,7 +130,10 @@ class mod_competvet_mod_form extends moodleform_mod {
         // Add evalgridid field.
         foreach (grid::COMPETVET_GRID_TYPES as $gridtype => $gridtypename) {
             $defaultgrid = grid::get_default_grid($gridtype);
-            $evalgrids = grid::get_records(['type' => $gridtype]);
+            $situation = situation::get_record(['competvetid' => $this->get_current()->id]);
+            $systemgrids = grid::get_records(['type' => $gridtype, 'situationid' => 0]);
+            $situationgrids = grid::get_records(['type' => $gridtype, 'situationid' => $situation->get('id')]);
+            $evalgrids = array_merge($systemgrids, $situationgrids);
             $evalgridscolumns = array_map(function($evalgrid) {
                 return [
                     'id' => $evalgrid->get('id'),

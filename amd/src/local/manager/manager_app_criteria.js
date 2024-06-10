@@ -48,6 +48,7 @@ class Manager {
     constructor() {
         this.app = document.querySelector('[data-region="criteria"]');
         this.cmId = this.app.dataset.cmId;
+        this.situationId = this.app.dataset.situationId;
         this.sets = [COMPETVET_CRITERIA_EVALUATION, COMPETVET_CRITERIA_CERTIFICATION, COMPETVET_CRITERIA_LIST];
         if (this.cmId) {
             this.dataset = COMPETVET_CRITERIA_CERTIFICATION;
@@ -68,6 +69,7 @@ class Manager {
         const args = {
             type: this.dataset,
             gridid: 0,
+            situationid: this.situationId,
         };
         const response = await Repository.getCriteria(args);
         CompetState.setValue('datatree', response);
@@ -281,6 +283,7 @@ class Manager {
                 // Update the grid with the new values from the UI.
                 element.haschanged = true;
                 element.gridname = this.getValue('grid', 'gridname', element.gridid);
+                element.situationid = this.situationId;
             }
             element.criteria.forEach((element) => {
                 if (element.edit && !element.deleted) {
@@ -310,7 +313,7 @@ class Manager {
      * Get the grid object keys that can be accepted by the server.
      */
     get gridObjectKeys() {
-        return ['gridid', 'gridname', 'type', 'sortorder', 'criteria', 'haschanged', 'deleted', 'updatesortorder'];
+        return ['gridid', 'gridname', 'type', 'situationid', 'sortorder', 'criteria', 'haschanged', 'deleted', 'updatesortorder'];
     }
 
     /**

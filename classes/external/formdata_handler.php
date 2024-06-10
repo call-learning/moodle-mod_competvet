@@ -124,6 +124,7 @@ class formdata_handler extends external_api {
 
         $userdata = formdata::get($userid, $planningid, $formname);
         $returndata = $userdata['json'];
+        $timemodified = $userdata['timemodified'];
         $result = true;
 
         if (!$userdata['success']) {
@@ -140,6 +141,7 @@ class formdata_handler extends external_api {
         return [
             'result' => $result,
             'data' => $returndata,
+            'timemodified' => $timemodified,
         ];
     }
 
@@ -152,6 +154,7 @@ class formdata_handler extends external_api {
         return new external_single_structure([
             'result' => new external_value(PARAM_BOOL, 'The processing result'),
             'data' => new external_value(PARAM_TEXT, 'The JSON data'),
+            'timemodified' => new external_value(PARAM_INT, 'The time created'),
         ]);
     }
 }
