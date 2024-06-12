@@ -54,13 +54,14 @@ const formCalculation = () => {
     const form = document.querySelector('[data-region="evaluations-grading"]');
     const formData = new FormData(form);
     const formObject = Object.fromEntries(formData);
-    const {'evaluations-grading': evaluationsGrading} = CompetState.getData();
+    const evaluationsGrading = CompetState.getValue('evaluations-grading');
     const grading = evaluationsGrading.grading;
     grading.deactivatepenalty = formObject.deactivatepenalty === 'on' ? 1 : 0;
-    const penalty = grading.deactivatepenalty ? 0 : 1;
+    let penalty = grading.deactivatepenalty ? 0 : 1;
+    penalty = grading.haspenalty * penalty;
     grading.selfevaluation = formObject.selfevaluation;
     grading.selfevalselectoptions.forEach((option) => {
-        if (option.value == Number(formObject.selfevaluation)) {
+        if (option.key == Number(formObject.selfevaluation)) {
             option.selected = true;
         } else {
             option.selected = false;

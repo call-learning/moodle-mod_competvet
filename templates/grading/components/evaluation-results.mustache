@@ -29,43 +29,16 @@
             {{#str}} noevaluations, mod_competvet {{/str}}
         </div>
     {{/evaluations}}
-    <div class="evaltable" data-region="evaluations-table">
-        <div class="row no-gutters flex-nowrap">
-            <div class="col1 criterionlabel">
-            </div>
-            {{#evaluations.0}}
-                {{#grades}}
-                    <div class="col3 evaluator font-weight-bold text-center d-flex">
-                        <div class="th rotatecontainer">
-                            <div class="transformed">
-                                <span class="gradername">{{graderinfo.fullname}}</span>
-                            </div>
-                        </div>
-                    </div>
-                {{/grades}}
-            {{/evaluations.0}}
-        </div>
-        {{#evaluations}}
-            <div class="row no-gutters flex-nowrap mb-2">
-                <div class="col1 criterionlabel font-weight-bold">
-                    {{criterion.label}}
-                </div>
-                {{#grades}}
-                    <div class="col3 grade text-center">
-                        {{level}}
-                        <div class="sr-only">
-                            {{graderinfo.fullname}}
-                        </div>
-                    </div>
-                {{/grades}}
-            </div>
-        {{/evaluations}}
-    </div>
     <div class="evalcomments d-flex row">
         <div class="span6 col-md-6">
             {{#comments}}
                 {{>mod_competvet/comment}}
             {{/comments}}
+        </div>
+        <div class="span6 col-md-6">
+            {{#autoevalcomments}}
+                {{>mod_competvet/comment}}
+            {{/autoevalcomments}}
         </div>
     </div>
 {{/evaluation-results}}

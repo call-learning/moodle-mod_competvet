@@ -40,6 +40,7 @@ const stateTemplate = () => {
         if (context.user === undefined) {
             return;
         }
+        context.userlist = CompetState.getValue('userlist');
         Templates.render(template, context).then((html) => {
             region.innerHTML = html;
             return;

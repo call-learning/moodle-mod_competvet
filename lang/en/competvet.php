@@ -349,4 +349,12 @@ $string['gradeK1'] = 'Grade calculation constant K1';
 $string['gradeK1_help'] = 'The weight of the evaluation grade, default is 5';
 $string['gradeK2'] = 'Grade calculation constant K2';
 $string['gradeK2_help'] = 'The weight of the list grade, default is 2';
-
+$string['gradecalculation'] = 'Le score suggéré ({$a->suggestedgrade}/100) est calculé de la manière suivante:<br>' .
+'Moyenne du score du module Compétences affecté du coefficient K1 ({$a->k1}) et du score du module Cas affecté du coefficient K2 ({$a->k2}).' .
+'Le module Incontournables doit nécessairement être validé. Une non-validation conduit à un score égal à 0 quelque soit ' .
+'les scores des deux autres modules. <br><br>' .
+'La note suggérée peut être modulée à la discrétion de l\'évaluateur. Vous pouvez donc choisir de conserver le score suggéré en le ' .
+'saisissant dans la case score final ou modifier ce score selon votre souhait. <br>' .
+'Un commentaire général de l\'évaluateur est très fortement souhaitable pour des encouragements ou des remarques spécifiques. ' .
+' Le score ({$a->suggestedgrade}/100) soumis est ensuite converti en lettres entre F et A. Un score inférieur à 40% conduit à un échec F. ' .
+' Un score entre 40% et 50% à une note d\'incertitude "FX". Cette conversion est réalisée dans le carnet de notes.';

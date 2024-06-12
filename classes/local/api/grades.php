@@ -115,13 +115,14 @@ class grades {
         // Hardcoded grade calculation for now.
         $suggestedgrade = ( (($k1 * $eval) + ($k2 * $list)) * $cert ) / ($k1 + $k2);
 
-        $gradecalculation = "(<br>";
-        $gradecalculation .= "&nbsp;&nbsp;(K1 <strong>*</strong> Evalutation) <strong>+</strong><br>";
-        $gradecalculation .= "&nbsp;&nbsp;(K2 <strong>*</strong> List) <br>)<br>";
-        $gradecalculation .= "<strong>*</strong> Certification <br>";
-        $gradecalculation .= "<strong>/</strong> (K1 <strong>+</strong> K2) <br>";
-
-        $gradecalculation .= "<br>((($k1 * $eval) + ($k2 * $list)) * $cert) / ($k1 + $k2)";
+        $gradecalculation = get_string('gradecalculation', 'mod_competvet', (object)[
+            'k1' => $k1,
+            'k2' => $k2,
+            'eval' => $eval,
+            'cert' => $cert,
+            'list' => $list,
+            'suggestedgrade' => $suggestedgrade,
+        ]);
 
 
         // Return an object with the suggested grade and the gradecalculation.

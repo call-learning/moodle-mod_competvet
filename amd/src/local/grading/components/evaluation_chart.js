@@ -90,6 +90,15 @@ const transformContext = (context, autoeval) => {
         'rgba(255, 159, 64, 0.6)',
     ];
 
+    const backgroundColors = [
+        'rgba(255, 99, 132, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(255, 206, 86, 0.2)',
+        'rgba(75, 192, 192, 0.2)',
+        'rgba(153, 102, 255, 0.2)',
+        'rgba(255, 159, 64, 0.2)',
+    ];
+
     data.evaluations.forEach(criterion => {
         criterion.grades.forEach(grade => {
             if (!grade.graderinfo || !grade.graderinfo.id) {
@@ -103,12 +112,17 @@ const transformContext = (context, autoeval) => {
 
             if (!graders[grade.graderinfo.id]) {
                 const color = colors.shift();
+                const backgroundColor = backgroundColors.shift();
                 graders[grade.graderinfo.id] = {
                     label: grade.graderinfo.fullname,
                     data: [],
-                    fill: false,
-                    backgroundColor: color,
-                    // add other properties as needed
+                    fill: true,
+                    backgroundColor: backgroundColor,
+                    bordercolor: color,
+                    pointBackgroundColor: color,
+                    pointBorderColor: 'rgba(255, 255, 255, 1)',
+                    pointHoverBackgroundColor: 'rgba(255, 255, 255, 1)',
+                    pointHoverBorderColor: color,
                 };
             }
             graders[grade.graderinfo.id].data.push(grade.level);
@@ -133,22 +147,54 @@ const chartConfig = async(autoeval) => {
                 display: true,
                 text: title,
                 position: 'bottom',
-                fontSize: 16,
+                font: {
+                    size: 16
+                },
+                fullSize: true
             },
-            scale: {
-                ticks: {
-                    display: false,
+            scales: {
+                r: {
+                    ticks: {
+                        display: true,
+                        min: 0,
+                        max: 100,
+                        stepSize: 25,
+                        callback: function(value) {
+                            // Display only specific tick values
+                            if (value === 25 || value === 50 || value === 75 || value === 100) {
+                                return value;
+                            }
+                            return '';
+                        },
+                    },
+                    pointLabels: {
+                        callback: function(label) {
+                            if (label.length > 10) {
+                                return label.substring(0, 10) + '...';
+                            }
+                            return label;
+                        }
+                    },
+                    angleLines: {
+                        display: false
+                    },
+                    suggestedMin: 0,
+                    suggestedMax: 100
                 }
             },
             plugins: {
                 title: {
                     display: true,
                     text: title,
-                    position: 'bottom',
+                    position: 'bottom'
                 },
                 legend: {
                     display: true,
-                    position: 'bottom'
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true, // Use point style for legend
+                        pointStyle: 'circle', // Set point style to circle
+                    }
                 },
             }
         }

@@ -27,17 +27,10 @@ import Repository from '../new-repository';
 /**
  * Initialize module
  * @param {string} modulename
- * @param {function} submitEventHandler
  */
-export const init = (modulename, submitEventHandler = null) => {
-    const onSubmitHandler = (event) => {
-        // Fire a custom event to notify the grading app that a case has been added.
-        const gradingApp = document.querySelector('[data-region="grading-app"]');
-        const customEvent = new CustomEvent('caseAdded', {});
-        gradingApp.dispatchEvent(customEvent);
-        if (submitEventHandler) {
-            submitEventHandler(event);
-        }
+export const init = (modulename) => {
+    const onSubmitHandler = () => {
+        window.location.reload();
     };
     const button = document.querySelector('[data-action="case-add"]');
     if (!button) {

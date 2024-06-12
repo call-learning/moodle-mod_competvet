@@ -97,6 +97,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
 
         $data = (object)$data;
         $oldid = $data->id;
+        $data->situationid = $this->get_new_parentid('situation');
 
         // Check if the grid already exists.
         if (!$DB->record_exists('competvet_grid', ['idnumber' => $data->idnumber])) {

@@ -37,9 +37,10 @@
                 {{#str}}numberofobservations, mod_competvet{{/str}}
                 <div class="ml-auto">
                     <span class="calculatedgrade" data-field="numberofobservations">{{numberofobservations}}</span> /
-                    <span class="maxgrade" data-field="maxobservations">{{maxobservations}}</span>
+                    <span class="maxgrade" data-field="evalnum">{{evalnum}}</span>
                 </div>
             </div>
+            {{#haspenalty}}
             <div class="d-flex justify-content-between">
                 <div class="d-flex flex-column">
                     <div>{{#str}}penalty, mod_competvet{{/str}}</div>
@@ -67,6 +68,7 @@
                     </label>
                 </div>
             </div>
+            {{/haspenalty}}
             <div class="form-group d-flex align-items-center mb-2">
                 <label for="selfevaluation">
                     {{#str}}selfevaluation, mod_competvet{{/str}}
@@ -80,7 +82,7 @@
                     data-field="selfevaluation"
                 >
                     {{#selfevalselectoptions}}
-                    <option value="{{key}}" {{#selected}}selected{{/selected}}>{{#str}}selfevalbonus, mod_competvet, {{value}}{{/str}}</option>
+                    <option value="{{key}}" {{#selected}}selected{{/selected}}>{{value}}</option>
                     {{/selfevalselectoptions}}
                 </select>
             </div>

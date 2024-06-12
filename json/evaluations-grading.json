@@ -8,9 +8,10 @@
     "deactivatepenalty": false,
     "penalty": -20,
     "selfevalselectoptions": [
-        { "key": 10, "value": 10 },
-        { "key": 20, "value": 20 },
-        { "key": 30, "value": 30 }
+        { "key": -30, "value": "-30 (non réalisée)" },
+        { "key": 0, "value": "0 (réalisée)" },
+        { "key": 10, "value": "+10 (réalisée et pertinente)" },
+        { "key": 20, "value": "+20 (réalisée et très pertinente)" }
     ],
     "scoreevaluator": 60,
     "comment": ""
