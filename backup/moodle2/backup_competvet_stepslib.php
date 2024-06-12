@@ -45,7 +45,7 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
 
         $grids = new backup_nested_element('grids');
         $grid = new backup_nested_element('grid', ['id'], [
-            'name', 'idnumber', 'sortorder', 'type', 'usermodified',
+            'name', 'idnumber', 'sortorder', 'type', 'situationid', 'usermodified',
             'timecreated', 'timemodified',
         ]);
 
@@ -259,6 +259,7 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
         $formdata->annotate_ids('user', 'graderid');
         $casefieldmap->annotate_ids('casefield', 'fieldid');
         $casefieldmap->annotate_ids('situation', 'situationid');
+        $grid->annotate_ids('situation', 'situationid');
 
         // Define file annotations
         $competvet->annotate_files('mod_competvet', 'intro', null);

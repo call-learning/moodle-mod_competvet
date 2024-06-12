@@ -175,6 +175,7 @@ class Competvet {
             return;
         }
         this.userlist = response.users;
+        CompetState.setValue('userlist', this.userlist);
     }
 
     /**
@@ -270,25 +271,26 @@ class Competvet {
         const evalGrading = CompetState.getValue('evaluations-grading');
         const evalResults = CompetState.getValue('evaluation-results');
         // Update the values numberofobservations and maxobservations based on the evaluation-results
-        evalGrading.grading.maxobservations = evalResults.evaluations.length;
+        evalGrading.grading.evalnum = this.gradingApp.dataset.evalnum;
         let totalEvalScore = 0;
         let totalGrades = 0;
         let numberofobservations = 0;
         if (evalResults.evaluations.length > 0) {
             evalResults.evaluations[0].grades.forEach(grade => {
-                if (grade.userid == this.currentUser.id) {
+                if (grade.graderinfo.id == this.currentUser.id) {
                     return;
                 }
                 numberofobservations++;
             });
         }
         evalGrading.grading.numberofobservations = numberofobservations;
+        evalGrading.grading.haspenalty = evalGrading.grading.evalnum > numberofobservations;
         evalResults.evaluations.forEach(evaluation => {
             evaluation.grades.forEach(grade => {
-                if (grade.value === null || grade.userid == this.currentUser.id) {
+                if (grade.level === null || grade.graderinfo.id == this.currentUser.id) {
                     return;
                 }
-                totalEvalScore += grade.value;
+                totalEvalScore += grade.level;
                 totalGrades++;
             });
         });
@@ -320,12 +322,13 @@ class Competvet {
             if (event.target.closest('[data-action="nextuser"]')) {
                 this.moveUser('next');
             }
+            if (event.target.closest('[data-action="setuser"]')) {
+                const userId = event.target.closest('[data-action="setuser"]').dataset.userid;
+                this.setCurrentUser(this.userlist.find(user => user.id === parseInt(userId)));
+            }
             if (event.target.closest('[data-action="reload"]')) {
                 this.getEvaluations();
             }
-        });
-        this.gradingApp.addEventListener('caseAdded', () => {
-            this.setListResults();
         });
         this.gradingApp.addEventListener('certAdded', () => {
             this.setCertifResults();

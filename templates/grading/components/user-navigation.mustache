@@ -28,13 +28,18 @@
         <button class="btn btn-icon icon-no-margin mx-2" data-action="prevuser" title="{{#str}}previoususer, mod_competvet{{/str}}">
             <i class="fa fa-chevron-left"></i>
         </button>
-        <div class="d-flex usernavigation" data-action="reload">
-            <div class="userimage mr-2">
-                <img src="{{user.userpictureurl}}" alt="{{user.fullname}}" class="rounded-circle">
-            </div>
-            <div class="userinfo">
-                <div class="fullname text-truncate">{{user.fullname}}</div>
-                <div class="period text-truncate">{{user.email}}</div>
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center" type="button" data-toggle="dropdown" aria-expanded="false">
+                <div class="userinfo">
+                    <div class="fullname text-truncate">{{user.fullname}}</div>
+                </div>
+            </button>
+            <div class="dropdown-menu w-100">
+                {{#userlist}}
+                    <a class="dropdown-item" data-action="setuser" data-userid="{{id}}">
+                        {{fullname}}
+                    </a>
+                {{/userlist}}
             </div>
         </div>
         <button class="btn btn-icon icon-no-margin mx-2" data-action="nextuser" title="{{#str}}nextuser, mod_competvet{{/str}}">

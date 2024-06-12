@@ -303,6 +303,7 @@ class certifications {
         $criterion = criterion::get_record(['id' => $cert->get('criterionid')]);
         $certrecord['label'] = $criterion->get('label');
         $certrecord['grade'] = $criterion->get('grade');
+        $certrecord['level'] = $cert->get('level');
 
         $certrecord['status'] = $cert->get('status');
         $certrecord['seendone'] = ($cert->get('status') == cert_decl::STATUS_DECL_SEENDONE);

@@ -91,6 +91,24 @@ class get_evaluations extends external_api {
                         ]
                     )
                 ),
+                'autoevalcomments' => new external_multiple_structure(
+                    new external_single_structure(
+                        [
+                            'userid' => new external_value(PARAM_INT, 'User id'),
+                            'fullname' => new external_value(PARAM_TEXT, 'Full name'),
+                            'picture' => new external_value(PARAM_URL, 'User picture url'),
+                            'comments' => new external_multiple_structure(
+                                new external_single_structure(
+                                    [
+                                        'id' => new external_value(PARAM_INT, 'Comment id'),
+                                        'commenttext' => new external_value(PARAM_TEXT, 'Comment'),
+                                        'timecreated' => new external_value(PARAM_INT, 'Time created'),
+                                    ]
+                                )
+                            ),
+                        ]
+                    )
+                ),
             ]
         );
     }
@@ -153,6 +171,7 @@ class get_evaluations extends external_api {
         }
 
         $comments = [];
+        $autoevalcomments = [];
         foreach ($userevals as $usereval) {
             foreach ($usereval['comments'] as $comment) {
                 $userid = $comment['userinfo']['id'];
@@ -162,20 +181,36 @@ class get_evaluations extends external_api {
                 $commenttext = $comment['comment'];
                 $timecreated = $comment['timecreated'];
 
-                if (!isset($comments[$userid])) {
-                    $comments[$userid] = [
-                        'userid' => $userid,
-                        'fullname' => $fullname,
-                        'picture' => $userpictureurl,
-                        'comments' => [],
+                if ($userid == $studentid) {
+                    if (empty($autoevalcomments)) {
+                        $autoevalcomments[] = [
+                            'userid' => $userid,
+                            'fullname' => $fullname,
+                            'picture' => $userpictureurl,
+                            'comments' => [],
+                        ];
+                    }
+                    $autoevalcomments[0]['comments'][] = [
+                        'id' => $commentid,
+                        'commenttext' => $commenttext,
+                        'timecreated' => $timecreated,
+                    ];
+                } else {
+                    if (!isset($comments[$userid])) {
+                        $comments[$userid] = [
+                            'userid' => $userid,
+                            'fullname' => $fullname,
+                            'picture' => $userpictureurl,
+                            'comments' => [],
+                        ];
+                    }
+
+                    $comments[$userid]['comments'][] = [
+                        'id' => $commentid,
+                        'commenttext' => $commenttext,
+                        'timecreated' => $timecreated,
                     ];
                 }
-
-                $comments[$userid]['comments'][] = [
-                    'id' => $commentid,
-                    'commenttext' => $commenttext,
-                    'timecreated' => $timecreated,
-                ];
             }
         }
 
@@ -183,6 +218,7 @@ class get_evaluations extends external_api {
         return [
             'evaluations' => array_values($gradedcriteria),
             'comments' => array_values($comments),
+            'autoevalcomments' => $autoevalcomments,
         ];
     }
 
