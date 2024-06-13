@@ -43,6 +43,7 @@ $event->add_record_snapshot('competvet', $moduleinstance);
 $event->trigger();
 
 $PAGE->set_context($modulecontext);
+$PAGE->add_body_class('limitedwidth');
 $widget = base::factory($USER->id);
 $widget->set_data();
 $widget->check_access();

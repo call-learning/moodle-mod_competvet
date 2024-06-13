@@ -102,7 +102,11 @@ class grader {
             $item['idnumber'] = $this->idnumber;
         }
 
-        if ($this->instance->grade > 0) {
+        if (!isset($this->instance->grade)) {
+            $item['gradetype'] = GRADE_TYPE_VALUE;
+            $item['grademax'] = 100;
+            $item['grademin'] = 0;
+        } else if ($this->instance->grade > 0) {
             $item['gradetype'] = GRADE_TYPE_VALUE;
             $item['grademax'] = $this->instance->grade;
             $item['grademin'] = 0;
