@@ -149,6 +149,14 @@ class utils {
     public static function get_user_info(int $userid): array {
         global $PAGE;
         $user = core_user::get_user($userid);
+        if (!$user) {
+            $renderer = $PAGE->get_renderer('core', 'core');
+            return [
+                'id' => $userid,
+                'fullname' => get_string('usernotfound', 'competvet'),
+                'userpictureurl' => $renderer->image_url('u/f1'), // Default image.
+            ];
+        }
         $userpicture = new user_picture($user);
         $userpicture->includetoken = true;
         $userpicture->size = 1; // Size f1.
