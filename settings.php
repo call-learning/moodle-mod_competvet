@@ -58,7 +58,7 @@ if ($hassiteconfig) {
                 'mod_competvet/gradeK2',
                 get_string('gradeK2', 'mod_competvet'),
                 get_string('gradeK2', 'mod_competvet'),
-                5,
+                2,
                 PARAM_FLOAT,
             )
         );
@@ -66,7 +66,6 @@ if ($hassiteconfig) {
         $renderer = $PAGE->get_renderer('mod_competvet');
         $widget = base::factory($USER->id, 'managecriteria');
         $widget->set_data();
-        $widget->check_access();
         $url = new moodle_url('/mod/competvet/criteria.php');
         $settings->add(
             new admin_setting_heading(

@@ -28,6 +28,7 @@
  */
 function xmldb_competvet_install() {
     $postinstall = new mod_competvet\task\post_install();
+    $postinstall->set_custom_data(['setup_update_tags', 'create_default_grids', 'create_default_cases']);
     core\task\manager::queue_adhoc_task($postinstall);
     return true;
 }

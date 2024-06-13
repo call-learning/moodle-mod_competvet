@@ -198,6 +198,7 @@ class setup {
                     'name' => get_string('grid:default:' . $gridtypename, 'mod_competvet'),
                     'idnumber' => grid::DEFAULT_GRID_SHORTNAME[$gridtype],
                     'sortorder' => 0, // We do not care about the order here.
+                    'situationid' => 0, // For global grids.
                     'type' => $gridtype,
                 ]);
                 // Create it and upload the criteria.

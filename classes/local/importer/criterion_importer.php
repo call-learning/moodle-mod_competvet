@@ -63,7 +63,10 @@ class criterion_importer extends base_persistent_importer {
         $evalgridnametoid = cache::make_from_params(cache_store::MODE_REQUEST, 'local_competvet', 'evalgridnametoid');
         $data = parent::to_persistent_data($row, $reader);
         $gridname = trim($data->gridid);
-        if (empty($data->grade)) {
+        if ($data->idnumber == 'EL15') {
+            $data->idnumber = 'EL15';
+        }
+        if (empty($data->grade) && $data->grade !== '0') {
             $data->grade = null;
         } else {
             $data->grade = floatval(str_replace(',', '.', $data->grade));
