@@ -169,7 +169,7 @@ trait test_data_definition {
                 ],
                 'activities' => [
                     'SIT1' => [
-                        'situationtags' => ['y:1'],
+                        'category' => 'Y1',
                         'plannings' => [
                             [
                                 'startdate' => $startdate,
@@ -192,7 +192,7 @@ trait test_data_definition {
                         ],
                     ],
                     'SIT2' => [
-                        'situationtags' => ['y:2'],
+                        'category' => 'Y2',
                         'plannings' => [
                             [
                                 'startdate' => $startdate,
@@ -203,7 +203,7 @@ trait test_data_definition {
                         ],
                     ],
                     'SIT3' => [
-                        'situationtags' => ['y:3'],
+                        'category' => 'Y3',
                         'plannings' => [
                             [
                                 'startdate' => $startdate,
@@ -241,7 +241,7 @@ trait test_data_definition {
                 ],
                 'activities' => [
                     'SIT4' => [
-                        'situationtags' => ['y:1'],
+                        'category' => 'Y1',
                         'plannings' => [
                             [
                                 'startdate' => $startdate + $onemonth * 3,
@@ -258,7 +258,7 @@ trait test_data_definition {
                         ],
                     ],
                     'SIT5' => [
-                        'situationtags' => ['y:2'],
+                        'category' => 'Y2',
                         'plannings' => [
                             [
                                 'startdate' => $startdate + $onemonth * 4,
@@ -275,7 +275,7 @@ trait test_data_definition {
                         ],
                     ],
                     'SIT6' => [
-                        'situationtags' => ['y:3'],
+                        'category' => 'Y3',
                         'plannings' => [
                             [
                                 'startdate' => $startdate + $onemonth * 5,
@@ -306,7 +306,7 @@ trait test_data_definition {
                 ],
                 'activities' => [
                     'SIT7' => [
-                        'situationtags' => ['y:1'],
+                        'category' => 'Y1',
                         'plannings' => [
                             [
                                 'startdate' => $startdate + $onemonth * 6,
@@ -317,7 +317,7 @@ trait test_data_definition {
                         ],
                     ],
                     'SIT8' => [
-                        'situationtags' => ['y:2'],
+                        'category' => 'Y2',
                         'plannings' => [
                             [
                                 'startdate' => $startdate + $onemonth * 7,
@@ -335,7 +335,7 @@ trait test_data_definition {
                         ],
                     ],
                     'SIT9' => [
-                        'situationtags' => ['y:3'],
+                        'category' => 'Y3',
                         'plannings' => [
                             [
                                 'startdate' => $startdate + $onemonth * 8,
@@ -386,7 +386,7 @@ trait test_data_definition {
                 ],
                 'activities' => [
                     'SIT1' => [
-                        'situationtags' => ['y:1'],
+                        'category' => 'Y1',
                         'plannings' => [
                             [
                                 'startdate' => $startdate,
@@ -443,7 +443,7 @@ trait test_data_definition {
                 ],
                 'activities' => [
                     'SIT1' => [
-                        'situationtags' => ['y:1'],
+                        'category' => 'Y1',
                         'plannings' => [
                             [
                                 'startdate' => $startdate,

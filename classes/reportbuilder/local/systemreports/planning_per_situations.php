@@ -115,7 +115,7 @@ class planning_per_situations extends system_report {
             'situation:hascertif',
             'situation:hascase',
             'situation:intro',
-            'situation:tagnames',
+            'situation:category',
             'planning:startdate',
             'planning:enddate',
             'planning:session',

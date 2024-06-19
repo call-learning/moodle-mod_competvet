@@ -113,20 +113,6 @@ class mod_competvet_mod_form extends moodleform_mod {
             $competvetidel = $mform->getElement('competvetid');
             $competvetidel->setValue($this->get_current()->id);
         }
-        $mform->addElement(
-            'tags',
-            'situationtags',
-            get_string('situation:tags', 'competvet'),
-            [
-                'itemtype' => 'competvet_situation',
-                'component' => 'mod_competvet',
-            ]
-        );
-        if ($this->_cm) {
-            $tags = core_tag_tag::get_item_tags_array('mod_competvet', 'competvet_situation', $this->_cm->id);
-            $mform->setDefault('situationtags', $tags);
-        }
-
         // Add evalgridid field.
         foreach (grid::COMPETVET_GRID_TYPES as $gridtype => $gridtypename) {
             $defaultgrid = grid::get_default_grid($gridtype);
@@ -173,11 +159,6 @@ class mod_competvet_mod_form extends moodleform_mod {
             $situation = situation::get_record(['competvetid' => $this->get_current()->id]);
             $situationrecord = array_intersect_key((array)$situation->to_record(), $situationfields);
             $mform->setDefaults($situationrecord);
-        }
-        // Populate tags for situation.
-        if (core_tag_tag::is_enabled('mod_competvet', 'competvet_situation') && !empty($this->get_current()->id)) {
-            $tags = core_tag_tag::get_item_tags_array('mod_competvet', 'competvet_situation', $this->get_current()->id);
-            $mform->setDefault('situationtags', $tags);
         }
     }
 }

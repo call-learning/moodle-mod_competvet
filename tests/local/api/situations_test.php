@@ -123,7 +123,7 @@ class situations_test extends advanced_testcase {
             'id' => 1,
             'label' => 'Savoir être',
             'idnumber' => 'Q001',
-            'sort' => 1,
+            'sort' => 0,
             'parentid' => 0,
             'parentlabel' => null,
             'parentidnumber' => null,

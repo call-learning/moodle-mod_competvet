@@ -17,9 +17,7 @@ namespace mod_competvet\task;
 
 /**
  * Ad-hoc task to perform post install tasks.
- * We use this to add new tags to the situation collection that is not created when the plugin is installed (and if
- * at this point \core_tag_area::reset_definitions_for_component is called, this is discarded after install or update
- * so cannot be directly called in the update process.
+ * We use this to for subsystems that need to be created after the plugin is installed.
  *
  * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
@@ -29,7 +27,7 @@ class post_install extends \core\task\adhoc_task {
     public function execute() {
         $methods = $this->get_custom_data();
         if (empty($methods)) {
-            $methods = ['setup_update_tags', 'create_update_roles', 'create_default_grids', 'create_default_cases'];
+            $methods = ['create_update_roles', 'create_default_grids', 'create_default_cases'];
         }
         foreach ($methods as $method) {
             \mod_competvet\setup::$method();

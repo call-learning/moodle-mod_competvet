@@ -166,4 +166,7 @@ class utils {
             'userpictureurl' => $userpicture->get_url($PAGE)->out(false),
         ];
     }
+
+    const SITUATION_CATEGORIES_DEF = "Y1|fr:Première année|en:First year\nY2|fr:Deuxième année|en:Second year
+Y3|fr:Troisième année|en:Third year\nY4|fr:Quatrième année|en:Fourth year\nY5|fr:Cinquième année|en:Fifth year";
 }

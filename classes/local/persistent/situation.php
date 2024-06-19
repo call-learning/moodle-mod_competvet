@@ -19,6 +19,7 @@ use cache;
 use core\persistent;
 use lang_string;
 use mod_competvet\competvet;
+use mod_competvet\utils;
 
 /**
  * Criterion template entity
@@ -163,8 +164,69 @@ class situation extends persistent {
                 'message' => new lang_string('invaliddatafor', 'competvet', 'certifgrid'),
                 'formtype' => 'skipped',
             ],
+            'category' => [
+                'type' => PARAM_TEXT,
+                'default' => self::get_default_category(),
+                'message' => new lang_string('invaliddatafor', 'competvet', 'category'),
+                'choices' => array_keys(self::get_categories_choices()),
+                'formtype' => 'select',
+                'formoptions' => self::get_categories_choices_for_display(),
+            ],
         ];
     }
+
+    /**
+     * Get default category ID, the first in the list
+     *
+     * @return string
+     */
+    public static function get_default_category(): string {
+        $categories = self::get_categories_choices();
+        return array_key_first($categories);
+    }
+
+    /**
+     * Get categories choices
+     *
+     * @return array
+     */
+    public static function get_categories_choices() {
+        $categories = get_config('mod_competvet', 'situationcategories');
+        if (empty($categories)) {
+            $categories = utils::SITUATION_CATEGORIES_DEF;
+        }
+        // Parse situation categories.
+        $categories = explode("\n", $categories);
+        $parsedcategories = [];
+        foreach ($categories as $category) {
+            $categorydef = explode('|', $category);
+            $categoryshortname = array_shift($categorydef);
+            $langinfo = [];
+            foreach ($categorydef as $value) {
+                $langdef = explode(':', trim($value));
+                $langdef = array_map('trim', $langdef);
+                $langinfo[$langdef[0]] = $langdef[1];
+            }
+            $parsedcategories[$categoryshortname] = json_encode($langinfo);
+        }
+        return $parsedcategories;
+    }
+
+    /**
+     * Get categories choices
+     *
+     * @return array
+     */
+    public static function get_categories_choices_for_display(): array {
+        $categories = self::get_categories_choices();
+        return array_map(
+            function ($category) {
+                $languages = json_decode($category, true);
+                return $languages[current_language()] ?? '';
+            },
+            $categories);
+    }
+
 
     /**
      * Get evaluation criteria for this situation

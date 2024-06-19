@@ -212,30 +212,6 @@ class situation extends base {
 
                 return format_text($intro, $row->introformat, ['context' => $context]);
             });
-        // System reports do not support aggregation, so while waiting for this to be implemented, we can
-        // use the groupconcatdistinct aggregation to get a list of all the tags for a given situation. See MDL-76392.
-        $tagalias = $this->get_table_alias('tag');
-        $contextalias = $this->get_table_alias('context');
-        $field = "{$tagalias}.rawname";
-        $fieldsort = database::sql_group_concat_sort($field);
-
-        $groupconcatsql = $DB->sql_group_concat($field, ', ', $fieldsort);
-        $instancealias = $this->get_table_alias('tag_instance');
-        $sql = "(SELECT {$groupconcatsql}
-                FROM {tag_instance} {$instancealias}
-                LEFT JOIN {tag} {$tagalias} ON {$tagalias}.id = {$instancealias}.tagid
-                WHERE {$instancealias}.contextid = {$contextalias}.id)";
-
-        $columns[] = (new column(
-            'tagnames',
-            new lang_string('situation:tagnames', 'mod_competvet'),
-            $this->get_entity_name()
-        ))
-            ->add_joins($this->get_joins())
-            ->add_joins($this->get_context_and_modules_joins())
-            ->set_type(column::TYPE_TEXT)
-            ->add_field($sql, 'tagnames')
-            ->set_is_sortable(true);
 
         $columns[] = (new column(
             'cmid',
@@ -377,8 +353,6 @@ class situation extends base {
             'modules' => 'sit_modules',
             'course_modules' => 'sit_cmodules',
             'context' => 'sit_ctxmodule',
-            'tag' => 'sit_tag',
-            'tag_instance' => 'sit_tagi',
         ];
     }
 

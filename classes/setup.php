@@ -20,8 +20,6 @@ use core_reportbuilder\datasource;
 use core_reportbuilder\local\helpers\report as helper;
 use core_reportbuilder\local\models\report as report_model;
 use core_reportbuilder\manager;
-use core_tag_area;
-use core_tag_tag;
 use mod_competvet\local\importer\criterion_importer;
 use mod_competvet\local\importer\fields_importer;
 use mod_competvet\local\persistent\case_field;
@@ -37,14 +35,6 @@ use mod_competvet\reportbuilder\datasource\plannings;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class setup {
-    /**
-     * Language string for situation tags
-     */
-    const SITUATION_TAG_LS = [
-        'y:1',
-        'y:2',
-        'y:3',
-    ];
     /**
      * Custom report infos.
      */
@@ -113,38 +103,6 @@ class setup {
         purge_all_caches();
         capabilities_cleanup(competvet::COMPONENT_NAME);
         update_capabilities(competvet::COMPONENT_NAME);
-    }
-
-    /**
-     * Add few standard tags for situation that can then be used to categorise and filter them.
-     *
-     * @return void
-     */
-    public static function setup_update_tags() {
-        // We must use tags here, so enable them.
-        set_config('usetags', true);
-        $tagareas = core_tag_area::get_areas();
-        $tagarea = $tagareas['competvet_situation']['mod_competvet'] ?? null;
-        if (!$tagarea) {
-            throw new \coding_exception('Unable to create tag area for mod_competvet');
-        }
-        $data = ['enabled' => true];
-        \core_tag_area::update($tagarea, $data);
-        core_tag_tag::create_if_missing($tagarea->tagcollid, self::SITUATION_TAG_LS, true);
-
-        $tags = \core_tag_tag::get_by_name_bulk(
-            $tagarea->tagcollid,
-            self::SITUATION_TAG_LS,
-            'id, name, rawname, tagcollid, userid, description, descriptionformat'
-        );
-        foreach ($tags as $tagname => $taginfo) {
-            $taginfo->update(
-                [
-                    'description' => get_string('situation:tags:' . $tagname, competvet::COMPONENT_NAME),
-                    'descriptionformat' => FORMAT_PLAIN,
-                ]
-            );
-        }
     }
 
     /**

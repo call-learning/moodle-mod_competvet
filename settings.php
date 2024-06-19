@@ -62,6 +62,16 @@ if ($hassiteconfig) {
                 PARAM_FLOAT,
             )
         );
+        // Set the situation Categories
+        $settings->add(
+            new admin_setting_configtextarea(
+                'mod_competvet/situationcategories',
+                get_string('situation:category', 'mod_competvet'),
+                get_string('situation:category_help', 'mod_competvet'),
+                \mod_competvet\utils::SITUATION_CATEGORIES_DEF,
+                PARAM_TEXT,
+            )
+        );
         // Add a link to the manage criteria page.
         $renderer = $PAGE->get_renderer('mod_competvet');
         $widget = base::factory($USER->id, 'managecriteria');
