@@ -47,6 +47,7 @@
     </div>
     {{#comments}}
         <div class="comment position-relative" data-region="commenttext">
+            {{$info}}{{info}}{{/info}}
             {{#commenttitle}}<div><strong>{{{commenttitle}}}</strong></div>{{/commenttitle}}
             <span class="shortened" data-region="shorttext">{{#shortentext}}200, {{{commenttext}}}{{/shortentext}}</span>
             <span class="fulltext d-none" data-region="fulltext">{{{commenttext}}}</span>

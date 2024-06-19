@@ -86,6 +86,7 @@ class observations {
             'id' => $observation->get('id'),
             'category' => $observation->get_observation_type(),
             'grader' => $observation->get('observerid'),
+            'timemodified' => $observation->get('timemodified'),
         ];
         if (!empty($context)) {
             $contextrecord = $context->to_record();

@@ -66,12 +66,13 @@ class student_evaluations extends base {
         foreach ($this->criteria as $criterion) {
             $grades = [];
             foreach ($this->observations as $observation) {
-                $grades[$observation['grader']] = [];
+                $grades[$observation['id']] = [];
                 foreach ($observation['criteria'] as $obscrit) {
                     if ($criterion['id'] == $obscrit['criterioninfo']['id']) {
-                        $grades[$observation['grader']] = [
+                        $grades[$observation['id']] = [
                             'level' => $obscrit['level'],
                             'graderinfo' => utils::get_user_info($observation['grader']),
+                            'timemodified' => $observation['timemodified'],
                             'viewurl' => (new moodle_url(
                                 $this->vieweval,
                                 ['obsid' => $observation['id']]

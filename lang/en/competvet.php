@@ -274,6 +274,7 @@ $string['confidencelevel'] = 'Confidence level';
 $string['seendone'] = 'Seen and done';
 $string['confirmed'] = 'Confirmed';
 $string['notseen'] = 'Not seen';
+$string['notreached'] = 'Level not reached';
 $string['validated'] = 'Validated';
 $string['nocertifications'] = 'No certifications';
 

@@ -272,6 +272,7 @@ class certifications {
             $certrecord['observernotseen'] = false;
             $certrecord['confirmed'] = false;
             $certrecord['levelnotreached'] = false;
+            $certrecord['timemodified'] = 0;
 
             $certdecl = cert_decl::get_record([
                 'studentid' => $studentid,
@@ -310,6 +311,7 @@ class certifications {
         $certrecord['notseen'] = ($cert->get('status') == cert_decl::STATUS_STUDENT_NOTSEEN);
         $certrecord['total'] = 5; // TODO: get the total from the criterion? maybe change to grade.
         $certrecord['timecreated'] = $cert->get('timecreated');
+        $certrecord['timemodified'] = $cert->get('timemodified');
         $certrecord['isdeclared'] = true; // This is the flag to determine if the certification is declared or not.
         $certrecord['comment'] = $cert->get('comment');
         $certrecord['commentformat'] = $cert->get('commentformat');
@@ -333,6 +335,7 @@ class certifications {
             $validrecord['id'] = $valid->get('id');
             $validrecord['supervisor'] = utils::get_user_info($valid->get('supervisorid'));
             $validrecord['status'] = $valid->get('status');
+            $validrecord['timemodified'] = $valid->get('timemodified');
 
             $certrecord['confirmed'] = ($valid->get('status') == cert_valid::STATUS_CONFIRMED);
             $certrecord['observernotseen'] = ($valid->get('status') == cert_valid::STATUS_OBSERVER_NOTSEEN);
