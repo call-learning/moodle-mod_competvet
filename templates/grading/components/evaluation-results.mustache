@@ -29,15 +29,72 @@
             {{#str}} noevaluations, mod_competvet {{/str}}
         </div>
     {{/evaluations}}
+    <div class="row">
+        <div class="col-12 d-flex justify-content-center">
+            {{#evaluations.0}}
+                <a class="btn btn-link mb-3" data-toggle="collapse" href="#evaluations-table" role="button" aria-expanded="false" aria-controls="evaluations-table">
+                    Show as table
+                </a>
+            {{/evaluations.0}}
+        </div>
+    </div>
+    <div class="collapse" id="evaluations-table">
+        <div class="evaltable mb-3">
+        <div class="row no-gutters flex-nowrap">
+            <div class="p-2 col-6 criterionlabel cellborder">
+            </div>
+                {{#evaluations.0}}
+                    {{#grades}}
+                        <div class="p-2 cellborder col-2 evaluator font-weight-bold text-center d-flex align-items-center">
+                            <div class="text-truncate" data-toggle="tooltip" title="{{graderinfo.fullname}}  {{#timemodified}}{{#userdate}}{{timemodified}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}}{{/userdate}}{{/timemodified}}">
+                                {{graderinfo.fullname}}
+                            </div>
+                        </div>
+                    {{/grades}}
+                {{/evaluations.0}}
+            </div>
+            {{#evaluations}}
+                <div class="row no-gutters flex-nowrap">
+                    <div class="p-2 cellborder col-6 criterionlabel font-weight-bold">
+                        {{criterion.label}}
+                    </div>
+                    {{#grades}}
+                        <div class="p-2 cellborder col-2 grade text-center">
+                            {{level}}
+                            <div class="sr-only">
+                                {{graderinfo.fullname}}
+                            </div>
+                        </div>
+                    {{/grades}}
+                </div>
+            {{/evaluations}}
+        </div>
+    </div>
     <div class="evalcomments d-flex row">
         <div class="span6 col-md-6">
             {{#comments}}
-                {{>mod_competvet/comment}}
+                {{< mod_competvet/comment}}
+                    {{$info}}
+                        {{#timecreated}}
+                        <div class="small timecreated d-flex justify-content-end">
+                            {{#userdate}} {{timecreated}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}} {{/userdate}}
+                        </div>
+                        {{/timecreated}}
+                    {{/info}}
+                {{/ mod_competvet/comment}}
             {{/comments}}
         </div>
         <div class="span6 col-md-6">
             {{#autoevalcomments}}
-                {{>mod_competvet/comment}}
+                {{< mod_competvet/comment}}
+                    {{$info}}
+                        {{#timecreated}}
+                        <div class="small timecreated d-flex justify-content-end">
+                            {{#userdate}} {{timecreated}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}} {{/userdate}}
+                        </div>
+                        {{/timecreated}}
+                    {{/info}}
+                {{/ mod_competvet/comment}}
             {{/autoevalcomments}}
         </div>
     </div>

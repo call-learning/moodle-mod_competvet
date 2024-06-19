@@ -47,6 +47,7 @@ class get_certifications extends external_api {
                     'level' => new external_value(PARAM_INT, 'The level', VALUE_OPTIONAL),
                     'total' => new external_value(PARAM_INT, 'The total', VALUE_OPTIONAL),
                     'status' => new external_value(PARAM_INT, 'The status', VALUE_OPTIONAL),
+                    'timemodified' => new external_value(PARAM_INT, 'The time created'),
                     'isdeclared' => new external_value(PARAM_BOOL, 'Is declared', VALUE_OPTIONAL),
                     'seendone' => new external_value(PARAM_BOOL, 'Is seen by an student', VALUE_OPTIONAL),
                     'notseen' => new external_value(PARAM_BOOL, 'Is not seen by a student', VALUE_OPTIONAL),
@@ -104,11 +105,11 @@ class get_certifications extends external_api {
 
         $certifications = certifications::get_certifications($planningid, $studentid);
         // Get an array of all validations.
-        $validations = 0;
+        $numvalidated = 0;
         $declared = 0;
         foreach ($certifications as $certification) {
             if ($certification['confirmed']) {
-                $validations++;
+                $numvalidated++;
             }
             if ($certification['isdeclared']) {
                 $declared++;
@@ -118,7 +119,7 @@ class get_certifications extends external_api {
         return [
             'certifications' => $certifications,
             'numcertifications' => count($certifications),
-            'numvalidated' => $validations,
+            'numvalidated' => $numvalidated,
             'isdeclared' => $declared > 0 ? true : false,
         ];
     }

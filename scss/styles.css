@@ -1,7 +1,8 @@
 .gradingapp {
   display: flex;
-  flex-direction: column;
-  height: 100vh; }
+  flex-direction: column; }
+  .gradingapp.full-height {
+    height: 100vh; }
   .gradingapp .usernavigation .userimage img {
     width: 50px; }
   .gradingapp .usernavigation .userinfo {
@@ -169,6 +170,22 @@
     .gradingapp .evaltable .cellborder {
       border-bottom: 1px solid #ccc;
       border-left: 1px solid #ccc; }
+    .gradingapp .evaltable .row:first-child .cellborder {
+      border-top: 1px solid #ccc;
+      background-color: #f5f5f5; }
+    .gradingapp .evaltable .row:first-child .cellborder:first-child {
+      border-top-left-radius: 0.4rem; }
+    .gradingapp .evaltable .row:first-child .cellborder:last-child {
+      border-top-right-radius: 0.4rem;
+      min-height: 2.5rem; }
+    .gradingapp .evaltable .row .cellborder:last-child {
+      border-right: 1px solid #ccc; }
+    .gradingapp .evaltable .row:last-child .cellborder {
+      border-bottom: 1px solid #ccc; }
+    .gradingapp .evaltable .row:last-child .cellborder:first-child {
+      border-bottom-left-radius: 0.4rem; }
+    .gradingapp .evaltable .row:last-child .cellborder:last-child {
+      border-bottom-right-radius: 0.4rem; }
   .gradingapp .opacity-0 {
     opacity: 0; }
 

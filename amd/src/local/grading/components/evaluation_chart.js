@@ -110,11 +110,11 @@ const transformContext = (context, autoeval) => {
                 return;
             }
 
-            if (!graders[grade.graderinfo.id]) {
+            if (!graders[grade.obsid]) {
                 const color = colors.shift();
                 const backgroundColor = backgroundColors.shift();
-                graders[grade.graderinfo.id] = {
-                    label: grade.graderinfo.fullname,
+                graders[grade.obsid] = {
+                    label: grade.graderinfo.fullname + ' (' + grade.date + ')',
                     data: [],
                     fill: true,
                     backgroundColor: backgroundColor,
@@ -125,7 +125,7 @@ const transformContext = (context, autoeval) => {
                     pointHoverBorderColor: color,
                 };
             }
-            graders[grade.graderinfo.id].data.push(grade.level);
+            graders[grade.obsid].data.push(grade.level);
         });
     });
 

@@ -59,6 +59,7 @@ class get_evaluations extends external_api {
                             'grades' => new external_multiple_structure(
                                 new external_single_structure(
                                     [
+                                        'obsid' => new external_value(PARAM_INT, 'Observation id'),
                                         'level' => new external_value(PARAM_INT, 'Grade', VALUE_OPTIONAL),
                                         'graderinfo' => new external_single_structure(
                                             [
@@ -67,6 +68,8 @@ class get_evaluations extends external_api {
                                                 'userpictureurl' => new external_value(PARAM_URL, 'Grader picture url'),
                                             ]
                                         , 'grader info', VALUE_OPTIONAL),
+                                        'timemodified' => new external_value(PARAM_TEXT, 'Date', VALUE_OPTIONAL),
+                                        'date' => new external_value(PARAM_TEXT, 'Date', VALUE_OPTIONAL),
                                     ]
                                 )
                             ),
@@ -154,11 +157,14 @@ class get_evaluations extends external_api {
         foreach ($criteria as $criterion) {
             $grades = [];
             foreach ($userevals as $observation) {
-                $grades[$observation['grader']] = [];
+                $grades[$observation['id']] = [];
                 foreach ($observation['criteria'] as $obscrit) {
                     if ($criterion['id'] == $obscrit['criterioninfo']['id']) {
-                        $grades[$observation['grader']] = [
+                        $grades[$observation['id']] = [
+                            'obsid' => $observation['id'],
                             'level' => $obscrit['level'],
+                            'timemodified' => $observation['timemodified'],
+                            'date' => userdate($observation['timemodified'], get_string('strftimedatefullshort')),
                             'graderinfo' => utils::get_user_info($observation['grader'])
                         ];
                     }
