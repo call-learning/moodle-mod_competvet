@@ -103,7 +103,7 @@ class situations extends system_report {
             'situation:hascertif',
             'situation:hascase',
             'situation:intro',
-            'situation:tagnames',
+            'situation:category',
             'situation:cmid',
         ];
 

@@ -48,25 +48,6 @@ class setup_test extends advanced_testcase {
     }
 
     /**
-     * Test tags created at install
-     *
-     * @return void
-     *
-     * @covers \mod_competvet\setup::create_update_roles
-     */
-    public function test_tags_setup() {
-        global $DB;
-        $situationscollectionid = \core_tag_area::get_collection('mod_competvet', 'competvet_situation');
-        $collection = \core_tag_collection::get_by_id($situationscollectionid);
-        $situationtagsname =
-            $DB->get_fieldset_select('tag', 'name', 'tagcollid = :collectionid', ['collectionid' => $collection->id]);
-
-        foreach (setup::SITUATION_TAG_LS as $tagsn) {
-            $this->assertContains($tagsn, $situationtagsname);
-        }
-    }
-
-    /**
      * Test default grid created and installed
      *
      * @return void

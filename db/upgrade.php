@@ -26,6 +26,19 @@ function xmldb_competvet_upgrade($oldversion) {
     global $CFG, $DB;
 
     $dbman = $DB->get_manager();
+    if ($oldversion < 2024060701) {
 
+        // Define field category to be added to competvet_situation.
+        $table = new xmldb_table('competvet_situation');
+        $field = new xmldb_field('category', XMLDB_TYPE_CHAR, '254', null, null, null, null, 'listgrid');
+
+        // Conditionally launch add field category.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024060701, 'competvet');
+    }
     return true;
 }

@@ -77,21 +77,8 @@ class situations {
             $newsituation['autoevalnum'] = intval($newsituation['autoevalnum']);
             $newsituation['certifpnum'] = intval($newsituation['certifpnum']);
             $newsituation['casenum'] = intval($newsituation['casenum']);
-            $tagsobjects = \core_tag_tag::get_item_tags('mod_competvet', 'competvet_situation', $competvetinstance->id);
-            $tags = array_map(function ($tag) {
-                return $tag->name;
-            }, $tagsobjects);
-
-            sort($tags);
-            $newsituation['tags'] = json_encode($tags);
-            $newsituation['translatedtags'] = json_encode(array_map(
-                fn($tag) => (object)
-                [$tag =>
-                    get_string_manager()->string_exists("situation:tags:{$tag}", 'mod_competvet') ?
-                        get_string("situation:tags:{$tag}", 'mod_competvet') : $tags,
-                ],
-                $tags
-            ));
+            $newsituation['category'] = $situation->get('category') ?? '';
+            $newsituation['translatedcategory'] = situation::get_categories_choices()[$newsituation['category']] ?? '';
             $newsituation['roles'] = json_encode(user_role::get_all($userid, $situationid));
             $situations[$situationid] = $newsituation;
         }

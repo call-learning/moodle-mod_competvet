@@ -79,14 +79,8 @@ class mod_competvet_generator extends testing_module_generator {
         }
 
         // Now take care of the tags.
-        if (empty($record->situationtags)) {
-            $possibletags = static::get_situation_sample_tags();
-            $tag = $possibletags[rand(0, count($possibletags) - 1)];
-            $record->situationtags = [$tag];
-        } else {
-            if (is_string($record->situationtags)) {
-                $record->situationtags = explode(',', $record->situationtags);
-            }
+        if (empty($record->category)) {
+            $record->category = situation::get_default_category();
         }
         $this->check_and_set_grid($record, 'evalgrid', grid::COMPETVET_CRITERIA_EVALUATION);
         $this->check_and_set_grid($record, 'certifgrid', grid::COMPETVET_CRITERIA_CERTIFICATION);
@@ -117,25 +111,6 @@ class mod_competvet_generator extends testing_module_generator {
         }
         $cache->set('situationnames', $possiblesituationnames);
         return $possiblesituationnames;
-    }
-
-    /**
-     * Get situation sample tags
-     *
-     * @return array
-     */
-    private static function get_situation_sample_tags() {
-        global $DB;
-        $cache = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_competvet', 'situationsamples');
-        if ($cache->has('situationtags')) {
-            return $cache->get('situationtags');
-        }
-        $situationscollectionid = \core_tag_area::get_collection('mod_competvet', 'competvet_situation');
-        $collection = \core_tag_collection::get_by_id($situationscollectionid);
-        $possiblesituationtags =
-            $DB->get_fieldset_select('tag', 'name', 'tagcollid = :collectionid', ['collectionid' => $collection->id]);
-        $cache->set('situationtags', $possiblesituationtags);
-        return $possiblesituationtags;
     }
 
     /**
