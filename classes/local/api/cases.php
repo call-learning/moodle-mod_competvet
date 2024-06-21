@@ -136,9 +136,9 @@ class cases {
      * @param int $studentid The student id
      * @param array $fields The fields
      *
-     * @return void
+     * @return int
      */
-    public static function create_case(int $planningid, int $studentid, array $fields): void {
+    public static function create_case(int $planningid, int $studentid, array $fields): int {
         // Create the case.
         $case = new case_entry();
         $case->set('planningid', $planningid);
@@ -158,6 +158,7 @@ class cases {
             $data->set('valueformat', 0);
             $data->save();
         }
+        return $case->get('id');
     }
 
     /**
@@ -226,9 +227,10 @@ class cases {
                 'id' => $case->id,
                 'timecreated' => $case->timecreated,
             ];
+            $date = self::get_case_field_value($case, 'date_cas', true) ?? 0;
             $casetrans['espece'] = self::get_case_field_value($case, 'espece') ?? '';
             $casetrans['animal'] = self::get_case_field_value($case, 'nom_animal') ?? '';
-            $casetrans['date'] = self::get_case_field_value($case, 'date_cas', true) ?? 0;
+            $casetrans['date'] = intval($date);
             $casetrans['label'] = self::get_case_field_value($case, 'motif_presentation') ?? '';
             $caselist[] = $casetrans;
         }

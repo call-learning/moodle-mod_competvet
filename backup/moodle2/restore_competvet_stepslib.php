@@ -236,11 +236,11 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
 
         $data = (object)$data;
         $oldid = $data->id;
-        if (!$DB->record_exists('competvet_case_cat', ['shortname' => $data->name])) {
-            // Insert the criterion record.
+        if (!$DB->record_exists('competvet_case_cat', ['shortname' => $data->shortname])) {
+            // Insert the category record.
             $casecatid = $DB->insert_record('competvet_case_cat', $data);
         } else {
-            $casecatid = $DB->get_field('competvet_case_cat', 'id', ['shortname' => $data->name]);
+            $casecatid = $DB->get_field('competvet_case_cat', 'id', ['shortname' => $data->shortname]);
         }
         // Insert the case category record.
         $this->set_mapping('casecat', $oldid, $casecatid);
@@ -251,9 +251,13 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
 
         $data = (object)$data;
         $oldid = $data->id;
-        // Insert the case field record.
-        $fieldid = $DB->insert_record('competvet_case_field', $data);
-        $this->set_mapping('casefield', $oldid, $fieldid);
+        if (!$DB->record_exists('competvet_case_field', ['idnumber' => $data->idnumber])) {
+            // Insert the field record.
+            $casefieldid = $DB->insert_record('competvet_case_field', $data);
+        } else {
+            $casefieldid = $DB->get_field('competvet_case_field', 'id', ['idnumber' => $data->idnumber]);
+        }
+        $this->set_mapping('casefield', $oldid, $casefieldid);
     }
 
     protected function process_caseentry($data) {
