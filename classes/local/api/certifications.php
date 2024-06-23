@@ -35,6 +35,7 @@ class certifications {
     /**
      * Decl status types
      */
+    const GLOBAL_CERT_STATUS_NOT_DECLARED = 0;
     const GLOBAL_CERT_STATUS_NOT_SEEN = 1;
     const GLOBAL_CERT_STATUS_WAITING = 2;
     const GLOBAL_CERT_STATUS_VALIDATED = 3;
@@ -43,6 +44,7 @@ class certifications {
      * Decl status types
      */
     const GLOBAL_CERT_STATUS_TYPES = [
+        self::GLOBAL_CERT_STATUS_NOT_DECLARED => 'cert:global:notdeclared',
         self::GLOBAL_CERT_STATUS_NOT_SEEN => 'cert:global:notseen',
         self::GLOBAL_CERT_STATUS_WAITING => 'cert:global:waiting',
         self::GLOBAL_CERT_STATUS_VALIDATED => 'cert:global:validated',
@@ -224,11 +226,16 @@ class certifications {
     public static function get_certifications_by_status(int $planningid, int $studentid): array {
         $certifications = self::get_certifications($planningid, $studentid);
         $certsbystatus = [
+            self::GLOBAL_CERT_STATUS_NOT_DECLARED => [],
             self::GLOBAL_CERT_STATUS_NOT_SEEN => [],
             self::GLOBAL_CERT_STATUS_WAITING => [],
             self::GLOBAL_CERT_STATUS_VALIDATED => [],
         ];
         foreach ($certifications as $cert) {
+            if (!$cert['isdeclared']) {
+                $certsbystatus[self::GLOBAL_CERT_STATUS_NOT_DECLARED][] = $cert;
+                continue;
+            }
             if ($cert['status'] == cert_decl::STATUS_STUDENT_NOTSEEN) {
                 $certsbystatus[self::GLOBAL_CERT_STATUS_NOT_SEEN][] = $cert;
             } else {
@@ -323,9 +330,7 @@ class certifications {
             $certrecord['feedback'] = [
                 'picture' => $student['userpictureurl'],
                 'fullname' => $student['fullname'],
-                'comments' => [
-                    'commenttext' => format_text($cert->get('comment'), $cert->get('commentformat')),
-                ],
+                'comment' => format_text($cert->get('comment'), $cert->get('commentformat')),
             ];
         }
         $certrecord['validations'] = [];
@@ -345,9 +350,7 @@ class certifications {
                 $validrecord['feedback'] = [
                     'picture' => $supervisor['userpictureurl'],
                     'fullname' => $supervisor['fullname'],
-                    'comments' => [
-                        'commenttext' => format_text($valid->get('comment'), $valid->get('commentformat')),
-                    ],
+                    'comment' => format_text($valid->get('comment'), $valid->get('commentformat')),
                 ];
             }
             $validrecord['comment'] = $valid->get('comment');

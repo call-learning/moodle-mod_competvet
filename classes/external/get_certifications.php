@@ -57,9 +57,7 @@ class get_certifications extends external_api {
                     'feedback' => new external_single_structure([
                         'picture' => new external_value(PARAM_TEXT, 'The picture'),
                         'fullname' => new external_value(PARAM_TEXT, 'The fullname'),
-                        'comments' => new external_single_structure([
-                            'commenttext' => new external_value(PARAM_RAW, 'The comment'),
-                        ], 'The comments', VALUE_OPTIONAL),
+                        'comment' => new external_value(PARAM_RAW, 'The comment'),
                     ], 'The feedback', VALUE_OPTIONAL),
                     'validations' => new external_multiple_structure(
                         new external_single_structure([
@@ -67,9 +65,7 @@ class get_certifications extends external_api {
                             'feedback' => new external_single_structure([
                                 'picture' => new external_value(PARAM_TEXT, 'The picture'),
                                 'fullname' => new external_value(PARAM_TEXT, 'The fullname'),
-                                'comments' => new external_single_structure([
-                                    'commenttext' => new external_value(PARAM_RAW, 'The comment'),
-                                ]),
+                                'comment' => new external_value(PARAM_RAW, 'The comment'),
                             ]),
                             'status' => new external_value(PARAM_INT, 'The status'),
                         ]),
