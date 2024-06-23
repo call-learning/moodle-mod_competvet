@@ -42,13 +42,15 @@
         </div>
         <div class="commentuserinfo">
             <div class="fullname text-truncate">{{fullname}}</div>
-            {{#note}}<div class="note">{{{note}}}</div>{{/note}}
+            {{#note}}
+                <div class="note">{{{note}}}</div>{{/note}}
         </div>
     </div>
     {{#comments}}
         <div class="comment position-relative" data-region="commenttext">
             {{$info}}{{info}}{{/info}}
-            {{#commenttitle}}<div><strong>{{{commenttitle}}}</strong></div>{{/commenttitle}}
+            {{#commenttitle}}
+                <div><strong>{{{commenttitle}}}</strong></div>{{/commenttitle}}
             <span class="shortened" data-region="shorttext">{{#shortentext}}200, {{{commenttext}}}{{/shortentext}}</span>
             <span class="fulltext d-none" data-region="fulltext">{{{commenttext}}}</span>
             <div class="small position-absolute" style="right: 4px; bottom: 2px;">
@@ -58,4 +60,9 @@
             </div>
         </div>
     {{/comments}}
+    {{#comment}}
+        <div class="comment position-relative" data-region="commenttext">
+            <span class="fulltext d-none" data-region="fulltext">{{{commenttext}}}</span>
+        </div>
+    {{/comment}}
 </div>

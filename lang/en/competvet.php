@@ -299,6 +299,7 @@ $string['addoption'] = 'Add an option';
 $string['newcriterion'] = 'New criterion';
 $string['newoption'] = 'New option';
 $string['newgrid'] = 'New grid';
+$string['cert:global:notdeclared'] = 'Not declared';
 $string['cert:global:notseen'] = 'Not seen';
 $string['cert:global:validated'] = 'Validated';
 $string['cert:global:waiting'] = 'Waiting';
