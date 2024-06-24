@@ -185,7 +185,7 @@ class plannings {
         }
         $studentfullyassessed = count(array_filter($studentmembersid, fn($count) => $count >= $requiredobservations));
         if ($nbstudents == $studentfullyassessed) {
-            return planning::CATEGORY_OBSERVER_COMPLETED;
+            //return planning::CATEGORY_OBSERVER_COMPLETED;
         }
         return planning::CATEGORY_OBSERVER_LATE;
     }

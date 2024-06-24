@@ -255,10 +255,10 @@ class certifications {
      * Get the list of certifications for a student and add the level and comment provided by the student and the supervisor(s)
      *
      * @param int $planningid The planning id
-     * @param int $studentid The student id
+     * @param int $studentid The student id (optional)
      * @return array The certifications
      */
-    public static function get_certifications(int $planningid, int $studentid): array {
+    public static function get_certifications(int $planningid, ?int $studentid = null): array {
         $gridid = criteria::get_grid_for_planning($planningid, 'cert')->get('id');
         $criteria = criteria::get_criteria_for_grid($gridid);
 
@@ -266,34 +266,45 @@ class certifications {
 
         $returnarray = [];
         foreach ($criteria as $criterion) {
-            $certrecord = [];
-            $certrecord['label'] = $criterion->get('label');
-            $certrecord['grade'] = $criterion->get('grade');
-            $certrecord['criterionid'] = $criterion->get('id');
-            $certrecord['status'] = 0; // Status is set to 0 by default, and it is not a real status as such but
-            // it is used to determine if the certification is declared or not.
-            $certrecord['declid'] = 0;
-            $certrecord['seendone'] = false;
-            $certrecord['notseen'] = false;
-            $certrecord['isdeclared'] = false; // This is the flag to determine if the certification is declared or not.
-            $certrecord['observernotseen'] = false;
-            $certrecord['confirmed'] = false;
-            $certrecord['levelnotreached'] = false;
-            $certrecord['timemodified'] = 0;
-
-            $certdecl = cert_decl::get_record([
-                'studentid' => $studentid,
+            $certfilter = [
                 'planningid' => $planningid,
                 'criterionid' => $criterion->get('id'),
-            ]);
-            if ($certdecl) {
-                $certrecord = array_merge($certrecord, self::get_certification($certdecl->get('id'), true));
+            ];
+            if (!empty($studentid)) {
+                $certfilter['studentid'] = $studentid;
             }
-            $returnarray[] = $certrecord;
+            $certdecls = cert_decl::get_records($certfilter);
+            if ($certdecls) {
+                foreach ($certdecls as $certdecl) {
+                    $certrecord = self::get_empty_cert_from_criterion($criterion);
+                    $certrecord = array_merge($certrecord, self::get_certification($certdecl->get('id'), true));
+                    $returnarray[] = $certrecord;
+                }
+            } else {
+                $certrecord = self::get_empty_cert_from_criterion($criterion);
+                $returnarray[] = $certrecord;
+            }
         }
         return $returnarray;
     }
 
+    private static function get_empty_cert_from_criterion(criterion $criterion): array {
+        $certrecord = [];
+        $certrecord['label'] = $criterion->get('label');
+        $certrecord['grade'] = $criterion->get('grade');
+        $certrecord['criterionid'] = $criterion->get('id');
+        $certrecord['status'] = 0; // Status is set to 0 by default, and it is not a real status as such but
+        // it is used to determine if the certification is declared or not.
+        $certrecord['declid'] = 0;
+        $certrecord['seendone'] = false;
+        $certrecord['notseen'] = false;
+        $certrecord['isdeclared'] = false; // This is the flag to determine if the certification is declared or not.
+        $certrecord['observernotseen'] = false;
+        $certrecord['confirmed'] = false;
+        $certrecord['levelnotreached'] = false;
+        $certrecord['timemodified'] = 0;
+        return $certrecord;
+    }
     /**
      * Get a single certification
      *
