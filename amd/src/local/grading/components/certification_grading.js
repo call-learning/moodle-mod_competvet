@@ -35,6 +35,9 @@ const CERTIFICATION_GRADE = 2;
 const stateTemplate = () => {
     const templateName = 'certification-grading';
     const region = gradingApp.querySelector(`[data-region="${templateName}"]`);
+    if (!region) {
+        return;
+    }
     const template = `mod_competvet/grading/components/${templateName}`;
     const regionRenderer = (context) => {
         if (context[templateName] === undefined) {
@@ -79,6 +82,9 @@ const formCalculation = () => {
 // Listen to the form events and save the form data.
 const formEvents = () => {
     const form = document.querySelector('[data-region="certification-grading"]');
+    if (!form) {
+        return;
+    }
     if (form.dataset.events) {
         return;
     }

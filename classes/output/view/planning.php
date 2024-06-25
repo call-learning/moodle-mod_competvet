@@ -119,10 +119,18 @@ class planning extends base {
             $userswithinfo = plannings_api::get_users_infos_for_planning_id($planningid);
             $context = $PAGE->context;
             $competvet = competvet::get_from_context($context);
+            $situation = $competvet->get_situation();
+            $pagetype = 'student_evaluations';
+            if (!$situation->get('haseval')) {
+                $pagetype = 'student_certifications';
+            }
+            if (!$situation->get('hascertif') && !$situation->get('haseval')) {
+                $pagetype = 'student_list';
+            }
             $viewstudenturl =
                 new moodle_url(
                     $this->baseurl,
-                    ['pagetype' => 'student_evaluations', 'id' => $competvet->get_course_module_id(), 'planningid' => $planningid]
+                    ['pagetype' => $pagetype, 'id' => $competvet->get_course_module_id(), 'planningid' => $planningid]
                 );
             $planning = plannings_entity::get_record(['id' => $planningid]);
             $currentgroupname = groups_get_group_name($planning->get('groupid'));

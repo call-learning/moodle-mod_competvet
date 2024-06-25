@@ -203,6 +203,20 @@
     color: #666;
 }
 
+.gradingapp .showmoreless {
+    position: absolute;
+    right: 12px;
+    bottom: 0;
+    transform: translate(0, 50%);
+}
+
+.gradingapp .showmore,
+.gradingapp .showless {
+    background-color: #f5f5f5;
+    padding: 0.2rem;
+    border-radius: 0.2rem;
+}
+
 .gradingapp .form-control:focus {
     box-shadow: none;
 }

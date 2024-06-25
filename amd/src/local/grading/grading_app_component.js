@@ -22,7 +22,6 @@
  */
 import Repository from '../new-repository';
 import CompetState from '../competstate';
-import '../helpers';
 import './components/user_navigation';
 import './components/evaluations_grading';
 import './components/list_grading';
@@ -191,6 +190,7 @@ class Competvet {
         if (!response.result) {
             return;
         }
+        response.result.hideaccept = true;
         CompetState.setValue('globalgrade', response.result);
     }
 
@@ -218,6 +218,7 @@ class Competvet {
         const response = await Repository.getSuggestedGrade(suggestedArgs);
         globalGrade.suggestedgrade = response.suggestedgrade;
         globalGrade.gradecalculation = response.gradecalculation;
+        globalGrade.hideaccept = response.suggestedgrade == 0 || response.suggestedgrade == globalGrade.finalgrade;
         CompetState.setValue('globalgrade', globalGrade);
     }
 
@@ -275,13 +276,18 @@ class Competvet {
         let totalEvalScore = 0;
         let totalGrades = 0;
         let numberofobservations = 0;
+        let numberofselfevaluations = 0;
         if (evalResults.evaluations.length > 0) {
             evalResults.evaluations[0].grades.forEach(grade => {
                 if (grade.graderinfo.id == this.currentUser.id) {
+                    numberofselfevaluations++;
                     return;
                 }
                 numberofobservations++;
             });
+        }
+        if (numberofselfevaluations > 0) {
+            evalGrading.grading.selfevalselectoptions[1].selected = true;
         }
         evalGrading.grading.numberofobservations = numberofobservations;
         evalGrading.grading.haspenalty = evalGrading.grading.evalnum > numberofobservations;

@@ -13,6 +13,6 @@
         { "key": 10, "value": "+10 (réalisée et pertinente)" },
         { "key": 20, "value": "+20 (réalisée et très pertinente)" }
     ],
-    "scoreevaluator": 60,
+    "scoreevaluator": 0,
     "comment": ""
 }

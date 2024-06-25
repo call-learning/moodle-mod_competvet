@@ -57,6 +57,10 @@ class student_tabs {
         $planninginfo = plannings::get_planning_info_for_student($planningid, $studentid);
         $situationid = $planninginfo['situationid'];
         $competvet = competvet::get_from_situation_id($situationid);
+        $situation = $competvet->get_situation();
+        $haseval = $situation->get('haseval');
+        $hascertif = $situation->get('hascertif');
+        $haslist = $situation->get('hascase');
         $urlparams = [
             'id' => $competvet->get_course_module_id(),
             'planningid' => $planningid,
@@ -78,6 +82,15 @@ class student_tabs {
         ];
 
         foreach ($tabs as $tab => $url) {
+            if ($tab == 'eval' && !$haseval) {
+                continue;
+            }
+            if ($tab == 'cert' && !$hascertif) {
+                continue;
+            }
+            if ($tab == 'list' && !$haslist) {
+                continue;
+            }
             $stringcontext = (object) [
                 'done' => 0,
                 'required' => 0,

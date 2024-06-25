@@ -345,16 +345,15 @@ $string['valid:levelnotreached'] = 'I do not validate because the level is not r
 $string['valid:observernotseen'] = 'The observer did not see this essential';
 
 // Suggested grade
+$string['acceptgrade'] = 'Accept the suggested grade';
 $string['gradeK1'] = 'Grade calculation constant K1';
 $string['gradeK1_help'] = 'The weight of the evaluation grade, default is 5';
 $string['gradeK2'] = 'Grade calculation constant K2';
 $string['gradeK2_help'] = 'The weight of the list grade, default is 2';
-$string['gradecalculation'] = 'Le score suggéré ({$a->suggestedgrade}/100) est calculé de la manière suivante:<br>' .
-'Moyenne du score du module Compétences affecté du coefficient K1 ({$a->k1}) et du score du module Cas affecté du coefficient K2 ({$a->k2}).' .
-'Le module Incontournables doit nécessairement être validé. Une non-validation conduit à un score égal à 0 quelque soit ' .
-'les scores des deux autres modules. <br><br>' .
-'La note suggérée peut être modulée à la discrétion de l\'évaluateur. Vous pouvez donc choisir de conserver le score suggéré en le ' .
-'saisissant dans la case score final ou modifier ce score selon votre souhait. <br>' .
-'Un commentaire général de l\'évaluateur est très fortement souhaitable pour des encouragements ou des remarques spécifiques. ' .
-' Le score ({$a->suggestedgrade}/100) soumis est ensuite converti en lettres entre F et A. Un score inférieur à 40% conduit à un échec F. ' .
-' Un score entre 40% et 50% à une note d\'incertitude "FX". Cette conversion est réalisée dans le carnet de notes.';
+$string['notenoughgrades'] = 'Not enough data to calculate the suggested grade';
+$string['calc:eval:certif:list'] = 'Le score suggéré est la moyenne des scores `Eval` et `List` affectés de leur coefficient. Le module `Incontournables` doit nécessairement être validé pour que cette moyenne soit calculée';
+$string['calc:certif:list'] = 'Le score suggéré est égal au score du module `List`. Le module `Incontournables` doit nécessairement être validé pour que ce score ne soit pas 0.';
+$string['calc:eval:list'] = 'Le score suggéré est la moyenne des scores `Eval` et `List` affectés de leur coefficient.';
+$string['calc:eval:certif'] = 'Le score suggéré est égal au score du module `Eval`. Le module `Incontournables` doit nécessairement être validé pour que ce score ne soit pas 0.';
+$string['calc:eval'] = 'Le score suggéré est égal au score du module `Eval`. ';
+$string['calc:list'] = 'Le score suggéré est égal au score du module `List`. ';

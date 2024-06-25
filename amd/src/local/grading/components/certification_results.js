@@ -24,6 +24,7 @@
 import CompetState from '../../competstate';
 import Notification from 'core/notification';
 import Templates from 'core/templates';
+import {activateShowMoreLess} from '../../helpers';
 
 const gradingApp = document.querySelector('[data-region="grading-app"]');
 
@@ -33,6 +34,9 @@ const gradingApp = document.querySelector('[data-region="grading-app"]');
 const stateTemplate = () => {
     const templateName = 'certification-results';
     const region = gradingApp.querySelector(`[data-region="${templateName}"]`);
+    if (!region) {
+        return;
+    }
     const template = `mod_competvet/grading/components/${templateName}`;
     const regionRenderer = (context) => {
         if (context[templateName] === undefined) {
@@ -40,6 +44,7 @@ const stateTemplate = () => {
         }
         Templates.render(template, context).then((html) => {
             region.innerHTML = html;
+            activateShowMoreLess();
             return;
         }).catch(Notification.exception);
     };

@@ -31,9 +31,15 @@ const stateWatcher = () => {
     const gradeTabCertif = gradingApp.querySelector('[data-region="grade-tab-certif"]');
     const gradeTabList = gradingApp.querySelector('[data-region="grade-tab-list"]');
     const regionRenderer = (context) => {
-        gradeTabEval.innerHTML = '';
-        gradeTabCertif.innerHTML = '';
-        gradeTabList.innerHTML = '';
+        if (gradeTabEval) {
+            gradeTabEval.innerHTML = '';
+        }
+        if (gradeTabCertif) {
+            gradeTabCertif.innerHTML = '';
+        }
+        if (gradeTabList) {
+            gradeTabList.innerHTML = '';
+        }
         if (context[stateVar] === undefined) {
             return;
         }
@@ -41,13 +47,13 @@ const stateWatcher = () => {
         if (subgrades.length === 0) {
             return;
         }
-        if (subgrades.EVALUATION_GRADE || subgrades.EVALUATION_GRADE === 0) {
+        if (gradeTabEval && (subgrades.EVALUATION_GRADE || subgrades.EVALUATION_GRADE === 0)) {
             gradeTabEval.innerHTML = subgrades.EVALUATION_GRADE;
         }
-        if (subgrades.CERTIFICATION_GRADE || subgrades.CERTIFICATION_GRADE === 0) {
+        if (gradeTabCertif && (subgrades.CERTIFICATION_GRADE || subgrades.CERTIFICATION_GRADE === 0)) {
             gradeTabCertif.innerHTML = subgrades.CERTIFICATION_GRADE;
         }
-        if (subgrades.LIST_GRADE || subgrades.LIST_GRADE === 0) {
+        if (gradeTabList && (subgrades.LIST_GRADE || subgrades.LIST_GRADE === 0)) {
             gradeTabList.innerHTML = subgrades.LIST_GRADE;
         }
         return;
