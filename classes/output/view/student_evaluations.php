@@ -151,6 +151,21 @@ class student_evaluations extends base {
     }
 
     /**
+     * Is the evaluation enabled?
+     *
+     * @return void
+     */
+    public function check_access(): void {
+        global $PAGE;
+        $context = $PAGE->context;
+        $competvet = competvet::get_from_context($context);
+        $situation = $competvet->get_situation();
+        if (!$situation->get('haseval')) {
+            throw new \moodle_exception('situation:haseval', 'mod_competvet');
+        }
+    }
+
+    /**
      * Adds the grade button to the page.
      * @param object $context The context object.
      * @return single_button|null

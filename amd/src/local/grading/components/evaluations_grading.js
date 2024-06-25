@@ -35,6 +35,9 @@ const EVALUATION_GRADE = 1;
 const stateTemplate = () => {
     const templateName = 'evaluations-grading';
     const region = gradingApp.querySelector(`[data-region="${templateName}"]`);
+    if (!region) {
+        return;
+    }
     const template = `mod_competvet/grading/components/${templateName}`;
     const regionRenderer = (context) => {
         if (context[templateName] === undefined) {
@@ -70,6 +73,10 @@ const formCalculation = () => {
     grading.finalscore = grading.evalscore + (grading.penalty * penalty) + Number(grading.selfevaluation);
     grading.scoreevaluator = Number(formObject.scoreevaluator);
     grading.comment = formObject.comment;
+    grading.hideaccept = true;
+    if (grading.scoreevaluator !== grading.finalscore) {
+        grading.hideaccept = false;
+    }
     const context = {
         'grading': grading
     };
@@ -78,9 +85,18 @@ const formCalculation = () => {
 
 const formEvents = () => {
     const form = document.querySelector('[data-region="evaluations-grading"]');
+    const acceptGradeButton = form.querySelector('[data-action="acceptgrade"]');
+    if (acceptGradeButton) {
+        acceptGradeButton.addEventListener('click', async(e) => {
+            e.preventDefault();
+            form.querySelector(acceptGradeButton.dataset.target).value =
+                form.querySelector(acceptGradeButton.dataset.source).innerHTML;
+        });
+    }
     if (form.dataset.events) {
         return;
     }
+
     form.addEventListener('change', async(e) => {
         e.preventDefault();
         const context = formCalculation();

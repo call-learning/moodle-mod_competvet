@@ -29,6 +29,9 @@ import {get_string as getString} from 'core/str';
 const activateShowMoreLess = () => {
     const comments = gradingApp.querySelectorAll('[data-region="commenttext"]');
     comments.forEach((comment) => {
+        if (comment.dataset.hasListener) {
+            return;
+        }
         const showMore = comment.querySelector('[data-action="showmore"]');
         const showLess = comment.querySelector('[data-action="showless"]');
         const shortText = comment.querySelector('[data-region="shorttext"]');
@@ -50,6 +53,7 @@ const activateShowMoreLess = () => {
             showMore.classList.remove('d-none');
             showLess.classList.add('d-none');
         });
+        showMore.dataset.hasListener = true;
     });
 };
 
@@ -72,4 +76,6 @@ const submitLoading = () => {
 
 submitLoading();
 activateShowMoreLess();
+
+export {activateShowMoreLess, submitLoading};
 

@@ -33,6 +33,9 @@ const gradingApp = document.querySelector('[data-region="grading-app"]');
 const stateTemplate = () => {
     const templateName = 'list-results';
     const region = gradingApp.querySelector(`[data-region="${templateName}"]`);
+    if (!region) {
+        return;
+    }
     const template = `mod_competvet/grading/components/${templateName}`;
     const regionRenderer = (context) => {
         if (context[templateName] === undefined) {

@@ -98,32 +98,52 @@ class grades {
         $certificationgrade = self::get_grades($studentid, $planningid, grade::CERTIFICATION_GRADE);
         $listgrade = self::get_grades($studentid, $planningid, grade::LIST_GRADE);
 
-        if (empty($evaluationgrade) || empty($certificationgrade) || empty($listgrade)) {
+        $planning = planning::get_record(['id' => $planningid]);
+        $situation = $planning->get_situation();
+        $haseval = $situation->get('haseval');
+        $hascertif = $situation->get('hascertif');
+        $haslist = $situation->get('hascase');
+
+        if ((empty($evaluationgrade) && $haseval) || (empty($certificationgrade) && $hascertif) ||
+            (empty($listgrade) && $haslist)) {
             return [
                 'suggestedgrade' => 0,
-                'gradecalculation' => 'Not enough data to calculate the suggested grade',
+                'gradecalculation' => get_string('notenoughgrades', 'mod_competvet'),
             ];
         }
 
+        // Get the string used based on if $eval, $certif and $list are true or false.
+        $string = 'calc:';
+        $string .= $haseval ? 'eval:' : '';
+        $string .= $hascertif ? 'certif:' : '';
+        $string .= $haslist ? 'list' : '';
+        // Remove the last colon if it is there.
+        $stringkey = rtrim($string, ':');
+
         $eval = $evaluationgrade->get('grade');
         $cert = $certificationgrade->get('grade');
-        $list = $listgrade->get('grade');
+        $list = $haslist ? $listgrade->get('grade') : 1;
 
-        $k1 = intval(get_config('mod_competvet', 'gradeK1'));
-        $k2 = intval(get_config('mod_competvet', 'gradeK2'));
+        $k1 = $haseval ? intval(get_config('mod_competvet', 'gradeK1')) : 0;
+        $k2 = $haslist ? intval(get_config('mod_competvet', 'gradeK2')) : 0;
+        if ($k1 == 0 && $k2 == 0) {
+            return [
+                'suggestedgrade' => 0,
+                'gradecalculation' => get_string('notenoughgrades', 'mod_competvet'),
+            ];
+        }
 
         // Hardcoded grade calculation for now.
         $suggestedgrade = ( (($k1 * $eval) + ($k2 * $list)) * $cert ) / ($k1 + $k2);
 
-        $gradecalculation = get_string('gradecalculation', 'mod_competvet', (object)[
+        $gradecalculation = get_string($stringkey, 'mod_competvet', (object)[
             'k1' => $k1,
             'k2' => $k2,
             'eval' => $eval,
             'cert' => $cert,
             'list' => $list,
-            'suggestedgrade' => $suggestedgrade,
+            'suggestedgrade' => round($suggestedgrade, 0),
         ]);
-
 
         // Return an object with the suggested grade and the gradecalculation.
         return [

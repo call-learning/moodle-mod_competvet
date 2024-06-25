@@ -32,23 +32,28 @@
                     {{#str}}suggestedgrade, mod_competvet{{/str}} :
                 </label>
                 <div class="d-flex align-items-center w-100">
-                    <div class="font-weight-bold">{{suggestedgrade}}</div>
+                    <div id="suggestedgrade" class="font-weight-bold">{{suggestedgrade}}</div>
                     <button type="button" class="btn btn-icon border-info icon-no-margin ml-5" data-toggle="popover" data-placement="bottom" data-html="true" data-content="{{{gradecalculation}}}">
                         {{#pix}}i/info{{/pix}}
                     </button>
                 </div>
+                <a
+                    type="button"
+                    class="small mt-2 {{#hideaccept}}d-none{{/hideaccept}}"
+                    data-action="acceptgrade"
+                    data-source="#suggestedgrade"
+                    data-target="#moodlegrade"
+                >
+                    {{#str}}acceptgrade, mod_competvet{{/str}}
+                </a>
             </div>
             <div class="form-group">
                 <label for="finalgrade">
                     {{#str}}finalgrade, mod_competvet{{/str}} :
                 </label>
                 <div>
-                    <select class="custom-select d-none ml-auto" id="finalgradeold" name="finalgradeold" data-field="finalgradeold">
-                        {{#finalgradeoptions}}
-                            <option value="{{key}}" {{#selected}}selected{{/selected}}>{{value}}</option>
-                        {{/finalgradeoptions}}
-                    </select>
                     <input
+                        id="moodlegrade"
                         type="number"
                         class="form-control w-auto{{!
                         }}{{#gradesuccess}} is-valid{{/gradesuccess}}{{!

@@ -101,6 +101,21 @@ class student_certifications extends base {
     }
 
     /**
+     * Is the certif enabled?
+     *
+     * @return void
+     */
+    public function check_access(): void {
+        global $PAGE;
+        $context = $PAGE->context;
+        $competvet = competvet::get_from_context($context);
+        $situation = $competvet->get_situation();
+        if (!$situation->get('hascertif')) {
+            throw new \moodle_exception('situation:hascertif', 'mod_competvet');
+        }
+    }
+
+    /**
      * Adds the grade button to the page.
      * @param object $context The context object.
      * @return single_button|null

@@ -31,6 +31,9 @@ const gradingApp = document.querySelector('[data-region="grading-app"]');
 const stateTemplate = () => {
     const templateName = 'globalgrade';
     const region = gradingApp.querySelector(`[data-region="${templateName}"]`);
+    if (!region) {
+        return;
+    }
     const template = `mod_competvet/grading/components/${templateName}`;
     const regionRenderer = (context) => {
         if (context[templateName] === undefined) {
@@ -52,12 +55,24 @@ const formCalculation = () => {
     const {globalgrade, user} = CompetState.getData();
     globalgrade.userid = user.id;
     globalgrade.finalgrade = formObject.finalgrade;
+    globalgrade.hideaccept = true;
+    if (globalgrade.scoreevaluator !== globalgrade.finalgrade) {
+        globalgrade.hideaccept = false;
+    }
     globalgrade.comment = formObject.comment;
     return globalgrade;
 };
 
 const formEvents = () => {
     const form = document.querySelector('[data-region="globalgrade"]');
+    const acceptGradeButton = form.querySelector('[data-action="acceptgrade"]');
+    if (acceptGradeButton) {
+        acceptGradeButton.addEventListener('click', async(e) => {
+            e.preventDefault();
+            form.querySelector(acceptGradeButton.dataset.target).value =
+                form.querySelector(acceptGradeButton.dataset.source).innerHTML;
+        });
+    }
     if (form.dataset.events) {
         return;
     }

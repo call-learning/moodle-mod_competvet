@@ -170,6 +170,9 @@ class get_evaluations extends external_api {
                     }
                 }
             }
+            if (empty($grades)) {
+                continue;
+            }
             $gradedcriteria[] = [
                 'criterion' => $criterion,
                 'grades' => array_values($grades),
