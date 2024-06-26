@@ -169,18 +169,18 @@ class certifications {
      */
     public static function validate_cert_declaration($declid, $supervisorid, $status, $comment, $commentformat): ?int {
         try {
-            $cert = new cert_valid();
-            $cert->set('declid', $declid);
-            $cert->set('supervisorid', $supervisorid);
-            $cert->set('status', $status);
-            $cert->set('comment', $comment);
-            $cert->set('commentformat', $commentformat);
-            $cert->create();
+            $valid = new cert_valid();
+            $valid->set('declid', $declid);
+            $valid->set('supervisorid', $supervisorid);
+            $valid->set('status', $status);
+            $valid->set('comment', $comment);
+            $valid->set('commentformat', $commentformat);
+            $valid->create();
         } catch (invalid_persistent_exception $e) {
             debugging($e->getMessage());
             return null;
         }
-        return $cert->get('id');
+        return $valid->get('id');
     }
 
     /**
@@ -193,16 +193,16 @@ class certifications {
      */
     public static function update_validation($validid, $status, $comment, $commentformat) {
         try {
-            $cert = new cert_valid($validid);
-            $cert->set('status', $status);
-            $cert->set('comment', $comment);
-            $cert->set('commentformat', $commentformat);
-            $cert->save();
+            $valid = new cert_valid($validid);
+            $valid->set('status', $status);
+            $valid->set('comment', $comment);
+            $valid->set('commentformat', $commentformat);
+            $valid->save();
         } catch (invalid_persistent_exception $e) {
             debugging($e->getMessage());
             return null;
         }
-        return $cert->get('id');
+        return $valid->get('id');
     }
 
     /**
@@ -339,9 +339,11 @@ class certifications {
 
         if ($withfeedback) {
             $certrecord['feedback'] = [
+                'userid' => $student['id'],
                 'picture' => $student['userpictureurl'],
                 'fullname' => $student['fullname'],
                 'comment' => format_text($cert->get('comment'), $cert->get('commentformat')),
+                'timestamp' => $cert->get('timemodified'),
             ];
         }
         $certrecord['validations'] = [];
@@ -359,9 +361,11 @@ class certifications {
             $supervisor = $validrecord['supervisor'];
             if ($withfeedback) {
                 $validrecord['feedback'] = [
+                    'userid' => $supervisor['id'],
                     'picture' => $supervisor['userpictureurl'],
                     'fullname' => $supervisor['fullname'],
                     'comment' => format_text($valid->get('comment'), $valid->get('commentformat')),
+                    'timestamp' => $valid->get('timemodified'),
                 ];
             }
             $validrecord['comment'] = $valid->get('comment');
