@@ -71,7 +71,7 @@ class behat_mod_competvet_generator extends behat_generator_base {
             'certifications' => [
                 'singular' => 'certification',
                 'datagenerator' => 'certification',
-                'required' => ['student', 'planning', 'criterion', 'comment'],
+                'required' => ['student', 'planning', 'criterion', 'level', 'comment'],
                 'switchids' => [
                     'student' => 'studentid',
                     'planning' => 'planningid',
@@ -83,6 +83,15 @@ class behat_mod_competvet_generator extends behat_generator_base {
                 'datagenerator' => 'planning',
                 'required' => ['situation', 'startdate', 'enddate'],
                 'switchids' => ['situation' => 'situationid', 'group' => 'groupid'],
+            ],
+            'cases' => [
+                'singular' => 'case',
+                'datagenerator' => 'case',
+                'required' => ['student', 'planning'],
+                'switchids' => [
+                    'student' => 'studentid',
+                    'planning' => 'planningid',
+                ],
             ],
         ];
     }
@@ -221,6 +230,46 @@ class behat_mod_competvet_generator extends behat_generator_base {
                     'comment' => $data[$typestring],
                 ];
                 unset($data[$typestring]);
+            }
+        }
+        return $data;
+    }
+
+    protected function preprocess_certification(array $data): array {
+        if (isset($data['validations'])) {
+            $validations = json_decode('[' . $data['validations'] . ']', false);
+            $data['validations'] = !empty($validations) ? $validations : [];
+        }
+        if (isset($data['supervisors'])) {
+            $supervisors = explode(',', $data['supervisors']);
+            $data['supervisors'] = [];
+            if ($supervisors) {
+                foreach ($supervisors as $supervisor) {
+                    $data['supervisors'][] = $this->get_user_id(trim($supervisor));
+                }
+            }
+            $data['comments'] = !empty($comments) ? $comments : [];
+        }
+        return $data;
+    }
+
+    protected function preprocess_case(array $data): array {
+        if (isset($data['fields'])) {
+            $fields = json_decode('{' . $data['fields'] . '}', false);
+            $data['fields'] = [];
+            if (!empty($fields)) {
+                $fieldsid = [];
+                foreach ($fields as $key => $value) {
+                    if (!isset($fieldsid[$key])) {
+                        $fieldrecord = \mod_competvet\local\persistent\case_field::get_record(['idnumber' => $key]);
+                        if ($fieldrecord) {
+                            $fieldsid[$key] = $fieldrecord->get('id');
+                        }
+                    }
+                    if (isset($fieldsid[$key])) {
+                        $data[$fieldsid[$key]][$fieldsid[$key]] = $value;
+                    }
+                }
             }
         }
         return $data;

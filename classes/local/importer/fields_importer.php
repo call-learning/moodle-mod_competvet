@@ -47,12 +47,12 @@ class fields_importer extends base_persistent_importer {
         $categoryName = $row[0];
         if (!isset($this->categoryCache[$categoryName])) {
             $category = case_cat::get_record(['name' => $categoryName]);
-            $sortorder = 0;
+            $sortorder = case_cat::count_records() + 1;
             if (!$category) {
                 $category = new case_cat(null, (object) [
                     'name' => $categoryName,
-                    'idnumber' => $sortorder,
-                    'sortorder' => $sortorder++,
+                    'idnumber' => 'c'.$sortorder,
+                    'sortorder' => $sortorder,
                     'description' => ""
                 ]);
                 $category->save();

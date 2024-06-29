@@ -133,14 +133,17 @@ class certifications {
      *
      * @param int $declid The declaration id
      * @param int $supervisorid The supervisor id
-     * @return bool success
+     * @return ?cert_decl_asso
      */
-    public static function declaration_supervisor_invite($declid, $supervisorid) {
-        $cert = new cert_decl_asso();
-        $cert->set('declid', $declid);
-        $cert->set('supervisorid', $supervisorid);
-        if ($cert->save()) {
-            return true;
+    public static function declaration_supervisor_invite($declid, $supervisorid): ?cert_decl_asso {
+        try {
+            $cert = new cert_decl_asso();
+            $cert->set('declid', $declid);
+            $cert->set('supervisorid', $supervisorid);
+            return $cert->create();
+        } catch (invalid_persistent_exception $e) {
+            debugging($e->getMessage());
+            return null;
         }
     }
 
@@ -261,8 +264,6 @@ class certifications {
     public static function get_certifications(int $planningid, ?int $studentid = null): array {
         $gridid = criteria::get_grid_for_planning($planningid, 'cert')->get('id');
         $criteria = criteria::get_criteria_for_grid($gridid);
-
-        $student = utils::get_user_info($studentid);
 
         $returnarray = [];
         foreach ($criteria as $criterion) {

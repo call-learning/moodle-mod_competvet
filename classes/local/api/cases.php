@@ -108,8 +108,8 @@ class cases {
                     'type' => $field->type,
                     'configdata' => $field->configdata,
                     'description' => $field->description,
-                    'value' => $fielddata ? $fielddata->get('value') : '',
-                    'displayvalue' => $fielddata ? $fielddata->get_displayvalue($field) : '',
+                    'value' => $fielddata ? $fielddata->get_value() : '',
+                    'displayvalue' => $fielddata ? $fielddata->get_display_value() : '',
                 ];
             }
             $case[] = (object) [
@@ -143,6 +143,7 @@ class cases {
         $case = new case_entry();
         $case->set('planningid', $planningid);
         $case->set('studentid', $studentid);
+        $case->create();
         $case->save();
 
         // Create the case data.
@@ -150,12 +151,8 @@ class cases {
             $data = new case_data();
             $data->set('fieldid', $fieldid);
             $data->set('entryid', $case->get('id'));
-            $data->set('intvalue', 0);
-            $data->set('decvalue', 0);
-            $data->set('shortcharvalue', '');
-            $data->set('charvalue', '');
-            $data->set('value', $value);
-            $data->set('valueformat', 0);
+            $data->set_value($value);
+            $data->create();
             $data->save();
         }
         return $case->get('id');
@@ -170,22 +167,18 @@ class cases {
      */
     public static function update_case(int $entryid, array $fields): void {
         // Update the case.
-        $case = new case_entry($entryid);
         foreach ($fields as $fieldid => $value) {
-            $data = case_data::get_records(['entryid' => $entryid, 'fieldid' => $fieldid]);
-            if (count($data) > 0) {
-                $data[0]->set('value', $value);
-                $data[0]->save();
-            } else {
+            $records = case_data::get_records(['entryid' => $entryid, 'fieldid' => $fieldid]);
+            if (empty($records)) {
                 $data = new case_data();
                 $data->set('fieldid', $fieldid);
                 $data->set('entryid', $entryid);
-                $data->set('intvalue', 0);
-                $data->set('decvalue', 0);
-                $data->set('shortcharvalue', '');
-                $data->set('charvalue', '');
-                $data->set('value', $value);
-                $data->set('valueformat', 0);
+                $data->set_value($value);
+                $data->save();
+                continue;
+            }
+            foreach($records as $data) {
+                $data->set_value($value);
                 $data->save();
             }
         }

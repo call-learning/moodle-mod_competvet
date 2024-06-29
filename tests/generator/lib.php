@@ -14,7 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+use mod_competvet\local\api\cases;
 use mod_competvet\local\api\certifications;
+use mod_competvet\local\persistent\case_entry;
+use mod_competvet\local\persistent\case_field;
 use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\cert_decl_asso;
 use mod_competvet\local\persistent\cert_valid;
@@ -174,9 +177,9 @@ class mod_competvet_generator extends testing_module_generator {
             throw new moodle_exception('studentnotingroup', 'competvet', '', $record->studentid);
         }
         $existingobservation = observation::get_record([
-                'studentid' => $record->studentid,
-                'observerid' => $record->observerid,
-                'planningid' => $record->planningid,
+            'studentid' => $record->studentid,
+            'observerid' => $record->observerid,
+            'planningid' => $record->planningid,
         ]);
 
         if ($existingobservation) {
@@ -208,8 +211,8 @@ class mod_competvet_generator extends testing_module_generator {
                 'type' => $commenttype,
             ];
             $existingcomments = observation_comment::get_records([
-                    'observationid' => $observation->id,
-                    'type' => $commenttype,
+                'observationid' => $observation->id,
+                'type' => $commenttype,
             ]);
             $existingcomment = false;
             if ($existingcomments) {
@@ -433,57 +436,105 @@ class mod_competvet_generator extends testing_module_generator {
                 throw new moodle_exception('cert:invalidstatus', 'competvet', '', $record->status);
             }
         }
-        $decls = $record->decls ?? null;
-        unset($record->decls);
+        if (!empty($record->criterion)) {
+            $criterion = criterion::get_record(['idnumber' => $record->criterion]);
+            if (!$criterion) {
+                throw new moodle_exception('criterionnotfound', 'competvet', '', $record->criterion);
+            }
+            $record->criterionid = $criterion->get('id');
+            unset($record->criterion);
+        }
+        if (!empty($record->student)) {
+            $student = core_user::get_user_by_username($record->student);
+            if (!$student) {
+                throw new moodle_exception('usernotfound', 'core', '', $record->student);
+            }
+            $record->studentid = $student->id;
+            unset($record->student);
+        }
+        $validations = $record->validations ?? null;
+        unset($record->validations);
         $record->commentformat = $record->commentformat ?? FORMAT_PLAIN;
         $certification = $this->create_from_entity_name(cert_decl::class, $record);
-        if (!empty($decls)) {
-            foreach ($decls as $decl) {
-                $decl = (object) (array) $decl;
-                $decl->certificationid = $certification->id;
-                if (isset($decl->supervisor)) {
+        if (!empty($validations)) {
+            foreach ($validations as $validation) {
+                $validation = (object) (array) $validation;
+                $validation->certificationid = $certification->id;
+                if (isset($validation->supervisor)) {
                     // In this case get the supervisorid.
-                    $decl->supervisorid = core_user::get_user_by_username($decl->supervisor);
-                    unset($decl->supervisor);
+                    $supervisor = core_user::get_user_by_username($validation->supervisor);
+                    if (!$supervisor) {
+                        throw new moodle_exception('usernotfound', 'core', '', $validation->supervisor);
+                    }
+                    $validation->declid = $certification->id;
+                    $validation->supervisorid = $supervisor->id;
+                    unset($validation->supervisor);
                 }
-                $this->create_certification_validation($decl);
+                $this->create_certification_validation($validation);
+            }
+        }
+        if ($record->supervisors) {
+            foreach ($record->supervisors as $supervisorid) {
+                if (is_string($supervisorid)) {
+                    $supervisor = core_user::get_user_by_username($supervisorid);
+                    if (!$supervisor) {
+                        $supervisor = core_user::get_user($supervisorid);
+                        if (!$supervisor) {
+                            throw new moodle_exception('usernotfound', 'core', '', $supervisorid);
+                        }
+                    }
+                    $supervisorid = $supervisor->id;
+                }
+                $certasso = new cert_decl_asso(0, (object) ['declid' => $certification->id, 'supervisorid' => $supervisorid]);
+                $certasso->create();
             }
         }
         return $certification;
     }
+
     /**
-     * Create a new instance of planning.
+     * Create certification validation
+     *
+     * @param $record
+     * @return int|null
+     */
+    public function create_certification_validation($record) {
+        $record = (array) $record;
+        ['declid' => $declid, 'supervisorid' => $supervisorid, 'status' => $status, 'comment' => $comment] = $record;
+        if (is_string($status)) {
+            $status = array_search($status, cert_valid::STATUS_TYPES);
+        }
+        $valid = certifications::validate_cert_declaration($declid, $supervisorid, $status, $comment, FORMAT_PLAIN);
+        return $valid;
+    }
+
+    /**
+     * Create a new instance of certification validation.
      *
      * @param array|stdClass|null $record
      * @return stdClass
      */
-    public function create_certification_validation($record = null) {
+    public function create_case($record = null) {
         $record = (object) (array) $record;
-        $certification = cert_decl::get_record(['id' => $record->certificationid]);
-        if (is_string($record->status)) {
-            $statustoint = array_search($record->status, cert_valid::STATUS_TYPES);
-            if ($statustoint !== false) {
-                $record->status = $statustoint;
-            } else {
-                throw new moodle_exception('certvalid:invalidstatus', 'competvet', '', $record->status);
+        $fields = $record->fields ?? [];
+        if (!empty($record->student)) {
+            $student = core_user::get_user_by_username($record->student);
+            if (!$student) {
+                throw new moodle_exception('usernotfound', 'core', '', $record->student);
+            }
+            $record->studentid = $student->id;
+            unset($record->student);
+        }
+        $fields = $record->fields ?? [];
+        foreach($fields as $key => $field) {
+            if (!is_number($key)) {
+                $newkey = (case_field::get_record(['idnumber' => trim($key)]))->get('id');
+                unset($fields[$key]);
+                $fields[$newkey] = $field;
             }
         }
-        $validid = certifications::validate_cert_declaration(
-            $record->certificationid,
-            $record->supervisorid,
-            $record->status,
-            $record->comment,
-            FORMAT_PLAIN
-        );
-        $decl = cert_valid::get_record(['id' => $validid]);
-        $association = new cert_decl_asso(
-            0,
-            (object) [
-                'supervisorid' => $record->supervisorid,
-                'declid' => $record->certificationid,
-            ]
-        );
-        $association->create();
-        return $decl->to_record();
+        $caseid = cases::create_case($record->planningid, $record->studentid, $fields);
+        $case = case_entry::get_record(['id' => $caseid]);
+        return $case->to_record();
     }
 }

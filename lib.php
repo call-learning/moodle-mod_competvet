@@ -21,7 +21,13 @@
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 use mod_competvet\local\grader;
+use mod_competvet\local\persistent\case_data;
+use mod_competvet\local\persistent\case_entry;
+use mod_competvet\local\persistent\cert_decl;
+use mod_competvet\local\persistent\cert_decl_asso;
+use mod_competvet\local\persistent\cert_valid;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\observation_comment;
 use mod_competvet\local\persistent\observation_criterion_level;
@@ -147,12 +153,30 @@ function competvet_delete_instance($id) {
             }
             $observation->delete();
         }
+        $certdecl = cert_decl::get_records(['planningid' => $planning->get('id')]);
+        foreach ($certdecl as $cert) {
+            $certvalid = cert_valid::get_records(['declid' => $cert->get('id')]);
+            foreach ($certvalid as $valid) {
+                $valid->delete();
+            }
+            $certasso = cert_decl_asso::get_records(['declid' => $cert->get('id')]);
+            foreach ($certasso as $asso) {
+                $asso->delete();
+            }
+            $cert->delete();
+        }
+        $caselogs = case_entry::get_records(['planningid' => $planning->get('id')]);
+        foreach ($caselogs as $caselog) {
+            $casedata = case_data::get_records(['entryid' => $caselog->get('id')]);
+            foreach ($casedata as $data) {
+                $data->delete();
+            }
+            $caselog->delete();
+        }
         $planning->delete();
     }
     $situation->delete();
-
     $DB->delete_records('competvet', ['id' => $id]);
-    $DB->delete_records('competvet_planning', ['situationid' => $id]);
     return true;
 }
 

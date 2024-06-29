@@ -13,8 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-use mod_competvet\local\persistent\criterion;
-use mod_competvet\local\persistent\grid;
 
 /**
  * Execute local_cveteval upgrade from the given old version.
@@ -40,5 +38,48 @@ function xmldb_competvet_upgrade($oldversion) {
         // Competvet savepoint reached.
         upgrade_mod_savepoint(true, 2024060701, 'competvet');
     }
+    if ($oldversion < 2024060703) {
+
+        // Rename field idnumber on table competvet_case_cat to NEWNAMEGOESHERE.
+        $table = new xmldb_table('competvet_case_cat');
+        if ($dbman->field_exists($table, 'shortname')) {
+            $field = new xmldb_field('shortname', XMLDB_TYPE_CHAR, '254', null, XMLDB_NOTNULL, null, null, 'name');
+            $dbman->rename_field($table, $field, 'idnumber');
+        }
+        $casecats = \mod_competvet\local\persistent\case_cat::get_records([]);
+        if ($casecats) {
+            $index = 0;
+            foreach ($casecats as $casecat) {
+                $casecat->set('idnumber', 'c' . $index++);
+                $casecat->save();
+            }
+        }
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024060703, 'competvet');
+    }
+
+    if ($oldversion < 2024060705) {
+
+        // Define field value to be dropped from competvet_case_data.
+        $table = new xmldb_table('competvet_case_data');
+        $field = new xmldb_field('value');
+
+        // Conditionally launch drop field value.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $field = new xmldb_field('valueformat');
+        // Conditionally launch drop field valueformat.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024060705, 'competvet');
+    }
+
     return true;
 }
