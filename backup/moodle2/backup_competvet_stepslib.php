@@ -34,7 +34,7 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
         $situation = new backup_nested_element('situation', ['id'], [
             'competvetid', 'shortname', 'evalnum', 'autoevalnum', 'certifpnum',
             'casenum', 'haseval', 'hascertif', 'hascase', 'evalgrid',
-            'certifgrid', 'listgrid', 'usermodified', 'timecreated', 'timemodified',
+            'certifgrid', 'listgrid','category', 'usermodified', 'timecreated', 'timemodified',
         ]);
 
         $plannings = new backup_nested_element('plannings');
@@ -110,7 +110,7 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
 
         $casecats = new backup_nested_element('casecats');
         $casecat = new backup_nested_element('casecat', ['id'], [
-            'name', 'shortname', 'description', 'sortorder', 'usermodified',
+            'name', 'idnumber', 'description', 'sortorder', 'usermodified',
             'timecreated', 'timemodified',
         ]);
 
@@ -185,19 +185,19 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
         $competvet->add_child($casecats);
         $casecats->add_child($casecat);
 
-        $competvet->add_child($casefields);
+        $casecats->add_child($casefields);
         $casefields->add_child($casefield);
 
-        $competvet->add_child($caseentries);
+        $planning->add_child($caseentries);
         $caseentries->add_child($caseentry);
 
-        $competvet->add_child($casedatas);
+        $casefield->add_child($casedatas);
         $casedatas->add_child($casedata);
 
-        $competvet->add_child($formdatas);
+        $planning->add_child($formdatas);
         $formdatas->add_child($formdata);
 
-        $competvet->add_child($casefieldsmap);
+        $casefield->add_child($casefieldsmap);
         $casefieldsmap->add_child($casefieldmap);
 
         // Define sources.
@@ -221,7 +221,7 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
             $caseentry->set_source_table('competvet_case_entry', ['planningid' => backup::VAR_PARENTID]);
             $casedata->set_source_table('competvet_case_data', ['entryid' => backup::VAR_PARENTID]);
             $formdata->set_source_table('competvet_formdata', ['planningid' => backup::VAR_PARENTID]);
-            $casefieldmap->set_source_table('competvet_case_fields', ['situationid' => backup::VAR_PARENTID]);
+            $casefieldmap->set_source_table('competvet_case_fields', ['fieldid' => backup::VAR_PARENTID]);
         }
         // Define id annotations.
         $competvet->annotate_ids('user', 'usermodified');
@@ -233,32 +233,43 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
         $observation->annotate_ids('user', 'studentid');
         $obscomment->annotate_ids('user', 'usermodified');
         $obscomment->annotate_ids('user', 'usercreated');
-        $criterion->annotate_ids('criterion', 'parentid');
+        $criterion->annotate_ids('user', 'usermodified');
         $grade->annotate_ids('user', 'studentid');
         $grade->annotate_ids('user', 'usermodified');
         $grade->annotate_ids('planning', 'planningid');
+        $obscritlevel->annotate_ids('user', 'usermodified');
         $obscritlevel->annotate_ids('criterion', 'criterionid');
         $obscritlevel->annotate_ids('observation', 'observationid');
+        $obscritcom->annotate_ids('user', 'usermodified');
         $obscritcom->annotate_ids('criterion', 'criterionid');
         $obscritcom->annotate_ids('observation', 'observationid');
         $todo->annotate_ids('user', 'userid');
         $todo->annotate_ids('user', 'targetuserid');
         $todo->annotate_ids('planning', 'planningid');
+        $certdecl->annotate_ids('user', 'usermodified');
         $certdecl->annotate_ids('criterion', 'criterionid');
         $certdecl->annotate_ids('planning', 'planningid');
         $certdecl->annotate_ids('user', 'studentid');
+        $certdeclasso->annotate_ids('user', 'usermodified');
         $certdeclasso->annotate_ids('user', 'supervisorid');
+        $certvalid->annotate_ids('user', 'usermodified');
         $certvalid->annotate_ids('user', 'supervisorid');
+        $casecat->annotate_ids('user', 'usermodified');
+        $casefield->annotate_ids('user', 'usermodified');
         $casefield->annotate_ids('casecat', 'categoryid');
+        $caseentry->annotate_ids('user', 'usermodified');
         $caseentry->annotate_ids('user', 'studentid');
         $caseentry->annotate_ids('planning', 'planningid');
+        $casedata->annotate_ids('user', 'usermodified');
         $casedata->annotate_ids('casefield', 'fieldid');
         $casedata->annotate_ids('caseentry', 'entryid');
+        $formdata->annotate_ids('user', 'usermodified');
         $formdata->annotate_ids('user', 'userid');
         $formdata->annotate_ids('planning', 'planningid');
         $formdata->annotate_ids('user', 'graderid');
         $casefieldmap->annotate_ids('casefield', 'fieldid');
         $casefieldmap->annotate_ids('situation', 'situationid');
+        $grid->annotate_ids('user', 'usermodified');
         $grid->annotate_ids('situation', 'situationid');
 
         // Define file annotations

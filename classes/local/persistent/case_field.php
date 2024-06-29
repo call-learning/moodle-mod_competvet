@@ -31,6 +31,13 @@ class case_field extends persistent {
      */
     const TABLE = 'competvet_case_field';
 
+    const FIELD_TYPES = [
+        'text',
+        'date',
+        'textarea',
+        'select',
+    ];
+
     /**
      * Return the custom definition of the properties of this model.
      *
@@ -77,5 +84,49 @@ class case_field extends persistent {
                 'message' => new lang_string('invaliddata', 'competvet', 'configdata'),
             ],
         ];
+    }
+
+    /**
+     * Validate type
+     *
+     * @param $type
+     * @return bool
+     */
+    protected function validate_type($type) {
+        if (!in_array($type, self::FIELD_TYPES)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Display a given raw value as string.
+     *
+     * @param mixed $value
+     * @return string
+     */
+    public function display_value($value) {
+        $type = $this->raw_get('type');
+        if ($type === null) {
+            return '';
+        }
+        switch ($this->get('type')) {
+            case 'text':
+            case 'textarea':
+                return $value;
+            case 'date':
+                return userdate($value, get_string('strftimedate', 'core_langconfig'));
+            case 'select':
+                $configdata = json_decode(stripslashes($this->get('configdata')), true);
+                if (!empty($configdata->options)) {
+                    foreach ($configdata->options as $key => $option) {
+                        if ($key == $value) {
+                            return $option->label;
+                        }
+                    }
+                }
+                return '';
+        }
+        return '';
     }
 }

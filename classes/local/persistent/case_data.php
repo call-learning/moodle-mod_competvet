@@ -31,6 +31,20 @@ class case_data extends persistent {
      * Current table
      */
     const TABLE = 'competvet_case_data';
+    /**
+     * Internal storage for field.
+     */
+    const FIELD_TYPE_TO_INTERNAL = [
+        'text' => 'charvalue',
+        'date' => 'intvalue',
+        'textarea' => 'charvalue',
+        'select' => 'intvalue',
+    ];
+    /**
+     * @var case_field $field The field object
+     */
+
+    private $field = null;
 
     /**
      * Return the custom definition of the properties of this model.
@@ -54,63 +68,93 @@ class case_data extends persistent {
             'intvalue' => [
                 'null' => NULL_ALLOWED,
                 'type' => PARAM_INT,
+                'default' => 0,
                 'message' => new lang_string('invaliddata', 'competvet', 'intvalue'),
             ],
             'decvalue' => [
                 'null' => NULL_ALLOWED,
                 'type' => PARAM_FLOAT,
+                'default' => 0.0,
                 'message' => new lang_string('invaliddata', 'competvet', 'decvalue'),
             ],
             'shortcharvalue' => [
                 'null' => NULL_ALLOWED,
                 'type' => PARAM_TEXT,
+                'default' => '',
                 'message' => new lang_string('invaliddata', 'competvet', 'shortcharvalue'),
             ],
             'charvalue' => [
                 'null' => NULL_ALLOWED,
                 'type' => PARAM_TEXT,
+                'default' => '',
                 'message' => new lang_string('invaliddata', 'competvet', 'charvalue'),
-            ],
-            'value' => [
-                'null' => NULL_NOT_ALLOWED,
-                'type' => PARAM_TEXT,
-                'message' => new lang_string('invaliddata', 'competvet', 'value'),
-            ],
-            'valueformat' => [
-                'null' => NULL_NOT_ALLOWED,
-                'type' => PARAM_INT,
-                'message' => new lang_string('invaliddata', 'competvet', 'valueformat'),
             ],
         ];
     }
 
     /**
      * Get the display value of the data.
+     *
      * @param object $field The field object
      * @return string
      */
-    public function get_displayvalue($field) {
-        if ($field->type == 'date') {
-            return userdate($this->raw_get('value'), get_string('strftimedate', 'core_langconfig'));
-        } else if ($field->type == 'select') {
-            $json = json_decode(stripslashes($field->configdata));
-            if ($json && isset($json->options)) {
-                $options = $json->options;
-                $selected = $this->raw_get('value');
-                if (isset($options->$selected)) {
-                    return $options->$selected;
-                }
-            }
-        }
-        return $this->raw_get('value');
+    public function get_display_value() {
+        $value = $this->retrieve_value();
+        $field = $this->get_field();
+        return $field->display_value($value);
     }
 
     /**
-     * Get printable version of end time
+     * Retrieve the value from the right field.
      *
-     * @return string
+     * @return mixed|null
      */
-    public function get_enddate_string() {
-        return userdate($this->raw_get('enddate'), get_string('strftimedate', 'core_langconfig'));
+    private function retrieve_value() {
+        $fieldtype = $this->field_type_to_field();
+        return $this->raw_get($fieldtype);
+    }
+
+    /**
+     * Retrieve the value from the right field.
+     *
+     * @return mixed|null
+     */
+    private function field_type_to_field() {
+        $field = $this->get_field();
+        $type = $field->get('type');
+        return self::FIELD_TYPE_TO_INTERNAL[$type] ?? 'charvalue';
+    }
+
+    /**
+     * Retrieve the field object.
+     *
+     * @return case_field
+     */
+    private function get_field() {
+        if (!isset($this->field)) {
+            $this->field = case_field::get_record(['id' => $this->get('fieldid')]);
+        }
+        return $this->field;
+    }
+
+    /**
+     * Set the value of the data.
+     *
+     * @param mixed $value
+     * @return void
+     */
+    public function set_value($value) {
+        $fieldtype = $this->field_type_to_field();
+        $this->set($fieldtype, $value);
+    }
+
+    /**
+     * Retrieve the value from the right field.
+     *
+     * @return mixed
+     */
+    public function get_value() {
+        $fieldtype = $this->field_type_to_field();
+        return $this->get($fieldtype);
     }
 }

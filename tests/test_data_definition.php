@@ -14,11 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 use mod_competvet\competvet;
-use mod_competvet\local\api\observations;
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\observation_comment;
-use mod_competvet\local\persistent\situation;
 
 /**
  * Competvet Trait for data test definition.
@@ -116,22 +114,14 @@ trait test_data_definition {
                     }
                     if (!empty($planningdef['certifications'])) {
                         foreach ($planningdef['certifications'] as $certificationdef) {
-                            $student = $users[$certificationdef['student']];
-                            $criterion = criterion::get_record(['idnumber' => $certificationdef['criterion']]);
-                            $certification = $competvetevalgenerator->create_certification([
-                                'studentid' => $student->id,
-                                'planningid' => $planning->id,
-                                'criterionid' => $criterion->get('id'),
-                                'level' => $certificationdef['level'],
-                                'comment' => $certificationdef['comment'],
-                                'status' => $certificationdef['status'],
-                            ]);
-                            $competvetevalgenerator->create_certification_validation([
-                                'certificationid' => $certification->id,
-                                'status' => $certificationdef['validations'][0]['status'],
-                                'comment' => $certificationdef['validations'][0]['comment'],
-                                'supervisorid' => $users[$certificationdef['validations'][0]['supervisor']]->id,
-                            ]);
+                            $certificationdef['planningid'] = $planning->id;
+                            $competvetevalgenerator->create_certification($certificationdef);
+                        }
+                    }
+                    if (!empty($planningdef['cases'])) {
+                        foreach ($planningdef['cases'] as $casesdef) {
+                            $casesdef['planningid'] = $planning->id;
+                            $competvetevalgenerator->create_case($casesdef);
                         }
                     }
                 }
@@ -393,6 +383,71 @@ trait test_data_definition {
                                 'enddate' => $startdate + $oneweek,
                                 'groupname' => 'group 8.1',
                                 'session' => '2023',
+                                'certifications' => [
+                                    [
+                                        'student' => 'student1',
+                                        'criterion' => 'CERT1',
+                                        'level' => 50,
+                                        'comment' => 'A comment',
+                                        'status' => 'cert:seendone',
+                                        'supervisors' => [
+                                            'observer1',
+                                            'observer2',
+                                        ],
+                                        'validations' => [
+                                            [
+                                                'status' => 'certvalid:notreached',
+                                                'comment' => 'A comment',
+                                                'supervisor' => 'observer1',
+                                            ],
+                                            [
+                                                'status' => 'certvalid:confirmed',
+                                                'comment' => 'A comment',
+                                                'supervisor' => 'observer2',
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                                'cases' => [
+                                    [
+                                        'student' => 'student1',
+                                        'fields' => [
+                                            'nom_animal' => 'Rex',
+                                            'espece' => 'Chien',
+                                            'race' => 'Labrador',
+                                            'sexe' => 'M',
+                                            'date_naissance' => '2019-01-01',
+                                            'num_dossier' => '250269802345678',
+                                            'date_cas' => '2021-01-01',
+                                            'motif_presentation' => 'Vomissement',
+                                            'resultats_examens' => 'Autres examens à faire',
+                                            'diag_final' => 'Gastro-entérite',
+                                            'traitement' => 'Rien',
+                                            'evolution' => 'Bon',
+                                            'taches_effectuees' => 'Consultation, examen clinique, diagnostic, traitement',
+                                            'reflexions_cas' => 'Premier cas observé. Bonne prise en charge.',
+                                        ],
+                                    ],
+                                    [
+                                        'student' => 'student1',
+                                        'fields' => [
+                                            'nom_animal' => 'Brian',
+                                            'espece' => 'Oiseau',
+                                            'race' => 'Perroquet',
+                                            'sexe' => 'M',
+                                            'date_naissance' => '2014-07-05',
+                                            'num_dossier' => '2502698068764105',
+                                            'date_cas' => '2023-06-10',
+                                            'motif_presentation' => 'Vomissement',
+                                            'resultats_examens' => 'Anomalie détectée',
+                                            'diag_final' => 'Dermatite',
+                                            'traitement' => 'Repos',
+                                            'evolution' => 'Stable',
+                                            'taches_effectuees' => 'Consultation, examen clinique, diagnostic, traitement',
+                                            'reflexions_cas' => 'Réponse positive au traitement.',
+                                        ],
+                                    ],
+                                ],
                             ],
                             [
                                 'startdate' => $startdate + $oneweek,
@@ -459,7 +514,7 @@ trait test_data_definition {
                                         'comments' => [
                                             ['type' => observation_comment::OBSERVATION_COMMENT, 'comment' => 'A comment'],
                                             ['type' => observation_comment::AUTOEVAL_OBSERVER_COMMENT,
-                                                'comment' => 'Another comment', ],
+                                                'comment' => 'Another comment',],
                                         ],
                                         'criteria' => [
                                             ['id' => 'Q001', 'value' => 1],
@@ -475,26 +530,12 @@ trait test_data_definition {
                                         'comments' => [
                                             ['type' => observation_comment::OBSERVATION_COMMENT, 'comment' => 'A comment'],
                                             ['type' => observation_comment::OBSERVATION_PRIVATE_COMMENT,
-                                                'comment' => 'Another comment', ],
+                                                'comment' => 'Another comment',],
                                         ],
                                         'criteria' => [
                                             ['id' => 'Q001', 'value' => 5],
                                             ['id' => 'Q002', 'value' => 'Comment eval 1'],
                                             ['id' => 'Q003', 'value' => 'Comment eval 2'],
-                                        ],
-                                    ],
-                                ],
-                                'certifications' => [
-                                    [
-                                        'student' => 'student1',
-                                        'planning' => 'planning1',
-                                        'criterion' => 'CERT1',
-                                        'level' => 50,
-                                        'comment' => 'A comment',
-                                        'status' => 'cert:seendone',
-                                        'validations' => [
-                                            ['status' => 'certvalid:confirmed', 'comment' => 'A comment', 'supervisor' => 'observer1'],
-                                            ['status' => 'certvalid:notseen', 'comment' => 'A comment', 'supervisor' => 'observer2'],
                                         ],
                                     ],
                                 ],

@@ -24,7 +24,6 @@ use mod_competvet\local\persistent\cert_valid;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
-use restore_controller;
 use test_data_definition;
 
 defined('MOODLE_INTERNAL') || die();
