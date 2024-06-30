@@ -41,6 +41,9 @@ class cases {
     public static function get_entry(int $caseid): stdClass {
         $structure = self::get_case_structure();
         $caseentry = case_entry::get_record(['id' => $caseid]);
+        if (empty($caseentry)) {
+            throw new \moodle_exception('case_not_found', 'competvet', '', $caseid);
+        }
         return self::do_get_entry_content($structure, $caseentry);
     }
 

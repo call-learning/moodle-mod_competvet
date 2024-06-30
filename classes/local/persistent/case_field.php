@@ -16,6 +16,7 @@
 namespace mod_competvet\local\persistent;
 
 use core\persistent;
+use DateTime;
 use lang_string;
 
 /**
@@ -118,15 +119,42 @@ class case_field extends persistent {
                 return userdate($value, get_string('strftimedate', 'core_langconfig'));
             case 'select':
                 $configdata = json_decode(stripslashes($this->get('configdata')), true);
-                if (!empty($configdata->options)) {
-                    foreach ($configdata->options as $key => $option) {
+                if (!empty($configdata['options'])) {
+                    foreach ($configdata['options'] as $key => $option) {
                         if ($key == $value) {
-                            return $option->label;
+                            return $option;
                         }
                     }
                 }
                 return '';
         }
         return '';
+    }
+
+    public function convert_to_raw_value(mixed $value) {
+        switch ($this->get('type')) {
+            case 'text':
+            case 'textarea':
+                return $value;
+            case 'date':
+                if (is_numeric($value)) {
+                    return intval($value);
+                }
+                $date = new DateTime($value);
+                return $date->getTimestamp();
+            case 'select':
+                if (is_numeric($value)) {
+                    return intval($value);
+                }
+                $configdata = json_decode(stripslashes($this->get('configdata')), true);
+                if (!empty($configdata['options'])) {
+                    foreach ($configdata['options'] as $key => $option) {
+                        if ($option == $value) {
+                            return $key;
+                        }
+                    }
+                }
+                return 0;
+        }
     }
 }

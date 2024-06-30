@@ -145,6 +145,8 @@ class case_data extends persistent {
      */
     public function set_value($value) {
         $fieldtype = $this->field_type_to_field();
+        $field = $this->get_field();
+        $value = $field->convert_to_raw_value($value);
         $this->set($fieldtype, $value);
     }
 

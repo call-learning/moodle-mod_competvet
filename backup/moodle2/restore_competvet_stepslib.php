@@ -29,21 +29,48 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $planning = new restore_path_element('planning', '/activity/competvet/situations/situation/plannings/planning');
         $grid = new restore_path_element('grid', '/activity/competvet/grids/grid');
         $criterion = new restore_path_element('criterion', '/activity/competvet/grids/grid/criteria/criterion');
-        $observation = new restore_path_element('observation', '/activity/competvet/situations/situation/plannings/planning/observations/observation');
-        $obscomment = new restore_path_element('obscomment', '/activity/competvet/situations/situation/plannings/planning/observations/observation/obscomments/obscomment');
+        $observation = new restore_path_element(
+            'observation',
+            '/activity/competvet/situations/situation/plannings/planning/observations/observation'
+        );
+        $obscomment = new restore_path_element(
+            'obscomment',
+            '/activity/competvet/situations/situation/plannings/planning/observations/observation/obscomments/obscomment'
+        );
         $grade = new restore_path_element('grade', '/activity/competvet/grades/grade');
-        $obscritlevel = new restore_path_element('obscritlevel', '/activity/competvet/situations/situation/plannings/planning/observations/observation/obscritlevels/obscritlevel');
-        $obscritcom = new restore_path_element('obscritcom', '/activity/competvet/situations/situation/plannings/planning/observations/observation/obscritcoms/obscritcom');
+        $obscritlevel = new restore_path_element(
+            'obscritlevel',
+            '/activity/competvet/situations/situation/plannings/planning/observations/observation/obscritlevels/obscritlevel'
+        );
+        $obscritcom = new restore_path_element(
+            'obscritcom',
+            '/activity/competvet/situations/situation/plannings/planning/observations/observation/obscritcoms/obscritcom'
+        );
         $todo = new restore_path_element('todo', '/activity/competvet/todos/todo');
-        $certdecl = new restore_path_element('certdecl', '/activity/competvet/situations/situation/plannings/planning/certdecls/certdecl');
-        $certdeclasso = new restore_path_element('certdeclasso', '/activity/competvet/situations/situation/plannings/planning/certdecls/certdecl/certdeclassos/certdeclasso');
-        $certvalid = new restore_path_element('certvalid', '/activity/competvet/situations/situation/plannings/planning/certdecls/certdecl/certvalids/certvalid');
+        $certdecl =
+            new restore_path_element('certdecl', '/activity/competvet/situations/situation/plannings/planning/certdecls/certdecl');
+        $certdeclasso = new restore_path_element(
+            'certdeclasso',
+            '/activity/competvet/situations/situation/plannings/planning/certdecls/certdecl/certdeclassos/certdeclasso'
+        );
+        $certvalid = new restore_path_element(
+            'certvalid',
+            '/activity/competvet/situations/situation/plannings/planning/certdecls/certdecl/certvalids/certvalid'
+        );
         $casecat = new restore_path_element('casecat', '/activity/competvet/casecats/casecat');
         $casefield = new restore_path_element('casefield', '/activity/competvet/casecats/casecat/casefields/casefield');
-        $caseentry = new restore_path_element('caseentry', '/activity/competvet/situations/situation/plannings/planning/caseentries/caseentry');
-        $casedata = new restore_path_element('casedata', '/activity/competvet/casecats/casecat/casefields/casefield/casedatas/casedata');
-        $formdata = new restore_path_element('formdata', '/activity/competvet/situations/situation/plannings/planning/formdatas/formdata');
-        $casefieldmap = new restore_path_element('casefieldmap', '/activity/competvet/casecats/casecat/casefields/casefield/casefieldsmap/casefieldmap');
+        $caseentry = new restore_path_element(
+            'caseentry',
+            '/activity/competvet/situations/situation/plannings/planning/caseentries/caseentry'
+        );
+        $casedata =
+            new restore_path_element('casedata', '/activity/competvet/situations/situation/plannings/planning/caseentries/caseentry/casedatas/casedata');
+        $formdata =
+            new restore_path_element('formdata', '/activity/competvet/situations/situation/plannings/planning/formdatas/formdata');
+        $casefieldmap = new restore_path_element(
+            'casefieldmap',
+            '/activity/competvet/casecats/casecat/casefields/casefield/casefieldsmap/casefieldmap'
+        );
 
         // Return the paths wrapped into standard activity structure.
         return $this->prepare_activity_structure([
@@ -56,7 +83,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     protected function process_competvet($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
 
         // Insert the competvet record.
@@ -68,12 +95,15 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     protected function process_situation($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         // Get the parent module id.
         $data->competvetid = $this->get_new_parentid('competvet');
 
+        while ($DB->record_exists('competvet_situation', ['shortname' => $data->shortname])) {
+            $data->shortname = $data->shortname . '-restored';
+        }
         // Insert the situation record.
         $newitemid = $DB->insert_record('competvet_situation', $data);
         $this->set_mapping('situation', $oldid, $newitemid);
@@ -82,7 +112,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     protected function process_planning($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         // Get the parent module id.
@@ -96,7 +126,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     protected function process_grid($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         $data->situationid = $this->get_new_parentid('situation');
@@ -114,7 +144,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     protected function process_criterion($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         $data->gridid = $this->get_new_parentid('grid');
@@ -124,7 +154,8 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
             // Insert the criterion record.
             $criterionitemid = $DB->insert_record('competvet_criterion', $data);
         } else {
-            $criterionitemid = $DB->get_field('competvet_criterion', 'id', ['idnumber' => $data->idnumber, 'gridid' => $data->gridid]);
+            $criterionitemid =
+                $DB->get_field('competvet_criterion', 'id', ['idnumber' => $data->idnumber, 'gridid' => $data->gridid]);
         }
         $this->set_mapping('criterion', $oldid, $criterionitemid);
     }
@@ -132,7 +163,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     protected function process_observation($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
         $data->planningid = $this->get_new_parentid('planning');
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
@@ -146,7 +177,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     protected function process_obscomment($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         $data->observationid = $this->get_new_parentid('observation');
@@ -157,7 +188,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     protected function process_grade($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         $data->competvet = $this->get_new_parentid('competvet');
@@ -170,10 +201,11 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     protected function process_obscritlevel($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         $data->observationid = $this->get_new_parentid('observation');
+        $data->criterionid = $this->get_mappingid('criterion', $data->criterionid);
         // Insert the observation criteria level record.
         $DB->insert_record('competvet_obs_crit_level', $data);
     }
@@ -181,10 +213,11 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     protected function process_obscritcom($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         $data->observationid = $this->get_new_parentid('observation');
+        $data->criterionid = $this->get_mappingid('criterion', $data->criterionid);
         // Insert the observation criteria comment record.
         $DB->insert_record('competvet_obs_crit_com', $data);
     }
@@ -192,7 +225,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     protected function process_todo($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
         $data->userid = $this->get_mappingid('user', $data->userid);
         $data->targetuserid = $this->get_mappingid('user', $data->targetuserid);
@@ -205,7 +238,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     protected function process_certdecl($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
         $data->criterionid = $this->get_mappingid('criterion', $data->criterionid);
         $data->studentid = $this->get_mappingid('user', $data->studentid);
@@ -219,7 +252,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     protected function process_certdeclasso($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
         $data->supervisorid = $this->get_mappingid('user', $data->supervisorid);
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
@@ -231,7 +264,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     protected function process_certvalid($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
         $data->supervisorid = $this->get_mappingid('user', $data->supervisorid);
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
@@ -243,7 +276,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     protected function process_casecat($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         if (!$DB->record_exists('competvet_case_cat', ['idnumber' => $data->idnumber])) {
@@ -259,7 +292,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     protected function process_casefield($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         if (!$DB->record_exists('competvet_case_field', ['idnumber' => $data->idnumber])) {
@@ -274,7 +307,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     protected function process_caseentry($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         $data->studentid = $this->get_mappingid('user', $data->studentid);
@@ -287,10 +320,10 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     protected function process_casedata($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
+        $data->entryid = $this->get_new_parentid('caseentry');
         $data->fieldid = $this->get_mappingid('casefield', $data->fieldid);
-        $data->entryid = $this->get_mappingid('caseentry', $data->entryid);
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         // Insert the case data record.
         $DB->insert_record('competvet_case_data', $data);
@@ -299,7 +332,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     protected function process_formdata($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         $data->planningid = $this->get_mappingid('planning', $data->planningid);
@@ -311,7 +344,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     protected function process_casefieldmap($data) {
         global $DB;
 
-        $data = (object)$data;
+        $data = (object) $data;
         $oldid = $data->id;
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         $data->situationid = $this->get_mappingid('situation', $data->situationid);

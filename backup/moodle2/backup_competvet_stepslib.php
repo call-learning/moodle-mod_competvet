@@ -143,6 +143,19 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
         ]);
 
         // Build the tree.
+        // Keep this order of backup so criterion are restored before and are correctly mapped.
+        $competvet->add_child($grids);
+        $grids->add_child($grid);
+
+        $grid->add_child($criteria);
+        $criteria->add_child($criterion);
+
+        $competvet->add_child($casecats);
+        $casecats->add_child($casecat);
+
+        $casecat->add_child($casefields);
+        $casefields->add_child($casefield);
+
         $competvet->add_child($situations);
         $situations->add_child($situation);
 
@@ -154,12 +167,6 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
 
         $observation->add_child($obscomments);
         $obscomments->add_child($obscomment);
-
-        $competvet->add_child($grids);
-        $grids->add_child($grid);
-
-        $grid->add_child($criteria);
-        $criteria->add_child($criterion);
 
         $competvet->add_child($grades);
         $grades->add_child($grade);
@@ -182,16 +189,10 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
         $certdecl->add_child($certvalids);
         $certvalids->add_child($certvalid);
 
-        $competvet->add_child($casecats);
-        $casecats->add_child($casecat);
-
-        $casecats->add_child($casefields);
-        $casefields->add_child($casefield);
-
         $planning->add_child($caseentries);
         $caseentries->add_child($caseentry);
 
-        $casefield->add_child($casedatas);
+        $caseentry->add_child($casedatas);
         $casedatas->add_child($casedata);
 
         $planning->add_child($formdatas);
@@ -262,7 +263,6 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
         $caseentry->annotate_ids('planning', 'planningid');
         $casedata->annotate_ids('user', 'usermodified');
         $casedata->annotate_ids('casefield', 'fieldid');
-        $casedata->annotate_ids('caseentry', 'entryid');
         $formdata->annotate_ids('user', 'usermodified');
         $formdata->annotate_ids('user', 'userid');
         $formdata->annotate_ids('planning', 'planningid');
