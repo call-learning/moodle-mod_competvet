@@ -267,7 +267,7 @@ class behat_mod_competvet_generator extends behat_generator_base {
                         }
                     }
                     if (isset($fieldsid[$key])) {
-                        $data[$fieldsid[$key]][$fieldsid[$key]] = $value;
+                        $data['fields'][$fieldsid[$key]] = $value;
                     }
                 }
             }

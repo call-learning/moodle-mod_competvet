@@ -19,6 +19,8 @@ use advanced_testcase;
 use backup;
 use backup_controller;
 use DateTime;
+use mod_competvet\local\persistent\case_data;
+use mod_competvet\local\persistent\case_entry;
 use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\cert_valid;
 use mod_competvet\local\persistent\observation;
@@ -117,7 +119,7 @@ class backup_restore_test extends advanced_testcase {
         $cm = reset($cms);
         $newsituation = competvet::get_from_cmid($cm->id)->get_situation();
         $oldsituation = $competvet->get_situation();
-        $this->check_created_instances($newsituation, $oldsituation);
+        $this->check_created_instances($oldsituation, $newsituation);
     }
 
     /**
@@ -125,7 +127,7 @@ class backup_restore_test extends advanced_testcase {
      */
     private function check_created_instances(situation $oldsituation, situation $newsituation) {
         // Check that situation was restored correctly.
-        $this->assertEqualWithoutIds($newsituation->to_record(), $oldsituation->to_record());
+        $this->assertEqualWithoutIds($oldsituation->to_record(), $newsituation->to_record(), ['shortname']);
 
         // Check planning and observations.
         $newplannings = planning::get_records(['situationid' => $newsituation->get('id')]);
@@ -133,7 +135,7 @@ class backup_restore_test extends advanced_testcase {
         $this->assertEquals(count($newplannings), count($oldplannings));
         foreach ($newplannings as $planningindex => $newplanning) {
             $oldplanning = $oldplannings[$planningindex];
-            $this->assertEqualWithoutIds($newplanning->to_record(), $oldplanning->to_record());
+            $this->assertEqualWithoutIds($oldplanning->to_record(), $newplanning->to_record());
             $this->assertEquals(
                 groups_get_group_name($oldplanning->get('groupid')),
                 groups_get_group_name($newplanning->get('groupid'))
@@ -141,20 +143,29 @@ class backup_restore_test extends advanced_testcase {
 
             $this->check_created_observations($newplanning, $oldplanning);
             $this->check_created_certifications($newplanning, $oldplanning);
+            $this->check_created_caselog($newplanning, $oldplanning);
         }
     }
 
-    private function assertequalwithoutids($expected, $actual) {
+    private function assertequalwithoutids($expected, $actual, array $additionalexcludedkeys =[]) {
         $expected = (array) $expected;
         $actual = (array) $actual;
-        // Any field with a key that starts or ends with 'id' is ignored.
-        $expected = array_filter($expected, function($key) {
-            return !preg_match('/id|timemodified|timecreated|usermodified/', $key);
-        }, ARRAY_FILTER_USE_KEY);
-        $actual = array_filter($actual, function($key) {
-            return !preg_match('/id|timemodified|timecreated|usermodified/', $key);
-        }, ARRAY_FILTER_USE_KEY);
 
+        // Still check that we have no null values in the excluded keys, so if it is not null in the expected, it should
+        // also not be null in actual.
+        $additionalpattern = !empty($additionalexcludedkeys) ? '|'. implode('|', $additionalexcludedkeys) : '';
+        $keypattern = '/id|timemodified|timecreated|usermodified' . $additionalpattern . '/';
+        $expectednotnull = array_filter($expected, fn($key) => preg_match($keypattern, $key), ARRAY_FILTER_USE_KEY);
+        $actualnotnull = array_filter($actual, fn($key) => preg_match($keypattern, $key), ARRAY_FILTER_USE_KEY);
+        foreach ($expectednotnull as $key => $value) {
+            if (!empty($value)) {
+                $this->assertNotEmpty($actualnotnull[$key], "Key $key is not empty in expected but is empty in actual.");
+            }
+        }
+
+        // Any field with a key that starts or ends with 'id' is ignored.
+        $expected = array_filter($expected, fn($key) => !preg_match($keypattern, $key), ARRAY_FILTER_USE_KEY);
+        $actual = array_filter($actual, fn($key) => !preg_match($keypattern, $key), ARRAY_FILTER_USE_KEY);
         $this->assertEqualsCanonicalizing($expected, $actual);
     }
 
@@ -171,14 +182,14 @@ class backup_restore_test extends advanced_testcase {
         $this->assertEquals(count($newobservations), count($oldobservations));
         foreach ($newobservations as $index => $newobservation) {
             $oldobservation = $oldobservations[$index];
-            $this->assertEqualWithoutIds($newobservation->to_record(), $oldobservation->to_record());
+            $this->assertEqualWithoutIds($oldobservation->to_record(), $newobservation->to_record());
             // Check comments.
             $newcomments = $newobservation->get_comments();
             $oldcomments = $oldobservation->get_comments();
             $this->assertEquals(count($newcomments), count($oldcomments));
             foreach ($newcomments as $commentindex => $newcomment) {
                 $oldcomment = $oldcomments[$commentindex];
-                $this->assertEqualWithoutIds($newcomment->to_record(), $oldcomment->to_record());
+                $this->assertEqualWithoutIds($oldcomment->to_record(), $newcomment->to_record());
             }
             // Check criteria comments.
             $newcriteria = $newobservation->get_criteria_comments();
@@ -186,7 +197,7 @@ class backup_restore_test extends advanced_testcase {
             $this->assertEquals(count($newcriteria), count($oldcriteria));
             foreach ($newcriteria as $critcomindex => $newcriterion) {
                 $oldcriterion = $oldcriteria[$critcomindex];
-                $this->assertEqualWithoutIds($newcriterion->to_record(), $oldcriterion->to_record());
+                $this->assertEqualWithoutIds($oldcriterion->to_record(), $newcriterion->to_record());
             }
             // Check criteria levels.
             $newcriteria = $newobservation->get_criteria_levels();
@@ -194,24 +205,55 @@ class backup_restore_test extends advanced_testcase {
             $this->assertEquals(count($newcriteria), count($oldcriteria));
             foreach ($newcriteria as $critlevelindex => $newcriterion) {
                 $oldcriterion = $oldcriteria[$critlevelindex];
-                $this->assertEqualWithoutIds($newcriterion->to_record(), $oldcriterion->to_record());
+                $this->assertEqualWithoutIds($oldcriterion->to_record(), $newcriterion->to_record());
             }
         }
     }
 
-    private function check_created_certifications(planning $newplanning, bool|planning $oldplanning) {
+    /**
+     * Check created certifications
+     *
+     * @param planning $newplanning
+     * @param bool|planning $oldplanning
+     * @return void
+     */
+    private function check_created_certifications(planning $newplanning, planning $oldplanning) {
         $newcertifications = cert_decl::get_records(['planningid' => $newplanning->get('id')]);
         $oldcertifications = cert_decl::get_records(['planningid' => $oldplanning->get('id')]);
         $this->assertEquals(count($newcertifications), count($oldcertifications));
         foreach ($newcertifications as $index => $newcertification) {
             $oldcertification = $oldcertifications[$index];
-            $this->assertEqualWithoutIds($newcertification->to_record(), $oldcertification->to_record());
+            $this->assertEqualWithoutIds($oldcertification->to_record(), $newcertification->to_record());
             $newvalidations = cert_valid::get_records(['declid' => $newcertification->get('id')]);
             $oldvalidations = cert_valid::get_records(['declid' => $oldcertification->get('id')]);
             $this->assertEquals(count($newvalidations), count($oldvalidations));
             foreach ($newvalidations as $valindex => $newvalidation) {
                 $oldvalidation = $oldvalidations[$valindex];
-                $this->assertEqualWithoutIds($newvalidation->to_record(), $oldvalidation->to_record());
+                $this->assertEqualWithoutIds($oldvalidation->to_record(), $newvalidation->to_record());
+            }
+        }
+    }
+
+    /**
+     * Check created caselog
+     *
+     * @param planning $newplanning
+     * @param bool|planning $oldplanning
+     * @return void
+     */
+    private function check_created_caselog(planning $newplanning, planning $oldplanning) {
+        $newcaseentries = case_entry::get_records(['planningid' => $newplanning->get('id')]);
+        $oldcaseentries = case_entry::get_records(['planningid' => $oldplanning->get('id')]);
+        $this->assertEquals(count($newcaseentries), count($oldcaseentries));
+        foreach ($newcaseentries as $index => $newcasentry) {
+            $oldcaseentry = $oldcaseentries[$index];
+            $this->assertEqualWithoutIds($oldcaseentry->to_record(), $newcasentry->to_record());
+            $newcasedatas = case_data::get_records(['entryid' => $newcasentry->get('id')]);
+            $oldcasedatas = case_data::get_records(['entryid' => $oldcaseentry->get('id')]);
+            $this->assertEquals(count($newcasedatas), count($oldcasedatas));
+            foreach ($newcasedatas as $valindex => $newvalidation) {
+                $oldcasedata = $oldcasedatas[$valindex];
+                $this->assertEqualWithoutIds($oldcasedata->to_record(), $newvalidation->to_record());
             }
         }
     }
