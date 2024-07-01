@@ -31,7 +31,6 @@ use mod_competvet\utils;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class certifications {
-
     /**
      * Decl status types
      */
@@ -43,11 +42,17 @@ class certifications {
     /**
      * Decl status types
      */
-    const GLOBAL_CERT_STATUS_TYPES = [
-        self::GLOBAL_CERT_STATUS_NOT_DECLARED => 'cert:global:notdeclared',
-        self::GLOBAL_CERT_STATUS_NOT_SEEN => 'cert:global:notseen',
-        self::GLOBAL_CERT_STATUS_WAITING => 'cert:global:waiting',
-        self::GLOBAL_CERT_STATUS_VALIDATED => 'cert:global:validated',
+    const GLOBAL_CERT_STATUS_TYPES_PER_ROLE = [
+        'student' => [
+            self::GLOBAL_CERT_STATUS_NOT_DECLARED => 'cert:global:notdeclared',
+            self::GLOBAL_CERT_STATUS_WAITING => 'cert:global:waiting',
+            self::GLOBAL_CERT_STATUS_VALIDATED => 'cert:global:validated',
+        ],
+        'observer' => [
+            self::GLOBAL_CERT_STATUS_NOT_SEEN => 'cert:global:notseen',
+            self::GLOBAL_CERT_STATUS_WAITING => 'cert:global:waiting',
+            self::GLOBAL_CERT_STATUS_VALIDATED => 'cert:global:validated',
+        ],
     ];
 
     /**
@@ -62,8 +67,15 @@ class certifications {
      * @param int $status The status
      * @return int The certification declaration id
      */
-    public static function add_cert_declaration(int $criterionid, int $studentid, int $planningid, int $level, string $comment,
-        int $commentformat, int $status) {
+    public static function add_cert_declaration(
+        int $criterionid,
+        int $studentid,
+        int $planningid,
+        int $level,
+        string $comment,
+        int $commentformat,
+        int $status
+    ) {
         $cert = new cert_decl();
         $cert->set('criterionid', $criterionid);
         $cert->set('studentid', $studentid);
@@ -86,10 +98,15 @@ class certifications {
      * @param int $status
      * @return bool
      */
-    public static function update_cert_declaration(int $declid, ?int $level = null, ?string $comment = null,
-        ?int $commentformat = null, ?int $status = null) {
+    public static function update_cert_declaration(
+        int $declid,
+        ?int $level = null,
+        ?string $comment = null,
+        ?int $commentformat = null,
+        ?int $status = null
+    ) {
         $arguments = compact('level', 'comment', 'commentformat', 'status');
-        $arguments = array_filter($arguments, function($value) {
+        $arguments = array_filter($arguments, function ($value) {
             return $value !== null;
         });
         $cert = new cert_decl($declid);
@@ -110,6 +127,27 @@ class certifications {
         $cert = new cert_decl($declid);
         if ($cert->delete()) {
             return true;
+        }
+    }
+
+    /**
+     * Supervisors update
+     *
+     * @param int $declid
+     * @param array $supervisorsid
+     * @return void
+     */
+    public static function declaration_supervisors_update($declid, $supervisorsid) {
+        $setsupervisors = self::get_declaration_supervisors($declid);
+        foreach ($supervisorsid as $supervisorid) {
+            if (!in_array($supervisorid, $setsupervisors)) {
+                self::declaration_supervisor_invite($declid, $supervisorid);
+            }
+        }
+        foreach ($setsupervisors as $supervisorid) {
+            if (!in_array($supervisorid, $supervisorsid)) {
+                self::declaration_supervisor_remove($declid, $supervisorid);
+            }
         }
     }
 
@@ -220,6 +258,7 @@ class certifications {
 
     /**
      * Get the certifications and validations for a student by status
+     * Also add supervisor info
      *
      *
      * @param int $planningid The planning id
@@ -235,6 +274,13 @@ class certifications {
             self::GLOBAL_CERT_STATUS_VALIDATED => [],
         ];
         foreach ($certifications as $cert) {
+            $cert['supervisors'] = [];
+            if ($cert['declid']) {
+                $supervisors = self::get_declaration_supervisors($cert['declid']);
+                foreach ($supervisors as $supid) {
+                    $cert['supervisors'][] = utils::get_user_info($supid);
+                }
+            }
             if (!$cert['isdeclared']) {
                 $certsbystatus[self::GLOBAL_CERT_STATUS_NOT_DECLARED][] = $cert;
                 continue;
@@ -242,12 +288,13 @@ class certifications {
             if ($cert['status'] == cert_decl::STATUS_STUDENT_NOTSEEN) {
                 $certsbystatus[self::GLOBAL_CERT_STATUS_NOT_SEEN][] = $cert;
             } else {
-                if ($cert['confirmed']) {
-                    $certsbystatus[self::GLOBAL_CERT_STATUS_VALIDATED][] = $cert;
-                } else {
+                if (!$cert['hasvalidations'] || $cert['levelnotreached']) {
                     $certsbystatus[self::GLOBAL_CERT_STATUS_WAITING][] = $cert;
+                } else {
+                    $certsbystatus[self::GLOBAL_CERT_STATUS_VALIDATED][] = $cert;
                 }
             }
+
         }
         return $certsbystatus;
     }
@@ -303,9 +350,12 @@ class certifications {
         $certrecord['observernotseen'] = false;
         $certrecord['confirmed'] = false;
         $certrecord['levelnotreached'] = false;
+        $certrecord['hasvalidations'] = false;
         $certrecord['timemodified'] = 0;
+
         return $certrecord;
     }
+
     /**
      * Get a single certification
      *
@@ -337,6 +387,7 @@ class certifications {
         $certrecord['confirmed'] = false;
         $certrecord['observernotseen'] = false;
         $certrecord['levelnotreached'] = false;
+        $certrecord['hasvalidations'] = false;
 
         if ($withfeedback) {
             $certrecord['feedback'] = [
@@ -349,6 +400,9 @@ class certifications {
         }
         $certrecord['validations'] = [];
         $valids = cert_valid::get_records(['declid' => $cert->get('id')]);
+        if (!empty($valids)) {
+            $certrecord['hasvalidations'] = true;
+        }
         foreach ($valids as $valid) {
             $validrecord = [];
             $validrecord['id'] = $valid->get('id');
