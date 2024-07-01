@@ -54,6 +54,7 @@ class get_certifications extends external_api {
                     'observernotseen' => new external_value(PARAM_BOOL, 'Observer not seen', VALUE_OPTIONAL),
                     'confirmed' => new external_value(PARAM_BOOL, 'Confirmed by an observer', VALUE_OPTIONAL),
                     'levelnotreached' => new external_value(PARAM_BOOL, 'Observer stated level not reached', VALUE_OPTIONAL),
+                    'hasvalidations' => new external_value(PARAM_BOOL, 'Has validations', VALUE_OPTIONAL),
                     'feedback' => new external_single_structure([
                         'userid' => new external_value(PARAM_INT, 'The user id'),
                         'picture' => new external_value(PARAM_TEXT, 'The picture'),

@@ -134,48 +134,50 @@ function competvet_delete_instance($id) {
     if (!$exists) {
         return false;
     }
-    $situation = situation::get_record(['competvetid' => $id], MUST_EXIST);
-    $plannings = planning::get_records(['situationid' => $situation->get('id')]);
-    foreach ($plannings as $planning) {
-        $observations = observation::get_records(['planningid' => $planning->get('id')]);
-        foreach ($observations as $observation) {
-            $observationcomment = observation_comment::get_records(['observationid' => $observation->get('id')]);
-            foreach ($observationcomment as $comment) {
-                $comment->delete();
+    $situation = situation::get_record(['competvetid' => $id]);
+    if ($situation) {
+        $plannings = planning::get_records(['situationid' => $situation->get('id')]);
+        foreach ($plannings as $planning) {
+            $observations = observation::get_records(['planningid' => $planning->get('id')]);
+            foreach ($observations as $observation) {
+                $observationcomment = observation_comment::get_records(['observationid' => $observation->get('id')]);
+                foreach ($observationcomment as $comment) {
+                    $comment->delete();
+                }
+                $obscriteria = observation_criterion_level::get_records(['observationid' => $observation->get('id')]);
+                foreach ($obscriteria as $criterion) {
+                    $criterion->delete();
+                }
+                $obscriteria = observation_criterion_comment::get_records(['observationid' => $observation->get('id')]);
+                foreach ($obscriteria as $criterion) {
+                    $criterion->delete();
+                }
+                $observation->delete();
             }
-            $obscriteria = observation_criterion_level::get_records(['observationid' => $observation->get('id')]);
-            foreach ($obscriteria as $criterion) {
-                $criterion->delete();
+            $certdecl = cert_decl::get_records(['planningid' => $planning->get('id')]);
+            foreach ($certdecl as $cert) {
+                $certvalid = cert_valid::get_records(['declid' => $cert->get('id')]);
+                foreach ($certvalid as $valid) {
+                    $valid->delete();
+                }
+                $certasso = cert_decl_asso::get_records(['declid' => $cert->get('id')]);
+                foreach ($certasso as $asso) {
+                    $asso->delete();
+                }
+                $cert->delete();
             }
-            $obscriteria = observation_criterion_comment::get_records(['observationid' => $observation->get('id')]);
-            foreach ($obscriteria as $criterion) {
-                $criterion->delete();
+            $caselogs = case_entry::get_records(['planningid' => $planning->get('id')]);
+            foreach ($caselogs as $caselog) {
+                $casedata = case_data::get_records(['entryid' => $caselog->get('id')]);
+                foreach ($casedata as $data) {
+                    $data->delete();
+                }
+                $caselog->delete();
             }
-            $observation->delete();
+            $planning->delete();
         }
-        $certdecl = cert_decl::get_records(['planningid' => $planning->get('id')]);
-        foreach ($certdecl as $cert) {
-            $certvalid = cert_valid::get_records(['declid' => $cert->get('id')]);
-            foreach ($certvalid as $valid) {
-                $valid->delete();
-            }
-            $certasso = cert_decl_asso::get_records(['declid' => $cert->get('id')]);
-            foreach ($certasso as $asso) {
-                $asso->delete();
-            }
-            $cert->delete();
-        }
-        $caselogs = case_entry::get_records(['planningid' => $planning->get('id')]);
-        foreach ($caselogs as $caselog) {
-            $casedata = case_data::get_records(['entryid' => $caselog->get('id')]);
-            foreach ($casedata as $data) {
-                $data->delete();
-            }
-            $caselog->delete();
-        }
-        $planning->delete();
+        $situation->delete();
     }
-    $situation->delete();
     $DB->delete_records('competvet', ['id' => $id]);
     return true;
 }

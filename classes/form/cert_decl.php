@@ -257,17 +257,7 @@ class cert_decl extends dynamic_form {
             );
         }
         if ($data->supervisors) {
-            $setsupervisors = certifications::get_declaration_supervisors($data->declid);
-            foreach ($data->supervisors as $supervisorid) {
-                if (!in_array($supervisorid, $setsupervisors)) {
-                    certifications::declaration_supervisor_invite($data->declid, $supervisorid);
-                }
-            }
-            foreach ($setsupervisors as $supervisorid) {
-                if (!in_array($supervisorid, $data->supervisors)) {
-                    certifications::declaration_supervisor_remove($data->declid, $supervisorid);
-                }
-            }
+            certifications::declaration_supervisors_update($data->declid, $data->supervisors);
         }
     }
 
