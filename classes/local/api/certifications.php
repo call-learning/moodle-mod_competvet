@@ -178,7 +178,12 @@ class certifications {
             $cert = new cert_decl_asso();
             $cert->set('declid', $declid);
             $cert->set('supervisorid', $supervisorid);
-            return $cert->create();
+            $cert->create();
+            // Now also ask for a todo.
+            // TODO use events instead of this, so we can modify the workflow more easily.
+            todos::ask_for_certification_validation($declid, $supervisorid);
+
+            return $cert;
         } catch (invalid_persistent_exception $e) {
             debugging($e->getMessage());
             return null;
@@ -344,6 +349,8 @@ class certifications {
         $certrecord['status'] = 0; // Status is set to 0 by default, and it is not a real status as such but
         // it is used to determine if the certification is declared or not.
         $certrecord['declid'] = 0;
+        $certrecord['planningid'] = 0;
+        $certrecord['studentid'] = 0;
         $certrecord['seendone'] = false;
         $certrecord['notseen'] = false;
         $certrecord['isdeclared'] = false; // This is the flag to determine if the certification is declared or not.
@@ -369,12 +376,13 @@ class certifications {
         $certrecord = [];
         $student = utils::get_user_info($cert->get('studentid'));
         $certrecord['declid'] = $cert->get('id');
+        $certrecord['planningid'] = $cert->get('planningid');
+        $certrecord['studentid'] = $cert->get('studentid');
         $certrecord['criterionid'] = $cert->get('criterionid');
         $criterion = criterion::get_record(['id' => $cert->get('criterionid')]);
         $certrecord['label'] = $criterion->get('label');
         $certrecord['grade'] = $criterion->get('grade');
         $certrecord['level'] = $cert->get('level');
-
         $certrecord['status'] = $cert->get('status');
         $certrecord['seendone'] = ($cert->get('status') == cert_decl::STATUS_DECL_SEENDONE);
         $certrecord['notseen'] = ($cert->get('status') == cert_decl::STATUS_STUDENT_NOTSEEN);

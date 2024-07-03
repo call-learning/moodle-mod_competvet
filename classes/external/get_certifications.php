@@ -42,6 +42,8 @@ class get_certifications extends external_api {
             'certifications' => new external_multiple_structure(
                 new external_single_structure([
                     'declid' => new external_value(PARAM_INT, 'The certification id'),
+                    'planningid' => new external_value(PARAM_INT, 'The certification planning id'),
+                    'studentid' => new external_value(PARAM_INT, 'The student id'),
                     'label' => new external_value(PARAM_TEXT, 'The label'),
                     'criterionid' => new external_value(PARAM_INT, 'The criterion id'),
                     'level' => new external_value(PARAM_INT, 'The level', VALUE_OPTIONAL),

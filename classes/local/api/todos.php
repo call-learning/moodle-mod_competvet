@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\local\api;
 
+use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\todo;
 use mod_competvet\utils;
 
@@ -67,6 +68,54 @@ class todos {
     }
 
     /**
+     * Ask for certification validation : add a todo list item for the observer
+     *
+     * @param int $declid
+     * @param int $supervisorid
+     * @return int the todo id
+     */
+    public static function ask_for_certification_validation(string $declid, int $supervisorid): int {
+        // First get the declaration
+        $declaration = cert_decl::get_record(['id' => $declid]);
+        // First check that the same user has not yet asked for a certification validation.
+        $existingtodos = todo::get_records([
+            'userid' => $supervisorid,
+            'targetuserid' => $declaration->get('studentid'),
+            'planningid' => $declaration->get('planningid'),
+            'action' => todo::ACTION_EVAL_CERTIFICATION_VALIDATION_ASKED,
+        ]);
+        $todo = null;
+        if ($existingtodos) {
+            // Find the one with the same declid.
+            foreach ($existingtodos as $todo) {
+                $data = json_decode($todo->get('data'));
+                if ($data->declid == $declid) {
+                    break;
+                }
+                $todo = null;
+            }
+        }
+        if ($todo) {
+            $todo = reset($existingtodos);
+            $todo->set('status', todo::STATUS_PENDING);
+            $todo->update();
+        } else {
+            $todo = new todo(0, (object) [
+                'userid' => $supervisorid,
+                'targetuserid' => $declaration->get('studentid'),
+                'planningid' => $declaration->get('planningid'),
+                'action' => todo::ACTION_EVAL_CERTIFICATION_VALIDATION_ASKED,
+                'data' => json_encode((object) [
+                    'declid' => $declid,
+                ]),
+                'status' => todo::STATUS_PENDING,
+            ]);
+            $todo->create();
+        }
+        return $todo->get('id');
+    }
+
+    /**
      * Get todos for a given user
      *
      * @param int $userid
@@ -94,6 +143,7 @@ class todos {
 
     /**
      * Update TODO status
+     *
      * @param int $todoid
      * @param int $status
      * @return void

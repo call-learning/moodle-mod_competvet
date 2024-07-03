@@ -31,7 +31,15 @@ class todo extends persistent {
      * Current table
      */
     const TABLE = 'competvet_todo';
+    /**
+     * Action definition
+     */
     const ACTION_EVAL_OBSERVATION_ASKED = 1;
+    const ACTION_EVAL_CERTIFICATION_VALIDATION_ASKED = 2;
+
+    /**
+     * Status definition
+     */
     const STATUS_PENDING = 1;
     const STATUS_DONE = 2;
     /**
@@ -47,6 +55,7 @@ class todo extends persistent {
      */
     const ACTIONS = [
         self::ACTION_EVAL_OBSERVATION_ASKED => 'eval:asked',
+        self::ACTION_EVAL_CERTIFICATION_VALIDATION_ASKED => 'certif:valid:asked',
     ];
 
     /**
