@@ -50,6 +50,7 @@
                                 id="criterion-{{criterionid}}-option-{{optionid}}"
                                 name="criterion-{{criterionid}}"
                                 value="{{grade}}"
+                                {{^cangrade}}disabled{{/cangrade}}
                                 {{#selected}}checked{{/selected}}
                             >
                             <label class="custom-control-label" for="criterion-{{criterionid}}-option-{{optionid}}">{{{label}}} (<strong>{{#str}}points, mod_competvet, {{grade}}{{/str}}</strong>)</label>
@@ -66,10 +67,12 @@
                             }}{{/comment}}"
                         id="criterion-{{criterionid}}-comment"
                         name="criterion-{{criterionid}}-comment"
+                        {{^cangrade}}disabled{{/cangrade}}
                         rows="1">{{comment}}</textarea>
                 </div>
             </section>
         {{/criteria}}
+        <button type="submit" class="btn btn-primary {{^cangrade}}d-none{{/cangrade}}">{{#str}}savechanges{{/str}}</button>
+
     {{/grading}}
-    <button type="submit" class="btn btn-primary">{{#str}}savechanges{{/str}}</button>
 {{/list-grading}}

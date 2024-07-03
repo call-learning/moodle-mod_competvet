@@ -25,6 +25,7 @@ use external_single_structure;
 use external_multiple_structure;
 use mod_competvet\competvet;
 use mod_competvet\local\api\observations;
+use mod_competvet\local\persistent\observation_comment;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\api\criteria;
 use mod_competvet\utils;
@@ -88,6 +89,7 @@ class get_evaluations extends external_api {
                                         'id' => new external_value(PARAM_INT, 'Comment id'),
                                         'commenttext' => new external_value(PARAM_TEXT, 'Comment'),
                                         'timecreated' => new external_value(PARAM_INT, 'Time created'),
+                                        'private' => new external_value(PARAM_BOOL, 'Private comment', VALUE_OPTIONAL),
                                     ]
                                 )
                             ),
@@ -188,7 +190,12 @@ class get_evaluations extends external_api {
                 $userpictureurl = $comment['userinfo']['userpictureurl'];
                 $commentid = $comment['id'];
                 $commenttext = $comment['comment'];
+                $private = $comment['type'] == observation_comment::OBSERVATION_PRIVATE_COMMENT;
                 $timecreated = $comment['timecreated'];
+
+                if ($private && !has_capability('mod/competvet:canobserve', $competvet->get_context())) {
+                    continue;
+                }
 
                 if ($userid == $studentid) {
                     if (empty($autoevalcomments)) {
@@ -210,6 +217,7 @@ class get_evaluations extends external_api {
                             'userid' => $userid,
                             'fullname' => $fullname,
                             'picture' => $userpictureurl,
+                            'private' => $private,
                             'comments' => [],
                         ];
                     }
@@ -218,6 +226,7 @@ class get_evaluations extends external_api {
                         'id' => $commentid,
                         'commenttext' => $commenttext,
                         'timecreated' => $timecreated,
+                        'private' => $private,
                     ];
                 }
             }

@@ -56,7 +56,7 @@ class app implements named_templatable, renderable {
      * @return stdClass - Flat list of exported data.
      */
     public function export_for_template(renderer_base $output) {
-        global $USER, $CFG;
+        global $CFG, $USER;
 
         $export = new stdClass();
         $export->userid = $this->userid;
@@ -68,6 +68,7 @@ class app implements named_templatable, renderable {
         $export->courseid = $this->competvet->get_course()->id;
         $export->coursename = $this->competvet->get_course()->fullname;
         $situation = $this->competvet->get_situation();
+        $export->situationid = $situation->get('id');
         $export->evalgrid = $situation->get('evalgrid');
         $export->certifgrid = $situation->get('certifgrid');
         $export->listgrid = $situation->get('listgrid');
@@ -79,6 +80,7 @@ class app implements named_templatable, renderable {
         $export->studentid = optional_param('studentid', 0, PARAM_INT);
         $export->returnurl = optional_param('returnurl', '', PARAM_URL);
         $export->debugging = $CFG->debugdisplay;
+        $export->cangrade = has_capability('mod/competvet:cangrade', $this->competvet->get_context());
         return $export;
     }
 

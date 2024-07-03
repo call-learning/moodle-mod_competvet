@@ -91,6 +91,7 @@ const formEvents = () => {
     form.addEventListener('change', async(e) => {
         e.preventDefault();
         const context = formCalculation();
+        context.cangrade = gradingApp.dataset.cangrade == 1;
         CompetState.setValue('certification-grading', context);
     });
     form.addEventListener('submit', async(e) => {
@@ -102,6 +103,7 @@ const formEvents = () => {
         const args = {
             userid: user.id,
             planningid: planning.id,
+            situationid: planning.situationid,
             formname: 'certification-grading',
             json: JSON.stringify(context.grading)
         };
@@ -109,6 +111,7 @@ const formEvents = () => {
         const result = await Repository.saveFormData(args);
         context.isvalid = result.result;
         context.isinvalid = !result.result;
+        context.cangrade = gradingApp == 1;
         CompetState.setValue('certification-grading', context);
 
         // Now set the sub grade that will be used for the suggested grade.

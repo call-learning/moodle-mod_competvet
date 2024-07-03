@@ -76,11 +76,13 @@
         <div class="span6 col-md-6">
             {{#comments}}
                 {{< mod_competvet/comment}}
+                    {{$classes}}{{#private}}text-muted{{/private}}{{/classes}}
                     {{$info}}
                         {{#timecreated}}
-                        <div class="small timecreated d-flex justify-content-end">
-                            {{#userdate}} {{timecreated}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}} {{/userdate}}
-                        </div>
+                            <div class="small timecreated d-flex justify-content-end">
+                                {{#private}}{{#pix}}t/show, core, {{#str}} observation:comment:privatecomment, mod_competvet{{/str}}{{/pix}}{{/private}}
+                                {{#userdate}} {{timecreated}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}} {{/userdate}} 
+                            </div>
                         {{/timecreated}}
                     {{/info}}
                 {{/ mod_competvet/comment}}

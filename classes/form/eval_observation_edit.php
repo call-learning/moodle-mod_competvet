@@ -20,6 +20,7 @@ use core_form\dynamic_form;
 use mod_competvet\competvet;
 use mod_competvet\local\api\observations;
 use mod_competvet\local\persistent\observation;
+use mod_competvet\local\persistent\observation_comment;
 use moodle_url;
 
 /**
@@ -54,11 +55,21 @@ class eval_observation_edit extends dynamic_form {
             $comments = $data['comments'];
             unset($data['comments']);
             $data['comments'] = [];
+            $privaterepeat = 0;
+            $repeat = 0;
             foreach ($comments as $comment) {
+                if ($comment['type'] == observation_comment::OBSERVATION_PRIVATE_COMMENT ) {
+                    $data['privatecomments'][] = $comment['comment'];
+                    $data['privatecomments_id'][] = $comment['id'];
+                    $privaterepeat++;
+                    continue;
+                }
                 $data['comments'][] = $comment['comment'];
                 $data['comments_id'][] = $comment['id'];
+                $repeat++;
             }
-            $data['comments_repeat'] = count($data['comments']);
+            $data['comments_repeat'] = $repeat;
+            $data['privatecomments_repeat'] = $privaterepeat;
         }
         if ($data['criteria']) {
             $criteria = $data['criteria'];
@@ -82,6 +93,7 @@ class eval_observation_edit extends dynamic_form {
             }
         }
         $this->_customdata['comments_repeat'] = $data['comments_repeat'];
+        $this->_customdata['privatecomments_repeat'] = $data['privatecomments_repeat'];
         parent::set_data((object) $data);
     }
 

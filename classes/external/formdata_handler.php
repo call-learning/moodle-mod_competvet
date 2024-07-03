@@ -25,6 +25,7 @@ use external_multiple_structure;
 use external_warnings;
 use mod_competvet\external\get_json;
 use mod_competvet\local\api\formdata;
+use mod_competvet\competvet;
 
 /**
  * Class formdata_handler
@@ -45,6 +46,7 @@ class formdata_handler extends external_api {
         return new external_function_parameters([
             'userid' => new external_value(PARAM_INT, 'The user id', VALUE_REQUIRED),
             'planningid' => new external_value(PARAM_INT, 'The planning id', VALUE_REQUIRED),
+            'situationid' => new external_value(PARAM_INT, 'The situation id', VALUE_REQUIRED),
             'formname' => new external_value(PARAM_TEXT, 'The form name', VALUE_REQUIRED),
             'json' => new external_value(PARAM_TEXT, 'The JSON data', VALUE_OPTIONAL),
         ]);
@@ -55,18 +57,27 @@ class formdata_handler extends external_api {
      *
      * @param int $userid - The user id
      * @param int $planningid - The planning id
+     * @param int $situationid - The situation id
      * @param string $formname - The form name
      * @param string $json - The JSON data
      * @return array
      */
-    public static function store($userid, $planningid, $formname, $json = ''): array {
+    public static function store($userid, $planningid, $situationid, $formname, $json = ''): array {
         global $USER;
         $params = self::validate_parameters(self::store_parameters(), [
             'userid' => $userid,
             'planningid' => $planningid,
+            'situationid' => $situationid,
             'formname' => $formname,
             'json' => $json,
         ]);
+
+        $competvet = competvet::get_from_situation_id($situationid);
+        if (!has_capability('mod/competvet:cangrade', $competvet->get_context())) {
+            return [
+                'result' => false,
+            ];
+        }
 
         $userid = $params['userid'];
         $planningid = $params['planningid'];

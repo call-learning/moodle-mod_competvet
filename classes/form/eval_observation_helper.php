@@ -17,6 +17,7 @@
 namespace mod_competvet\form;
 
 use mod_competvet\local\persistent\situation;
+use mod_competvet\local\persistent\observation_comment;
 
 /**
  * Observation create form
@@ -104,6 +105,39 @@ class eval_observation_helper {
         );
         $mform->setType('comments_id', PARAM_INT);
         $mform->setType('comments', PARAM_TEXT);
+
+        // Now do the same for private comments
+        $mform->addElement('header', 'privatecomment_header', get_string('observation:comment:privatecomment', 'mod_competvet'));
+        $mform->setExpanded('privatecomment_header');
+        $form->repeat_elements(
+            [
+                $mform->createElement('textarea', 'privatecomments', get_string('observation:comment:commentno', 'mod_competvet')),
+                $mform->createElement('hidden', 'privatecomments_id'),
+                $mform->createElement(
+                    'submit',
+                    'privatecomment_delete',
+                    get_string('observation:comment:deleteno', 'mod_competvet'),
+                    [],
+                    false
+                ),
+            ],
+            $currentrepeat,
+            [
+                'privatecomments' => [
+                    'type' => PARAM_TEXT,
+                ],
+                'privatecomments_id' => [
+                    'type' => PARAM_INT,
+                ],
+
+            ],
+            'privatecomments_repeat',
+            'privatecomments_add',
+            1,
+            get_string('observation:comment:add', 'mod_competvet'),
+            true,
+            'privatecomment_delete',
+        );
     }
 
     /**
@@ -163,6 +197,14 @@ class eval_observation_helper {
             $comments[] = [
                 'id' => empty($data->comments_id[$commentindex]) ? 0 : $data->comments_id[$commentindex],
                 'comment' => $comment,
+                'type' => observation_comment::OBSERVATION_COMMENT
+            ];
+        }
+        foreach ($data->privatecomments as $commentindex => $comment) {
+            $comments[] = [
+                'id' => empty($data->privatecomments_id[$commentindex]) ? 0 : $data->privatecomments_id[$commentindex],
+                'comment' => $comment,
+                'type' => observation_comment::OBSERVATION_PRIVATE_COMMENT
             ];
         }
         return $comments;

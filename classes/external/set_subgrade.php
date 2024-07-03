@@ -74,6 +74,16 @@ class set_subgrade extends external_api {
 
         self::validate_context($competvet->get_context());
 
+        if (!has_capability('mod/competvet:cangrade', $competvet->get_context())) {
+            return [
+                'result' => false,
+                'warnings' => [[
+                    'item' => $type,
+                    'warningcode' => 'nopermission',
+                    'message' => 'Capability error: you do not have permission to grade this item.'
+                ]]
+            ];
+        }
         return grades::set_grade($studentid, $planningid, $type, $grade);
     }
 }

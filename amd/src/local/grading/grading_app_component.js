@@ -66,6 +66,7 @@ class Competvet {
         this.listgrid = this.gradingApp.dataset.listgrid;
         this.planning = {
             id: this.gradingApp.dataset.planningid,
+            situationid: this.gradingApp.dataset.situationid,
             cmid: this.cmId,
         };
         CompetState.setValue('planning', this.planning);
@@ -94,6 +95,7 @@ class Competvet {
      */
     async setCurrentUser(user) {
         this.gradingApp.dataset.studentid = user.id;
+        user.cangrade = this.gradingApp.dataset.cangrade == 1;
         CompetState.setValue('user', user);
         this.currentUser = user;
 
@@ -153,7 +155,8 @@ class Competvet {
             grading: {
                 'criteria': response.grids[0].criteria,
                 'timemodified': response.grids[0].timemodified,
-            }
+                'cangrade': this.gradingApp.dataset.cangrade == 1,
+            },
         };
         context.grading.criteria.forEach(criterion => {
             // Set the option with the second sortorder as the default selected option.
@@ -238,7 +241,8 @@ class Competvet {
                 return;
             }
             const context = {
-                grading: JSON.parse(response.data)
+                grading: JSON.parse(response.data),
+                cangrade: this.gradingApp.dataset.cangrade == 1,
             };
             // For the list-grading we need to check the timemodified against the stored form timemodified.
             if (formname === 'list-grading') {

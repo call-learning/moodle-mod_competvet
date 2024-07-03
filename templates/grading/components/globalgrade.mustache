@@ -64,6 +64,7 @@
                         min="0"
                         max="100"
                         step="1"
+                        {{^cangrade}}disabled{{/cangrade}}
                     >
                 </div>
             </div>
@@ -80,12 +81,13 @@
                     name="comment"
                     data-action="comment"
                     data-grade-id="0"
+                    {{^cangrade}}disabled{{/cangrade}}
                     data-criterion-id="4">{{comment}}</textarea>
             </div>
             <div class="form-group">
                 <label>&nbsp;</label>
                 <div>
-                    <button type="submit" class="btn btn-primary" data-action="save">
+                    <button type="submit" class="btn btn-primary {{^cangrade}}d-none{{/cangrade}}" data-action="save">
                         {{#str}}submit, mod_competvet{{/str}}
                     </button>
                 </div>

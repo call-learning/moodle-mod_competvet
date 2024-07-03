@@ -93,6 +93,7 @@ const formEvents = () => {
         const formDataArgs = {
             userid: user.id,
             planningid: planning.id,
+            situationid: planning.situationid,
             formname: 'globalgrade',
             json: globalgrade.comment,
         };

@@ -231,7 +231,7 @@ class situation extends base {
     /**
      * Add context and module joins
      *
-     * @return void
+     * @return array
      */
     public function get_context_and_modules_joins(): array {
         $competvetalias = $this->get_table_alias('competvet');
@@ -328,14 +328,6 @@ class situation extends base {
             new lang_string('situation:hascase', 'mod_competvet'),
             $this->get_entity_name(),
             "{$situationalias}.hascase"
-        ))->add_joins($this->get_joins());
-
-        $filters[] = (new filter(
-            situation_selector::class,
-            'situationselect',
-            new lang_string('situation:selector', 'mod_competvet'),
-            $this->get_entity_name(),
-            "{$situationalias}.id"
         ))->add_joins($this->get_joins());
 
         return $filters;

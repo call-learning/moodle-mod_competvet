@@ -95,6 +95,7 @@ const formEvents = () => {
         const args = {
             userid: user.id,
             planningid: planning.id,
+            situationid: planning.situationid,
             formname: 'list-grading',
             json: JSON.stringify(context.grading)
         };

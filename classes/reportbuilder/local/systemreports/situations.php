@@ -103,7 +103,6 @@ class situations extends system_report {
             'situation:hascertif',
             'situation:hascase',
             'situation:intro',
-            'situation:category',
             'situation:cmid',
         ];
 
@@ -123,7 +122,6 @@ class situations extends system_report {
         $filters = [
             'situation:shortnamewithlinks',
             'situation:evalnum',
-            'situation:situationselect',
         ];
 
         $this->add_filters_from_entities($filters);

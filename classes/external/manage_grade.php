@@ -70,6 +70,17 @@ class manage_grade extends external_api {
         $competvet = competvet::get_from_cmid($cmid);
         self::validate_context($competvet->get_context());
 
+        if (!has_capability('mod/competvet:cangrade', $competvet->get_context())) {
+            return [
+                'result' => false,
+                'warnings' => [[
+                    'item' => $cmid,
+                    'warningcode' => 'nopermission',
+                    'message' => 'Capability error: you do not have permission to grade this item.'
+                ]]
+            ];
+        }
+
         $grades = [];
         $grades[$userid] = [
             'userid' => $userid,
@@ -134,7 +145,6 @@ class manage_grade extends external_api {
      * @return array
      */
     public static function get($userid, $cmid, $planningid): array {
-        global $DB;
         $params = self::validate_parameters(self::get_parameters(), [
             'userid' => $userid,
             'cmid' => $cmid,
@@ -152,6 +162,7 @@ class manage_grade extends external_api {
         $grade->suggestedgrade = '';
         $grade->finalgrade = $usergrade;
         $grade->comment = $userdata['json'];
+        $grade->cangrade = has_capability('mod/competvet:cangrade', $competvet->get_context());
 
         return [
             'result' => $grade,
@@ -172,6 +183,7 @@ class manage_grade extends external_api {
                     'comment' => new external_value(PARAM_TEXT, 'The comment'),
                     'suggestedgrade' => new external_value(PARAM_TEXT, 'The suggested grade'),
                     'finalgrade' => new external_value(PARAM_INT, 'The final grade'),
+                    'cangrade' => new external_value(PARAM_BOOL, 'Can grade'),
                 ]
             ),
             'warnings' => new external_warnings(),

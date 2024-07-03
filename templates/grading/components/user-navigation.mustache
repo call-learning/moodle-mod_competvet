@@ -24,7 +24,7 @@
     }
 }}
 {{#user}}
-    <div class="d-flex align-items-center usernavigation">
+    <div class="align-items-center usernavigation {{^cangrade}}d-none{{/cangrade}}{{#cangrade}}d-flex{{/cangrade}}">
         <button class="btn btn-icon icon-no-margin mx-2" data-action="prevuser" title="{{#str}}previoususer, mod_competvet{{/str}}">
             <i class="fa fa-chevron-left"></i>
         </button>

@@ -47,7 +47,7 @@
         </div>
     </div>
     {{#comments}}
-        <div class="comment position-relative" data-region="commenttext">
+        <div class="comment position-relative {{$classes}}{{/classes}}" data-region="commenttext">
             {{$info}}{{info}}{{/info}}
             {{#commenttitle}}
                 <div><strong>{{{commenttitle}}}</strong></div>{{/commenttitle}}

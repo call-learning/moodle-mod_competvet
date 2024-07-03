@@ -65,7 +65,6 @@ class situations extends datasource {
         return [
             'situation:shortname',
             'situation:evalnum',
-            'situation:situationselect',
         ];
     }
 
