@@ -331,9 +331,11 @@ $string['gradeK2'] = 'Constante de calcul de la note K2';
 $string['gradeK2_help'] = 'Le poids de la note de la liste, par défaut est de 2';
 $string['notenoughgrades'] = 'Pas assez de données pour calculer la note suggérée';
 
-$string['calc:eval:certif:list'] = 'Le score suggéré est la moyenne des scores `Eval` et `List` affectés de leur coefficient. Le module `Incontournables` doit nécessairement être validé pour que cette moyenne soit calculée';
-$string['calc:certif:list'] = 'Le score suggéré est égal au score du module `List`. Le module `Incontournables` doit nécessairement être validé pour que ce score ne soit pas 0.';
-$string['calc:eval:list'] = 'Le score suggéré est la moyenne des scores `Eval` et `List` affectés de leur coefficient.';
-$string['calc:eval:certif'] = 'Le score suggéré est égal au score du module `Eval`. Le module `Incontournables` doit nécessairement être validé pour que ce score ne soit pas 0.';
-$string['calc:eval'] = 'Le score suggéré est égal au score du module `Eval`. ';
-$string['calc:list'] = 'Le score suggéré est égal au score du module `List`. ';
+$string['calc:eval:certif:list'] = 'Le score suggéré est la moyenne des scores \'Eval\' et \'List\' affectés de leur coefficient. Le module \'Incontournables\' doit nécessairement être validé pour que cette moyenne soit calculée';
+$string['calc:certif:list'] = 'Le score suggéré est égal au score du module \'List\'. Le module \'Incontournables\' doit nécessairement être validé pour que ce score ne soit pas 0.';
+$string['calc:eval:list'] = 'Le score suggéré est la moyenne des scores \'Eval\' et \'List\' affectés de leur coefficient.';
+$string['calc:eval:certif'] = 'Le score suggéré est égal au score du module \'Eval\'. Le module \'Incontournables\' doit nécessairement être validé pour que ce score ne soit pas 0.';
+$string['calc:eval'] = 'Le score suggéré est égal au score du module \'Eval\'.';
+$string['calc:list'] = 'Le score suggéré est égal au score du module \'List\'.';
+
+$string['search:activity'] = 'Rechercher activités CompetVet';

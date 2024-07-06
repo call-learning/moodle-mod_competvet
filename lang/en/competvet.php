@@ -351,9 +351,11 @@ $string['gradeK1_help'] = 'The weight of the evaluation grade, default is 5';
 $string['gradeK2'] = 'Grade calculation constant K2';
 $string['gradeK2_help'] = 'The weight of the list grade, default is 2';
 $string['notenoughgrades'] = 'Not enough data to calculate the suggested grade';
-$string['calc:eval:certif:list'] = 'The suggested score is the average of the `Eval` and `List` scores weighted by their coefficient. The `Incontournables` module must be validated for this average to be calculated.';
-$string['calc:certif:list'] = 'The suggested score is equal to the `List` module score. The `Incontournables` module must be validated for this score not to be 0.';
-$string['calc:eval:list'] = 'The suggested score is the average of the `Eval` and `List` scores weighted by their coefficient.';
-$string['calc:eval:certif'] = 'The suggested score is equal to the `Eval` module score. The `Incontournables` module must be validated for this score not to be 0.';
-$string['calc:eval'] = 'Le score suggéré est égal au score du module `Eval`. ';
-$string['calc:list'] = 'Le score suggéré est égal au score du module `List`. ';
+$string['calc:eval:certif:list'] = 'The suggested score is the average of the \'Eval\' and \'List\' scores weighted by their coefficient. The \'Incontournables\' module must be validated for this average to be calculated.';
+$string['calc:certif:list'] = 'The suggested score is equal to the \'List\' module score. The \'Incontournables\' module must be validated for this score not to be 0.';
+$string['calc:eval:list'] = 'The suggested score is the average of the \'Eval\' and \'List\' scores weighted by their coefficient.';
+$string['calc:eval:certif'] = 'The suggested score is equal to the \'Eval\' module score. The \'Incontournables\' module must be validated for this score not to be 0.';
+$string['calc:eval'] = 'The suggested score is equal to the \'Eval\' module score.';
+$string['calc:list'] = 'The suggested score is equal to the \'List\' module score.';
+
+$string['search:activity'] = 'Rechercher activités CompetVet';
