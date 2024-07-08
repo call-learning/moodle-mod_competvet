@@ -14,6 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\external;
+// This is for 4.4 compatibility.
+defined('MOODLE_INTERNAL') || die;
+global $CFG;
+require_once("$CFG->libdir/externallib.php");
 
 use core_user;
 use external_api;

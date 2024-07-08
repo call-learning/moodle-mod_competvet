@@ -15,6 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\external;
+// This is for 4.4 compatibility.
+defined('MOODLE_INTERNAL') || die;
+global $CFG;
+require_once("$CFG->libdir/externallib.php");
 
 use core_reportbuilder\local\filters\number;
 use external_api;
@@ -75,7 +79,7 @@ class get_evaluations extends external_api {
                                 )
                             ),
                         ]
-                    )
+                    ),
                 ),
                 'comments' => new external_multiple_structure(
                     new external_single_structure(
@@ -172,6 +176,8 @@ class get_evaluations extends external_api {
                     }
                 }
             }
+            // Prune empty grades entries.
+            $grades = array_filter($grades);
             if (empty($grades)) {
                 continue;
             }
