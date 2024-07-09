@@ -58,6 +58,17 @@ class search_test extends advanced_testcase {
                     ],
                 ],
             ],
+            'simple search with part of word' => [
+                'sit',
+                1,
+                [
+                    [
+                        'type' => 'situation',
+                        'description' => 'Situation 1',
+                        'identifier' => 'SIT1',
+                    ],
+                ],
+            ],
         ];
     }
 
