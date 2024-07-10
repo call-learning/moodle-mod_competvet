@@ -20,9 +20,10 @@ namespace mod_competvet\reportbuilder\local\entities;
 
 use context_helper;
 use core_reportbuilder\local\entities\base;
-use core_reportbuilder\local\filters\{boolean_select, number};
+use core_reportbuilder\local\filters\{boolean_select, number, text};
 use core_reportbuilder\local\helpers\database;
 use core_reportbuilder\local\report\{column, filter};
+use core_reportbuilder\local\helpers\format;
 use html_writer;
 use lang_string;
 use mod_competvet\reportbuilder\local\filters\situation_selector;
@@ -65,7 +66,6 @@ class situation extends base {
      * @return column[]
      */
     protected function get_all_columns(): array {
-        global $DB; // Used for aggregation.
         $situationalias = $this->get_table_alias('competvet_situation');
         $competvetalias = $this->get_table_alias('competvet');
         $contextalias = $this->get_table_alias('context');
@@ -92,12 +92,14 @@ class situation extends base {
             ->add_fields("{$cmmodulealias}.id AS cmmoduleid")
             ->add_fields("{$situationalias}.shortname")
             ->set_is_sortable(true)
-            ->add_callback(static function(?string $value, stdClass $row): string {
+            ->add_callback(static function (?string $value, stdClass $row): string {
                 if ($value === null) {
                     return '';
                 }
-                return html_writer::link(new moodle_url('/mod/competvet/view.php', ['id' => $row->cmmoduleid]),
-                    $row->shortname);
+                return html_writer::link(
+                    new moodle_url('/mod/competvet/view.php', ['id' => $row->cmmoduleid]),
+                    $row->shortname
+                );
             });
 
         $columns[] = (new column(
@@ -148,7 +150,8 @@ class situation extends base {
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_BOOLEAN)
             ->add_fields("{$situationalias}.haseval")
-            ->set_is_sortable(true);
+            ->set_is_sortable(true)
+            ->set_callback([format::class, 'boolean_as_text']);
 
         $columns[] = (new column(
             'hascertif',
@@ -158,7 +161,8 @@ class situation extends base {
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_BOOLEAN)
             ->add_fields("{$situationalias}.hascertif")
-            ->set_is_sortable(true);
+            ->set_is_sortable(true)
+            ->set_callback([format::class, 'boolean_as_text']);
         $columns[] = (new column(
             'hascase',
             new lang_string('situation:hascase', 'mod_competvet'),
@@ -167,7 +171,8 @@ class situation extends base {
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_BOOLEAN)
             ->add_fields("{$situationalias}.hascase")
-            ->set_is_sortable(true);
+            ->set_is_sortable(true)
+            ->set_callback([format::class, 'boolean_as_text']);
 
         $columns[] = (new column(
             'name',
@@ -191,7 +196,7 @@ class situation extends base {
             ->add_fields("{$competvetalias}.introformat, {$competvetalias}.id as competvetid, {$cmmodulealias}.id AS cmmoduleid")
             ->add_fields(context_helper::get_preload_record_columns_sql($contextalias))
             ->set_is_sortable(true)
-            ->set_callback(static function(?string $intro, stdClass $row): string {
+            ->set_callback(static function (?string $intro, stdClass $row): string {
                 global $CFG;
                 if ($intro === null) {
                     return '';
@@ -260,7 +265,7 @@ class situation extends base {
         $situationalias = $this->get_table_alias('competvet_situation');
 
         $filters[] = (new filter(
-            number::class,
+            text::class,
             'shortname',
             new lang_string('situation:shortname', 'mod_competvet'),
             $this->get_entity_name(),
@@ -268,7 +273,7 @@ class situation extends base {
         ))->add_joins($this->get_joins());
 
         $filters[] = (new filter(
-            number::class,
+            text::class,
             'shortnamewithlinks',
             new lang_string('situation:shortnamewithlinks', 'mod_competvet'),
             $this->get_entity_name(),

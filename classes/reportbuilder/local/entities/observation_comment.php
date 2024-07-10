@@ -32,25 +32,19 @@ use lang_string;
  */
 class observation_comment extends base {
     /**
-     * Database tables that this entity uses and their default aliases
+     * Comment type
      *
-     * @return array
+     * @var string
      */
-    protected function get_default_table_aliases(): array {
-        return [
-            'competvet_obs_comment' => 'obscomment',
-        ];
-    }
+    private string $commenttype;
 
     /**
-     * The default title for this entity
-     *
-     * @return lang_string
+     * Constructor
+     * @param string $commenttype
      */
-    protected function get_default_entity_title(): lang_string {
-        return new lang_string('entity:observation_comment', 'mod_competvet');
+    public function __construct(string $commenttype) {
+        $this->commenttype = $commenttype;
     }
-
     /**
      * Initialise the entity
      *
@@ -83,7 +77,7 @@ class observation_comment extends base {
 
         $columns[] = (new column(
             'comment',
-            new lang_string('observation_comment:comment', 'mod_competvet'),
+            new lang_string('observation_comment:comment', 'mod_competvet', $this->commenttype),
             $this->get_entity_name()
         ))
             ->add_joins($this->get_joins())
@@ -96,14 +90,15 @@ class observation_comment extends base {
 
         $columns[] = (new column(
             'type',
-            new lang_string('observation_comment:type', 'mod_competvet'),
+            new lang_string('observation_comment:type', 'mod_competvet', $this->commenttype),
             $this->get_entity_name()
         ))
             ->add_joins($this->get_joins())
-            ->set_type(column::TYPE_TEXT)
-            ->add_fields("{$obscommentalias}.comment, {$obscommentalias}.commentformat")
+            ->set_type(column::TYPE_INTEGER)
+            ->add_fields("{$obscommentalias}.type")
             ->set_is_sortable(true)
-            ->set_callback(fn($value, $row) => \mod_competvet\local\persistent\observation_comment::from_type_to_string($value));
+            ->set_callback(fn($value, $row) => !empty($value) ?
+                \mod_competvet\local\persistent\observation_comment::from_type_to_string($value) : '');
         return $columns;
     }
 
@@ -124,5 +119,25 @@ class observation_comment extends base {
         ))->add_joins($this->get_joins());
 
         return $filters;
+    }
+
+    /**
+     * Database tables that this entity uses and their default aliases
+     *
+     * @return array
+     */
+    protected function get_default_table_aliases(): array {
+        return [
+            'competvet_obs_comment' => 'obscomment',
+        ];
+    }
+
+    /**
+     * The default title for this entity
+     *
+     * @return lang_string
+     */
+    protected function get_default_entity_title(): lang_string {
+        return new lang_string('entity:observation_comment', 'mod_competvet');
     }
 }

@@ -52,7 +52,7 @@ class observations extends datasource {
             'planning:startdate',
             'planning:enddate',
             'situation:shortname',
-            'observation_comment:comment',
+            'observercomment:comment',
             'situation:evalnum',
         ];
     }

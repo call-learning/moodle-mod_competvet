@@ -80,8 +80,8 @@ trait observations_helper {
                    ON {$observeralias}.id = {$observationalias}.observerid"));
         $observerentity->get_column('fullname')->set_title(new lang_string('observer:fullname', 'mod_competvet'));
         // Add comments to observation.
-        foreach(observation_comment_entity::COMMENT_TYPES as $type => $entityname) {
-            $this->add_comment_entity( $type, $entityname, $observationalias);
+        foreach (observation_comment_entity::COMMENT_TYPES as $type => $entityname) {
+            $this->add_comment_entity($type, $entityname, $observationalias);
         }
     }
 
@@ -95,7 +95,7 @@ trait observations_helper {
      */
     private function add_comment_entity(int $type, string $entityname, string $observationalias): void {
         // Add comments to observation.
-        $obscommententity = (new observation_comment())
+        $obscommententity = (new observation_comment($entityname))
             ->set_entity_name($entityname)
             ->set_table_aliases(['competvet_obs_comment' => 'obs' . $entityname])
             ->set_entity_title(new lang_string('observation:comment:' . $entityname, 'mod_competvet'));
