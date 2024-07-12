@@ -19,26 +19,28 @@ declare(strict_types=1);
 namespace mod_competvet\reportbuilder\local\systemreports;
 
 use context;
+use core_group\reportbuilder\local\entities\group;
 use core_reportbuilder\local\helpers\database;
 use core_reportbuilder\local\report\action;
 use core_reportbuilder\system_report;
 use lang_string;
+use mod_competvet\reportbuilder\local\entities\planning;
 use mod_competvet\reportbuilder\local\entities\situation;
+use mod_competvet\reportbuilder\local\helpers\observations_helper;
 use moodle_url;
 use pix_icon;
 use stdClass;
 
 /**
- * Situations for a given user
+ * Planning per situation
  *
- * Used in the situations API:
- * @see \mod_competvet\local\api\situations::get_all_situations_with_planning_for
+ * Used in the situations API
  *
  * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class situations extends system_report {
+class student_per_situation extends system_report {
     /**
      * Return the conditions that will be added to the report upon creation
      *
@@ -55,14 +57,13 @@ class situations extends system_report {
         $this->set_main_table('competvet_situation', $situationalias);
 
         // Join situation entity to competvet.
-        if ($situationids = $this->get_parameter('onlyforsituationsid', "", PARAM_RAW)) {
+        if ($situationidsjson = $this->get_parameter('onlyforsituations', "[]", PARAM_RAW)) {
             global $DB;
-            $situationids = explode(',', $situationids);
+            $situationids = json_decode($situationidsjson);
             if (!empty($situationids)) {
-                $situationparamprefix = database::generate_param_name();
-                [$where, $params] = $DB->get_in_or_equal($situationids, SQL_PARAMS_NAMED, $situationparamprefix);
+                [$where, $params] = $DB->get_in_or_equal($situationids, SQL_PARAMS_NAMED, 'situationids');
                 $this->add_base_condition_sql(
-                    "{$situationalias}.id {$where}",
+                    "{$situationalias}.situationid = {$where}",
                     $params
                 );
             }
@@ -71,6 +72,23 @@ class situations extends system_report {
         $coursemodulealias = $situationentity->get_table_alias('course_modules');
         $this->add_base_fields("{$situationalias}.id, {$contextalias}.id AS contextid, {$coursemodulealias}.id AS cmid");
         $this->add_entity($situationentity->add_joins($situationentity->get_context_and_modules_joins()));
+
+        $planningentity = new planning();
+        $planningalias = $planningentity->get_table_alias('competvet_planning');
+        $this->add_entity($planningentity
+            ->add_join(
+                "LEFT JOIN {competvet_planning} {$planningalias} ON {$planningalias}.situationid = {$situationalias}.id"
+            ));
+        $groupentity = new group();
+        $groupsalias = $groupentity->get_table_alias('groups');
+        $groupscontextalias = $groupentity->get_table_alias('context');
+        $this->add_entity($groupentity
+            ->add_join("LEFT JOIN {groups} {$groupsalias} ON {$groupsalias}.id = {$planningalias}.groupid")
+            ->add_join("LEFT JOIN {context} {$groupscontextalias}
+            ON {$groupscontextalias}.contextlevel = " . CONTEXT_COURSE . "
+           AND {$groupscontextalias}.instanceid = {$groupsalias}.courseid"));
+
+
         // Now we can call our helper methods to add the content we want to include in the report.
         $this->add_columns();
         $this->add_filters();
@@ -79,7 +97,7 @@ class situations extends system_report {
         // Here we do this intentionally as any button inserted in the page results in a javascript error.
         // This is due to fact that if we insert it in an existing form this will nest the form and this is not allowed.
         $isdownloadable = $this->get_parameter('downloadable', false, PARAM_BOOL);
-        $hasfilters = $this->get_parameter('hasfilters', true, PARAM_BOOL);
+        $hasfilters = $this->get_parameter('hasfilters', false, PARAM_BOOL);
         $this->set_downloadable($isdownloadable);
         $this->set_filter_form_default($hasfilters);
     }
@@ -93,17 +111,10 @@ class situations extends system_report {
     protected function add_columns(): void {
         $columns = [
             'situation:shortnamewithlinks',
-            'situation:shortname',
-            'situation:name',
-            'situation:evalnum',
-            'situation:autoevalnum',
-            'situation:certifpnum',
-            'situation:casenum',
-            'situation:haseval',
-            'situation:hascertif',
-            'situation:hascase',
-            'situation:intro',
-            'situation:cmid',
+            'planning:startdate',
+            'planning:enddate',
+            'planning:session',
+            'group:name',
         ];
 
         $this->add_columns_from_entities($columns);
