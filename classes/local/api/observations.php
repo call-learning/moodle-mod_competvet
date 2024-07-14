@@ -79,7 +79,11 @@ class observations {
         );
         $comments = $observation->get_comments();
         $contexts = array_filter($comments, fn($comment) => $comment->get('type') == observation_comment::OBSERVATION_CONTEXT);
-        $context = end($contexts);
+        if (empty($contexts)) {
+            $context = null;
+        } else {
+            $context = end($contexts);
+        }
         $othercomments = array_filter($comments, fn($comment) => $comment->get('type') != observation_comment::OBSERVATION_CONTEXT);
         $contextrecord = [];
         $result = [
@@ -183,13 +187,15 @@ class observations {
         $observation->set('observerid', $observerid);
         $observation->set('status', observation::STATUS_NOTSTARTED);
         $observation->create();
-        $contextcomment = new observation_comment(0);
-        $contextcomment->set('observationid', $observation->get('id'));
-        $contextcomment->set('type', observation_comment::OBSERVATION_CONTEXT);
-        $contextcomment->set('comment', $context ?? '');
-        $contextcomment->set('commentformat', FORMAT_PLAIN);
-        $contextcomment->set('usercreated', $studentid);
-        $contextcomment->create();
+        if (!empty($context)) {
+            $contextcomment = new observation_comment(0);
+            $contextcomment->set('observationid', $observation->get('id'));
+            $contextcomment->set('type', observation_comment::OBSERVATION_CONTEXT);
+            $contextcomment->set('comment', $context ?? '');
+            $contextcomment->set('commentformat', FORMAT_PLAIN);
+            $contextcomment->set('usercreated', $studentid);
+            $contextcomment->create();
+        }
         foreach ($comments as $comment) {
             if (!empty($comment['id'])) {
                 $obscomment = observation_comment::get_record(['id' => $comment['id']]);

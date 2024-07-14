@@ -55,7 +55,7 @@ class student_eval extends base {
      */
     public function export_for_template(renderer_base $output) {
         $data = parent::export_for_template($output);
-        $data['context'] = $this->evaluation['context'];
+        $data['context'] = $this->evaluation['context'] ?? null;
         $data['comments'] = $this->evaluation['comments'];
         foreach ($this->evaluation['criteria'] as $evalcriterion) {
             $info = ['label' => $evalcriterion['criterioninfo']['label']];
