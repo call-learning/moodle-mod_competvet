@@ -1,0 +1,148 @@
+{
+    "plannings": [
+        {
+            "planningid": 1,
+            "start": "2024-08-01",
+            "end": "2024-08-31",
+            "group": "Nurses",
+            "requiredevaluations": "3",
+            "requiredautoevaluations": "1",
+            "requiredcertificates": "4",
+            "requiredcases": "2",
+            "contentcollapsed": "false",
+            "students": [
+                {
+                    "id": 1,
+                    "name": "Ameli Boucher",
+                    "evaluations": "2",
+                    "autoevaluations": "1",
+                    "certificates": "0",
+                    "cases": "1",
+                    "globalgrade": "55",
+                    "failure": "true",
+                    "feedback": "Cette année ne s'est pas très bien passée, l'année prochaine sera meilleure",
+                    "certifpass": "0",
+                    "evalpass": "1",
+                    "casepass": "0"
+                },
+                {
+                    "id": 2,
+                    "name": "Bastien Lefevre",
+                    "evaluations": "3",
+                    "autoevaluations": "1",
+                    "certificates": "4",
+                    "cases": "2",
+                    "globalgrade": "75",
+                    "feedback": "Très bon travail, continuez comme ça",
+                    "certifpass": "1",
+                    "evalpass": "1",
+                    "casepass": "1"
+                },
+                {
+                    "id": 3,
+                    "name": "Céleste Moreau",
+                    "evaluations": "3",
+                    "autoevaluations": "1",
+                    "certificates": "4",
+                    "cases": "2",
+                    "globalgrade": "80",
+                    "feedback": "Excellent travail, continuez comme ça",
+                    "certifpass": "1",
+                    "evalpass": "1",
+                    "casepass": "1"
+                },
+                {
+                    "id": 4,
+                    "name": "Doriane Lemoine",
+                    "evaluations": "3",
+                    "autoevaluations": "1",
+                    "certificates": "4",
+                    "cases": "0",
+                    "globalgrade": "85",
+                    "feedback": "Excellent travail, continuez comme ça",
+                    "certifpass": "1",
+                    "evalpass": "1",
+                    "casepass": "0"
+                },
+                {
+                    "id": 5,
+                    "name": "Eliot Dubois",
+                    "evaluations": "0",
+                    "autoevaluations": "1",
+                    "certificates": "4",
+                    "cases": "2",
+                    "globalgrade": "90",
+                    "feedback": "Excellent travail, continuez comme ça",
+                    "certifpass": "1",
+                    "evalpass": "0",
+                    "casepass": "1"
+                }
+            ]
+        },
+        {
+            "planningid": 4,
+            "start": "2024-09-01",
+            "end": "2024-09-30",
+            "group": "Assistants",
+            "requiredevaluations": "3",
+            "requiredautoevaluations": "1",
+            "requiredcertificates": "4",
+            "requiredcases": "2",
+            "contentcollapsed": "true",
+            "students": [
+                {
+                    "id": 15,
+                    "name": "Léonie Lefevre",
+                    "evaluations": "2",
+                    "autoevaluations": "1",
+                    "certificates": "3",
+                    "cases": "1",
+                    "globalgrade": "55",
+                    "failure": "true",
+                    "feedback": "Cette année ne s'est pas très bien passée, l'année prochaine sera meilleure"
+                },
+                {
+                    "id": 16,
+                    "name": "Marius Moreau",
+                    "evaluations": "3",
+                    "autoevaluations": "1",
+                    "certificates": "4",
+                    "cases": "2",
+                    "globalgrade": "75",
+                    "feedback": "Très bon travail, continuez comme ça"
+                },
+                {
+                    "id": 17,
+                    "name": "Ninon Lemoine",
+                    "evaluations": "3",
+                    "autoevaluations": "1",
+                    "certificates": "4",
+                    "cases": "2",
+                    "globalgrade": "80",
+                    "feedback": "Excellent travail, continuez comme ça"
+                },
+                {
+                    "id": 18,
+                    "name": "Olivier Dubois",
+                    "evaluations": "3",
+                    "autoevaluations": "1",
+                    "certificates": "4",
+                    "cases": "2",
+                    "globalgrade": "85",
+                    "feedback": "Excellent travail, continuez comme ça"
+                },
+                {
+                    "id": 19,
+                    "name": "Pénélope Lefevre",
+                    "evaluations": "3",
+                    "autoevaluations": "1",
+                    "certificates": "4",
+                    "cases": "2",
+                    "globalgrade": "40",
+                    "failure": "true",
+                    "feedback": "Excellent travail, continuez comme ça"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,99 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_competvet/mockup
+
+    TODO describe template mockup
+
+    Example context (json):
+    {
+    }
+}}
+<link rel="stylesheet" href="{{wwwroot}}/mod/competvet/scss/styles.css?v={{version}}" />
+<form class="form mb-5">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2 class="title">Student Grading</h2>
+        <div class="d-flex align-items-center">
+            <input type="text" name=studentsearch" class="form-control" placeholder="Search Student" />
+            </div>
+        <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center">
+                <label for="planning" class="mr-1 mb-0">Planning</label>
+                <select name="planning" id="planning" class="form-control">
+                    <option value="1">Planning 1</option>
+                    <option value="2">Planning 2</option>
+                    <option value="3">Planning 3</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</form>
+<table class="competvet-grade-table w-100">
+    <tr class="legend">
+        <th class="label first"></th>
+        <th class="label">Stats</th>
+        <th class="label">Global Grade</th>
+        <th class="label last">Comments</th>
+    </tr>
+{{#plannings}}
+    <tr class="planning">
+        <th class="planning-name" colspan="7">
+            <div class="position-relative d-flex align-items-center">
+                {{< mod_competvet/expandcollapse}}
+                    {{$id}}{{planningid}}{{/id}}
+                {{/ mod_competvet/expandcollapse}}
+                {{start}}
+            </div>
+        </th>
+    </tr>
+    {{#students}}
+        <tr class="student collapse {{#contentcollapsed}}show{{/contentcollapsed}}" id="collapse{{planningid}}">
+            <th class="user student-name"><a href="{{{studenturl}}}">{{name}}</a></td>
+            <td class="t-grade stats">
+                <span class="evalutations">
+                    <span class="badge {{#evalpass}}badge-success{{/evalpass}}{{^evalpass}}badge-secondary{{/evalpass}} badge-pill" data-toggle="tooltip" title="{{#str}}planning:page:info:eval, mod_competvet{{/str}}">
+                        {{requiredevaluations}}/{{evaluations}}
+                        {{> mod_competvet/grading/svg/chat}}
+                    </span>
+                </span>
+                <span class="autoevaluations">
+                    <span class="badge {{#autoevalpass}}badge-success{{/autoevalpass}}{{^autoevalpass}}badge-secondary{{/autoevalpass}} badge-pill" data-toggle="tooltip" title="{{#str}}planning:page:info:autoeval, mod_competvet{{/str}}">
+                        {{requiredautoevaluations}}/{{autoevaluations}} 
+                        {{> mod_competvet/grading/svg/chat}}
+                    </span>
+                </span>
+                <span class="certifications">
+                    <span class="badge {{#certifpass}}badge-success{{/certifpass}}{{^certifpass}}badge-secondary{{/certifpass}} badge-pill" data-toggle="tooltip" title="{{#str}}planning:page:info:cert, mod_competvet{{/str}}">
+                        {{requiredcertificates}}/{{certificates}}
+                        {{> mod_competvet/grading/svg/certif}}
+                    </span>
+                </span>
+                </span>
+                <span class="cases">
+                    <span class="badge {{#casepass}}badge-success{{/casepass}}{{^casepass}}badge-secondary{{/casepass}} badge-pill"  data-toggle="tooltip" title="{{#str}}planning:page:info:list, mod_competvet{{/str}}">
+                        {{requiredcases}}/{{cases}}
+                        {{> mod_competvet/grading/svg/list}}
+                    </span>
+                </span>
+            </td>
+            <td class="t-grade globalgrade"><span class="circle {{#failure}}fail{{/failure}}">{{globalgrade}}</span></td>
+            <td class="t-grade comments">{{feedback}}</td>
+        </tr>
+    {{/students}}
+
+{{/plannings}}
+</table>
