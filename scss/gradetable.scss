@@ -1,0 +1,66 @@
+.competvet-grade-table {
+    th {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        &.first {
+            border-left: 1px solid #dee2e6;
+        }
+        &.last {
+            border-right: 1px solid #dee2e6;
+        }
+        &.planning-name {
+            padding: 1.5rem 1rem 0.5rem 0;
+            background-color: #ffffff;
+        }
+        &.label {
+            padding: 0.5rem 1rem;
+            text-align:left;
+            border-top: 1px solid #dee2e6;
+        }
+    }
+    th.user {
+        background-color: #f8f9fa;
+        padding: 0.5rem 1rem;
+        text-align: left;
+        border-left: 1px solid #dee2e6;
+        border-top: 1px solid #dee2e6;
+        border-bottom: 1px solid #dee2e6;
+        width: 150px;
+    }
+    .t-grade {
+        padding: 0.5rem 1rem;
+        text-align: center;
+        border-left: 1px solid #dee2e6;
+        border-right: 1px solid #dee2e6;
+        border-bottom: 1px solid #dee2e6;
+        &.comments {
+            text-align: left;
+        }
+        &.globalgrade {
+            padding: 0.5rem 1rem;
+        }
+    }
+    .globalgrade .circle {
+        border-radius: 100%;
+        background-color: #f8f9fa;
+        padding: 1rem;
+        width: 2rem;
+        height: 2rem;
+        border: 1px solid #dee2e6;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto;
+        &.fail {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+    }
+    svg {
+        width: 1.5rem;
+        .svg-stroke {
+            stroke: #fff;;
+        }
+    }
+}
