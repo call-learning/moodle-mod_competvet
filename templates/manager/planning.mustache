@@ -79,6 +79,7 @@
             {{#str}}inuse, mod_competvet{{/str}}
         </div>
     {{/inuse}}
+
     <div data-region="plannings">
         {{> mod_competvet/manager/planning/plannings}}
     </div>
@@ -86,11 +87,14 @@
         <a class="btn btn-link jsbutton" href="#" data-action="add" data-type="planning">
             {{#str}}addplanning, mod_competvet{{/str}}
         </a>
+        <a class="btn btn-link" data-action="section-upload-form" data-situationid="{{situationid}}" data-courseid="{{courseid}}" data-cmid="{{cmid}}" >
+            {{#str}}uploadplanning, mod_competvet{{/str}}
+        </a>
     </div>
 </div>
-<pre id="debug"></pre>
 {{#js}}
-require(['mod_competvet/local/manager/manager_app_planning'], function(manager) {
+require(['mod_competvet/local/manager/manager_app_planning', 'mod_competvet/planning_upload_form'], function(manager, form) {
     manager.init();
+    form.init();
 });
 {{/js}}
