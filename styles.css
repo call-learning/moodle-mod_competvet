@@ -179,44 +179,6 @@
     stroke: var(--primary);
 }
 
-.gradingapp .comment {
-    margin-top: 0.25rem;
-    margin-bottom: 0.25remrem;
-    background-color: #f5f5f5;
-    padding: 0.5rem 0.7rem;
-    border-radius: 0.5rem;
-    margin-left: 2.5rem;
-}
-
-.gradingapp .commentsection {
-    margin-bottom: 1rem;
-}
-
-.gradingapp .commentsection .userimage img {
-    width: 35px;
-    height: 35px;
-}
-
-.gradingapp .commentuserinfo .note {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: #666;
-}
-
-.gradingapp .showmoreless {
-    position: absolute;
-    right: 12px;
-    bottom: 0;
-    transform: translate(0, 50%);
-}
-
-.gradingapp .showmore,
-.gradingapp .showless {
-    background-color: #f5f5f5;
-    padding: 0.2rem;
-    border-radius: 0.2rem;
-}
-
 .gradingapp .form-control:focus {
     box-shadow: none;
 }
@@ -666,4 +628,42 @@
     padding: 0.5rem;
     border-radius: 0.25rem;
     margin: 0.5rem 0;
+}
+
+.path-mod-competvet .comment {
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+    background-color: #f5f5f5;
+    padding: 0.5rem 0.7rem;
+    border-radius: 0.5rem;
+    margin-left: 2.5rem;
+}
+
+.path-mod-competvet .commentsection {
+    margin-bottom: 1rem;
+}
+
+.path-mod-competvet .commentsection .userimage img {
+    width: 35px;
+    height: 35px;
+}
+
+.path-mod-competvet .commentuserinfo .note {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #666;
+}
+
+.path-mod-competvet .showmoreless {
+    position: absolute;
+    right: 12px;
+    bottom: 0;
+    transform: translate(0, 50%);
+}
+
+.path-mod-competvet .showmore,
+.path-mod-competvet .showless {
+    background-color: #f5f5f5;
+    padding: 0.2rem;
+    border-radius: 0.2rem;
 }

@@ -39,39 +39,42 @@
         {{/candelete}}
     </div>
     <div class="container">
-        <h3>{{#str}}context, mod_competvet{{/str}}</h3>
-        <div class="container">
-            {{#context}}
-                <div class="card rounded-pill p-3">
-                    {{{comment}}}
-                </div>
-            {{/context}}
-        </div>
-        <div class="container">
-            {{#criteria}}
-                <div class="container m-3">
-                    <span><a href="{{viewurl}}">{{label}}</a></span>
-                    <span class="badge badge-{{badgetype}}">{{level}}</span>
-                </div>
-            {{/criteria}}
-        </div>
-        <h3>{{#str}}comments, mod_competvet{{/str}}</h3>
-        <div class="container">
-            {{#comments}}
-                <div>
-                    <div class="card rounded-pill p-3">
-                        <div class="card-body">
-                            {{#userinfo}}
-                                <div>
-                                    <img src="{{userpictureurl}}" class="rounded-circle" width="50" height="50">
-                                    <a href="{{viewurl}}"><span>{{fullname}}</span></a>
-                                </div>
-                            {{/userinfo}}
-                            <span class="font-italic">{{{comment}}}</span>
+        <div class="row mb-5">
+            <div class="col-12 col-md-6">
+                <h3>{{#str}}context, mod_competvet{{/str}}</h3>
+                {{#context}}
+                    <div class="comment mb-5 ml-0">
+                        {{{comment}}}
+                    </div>
+                {{/context}}
+                <h3>{{#str}}report:observations, mod_competvet{{/str}}</h3>
+                <div class="mb-5">
+                {{#criteria}}
+                    <div class="d-flex p-3 border-bottom border-secondary">
+                        <span><a href="{{viewurl}}">{{label}}</a></span>
+                        <div class="ml-auto">
+                            <span class="badge badge-{{badgetype}}">{{level}}</span>
                         </div>
                     </div>
+                {{/criteria}}
                 </div>
-            {{/comments}}
+            </div>
+            <div class="col-12 col-md-6">
+                <h3>{{#str}}comments, mod_competvet{{/str}}</h3>
+                {{#evalcomments}}
+                    {{< mod_competvet/comment}}
+                        {{$classes}}{{#private}}text-muted{{/private}}{{/classes}}
+                        {{$info}}
+                            {{#timecreated}}
+                                <div class="small timecreated d-flex justify-content-end">
+                                    {{#private}}{{#pix}}t/show, core, {{#str}} observation:comment:privatecomment, mod_competvet{{/str}}{{/pix}}{{/private}}
+                                    {{#userdate}} {{timecreated}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}} {{/userdate}} 
+                                </div>
+                            {{/timecreated}}
+                        {{/info}}
+                    {{/ mod_competvet/comment}}
+                {{/evalcomments}}
+            </div>
         </div>
     </div>
 </div>
