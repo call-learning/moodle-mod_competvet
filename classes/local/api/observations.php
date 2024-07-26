@@ -110,7 +110,10 @@ class observations {
             array_values(
                 array_map(function($obscrit) {
                     $return = (array) $obscrit->to_record();
-                    $return['userinfo'] = utils::get_user_info($return['usercreated']);
+                    $userinfo = utils::get_user_info($return['usercreated']);
+                    $return['picture'] = $userinfo['userpictureurl'];
+                    $return['fullname'] = $userinfo['fullname'];
+                    $return['private'] = $return['type'] == observation_comment::OBSERVATION_PRIVATE_COMMENT;
                     $return['commentlabel'] = ''; // TODO Fill this in with labels for comment/autoeval.
                     unset($return['usercreated']);
                     $return['comment'] = format_text($return['comment'], $return['commentformat']);
