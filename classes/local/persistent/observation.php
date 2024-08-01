@@ -220,6 +220,16 @@ class observation extends persistent {
      * @return observation_comment[]
      */
     public function get_comments() {
-        return observation_comment::get_records(['observationid' => $this->raw_get('id')]);
+        $comments = observation_comment::get_records(['observationid' => $this->raw_get('id')]);
+        $situation = $this->get_situation();
+        $competvet = competvet::get_from_situation($situation);
+        $context = $competvet->get_context();
+        $canobserve = has_capability('mod/competvet:canobserve', $context);
+        return array_filter($comments, function($comment) use ($canobserve) {
+            if ($comment->get('type') == observation_comment::OBSERVATION_PRIVATE_COMMENT && !$canobserve) {
+                return false;
+            }
+            return true;
+        });
     }
 }

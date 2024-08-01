@@ -111,7 +111,7 @@ const formEvents = () => {
         const result = await Repository.saveFormData(args);
         context.isvalid = result.result;
         context.isinvalid = !result.result;
-        context.cangrade = gradingApp == 1;
+        context.cangrade = gradingApp.dataset.cangrade == 1;
         CompetState.setValue('certification-grading', context);
 
         // Now set the sub grade that will be used for the suggested grade.

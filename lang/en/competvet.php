@@ -245,11 +245,13 @@ $string['entercertificationassesment'] = 'enter your certification assessments h
 $string['more'] = 'more';
 $string['less'] = 'less';
 $string['points'] = '{$a} points';
-
 $string['managecriteria'] = 'Manage criteria';
 $string['list_criteria'] = 'List criteria';
 $string['certif_criteria'] = 'Certification criteria';
 $string['eval_criteria'] = 'Evaluation criteria';
+
+// Planning interface
+$string['stats'] = 'Stats';
 
 // Eval
 $string['evalevaluation'] = 'Eval evaluation';
@@ -322,6 +324,7 @@ $string['nocases'] = 'No cases';
 
 // Webservice warnings
 $string['gridnotfound'] = 'The grid with id {$a} was not found';
+$string['groupnotfound'] = 'The group with name {$a} was not found';
 
 // Case form
 $string['case:add'] = 'Add a clinical case';
@@ -348,6 +351,9 @@ $string['valid:confirmed'] = 'I confirm that this essential has been achieved';
 $string['valid:notseen'] = 'I do not validate because I did not see this essential';
 $string['valid:levelnotreached'] = 'I do not validate because the level is not reached';
 $string['valid:observernotseen'] = 'The observer did not see this essential';
+
+// Upload planning form
+$string['uploadplanning'] = 'Upload planning';
 
 // Suggested grade
 $string['acceptgrade'] = 'Accept the suggested grade';
