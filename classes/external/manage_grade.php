@@ -19,6 +19,7 @@ namespace mod_competvet\external;
 defined('MOODLE_INTERNAL') || die;
 global $CFG;
 require_once("$CFG->libdir/externallib.php");
+require_once($CFG->libdir.'/gradelib.php');
 
 use external_api;
 use external_description;
@@ -51,6 +52,7 @@ class manage_grade extends external_api {
             'userid' => new external_value(PARAM_INT, 'The user id', VALUE_REQUIRED),
             'cmid' => new external_value(PARAM_INT, 'The course module id', VALUE_REQUIRED),
             'grade' => new external_value(PARAM_TEXT, 'The grade', VALUE_REQUIRED),
+            'feedback' => new external_value(PARAM_TEXT, 'The feedback', VALUE_OPTIONAL),
         ]);
     }
 
@@ -60,18 +62,21 @@ class manage_grade extends external_api {
      * @param int $userid
      * @param int $cmid
      * @param string $grade
+     * @param string $feedback
      * @return array
      */
-    public static function update($userid, $cmid, $grade): array {
+    public static function update($userid, $cmid, $grade, $feedback): array {
         $params = self::validate_parameters(self::update_parameters(), [
             'userid' => $userid,
             'cmid' => $cmid,
             'grade' => $grade,
+            'feedback' => $feedback,
         ]);
         // Set the grade for this user in the Moodle gradebook
         $grade = intval($params['grade']);
         $cmid = $params['cmid'];
         $userid = $params['userid'];
+        $feedback = $params['feedback'];
         $competvet = competvet::get_from_cmid($cmid);
         self::validate_context($competvet->get_context());
 
@@ -86,24 +91,15 @@ class manage_grade extends external_api {
             ];
         }
 
-        $grades = [];
-        $grades[$userid] = [
-            'userid' => $userid,
-            'rawgrade' => $grade,
-            'dategraded' => time(),
-            'datesubmitted' => time(),
-        ];
+        $item = \grade_item::fetch([
+            'itemtype' => 'mod',
+            'itemmodule' => 'competvet',
+            'iteminstance' => $competvet->get_instance_id(),
+            'courseid' => $competvet->get_course_id(),
+        ]);
+        $result = $item->update_final_grade($userid, $grade, null, $feedback, FORMAT_HTML);
 
-        $result = grade_update(
-            'mod/competvet',
-            $competvet->get_course_id(),
-            'mod',
-            'competvet',
-            $competvet->get_instance_id(),
-            0,
-            $grades
-        );
-        if ($result == GRADE_UPDATE_OK) {
+        if ($result) {
             return [
                 'result' => true,
                 'warnings' => [],
@@ -159,14 +155,12 @@ class manage_grade extends external_api {
         $userid = $params['userid'];
         $competvet = competvet::get_from_cmid($cmid);
         self::validate_context($competvet->get_context());
-        $grades = grade_get_grades($competvet->get_course_id(), 'mod', 'competvet', $competvet->get_instance_id(), $userid);
-        $usergrade = intval($grades->items[0]->grades[$userid]->grade);
-        $userdata = formdata::get($userid, $planningid, 'globalgrade');
 
+        $usergrade = $competvet->get_final_grade_for_student($userid);
         $grade = new stdClass();
         $grade->suggestedgrade = '';
-        $grade->finalgrade = $usergrade;
-        $grade->comment = $userdata['json'];
+        $grade->finalgrade = IntVal($usergrade->finalgrade);
+        $grade->comment = $usergrade->feedback;
         $grade->cangrade = has_capability('mod/competvet:cangrade', $competvet->get_context());
 
         return [

@@ -458,6 +458,11 @@
   padding: 0.2rem;
   border-radius: 0.2rem; }
 
+.path-mod-competvet .user-info .userpicture {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 100%; }
+
 .competvet-grade-table th {
   background-color: #f8f9fa;
   border-bottom: 1px solid #dee2e6; }
@@ -481,6 +486,10 @@
   border-top: 1px solid #dee2e6;
   border-bottom: 1px solid #dee2e6;
   width: 150px; }
+  .competvet-grade-table th.user .userpicture {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 100%; }
 
 .competvet-grade-table .t-grade {
   padding: 0.5rem 1rem;
@@ -488,6 +497,8 @@
   border-left: 1px solid #dee2e6;
   border-right: 1px solid #dee2e6;
   border-bottom: 1px solid #dee2e6; }
+  .competvet-grade-table .t-grade.stats {
+    width: 400px; }
   .competvet-grade-table .t-grade.comments {
     text-align: left; }
   .competvet-grade-table .t-grade.globalgrade {

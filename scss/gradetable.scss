@@ -26,6 +26,11 @@
         border-top: 1px solid #dee2e6;
         border-bottom: 1px solid #dee2e6;
         width: 150px;
+        .userpicture {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 100%;
+        }
     }
     .t-grade {
         padding: 0.5rem 1rem;
@@ -33,6 +38,9 @@
         border-left: 1px solid #dee2e6;
         border-right: 1px solid #dee2e6;
         border-bottom: 1px solid #dee2e6;
+        &.stats {
+            width: 400px;
+        }
         &.comments {
             text-align: left;
         }

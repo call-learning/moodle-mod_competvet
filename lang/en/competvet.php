@@ -245,11 +245,13 @@ $string['entercertificationassesment'] = 'enter your certification assessments h
 $string['more'] = 'more';
 $string['less'] = 'less';
 $string['points'] = '{$a} points';
-
 $string['managecriteria'] = 'Manage criteria';
 $string['list_criteria'] = 'List criteria';
 $string['certif_criteria'] = 'Certification criteria';
 $string['eval_criteria'] = 'Evaluation criteria';
+
+// Planning interface
+$string['stats'] = 'Stats';
 
 // Eval
 $string['evalevaluation'] = 'Eval evaluation';

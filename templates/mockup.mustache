@@ -26,7 +26,6 @@
 <link rel="stylesheet" href="{{wwwroot}}/mod/competvet/scss/styles.css?v={{version}}" />
 <form class="form mb-5">
     <div class="d-flex justify-content-between align-items-center">
-        <h2 class="title">Student Grading</h2>
         <div class="d-flex align-items-center">
             <input type="text" name=studentsearch" class="form-control" placeholder="Search Student" />
             </div>
@@ -45,55 +44,58 @@
 <table class="competvet-grade-table w-100">
     <tr class="legend">
         <th class="label first"></th>
-        <th class="label">Stats</th>
-        <th class="label">Global Grade</th>
-        <th class="label last">Comments</th>
+        <th class="label">{{#str}}stats, mod_competvet{{/str}}</th>
+        <th class="label">{{#str}}grade, mod_competvet{{/str}}</th>
+        <th class="label last">{{#str}}comments, mod_competvet{{/str}}</th>
     </tr>
-{{#plannings}}
-    <tr class="planning">
-        <th class="planning-name" colspan="7">
-            <div class="position-relative d-flex align-items-center">
-                {{< mod_competvet/expandcollapse}}
-                    {{$id}}{{planningid}}{{/id}}
-                {{/ mod_competvet/expandcollapse}}
-                {{start}}
-            </div>
-        </th>
-    </tr>
-    {{#students}}
-        <tr class="student collapse {{#contentcollapsed}}show{{/contentcollapsed}}" id="collapse{{planningid}}">
-            <th class="user student-name"><a href="{{{studenturl}}}">{{name}}</a></td>
-            <td class="t-grade stats">
-                <span class="evalutations">
-                    <span class="badge {{#evalpass}}badge-success{{/evalpass}}{{^evalpass}}badge-secondary{{/evalpass}} badge-pill" data-toggle="tooltip" title="{{#str}}planning:page:info:eval, mod_competvet{{/str}}">
-                        {{requiredevaluations}}/{{evaluations}}
-                        {{> mod_competvet/grading/svg/chat}}
-                    </span>
-                </span>
-                <span class="autoevaluations">
-                    <span class="badge {{#autoevalpass}}badge-success{{/autoevalpass}}{{^autoevalpass}}badge-secondary{{/autoevalpass}} badge-pill" data-toggle="tooltip" title="{{#str}}planning:page:info:autoeval, mod_competvet{{/str}}">
-                        {{requiredautoevaluations}}/{{autoevaluations}} 
-                        {{> mod_competvet/grading/svg/chat}}
-                    </span>
-                </span>
-                <span class="certifications">
-                    <span class="badge {{#certifpass}}badge-success{{/certifpass}}{{^certifpass}}badge-secondary{{/certifpass}} badge-pill" data-toggle="tooltip" title="{{#str}}planning:page:info:cert, mod_competvet{{/str}}">
-                        {{requiredcertificates}}/{{certificates}}
-                        {{> mod_competvet/grading/svg/certif}}
-                    </span>
-                </span>
-                </span>
-                <span class="cases">
-                    <span class="badge {{#casepass}}badge-success{{/casepass}}{{^casepass}}badge-secondary{{/casepass}} badge-pill"  data-toggle="tooltip" title="{{#str}}planning:page:info:list, mod_competvet{{/str}}">
-                        {{requiredcases}}/{{cases}}
-                        {{> mod_competvet/grading/svg/list}}
-                    </span>
-                </span>
-            </td>
-            <td class="t-grade globalgrade"><span class="circle {{#failure}}fail{{/failure}}">{{globalgrade}}</span></td>
-            <td class="t-grade comments">{{feedback}}</td>
-        </tr>
-    {{/students}}
+    {{#categories}}
+        {{#plannings}}
+            <tr class="planning">
+                <th class="planning-name" colspan="7">
+                    <div class="position-relative d-flex align-items-center">
+                        {{< mod_competvet/expandcollapse}}
+                            {{$id}}{{planningid}}{{/id}}
+                        {{/ mod_competvet/expandcollapse}}
+                        {{startdate}} - {{enddate}}
+                    </div>
+                </th>
+            </tr>
+            {{#students}}
+                <tr class="student collapse {{#contentcollapsed}}show{{/contentcollapsed}}" id="collapse{{planningid}}">
+                    <th class="user student-name"><a href="{{{studenturl}}}"><img src="{{userinfo.userpictureurl}}" alt="{{userinfo.fullname}}" class="userpicture">{{userinfo.fullname}}</a></td>
+                    <td class="t-grade stats">
+                        {{#planninginfo}}
+                        <span class="evalutations">
+                            <span class="badge {{#evalpass}}badge-success{{/evalpass}}{{^evalpass}}badge-secondary{{/evalpass}} badge-pill" data-toggle="tooltip" title="{{#str}}planning:page:info:eval, mod_competvet{{/str}}">
+                                {{info[0].nbrequired}}/{{info[0].nbdone}}
+                                {{> mod_competvet/grading/svg/chat}}
+                            </span>
+                        </span>
+                        <span class="autoevaluations">
+                            <span class="badge {{#autoevalpass}}badge-success{{/autoevalpass}}{{^autoevalpass}}badge-secondary{{/autoevalpass}} badge-pill" data-toggle="tooltip" title="{{#str}}planning:page:info:autoeval, mod_competvet{{/str}}">
+                                {{info[1].nbrequired}}/{{info[1].nbdone}}
+                                {{> mod_competvet/grading/svg/chat}}
+                            </span>
+                        </span>
+                        <span class="certifications">
+                            <span class="badge {{#certifpass}}badge-success{{/certifpass}}{{^certifpass}}badge-secondary{{/certifpass}} badge-pill" data-toggle="tooltip" title="{{#str}}planning:page:info:cert, mod_competvet{{/str}}">
+                                {{info[2].nbrequired}}/{{info[2].nbdone}}
+                                {{> mod_competvet/grading/svg/certif}}
+                            </span>
+                        </span>
+                        </span>
+                        <span class="cases">
+                            <span class="badge {{#casepass}}badge-success{{/casepass}}{{^casepass}}badge-secondary{{/casepass}} badge-pill"  data-toggle="tooltip" title="{{#str}}planning:page:info:list, mod_competvet{{/str}}">
+                                {{info[3].nbrequired}}/{{info[3].nbdone}}
+                                {{> mod_competvet/grading/svg/list}}
+                            </span>
+                        </span>
+                    </td>
+                    <td class="t-grade globalgrade"><span class="circle {{#failure}}fail{{/failure}}">{{grade.finalgrade}}</span></td>
+                    <td class="t-grade comments">{{grade.feedback}}</td>
+                </tr>
+            {{/students}}
 
-{{/plannings}}
+        {{/plannings}}
+    {{/categories}}
 </table>

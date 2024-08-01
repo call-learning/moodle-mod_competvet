@@ -85,21 +85,13 @@ const formEvents = () => {
             userid: user.id,
             cmid: planning.cmid,
             grade: globalgrade.finalgrade,
+            feedback: globalgrade.comment,
         };
         const result = await Repository.saveGlobalGrade(args);
         globalgrade.gradesuccess = result.result;
         globalgrade.gradeerror = !result.result;
-
-        const formDataArgs = {
-            userid: user.id,
-            planningid: planning.id,
-            situationid: planning.situationid,
-            formname: 'globalgrade',
-            json: globalgrade.comment,
-        };
-        const resultForm = await Repository.saveFormData(formDataArgs);
-        globalgrade.commentsuccess = resultForm.result;
-        globalgrade.commenterror = !resultForm.result;
+        globalgrade.commentsuccess = result.result;
+        globalgrade.commenterror = !result.result;
 
         CompetState.setValue('globalgrade', globalgrade);
     });

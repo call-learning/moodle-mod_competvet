@@ -21,6 +21,9 @@ use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\local\persistent\case_entry;
 use mod_competvet\utils;
+use moodle_url;
+
+require_once($CFG->libdir.'/gradelib.php');
 
 /**
  * Plannings API
@@ -112,6 +115,7 @@ class plannings {
             $category = self::get_category_for_planning_id($planningid);
             $stats[] = [
                 'id' => $planning->get('id'),
+                'planningid' => $planning->get('id'),
                 'groupstats' => $groupstats,
                 'info' => self::get_planning_info($planningid),
                 'category' => $category,
@@ -132,6 +136,7 @@ class plannings {
         $stats = ['groupid' => $planning->get('groupid')];
         $students = self::get_students_for_planning_id($planningid);
         $stats['nbstudents'] = count($students);
+        $stats['students'] = array_values($students);
         return $stats;
     }
 
@@ -145,11 +150,25 @@ class plannings {
         $planning = planning::get_record(['id' => $planningid]);
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         $situationcontext = $competvet->get_context();
-        $groupmembers = groups_get_members($planning->get('groupid'), 'u.id');
+        // Get the user fields for the userpicture
+        $userfieldsapi = \core_user\fields::for_userpic();
+        $allfields = $userfieldsapi->get_sql('u', false, '', '', false)->selects;
+        $groupmembers = groups_get_members($planning->get('groupid'), $allfields);
         foreach ($groupmembers as $index => $groupmember) {
             // Check if this user is a student or not.
             if (!utils::is_student($groupmember->id, $situationcontext->id)) {
                 unset($groupmembers[$index]);
+            } else {
+                $studentgrade = '';
+                $grade = $competvet->get_final_grade_for_student($groupmember->id);
+                if ($grade->finalgrade) {
+                    $studentgrade = round($grade->finalgrade, 2);
+                }
+                $groupmembers[$index]->userinfo = utils::get_user_info($groupmember->id);
+                $groupmembers[$index]->planninginfo = self::get_planning_info_for_student($planningid, $groupmember->id);
+                $groupmembers[$index]->grade = $studentgrade;
+                $groupmembers[$index]->feedback = format_text($grade->feedback, FORMAT_HTML);
+                $groupmembers[$index]->studenturl = $competvet->get_user_planning_url($groupmember->id, $planningid);
             }
         }
         return $groupmembers;
@@ -245,45 +264,56 @@ class plannings {
      */
     protected static function create_planning_info_for_student(
         int $studentid, situation $situation, array $existingobservations, int $planningid) {
+
+
+        $gridid = criteria::get_grid_for_planning($planningid, 'cert')->get('id');
+        $criteria = criteria::get_sorted_parent_criteria($gridid);
+        $certifcations = certifications::get_certifications($planningid, $studentid);
+        $numvalidated = array_reduce($certifcations, fn($carry, $certification) => $carry + $certification['confirmed'], 0);
+        $entries = case_entry::get_records(['studentid' => $studentid, 'planningid' => $planningid]);
+
         $info = [];
-        // Check for eval.
-        $eval = [
+        // New structure.
+        $info['eval'] = [
             'type' => 'eval',
             'nbdone' => 0,
             'nbrequired' => $situation->get('evalnum'),
+            'pass' => 0,
         ];
-        $autoeval = [
+        $info['autoeval'] = [
             'type' => 'autoeval',
             'nbdone' => 0,
             'nbrequired' => $situation->get('autoevalnum'),
+            'pass' => 0,
         ];
+        $info['cert'] = [
+            'type' => 'cert',
+            'nbdone' => $numvalidated,
+            'nbrequired' => round(count($criteria) * $situation->get('certifpnum') / 100),
+            'pass' => 0,
+        ];
+        $info['list'] = [
+            'type' => 'list',
+            'nbdone' => count($entries),
+            'nbrequired' => $situation->get('casenum'),
+            'pass' => 0,
+        ];
+
         foreach ($existingobservations as $observation) {
             if ($observation->get('studentid') != $studentid) {
                 continue;
             }
             if ($observation->get_observation_type() == observation::CATEGORY_EVAL_AUTOEVAL) {
-                $autoeval['nbdone']++;
+                $info['autoeval']['nbdone']++;
             } else {
-                $eval['nbdone']++;
+                $info['eval']['nbdone']++;
             }
         }
-        $info[] = $eval;
-        $info[] = $autoeval;
-        $gridid = criteria::get_grid_for_planning($planningid, 'cert')->get('id');
-        $criteria = criteria::get_sorted_parent_criteria($gridid);
-        $certifcations = certifications::get_certifications($planningid, $studentid);
-        $numvalidated = array_reduce($certifcations, fn($carry, $certification) => $carry + $certification['confirmed'], 0);
-        $info[] = [
-            'type' => 'cert',
-            'nbdone' => $numvalidated,
-            'nbrequired' => round(count($criteria) * $situation->get('certifpnum') / 100),
-        ];
-        $entries = case_entry::get_records(['studentid' => $studentid, 'planningid' => $planningid]);
-        $info[] = [
-            'type' => 'list',
-            'nbdone' => count($entries),
-            'nbrequired' => $situation->get('casenum'),
-        ];
+
+        // Set the pass to 1 if nbdone >= nbrequired
+        foreach ($info as $type => $data) {
+            $info[$type]['pass'] = $data['nbdone'] >= $data['nbrequired'] ? 1 : 0;
+        }
 
         return $info;
     }
