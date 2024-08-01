@@ -667,3 +667,92 @@
     padding: 0.2rem;
     border-radius: 0.2rem;
 }
+
+.path-mod-competvet .user-info .userpicture {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 100%;
+}
+
+.competvet-grade-table th {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.competvet-grade-table th.first {
+    border-left: 1px solid #dee2e6;
+}
+
+.competvet-grade-table th.last {
+    border-right: 1px solid #dee2e6;
+}
+
+.competvet-grade-table th.planning-name {
+    padding: 1.5rem 1rem 0.5rem 0;
+    background-color: #ffffff;
+}
+
+.competvet-grade-table th.label {
+    padding: 0.5rem 1rem;
+    text-align: left;
+    border-top: 1px solid #dee2e6;
+}
+
+.competvet-grade-table th.user {
+    background-color: #f8f9fa;
+    padding: 0.5rem 1rem;
+    text-align: left;
+    border-left: 1px solid #dee2e6;
+    border-top: 1px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
+    width: 150px;
+}
+
+.competvet-grade-table th.user .userpicture {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 100%;
+}
+
+.competvet-grade-table .t-grade {
+    padding: 0.5rem 1rem;
+    text-align: center;
+    border-left: 1px solid #dee2e6;
+    border-right: 1px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.competvet-grade-table .t-grade.comments {
+    text-align: left;
+}
+
+.competvet-grade-table .t-grade.globalgrade {
+    padding: 0.5rem 1rem;
+}
+
+.competvet-grade-table .globalgrade .circle {
+    border-radius: 100%;
+    background-color: #f8f9fa;
+    padding: 1rem;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid #dee2e6;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.competvet-grade-table .globalgrade .circle.fail {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.competvet-grade-table svg {
+    width: 1.5rem;
+}
+
+.competvet-grade-table svg .svg-stroke {
+    stroke: #fff;
+}

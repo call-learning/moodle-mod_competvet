@@ -23,6 +23,7 @@ use grade_item;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
 use stdClass;
+use moodle_url;
 
 /**
  * CompetVet class
@@ -120,6 +121,7 @@ class competvet {
      * @var stdClass $instance
      */
     private $instance;
+
     /**
      * Course instance
      *
@@ -375,5 +377,45 @@ class competvet {
             default:
                 return GRADE_TYPE_NONE;
         }
+    }
+
+    /**
+     * Get the final grade for a student
+     *
+     * @param competvet $competvet
+     * @return \grade_grade The grade object
+     */
+    public function get_final_grade_for_student($userid): \grade_grade {
+        $item = \grade_item::fetch([
+            'itemtype' => 'mod',
+            'itemmodule' => 'competvet',
+            'iteminstance' => $this->get_instance_id(),
+            'courseid' => $this->get_course_id(),
+        ]);
+        return $item->get_grade($userid);
+    }
+
+    /**
+     * Get the user planning URL
+     *
+     * @param int $userid
+     * @param int $planningid
+     * @return \moodle_url
+     */
+    public function get_user_planning_url(int $userid, int $planningid): \moodle_url {
+        global $FULLME;
+        $baseurl = new \moodle_url($FULLME);
+        $baseurl->remove_all_params();
+        $situation = $this->get_situation();
+        $pagetype = 'student_evaluations';
+        if (!$situation->get('haseval')) {
+            $pagetype = 'student_certifications';
+        }
+        if (!$situation->get('hascertif') && !$situation->get('haseval')) {
+            $pagetype = 'student_list';
+        }
+        return new moodle_url($baseurl,
+            ['pagetype' => $pagetype, 'id' => $this->get_course_module_id(), 'planningid' => $planningid, 'studentid' => $userid]
+        );
     }
 }

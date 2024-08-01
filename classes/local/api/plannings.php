@@ -16,11 +16,13 @@
 namespace mod_competvet\local\api;
 
 use mod_competvet\competvet;
+use mod_competvet\local\persistent\case_entry;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\planning;
-use mod_competvet\local\persistent\situation;
-use mod_competvet\local\persistent\case_entry;
 use mod_competvet\utils;
+
+global $CFG;
+require_once($CFG->libdir . '/gradelib.php');
 
 /**
  * Plannings API
@@ -185,7 +187,7 @@ class plannings {
         }
         $studentfullyassessed = count(array_filter($studentmembersid, fn($count) => $count >= $requiredobservations));
         if ($nbstudents == $studentfullyassessed) {
-            //return planning::CATEGORY_OBSERVER_COMPLETED;
+            // return planning::CATEGORY_OBSERVER_COMPLETED;
         }
         return planning::CATEGORY_OBSERVER_LATE;
     }
@@ -200,8 +202,10 @@ class plannings {
         $planning = planning::get_record(['id' => $planningid]);
         $planningarray = (array) $planning->to_record();
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
-        $planningarray = array_intersect_key($planningarray,
-            array_fill_keys(['id', 'startdate', 'enddate', 'session', 'groupid', 'situationid'], 0));
+        $planningarray = array_intersect_key(
+            $planningarray,
+            array_fill_keys(['id', 'startdate', 'enddate', 'session', 'groupid', 'situationid'], 0)
+        );
         $planningarray['groupname'] = groups_get_group_name($planning->get('groupid'));
         $planningarray['situationname'] = $competvet->get_course_module()->name;
         return $planningarray;
@@ -209,6 +213,63 @@ class plannings {
 
     protected static function get_category_text_for_planning_id(int $planningid, int $category): string {
         return get_string('planningcategory:' . planning::CATEGORY[$category], 'mod_competvet');
+    }
+
+    /**
+     * Retrieves the users which are students associated with all grades for a given planning ID.
+     *
+     * @param int $planningid The ID of the planning.
+     * @return array An array of users.
+     */
+    public static function get_students_with_grade_info_for_planning_id(int $planningid): array {
+        $planning = planning::get_record(['id' => $planningid]);
+        $competvet = competvet::get_from_situation_id($planning->get('situationid'));
+        $students = self::get_students_for_planning_id($planningid);
+        $groupmembers = [];
+        foreach ($students as $student) {
+            $studentgrade = '';
+            $grade = $competvet->get_final_grade_for_student($student->id);
+            if ($grade->finalgrade) {
+                $studentgrade = round($grade->finalgrade, 2);
+            }
+            $groupmember = clone $student;
+            $groupmember->userinfo = utils::get_user_info($student->id);
+            $groupmember->planninginfo = self::get_planning_stats_for_student($planningid, $student->id);
+            $groupmember->grade = $studentgrade;
+            $groupmember->feedback = format_text($grade->feedback, FORMAT_HTML);
+            $groupmember->studenturl = $competvet->get_user_planning_url($student->id, $planningid);
+            $groupmembers[] = $groupmember;
+        }
+        return $groupmembers;
+    }
+
+    /**
+     * Get users infos for planning id
+     *
+     * @param int $planningid
+     * @return void
+     */
+    public static function get_users_infos_for_planning_id(int $planningid): array {
+        $students = [];
+        $planning = planning::get_record(['id' => $planningid]);
+        $competvet = competvet::get_from_situation_id($planning->get('situationid'));
+        $studentsid = array_keys(self::get_students_for_planning_id($planningid));
+        if (!has_capability('mod/competvet:viewother', $competvet->get_context())) {
+            global $USER;
+            if (in_array($USER->id, $studentsid)) {
+                $studentsid = [$USER->id];
+            } else {
+                $studentsid = [];
+            }
+        }
+        foreach ($studentsid as $studentid) {
+            $userinfo = [];
+            $userinfo['userinfo'] = utils::get_user_info($studentid);
+            $userinfo['userinfo']['role'] = 'student';
+            $userinfo['planninginfo'] = self::get_planning_stats_for_student($planningid, $studentid);
+            $students[] = $userinfo;
+        }
+        return ['students' => $students, 'observers' => self::get_observers_infos_for_planning_id($planningid)];
     }
 
     /**
@@ -241,78 +302,59 @@ class plannings {
     protected static function create_planning_stats_for_student(int $studentid, int $planningid) {
         $planning = planning::get_record(['id' => $planningid]);
         $situation = $planning->get_situation();
+        $observations =
+            observation::get_records(['planningid' => $planningid, 'studentid' => $studentid], 'studentid, observerid');
+
+        $gridid = criteria::get_grid_for_planning($planningid, 'cert')->get('id');
+        $criteria = criteria::get_sorted_parent_criteria($gridid);
+        $certifcations = certifications::get_certifications($planningid, $studentid);
+        $numvalidated = array_reduce($certifcations, fn($carry, $certification) => $carry + $certification['confirmed'], 0);
+        $entries = case_entry::get_records(['studentid' => $studentid, 'planningid' => $planningid]);
+
         $info = [];
-        $eval = [
+        // New structure.
+        $info['eval'] = [
             'type' => 'eval',
             'nbdone' => 0,
             'nbrequired' => $situation->get('evalnum'),
+            'pass' => 0,
         ];
-        $autoeval = [
+        $info['autoeval'] = [
             'type' => 'autoeval',
             'nbdone' => 0,
             'nbrequired' => $situation->get('autoevalnum'),
+            'pass' => 0,
         ];
-        $params = ['planningid' => $planningid, 'studentid' => $studentid];
-        $observations =
-            observation::get_records($params, 'studentid, observerid');
+        $info['cert'] = [
+            'type' => 'cert',
+            'nbdone' => $numvalidated,
+            'nbrequired' => round(count($criteria) * $situation->get('certifpnum') / 100),
+            'pass' => 0,
+        ];
+        $info['list'] = [
+            'type' => 'list',
+            'nbdone' => count($entries),
+            'nbrequired' => $situation->get('casenum'),
+            'pass' => 0,
+        ];
+
         foreach ($observations as $observation) {
             if ($observation->get('studentid') != $studentid) {
                 continue;
             }
             if ($observation->get_observation_type() == observation::CATEGORY_EVAL_AUTOEVAL) {
-                $autoeval['nbdone']++;
+                $info['autoeval']['nbdone']++;
             } else {
-                $eval['nbdone']++;
+                $info['eval']['nbdone']++;
             }
         }
-        $info[] = $eval;
-        $info[] = $autoeval;
-        $gridid = criteria::get_grid_for_planning($planningid, 'cert')->get('id');
-        $criteria = criteria::get_sorted_parent_criteria($gridid);
-        $certifcations = certifications::get_certifications($planningid, $studentid);
-        $numvalidated = array_reduce($certifcations, fn($carry, $certification) => $carry + $certification['confirmed'], 0);
-        $info[] = [
-            'type' => 'cert',
-            'nbdone' => $numvalidated,
-            'nbrequired' => round(count($criteria) * $situation->get('certifpnum') / 100),
-        ];
-        $entries = case_entry::get_records(['studentid' => $studentid, 'planningid' => $planningid]);
-        $info[] = [
-            'type' => 'list',
-            'nbdone' => count($entries),
-            'nbrequired' => $situation->get('casenum'),
-        ];
+
+        // Set the pass to 1 if nbdone >= nbrequired
+        foreach ($info as $type => $data) {
+            $info[$type]['pass'] = $data['nbdone'] >= $data['nbrequired'] ? 1 : 0;
+        }
 
         return $info;
-    }
-
-    /**
-     * Get users infos for planning id
-     *
-     * @param int $planningid
-     * @return void
-     */
-    public static function get_users_infos_for_planning_id(int $planningid): array {
-        $students = [];
-        $planning = planning::get_record(['id' => $planningid]);
-        $competvet = competvet::get_from_situation_id($planning->get('situationid'));
-        $studentsid = array_keys(self::get_students_for_planning_id($planningid));
-        if (!has_capability('mod/competvet:viewother', $competvet->get_context())) {
-            global $USER;
-            if (in_array($USER->id, $studentsid)) {
-                $studentsid = [$USER->id];
-            } else {
-                $studentsid = [];
-            }
-        }
-        foreach ($studentsid as $studentid) {
-            $userinfo = [];
-            $userinfo['userinfo'] = utils::get_user_info($studentid);
-            $userinfo['userinfo']['role'] = 'student';
-            $userinfo['planninginfo'] = self::get_planning_stats_for_student($planningid, $studentid);
-            $students[] = $userinfo;
-        }
-        return ['students' => $students, 'observers' => self::get_observers_infos_for_planning_id($planningid)];
     }
 
     /**
@@ -354,7 +396,6 @@ class plannings {
             } catch (\Exception $e) {
                 debugging("Roles issue with $userid :" . $e->getMessage());
             }
-
         }
         return $observers;
     }
@@ -397,6 +438,7 @@ class plannings {
 
     /**
      * Delete the planning
+     *
      * @param int $planningid - The planning id
      */
     public static function delete_planning(int $planningid): void {
@@ -414,6 +456,6 @@ class plannings {
      */
     public static function get_students_info_for_planning_id(int $planningid) {
         $users = static::get_students_for_planning_id($planningid);
-        return array_map(fn($user) =>  utils::get_user_info($user->id), $users);
+        return array_map(fn($user) => utils::get_user_info($user->id), $users);
     }
 }

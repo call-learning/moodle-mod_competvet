@@ -22,7 +22,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_competvet\local\api\plannings;
 use mod_competvet\output\view\base;
 use mod_competvet\utils;
 
@@ -49,10 +48,6 @@ $widget->set_data();
 $widget->check_access();
 $renderer = $PAGE->get_renderer('mod_competvet');
 echo $OUTPUT->header();
-
-// Get the original page params
-parse_str(parse_url($_SERVER['REQUEST_URI'])['query'], $query);
-$query['returnurl'] = $_SERVER['REQUEST_URI'];
 
 echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
 $button = $widget->get_button($modulecontext);

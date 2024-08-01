@@ -77,6 +77,7 @@ class plannings extends base {
                 $planningresult->enddate = planning::get_planning_date_string($planning['enddate']);
                 $planningresult->groupname = $planning['groupname'];
                 $planningresult->nbstudents = $planningstat['groupstats']['nbstudents'];
+                $planningresult->students = $planningstat['groupstats']['students'];
                 $planningresult->viewurl = (new moodle_url(
                     $this->viewplanning,
                     ['planningid' => $planningstat['id']]
