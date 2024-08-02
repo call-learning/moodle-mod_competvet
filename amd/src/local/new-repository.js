@@ -30,13 +30,13 @@ import Notification from 'core/notification';
 class Repository {
 
     /**
-     * Get the User list.
+     * Get the Student list.
      * @param {Object} args The arguments.
      * @return {Promise} The promise.
      */
-    getUserList(args) {
+    getStudentList(args) {
         const request = {
-            methodname: 'mod_competvet_get_user_list',
+            methodname: 'mod_competvet_get_student_list',
             args: args
         };
         const promise = Ajax.call([request])[0];

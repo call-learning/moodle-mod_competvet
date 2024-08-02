@@ -24,10 +24,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 $functions = [
-    'mod_competvet_get_user_list' => [
-        'classname' => mod_competvet\external\get_user_list::class,
+    'mod_competvet_get_student_list' => [
+        'classname' => mod_competvet\external\get_student_list::class,
         'methodname' => 'execute',
-        'description' => 'Get get_user_list for the given activity',
+        'description' => 'Get get_student_list for the given activity',
         'type' => 'read',
         'ajax' => true,
         'capabilities' => 'mod/competvet:view',

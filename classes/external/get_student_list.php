@@ -35,7 +35,7 @@ use mod_competvet\local\api\plannings;
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_user_list extends external_api {
+class get_student_list extends external_api {
 
     /**
      * Returns description of method parameters
@@ -60,7 +60,6 @@ class get_user_list extends external_api {
                     'id' => new external_value(PARAM_INT, 'The user id'),
                     'fullname' => new external_value(PARAM_TEXT, 'The user full name'),
                     'userpictureurl' => new external_value(PARAM_TEXT, 'The user picture url'),
-                    'role' => new external_value(PARAM_TEXT, 'The user role'),
                 ])
             ),
         ]);

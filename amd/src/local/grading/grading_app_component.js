@@ -172,7 +172,7 @@ class Competvet {
         const args = {
             planningid: this.planning.id
         };
-        const response = await Repository.getUserList(args);
+        const response = await Repository.getStudentList(args);
         if (!response.users) {
             return;
         }
