@@ -78,7 +78,8 @@ class app implements named_templatable, renderable {
         $export->hascase = $situation->get('hascase');
         $export->planningid = optional_param('planningid', 0, PARAM_INT);
         $export->studentid = optional_param('studentid', 0, PARAM_INT);
-        $export->returnurl = optional_param('returnurl', '', PARAM_URL);
+        $returnurl = new \moodle_url('/mod/competvet/view.php', ['id' => $this->competvet->get_course_module()->id]);
+        $export->returnurl = $returnurl->out();
         $export->debugging = $CFG->debugdisplay;
         $export->cangrade = has_capability('mod/competvet:cangrade', $this->competvet->get_context());
         return $export;

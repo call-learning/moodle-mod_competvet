@@ -252,6 +252,7 @@ $string['eval_criteria'] = 'Evaluation criteria';
 
 // Planning interface
 $string['stats'] = 'Stats';
+$string['studentprogress'] = 'Student progress';
 
 // Eval
 $string['evalevaluation'] = 'Eval evaluation';

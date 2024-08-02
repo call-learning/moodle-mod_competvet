@@ -169,6 +169,7 @@ class plannings {
                 $groupmembers[$index]->grade = $studentgrade;
                 $groupmembers[$index]->feedback = format_text($grade->feedback, FORMAT_HTML);
                 $groupmembers[$index]->studenturl = $competvet->get_user_planning_url($groupmember->id, $planningid);
+                $groupmembers[$index]->gradeurl = $competvet->get_user_grading_url($groupmember->id, $planningid);
             }
         }
         return $groupmembers;

@@ -418,4 +418,23 @@ class competvet {
             ['pagetype' => $pagetype, 'id' => $this->get_course_module_id(), 'planningid' => $planningid, 'studentid' => $userid]
         );
     }
+
+    /**
+     * Get the user grading URL
+     *
+     * @param int $userid
+     * @param int $planningid
+     * @return \moodle_url
+     */
+    public function get_user_grading_url(int $userid, int $planningid): \moodle_url {
+        global $CFG;
+        return new \moodle_url(
+            $CFG->wwwroot . '/mod/competvet/grading.php',
+            [
+                'id' => $this->get_course_module_id(),
+                'studentid' => $userid,
+                'planningid' => $planningid
+            ]
+        );
+    }
 }
