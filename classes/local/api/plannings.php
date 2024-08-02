@@ -219,9 +219,6 @@ class plannings {
      * @return array
      */
     public static function get_planning_info_for_student(int $planningid, int $userid): array {
-        $params = ['planningid' => $planningid, 'studentid' => $userid];
-        $observations =
-            observation::get_records($params, 'studentid, observerid');
         $planning = planning::get_record(['id' => $planningid]);
         $situation = $planning->get_situation();
         $result =
@@ -229,7 +226,7 @@ class plannings {
                 'id' => $userid,
                 'planningid' => $planningid,
                 'situationid' => $situation->get('id'),
-                'info' => self::create_planning_info_for_student($userid, $situation, $observations, $planningid),
+                'info' => self::create_planning_info_for_student($userid, $planningid),
             ];
         return $result;
     }
@@ -238,15 +235,13 @@ class plannings {
      * Creates planning information for a student.
      *
      * @param int $studentid The ID of the student.
-     * @param situation $situation The situation object.
-     * @param array $existingobservations An array of existing observations.
      * @param int $planningid The ID of the planning.
      * @return array The planning information for the student.
      */
-    protected static function create_planning_info_for_student(
-        int $studentid, situation $situation, array $existingobservations, int $planningid) {
+    protected static function create_planning_info_for_student(int $studentid, int $planningid) {
+        $planning = planning::get_record(['id' => $planningid]);
+        $situation = $planning->get_situation();
         $info = [];
-        // Check for eval.
         $eval = [
             'type' => 'eval',
             'nbdone' => 0,
@@ -257,7 +252,10 @@ class plannings {
             'nbdone' => 0,
             'nbrequired' => $situation->get('autoevalnum'),
         ];
-        foreach ($existingobservations as $observation) {
+        $params = ['planningid' => $planningid, 'studentid' => $studentid];
+        $observations =
+            observation::get_records($params, 'studentid, observerid');
+        foreach ($observations as $observation) {
             if ($observation->get('studentid') != $studentid) {
                 continue;
             }
@@ -297,7 +295,6 @@ class plannings {
     public static function get_users_infos_for_planning_id(int $planningid): array {
         $students = [];
         $planning = planning::get_record(['id' => $planningid]);
-        $situation = $planning->get_situation();
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         $studentsid = array_keys(self::get_students_for_planning_id($planningid));
         if (!has_capability('mod/competvet:viewother', $competvet->get_context())) {
@@ -312,10 +309,7 @@ class plannings {
             $userinfo = [];
             $userinfo['userinfo'] = utils::get_user_info($studentid);
             $userinfo['userinfo']['role'] = 'student';
-            $params = ['planningid' => $planningid, 'studentid' => $studentid];
-            $observations =
-                observation::get_records($params, 'studentid, observerid');
-            $userinfo['planninginfo'] = self::create_planning_info_for_student($studentid, $situation, $observations, $planningid);
+            $userinfo['planninginfo'] = self::create_planning_info_for_student($studentid, $planningid);
             $students[] = $userinfo;
         }
         return ['students' => $students, 'observers' => self::get_observers_infos_for_planning_id($planningid)];
