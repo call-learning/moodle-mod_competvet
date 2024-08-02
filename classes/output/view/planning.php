@@ -75,7 +75,7 @@ class planning extends base {
                     }
                     $userinfo->rolename = $rolename;
                 }
-                $userplanninginfo = $user['planninginfo'] ?? [];
+                $userplanninginfo = $user['planninginfo']['stats'] ?? [];
                 if (!empty($userplanninginfo)) {
                     $userplanninginfo = array_combine(array_column($userplanninginfo, 'type'), $userplanninginfo);
                     foreach ($userplanninginfo as $infotype => $userinfovalue) {

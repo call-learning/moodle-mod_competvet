@@ -218,7 +218,7 @@ class plannings {
      * @param int $userid
      * @return array
      */
-    public static function get_planning_info_for_student(int $planningid, int $userid): array {
+    public static function get_planning_stats_for_student(int $planningid, int $userid): array {
         $planning = planning::get_record(['id' => $planningid]);
         $situation = $planning->get_situation();
         $result =
@@ -226,19 +226,19 @@ class plannings {
                 'id' => $userid,
                 'planningid' => $planningid,
                 'situationid' => $situation->get('id'),
-                'info' => self::create_planning_info_for_student($userid, $planningid),
+                'stats' => self::create_planning_stats_for_student($userid, $planningid),
             ];
         return $result;
     }
 
     /**
-     * Creates planning information for a student.
+     * Creates planning information (stats) for a student.
      *
      * @param int $studentid The ID of the student.
      * @param int $planningid The ID of the planning.
      * @return array The planning information for the student.
      */
-    protected static function create_planning_info_for_student(int $studentid, int $planningid) {
+    protected static function create_planning_stats_for_student(int $studentid, int $planningid) {
         $planning = planning::get_record(['id' => $planningid]);
         $situation = $planning->get_situation();
         $info = [];
@@ -309,7 +309,7 @@ class plannings {
             $userinfo = [];
             $userinfo['userinfo'] = utils::get_user_info($studentid);
             $userinfo['userinfo']['role'] = 'student';
-            $userinfo['planninginfo'] = self::create_planning_info_for_student($studentid, $planningid);
+            $userinfo['planninginfo'] = self::get_planning_stats_for_student($planningid, $studentid);
             $students[] = $userinfo;
         }
         return ['students' => $students, 'observers' => self::get_observers_infos_for_planning_id($planningid)];
@@ -404,5 +404,16 @@ class plannings {
         if ($planning) {
             $planning->delete();
         }
+    }
+
+    /**
+     * Get students info for planning id
+     *
+     * @param int $planningid
+     * @return array|array[]
+     */
+    public static function get_students_info_for_planning_id(int $planningid) {
+        $users = static::get_students_for_planning_id($planningid);
+        return array_map(fn($user) =>  utils::get_user_info($user->id), $users);
     }
 }

@@ -75,17 +75,7 @@ class get_user_list extends external_api {
      */
     public static function execute(int $planningid) {
         self::validate_context(context_system::instance());
-        $userswithinfo = plannings::get_users_infos_for_planning_id($planningid);
-        $users = [];
-        foreach ($userswithinfo['students'] as $user) {
-            $users[] = [
-                'id' => $user['userinfo']['id'],
-                'fullname' => $user['userinfo']['fullname'],
-                'userpictureurl' => $user['userinfo']['userpictureurl'],
-                'role' => $user['userinfo']['role'],
-            ];
-        }
-
+        $users  = plannings::get_students_info_for_planning_id($planningid);
         return [
             'users' => $users,
         ];

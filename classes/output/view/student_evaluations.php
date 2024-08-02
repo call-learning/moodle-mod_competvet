@@ -127,7 +127,7 @@ class student_evaluations extends base {
                 $userevals[] = observations::get_observation_information($number);
             }
             $competvet = competvet::get_from_context($context);
-            $planninginfo = plannings::get_planning_info_for_student($planningid, $studentid);
+            $planninginfo = plannings::get_planning_stats_for_student($planningid, $studentid);
             $urlparams = [
                 'id' => $competvet->get_course_module_id(),
                 'planningid' => $planningid,

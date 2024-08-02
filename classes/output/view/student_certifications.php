@@ -84,7 +84,7 @@ class student_certifications extends base {
         if (empty($data)) {
             $planningid = required_param('planningid', PARAM_INT);
             $studentid = required_param('studentid', PARAM_INT);
-            $planninginfo = plannings::get_planning_info_for_student($planningid, $studentid);
+            $planninginfo = plannings::get_planning_stats_for_student($planningid, $studentid);
             $certifcations = certifications::get_certifications($planningid, $studentid);
             $situationid = $planninginfo['situationid'];
             $competvet = competvet::get_from_situation_id($situationid);

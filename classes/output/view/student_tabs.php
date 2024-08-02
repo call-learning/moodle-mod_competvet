@@ -54,7 +54,7 @@ class student_tabs {
         $baseurl = new \moodle_url($FULLME);
         $baseurl->remove_all_params();
 
-        $planninginfo = plannings::get_planning_info_for_student($planningid, $studentid);
+        $planninginfo = plannings::get_planning_stats_for_student($planningid, $studentid);
         $situationid = $planninginfo['situationid'];
         $competvet = competvet::get_from_situation_id($situationid);
         $situation = $competvet->get_situation();
