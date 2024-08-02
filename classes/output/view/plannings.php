@@ -16,7 +16,7 @@
 namespace mod_competvet\output\view;
 
 use mod_competvet\competvet;
-use mod_competvet\local\api\plannings as plannings_api;
+use mod_competvet\local\api\grading as grading_api;
 use mod_competvet\local\persistent\planning;
 use moodle_url;
 use renderer_base;
@@ -105,11 +105,13 @@ class plannings extends base {
             global $USER, $PAGE;
             $context = $PAGE->context;
             $competvet = competvet::get_from_context($context);
-            $currentplannings = plannings_api::get_plannings_for_situation_id($competvet->get_situation()->get('id'), $USER->id);
+            $currentplannings =
+                \mod_competvet\local\api\plannings::get_plannings_for_situation_id($competvet->get_situation()->get('id'),
+                    $USER->id);
             $planningids = array_map(function($planning) {
                 return $planning['id'];
             }, $currentplannings);
-            $planningstats = plannings_api::get_planning_infos($planningids, $USER->id);
+            $planningstats = grading_api::get_planning_infos_for_grading($planningids, $USER->id);
             $viewplanning =
                 new moodle_url($this->baseurl, ['pagetype' => 'planning', 'id' => $competvet->get_course_module_id()]);
             $data = [$currentplannings, $planningstats, $viewplanning];

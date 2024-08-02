@@ -137,6 +137,7 @@ class plannings {
         return $stats;
     }
 
+
     /**
      * Retrieves the users which are students  associated with a given planning ID.
      *
@@ -157,7 +158,7 @@ class plannings {
         return $groupmembers;
     }
 
-    protected static function get_category_for_planning_id(int $planningid): int {
+    public static function get_category_for_planning_id(int $planningid): int {
         $planning = planning::get_record(['id' => $planningid]);
         // First check: is this the current week ?
         $now = time();
@@ -211,36 +212,15 @@ class plannings {
         return $planningarray;
     }
 
-    protected static function get_category_text_for_planning_id(int $planningid, int $category): string {
-        return get_string('planningcategory:' . planning::CATEGORY[$category], 'mod_competvet');
-    }
-
     /**
-     * Retrieves the users which are students associated with all grades for a given planning ID.
+     * Get category text for planning id
      *
-     * @param int $planningid The ID of the planning.
-     * @return array An array of users.
+     * @param int $planningid
+     * @param int $category
+     * @return string
      */
-    public static function get_students_with_grade_info_for_planning_id(int $planningid): array {
-        $planning = planning::get_record(['id' => $planningid]);
-        $competvet = competvet::get_from_situation_id($planning->get('situationid'));
-        $students = self::get_students_for_planning_id($planningid);
-        $groupmembers = [];
-        foreach ($students as $student) {
-            $studentgrade = '';
-            $grade = $competvet->get_final_grade_for_student($student->id);
-            if ($grade->finalgrade) {
-                $studentgrade = round($grade->finalgrade, 2);
-            }
-            $groupmember = clone $student;
-            $groupmember->userinfo = utils::get_user_info($student->id);
-            $groupmember->planninginfo = self::get_planning_stats_for_student($planningid, $student->id);
-            $groupmember->grade = $studentgrade;
-            $groupmember->feedback = format_text($grade->feedback, FORMAT_HTML);
-            $groupmember->studenturl = $competvet->get_user_planning_url($student->id, $planningid);
-            $groupmembers[] = $groupmember;
-        }
-        return $groupmembers;
+    public static function get_category_text_for_planning_id(int $planningid, int $category): string {
+        return get_string('planningcategory:' . planning::CATEGORY[$category], 'mod_competvet');
     }
 
     /**
@@ -287,7 +267,7 @@ class plannings {
                 'id' => $userid,
                 'planningid' => $planningid,
                 'situationid' => $situation->get('id'),
-                'stats' => self::create_planning_stats_for_student($userid, $planningid),
+                'stats' => array_values(self::create_planning_stats_for_student($userid, $planningid)),
             ];
         return $result;
     }
@@ -349,7 +329,7 @@ class plannings {
             }
         }
 
-        // Set the pass to 1 if nbdone >= nbrequired
+        // Set the pass to 1 if nbdone >= nbrequired.
         foreach ($info as $type => $data) {
             $info[$type]['pass'] = $data['nbdone'] >= $data['nbrequired'] ? 1 : 0;
         }
