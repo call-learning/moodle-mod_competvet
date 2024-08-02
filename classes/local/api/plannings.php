@@ -257,9 +257,10 @@ class plannings {
      *
      * @param int $planningid
      * @param int $userid
+     * @param bool|null $associative
      * @return array
      */
-    public static function get_planning_stats_for_student(int $planningid, int $userid): array {
+    public static function get_planning_stats_for_student(int $planningid, int $userid, ?bool $associative = false): array {
         $planning = planning::get_record(['id' => $planningid]);
         $situation = $planning->get_situation();
         $result =
@@ -267,8 +268,11 @@ class plannings {
                 'id' => $userid,
                 'planningid' => $planningid,
                 'situationid' => $situation->get('id'),
-                'stats' => array_values(self::create_planning_stats_for_student($userid, $planningid)),
+                'stats' => self::create_planning_stats_for_student($userid, $planningid),
             ];
+        if (!$associative) {
+            $result['stats'] = array_values($result['stats']);
+        }
         return $result;
     }
 

@@ -59,8 +59,7 @@ class grading {
             $category = plannings::get_category_for_planning_id($planningid);
             $stats[] = [
                 'id' => $planning->get('id'),
-                'groupstats' => $groupstats,
-                'info' => self::get_students_with_grade_info_for_planning_id($planningid),
+                'stats' => $groupstats,
                 'category' => $category,
                 'categorytext' => plannings::get_category_text_for_planning_id($planningid, $category),
             ];
@@ -87,10 +86,13 @@ class grading {
             }
             $groupmember = clone $student;
             $groupmember->userinfo = utils::get_user_info($student->id);
-            $groupmember->planninginfo = plannings::get_planning_stats_for_student($planningid, $student->id);
+
+            // We need the stats per type (so we can display them in the UI).
+            $groupmember->planninginfo = plannings::get_planning_stats_for_student($planningid, $student->id, true);
             $groupmember->grade = $studentgrade;
             $groupmember->feedback = format_text($grade->feedback, FORMAT_HTML);
             $groupmember->studenturl = $competvet->get_user_planning_url($student->id, $planningid);
+            $groupmember->gradeurl = $competvet->get_user_grading_url($groupmember->id, $planningid);
             $groupmembers[] = $groupmember;
         }
         return $groupmembers;
@@ -105,7 +107,7 @@ class grading {
     protected static function get_group_infos_for_planning_with_students(int $planningid): ?array {
         $planning = planning::get_record(['id' => $planningid]);
         $stats = ['groupid' => $planning->get('groupid')];
-        $students = plannings::get_students_for_planning_id($planningid);
+        $students = self::get_students_with_grade_info_for_planning_id($planningid);
         $stats['nbstudents'] = count($students);
         $stats['students'] = $students;
         return $stats;

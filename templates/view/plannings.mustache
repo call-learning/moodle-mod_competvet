@@ -65,7 +65,7 @@
     }
 }}
 <link rel="stylesheet" href="{{wwwroot}}/mod/competvet/scss/styles.css?v={{version}}" />
-<form class="form mb-5">
+<form class="form mb-5 d-none">
     <div class="d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
             <input type="text" name=studentsearch" class="form-control" placeholder="Search Student" />
@@ -102,50 +102,55 @@
                 </th>
             </tr>
             {{#students}}
-                <tr class="student collapse {{^contentcollapsed}}show{{/contentcollapsed}}" id="collapse{{planningid}}">
+                <tr class="student collapse {{^contentcollapsed}}show{{/contentcollapsed}}" id="collapse{{planninginfo.planningid}}">
                     <th class="user student-name position-relative">
                         <div class="d-flex align-items-center">
                             <img src="{{userinfo.userpictureurl}}" alt="{{userinfo.fullname}}" class="userpicture">
-                            <a class="stretched-link" href="{{{studenturl}}}">{{userinfo.fullname}}</a>
+                            <a class="stretched-link" href="{{{gradeurl}}}">{{userinfo.fullname}}</a>
                         </div>
                     </td>
                     <td class="t-grade stats">
                         {{#planninginfo}}
-                            {{#info.eval}}
+                            {{#stats.eval}}
                             <span class="evalutations">
                                 <span class="badge {{#pass}}badge-success{{/pass}}{{^pass}}badge-secondary{{/pass}} badge-pill" data-toggle="tooltip" title="{{#str}}planning:page:info:eval, mod_competvet{{/str}}">
                                     {{nbrequired}}/{{nbdone}}
                                     {{> mod_competvet/grading/svg/chat}}
                                 </span>
                             </span>
-                            {{/info.eval}}
-                            {{#info.autoeval}}
+                            {{/stats.eval}}
+                            {{#stats.autoeval}}
                             <span class="autoevaluations">
                                 <span class="badge {{#pass}}badge-success{{/pass}}{{^pass}}badge-secondary{{/pass}} badge-pill" data-toggle="tooltip" title="{{#str}}planning:page:info:autoeval, mod_competvet{{/str}}">
                                     {{nbrequired}}/{{nbdone}}
                                     {{> mod_competvet/grading/svg/chat}}
                                 </span>
                             </span>
-                            {{/info.autoeval}}
-                            {{#info.cert}}
+                            {{/stats.autoeval}}
+                            {{#stats.cert}}
                             <span class="certications">
                                 <span class="badge {{#pass}}badge-success{{/pass}}{{^pass}}badge-secondary{{/pass}} badge-pill" data-toggle="tooltip" title="{{#str}}planning:page:info:cert, mod_competvet{{/str}}">
                                     {{nbrequired}}/{{nbdone}}
                                     {{> mod_competvet/grading/svg/certif}}
                                 </span>
                             </span>
-                            {{/info.cert}}
-                            {{#info.list}}
+                            {{/stats.cert}}
+                            {{#stats.list}}
                             <span class="cases">
                                 <span class="badge {{#pass}}badge-success{{/pass}}{{^pass}}badge-secondary{{/pass}} badge-pill"  data-toggle="tooltip" title="{{#str}}planning:page:info:list, mod_competvet{{/str}}">
                                     {{nbrequired}}/{{nbdone}}
                                     {{> mod_competvet/grading/svg/list}}
                                 </span>
                             </span>
-                            {{/info.list}}
+                            {{/stats.list}}
                         {{/planninginfo}}
+                        <span class="badge badge-info icon-no-margin ml-4 badge-pill" data-toggle="tooltip" title="{{#str}}studentprogress, mod_competvet{{/str}}">
+                            <a class="text-white" href="{{{studenturl}}}">
+                                {{#pix}}i/info, core{{/pix}}
+                            </a>
+                        </span>
                     </td>
-                    <td class="t-grade globalgrade"><span class="circle {{#failure}}fail{{/failure}}">{{grade}}</span></td>
+                    <td class="t-grade globalgrade">{{#grade}}<span class="circle {{#failure}}fail{{/failure}}">{{grade}}</span>{{/grade}}</td>
                     <td class="t-grade comments">{{feedback}}</td>
                 </tr>
             {{/students}}
