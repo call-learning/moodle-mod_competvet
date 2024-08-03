@@ -85,7 +85,6 @@ class observations {
             $context = end($contexts);
         }
         $othercomments = array_filter($comments, fn($comment) => $comment->get('type') != observation_comment::OBSERVATION_CONTEXT);
-        $contextrecord = [];
         $result = [
             'id' => $observation->get('id'),
             'category' => $observation->get_observation_type(),
@@ -160,6 +159,8 @@ class observations {
         }
         $result['canedit'] = $observation->can_edit();
         $result['candelete'] = $observation->can_delete();
+        $result['planningid'] = $planning->get('id');
+        $result['situationid'] = $planning->get('situationid');
         return $result;
     }
 
