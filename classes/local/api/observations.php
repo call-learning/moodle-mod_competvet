@@ -55,6 +55,8 @@ class observations {
                 'time' => $observation->get('timemodified'),
                 'category' => $category,
                 'categorytext' => get_string('observation:category:' . observation::CATEGORIES[$category], 'competvet'),
+                'canedit' => $observation->can_edit(),
+                'candelete' => $observation->can_delete(),
             ];
         }
         return $evalobservations;
