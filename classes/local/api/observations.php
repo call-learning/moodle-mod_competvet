@@ -379,24 +379,4 @@ class observations {
         }
         return array_shift($comments);
     }
-
-    /**
-     * Delete an observation
-     *
-     * @param int $observationid
-     * @return void
-     */
-    public static function delete_observation(int $observationid): void {
-        $observation = observation::get_record(['id' => $observationid]);
-        foreach (observation_comment::get_records(['observationid' => $observationid]) as $comment) {
-            $comment->delete();
-        }
-        foreach (observation_criterion_level::get_records(['observationid' => $observationid]) as $criterion) {
-            $criterion->delete();
-        }
-        foreach (observation_criterion_comment::get_records(['observationid' => $observationid]) as $criterion) {
-            $criterion->delete();
-        }
-        $observation->delete();
-    }
 }

@@ -59,14 +59,12 @@ class delete_observation extends external_api {
         $planning = planning::get_record(['id' => $observation->get('planningid')]);
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
-
-
-
         // Check if we can delete.
-        $situation = $observation->get_situation();
-        $competvet = competvet::get_from_situation($situation);
-        self::validate_context($competvet->get_context());
-        $observation->delete();
+        if ($observation->can_delete()) {
+            $observation->delete();
+        } else {
+            throw new \invalid_parameter_exception('Cannot delete observation');
+        }
     }
 
     /**

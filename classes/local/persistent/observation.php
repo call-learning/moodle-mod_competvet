@@ -142,6 +142,12 @@ class observation extends persistent {
     public function can_edit() {
         global $USER;
         $sameuser = $USER->id == $this->raw_get('observerid');
+        if ($this->get_observation_type() == self::CATEGORY_EVAL_AUTOEVAL) {
+            $sameuser = $USER->id == $this->raw_get('studentid');
+            if ($sameuser) {
+                return true;
+            }
+        }
         $situation = $this->get_situation();
         $competvet = competvet::get_from_situation($situation);
         $context = $competvet->get_context();
