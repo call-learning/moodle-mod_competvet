@@ -57,7 +57,7 @@ function competvet_supports($feature) {
         FEATURE_GRADE_HAS_GRADE => false,
         FEATURE_GRADE_OUTCOMES => false,
         FEATURE_SHOW_DESCRIPTION => true,
-        FEATURE_MOD_PURPOSE => MOD_PURPOSE_ASSESSMENT
+        FEATURE_MOD_PURPOSE => MOD_PURPOSE_ASSESSMENT,
     ];
     if (isset($features[(string) $feature])) {
         return $features[$feature];
