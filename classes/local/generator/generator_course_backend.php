@@ -504,7 +504,7 @@ class generator_course_backend extends tool_generator_course_backend {
             $currentstatusindex++;
             $currentstatusindex = $currentstatusindex % count(observation::STATUS);
             $statustoset = array_flip(array_keys(observation::STATUS))[$currentstatusindex];
-            $status = $this->fixeddataset ? $statustoset : random_int(0, observation::STATUS_ARCHIVED);
+            $status = $this->fixeddataset ? $statustoset : random_int(0, observation::STATUS_COMPLETED);
         }
         $observation = $competvetgenerator->create_observation([
             'category' => $category,

@@ -51,26 +51,17 @@ class observation extends persistent {
      */
     const STATUS = [
         self::STATUS_NOTSTARTED => 'notstarted',
-        self::STATUS_INPROGRESS => 'inprogress',
         self::STATUS_COMPLETED => 'completed',
-        self::STATUS_ARCHIVED => 'archived',
     ];
     /**
-     * Status not started: student asked for evaluation but not yet taken into account by observer.
+     * Status not started: student asked for evaluation but not finalised by observer (or student when self evaluating).
+     * This is used in the process where we start to create the observation and then we ask the observer to evaluate.
      */
     const STATUS_NOTSTARTED = 0;
     /**
-     * Status in progress: student is being evaluated by observer.
-     */
-    const STATUS_INPROGRESS = 1;
-    /**
-     * Status completed: student has been evaluated by observer.
+     * Status completed: student has been evaluated by observer (the observation has been edited).
      */
     const STATUS_COMPLETED = 2;
-    /**
-     * Status archived: student has been evaluated by observer and archived, so not counted in the stats.
-     */
-    const STATUS_ARCHIVED = 3;
 
     /**
      * Usual properties definition for a persistent

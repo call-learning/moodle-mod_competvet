@@ -91,7 +91,7 @@ trait test_data_definition {
                             $observer = $users[$observationdef['observer']];
                             $record = [
                                 'category' => $observationdef['category'],
-                                'status' => $observationdef['status'] ?? observation::STATUS_INPROGRESS,
+                                'status' => $observationdef['status'] ?? observation::STATUS_NOTSTARTED,
                                 'planningid' => $planning->id,
                                 'studentid' => $student->id,
                                 'observerid' => $observer->id,
