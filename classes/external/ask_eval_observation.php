@@ -20,13 +20,11 @@ global $CFG;
 require_once("$CFG->libdir/externallib.php");
 
 use external_api;
-use external_description;
 use external_function_parameters;
 use external_value;
 use mod_competvet\competvet;
-use mod_competvet\local\api\todos;
+use mod_competvet\event\observation_requested;
 use mod_competvet\local\persistent\planning;
-use mod_competvet\local\persistent\situation;
 
 /**
  * Class delete_observation
@@ -44,7 +42,7 @@ class ask_eval_observation extends external_api {
     public static function execute_returns(): \external_single_structure {
         return new \external_single_structure(
             [
-                'todoid' => new external_value(PARAM_INT, 'Observation instance id'),
+                'success' => new external_value(PARAM_BOOL, 'As the observation been asked?'),
             ]
         );
     }
@@ -73,9 +71,9 @@ class ask_eval_observation extends external_api {
         // Check if we can act.
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
-        return [
-            'todoid' => todos::ask_for_observation($context, $planningid, $observerid, $studentid),
-        ];
+        $event = observation_requested::create_from_planning($planning, $context, $observerid, $studentid);
+        $event->trigger();
+        return ['success' => true];
     }
 
 

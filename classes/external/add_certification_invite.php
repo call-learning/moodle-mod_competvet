@@ -71,6 +71,7 @@ class add_certification_invite extends external_api {
      * @return stdClass
      */
     public static function execute($declid, $supervisorid): stdClass {
+        global $USER;
         self::validate_parameters(self::execute_parameters(), ['declid' => $declid, 'supervisorid' => $supervisorid]);
         // Validate context : important as it also require the user to be logged in.
         $decl = cert_decl::get_record(['id' => $declid]);
@@ -79,9 +80,7 @@ class add_certification_invite extends external_api {
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
 
-        if (certifications::declaration_supervisor_invite($declid, $supervisorid)) {
-            return (object) ['success' => true];
-        }
-        return (object) ['success' => false];
+        certifications::declaration_supervisor_invite($declid, $supervisorid, $USER->id);
+        return (object) ['success' => true];
     }
 }

@@ -236,6 +236,7 @@ class cert_decl extends dynamic_form {
      * Process the student form submission, used if form was submitted via AJAX
      */
     public function process_student_submission() {
+        global $USER;
         $data = $this->get_data();
         if ($data->declid) {
             certifications::update_cert_declaration(
@@ -257,7 +258,7 @@ class cert_decl extends dynamic_form {
             );
         }
         if ($data->supervisors) {
-            certifications::declaration_supervisors_update($data->declid, $data->supervisors);
+            certifications::declaration_supervisors_update($data->declid, $data->supervisors, $USER->id);
         }
     }
 

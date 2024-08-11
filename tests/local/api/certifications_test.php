@@ -151,11 +151,14 @@ class certifications_test extends advanced_testcase {
         $certification = $this->get_certification_declaration();
 
         $observer3 = $this->getDataGenerator()->create_user();
+
+        $student1 = core_user::get_user_by_username('student1');
         // Act: Call the method under test
-        $this->assertNotNull(certifications::declaration_supervisor_invite(
+        certifications::declaration_supervisor_invite(
             $certification->id,
-            $observer3->id
-        ));
+            $observer3->id,
+            $student1->id
+        );
 
         $this->assertContainsEquals($observer3->id, certifications::get_declaration_supervisors($certification->id));
     }
@@ -168,9 +171,9 @@ class certifications_test extends advanced_testcase {
         $certification = $this->get_certification_declaration();
 
         $observer2 = core_user::get_user_by_username('observer2');
-
+        $student1 = core_user::get_user_by_username('student1');
         // Act: Call the method under test.
-        $success = certifications::declaration_supervisor_remove($certification->id, $observer2->id);
+        $success = certifications::declaration_supervisor_remove($certification->id, $observer2->id, $student1->id);
 
         // Assert: Check that the results are as expected
         $this->assertTrue($success, "Removing supervisor should return true");

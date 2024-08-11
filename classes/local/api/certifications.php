@@ -17,6 +17,7 @@
 namespace mod_competvet\local\api;
 
 use core\invalid_persistent_exception;
+use mod_competvet\event\cert_validation_requested;
 use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\cert_decl_asso;
 use mod_competvet\local\persistent\cert_valid;
@@ -137,16 +138,16 @@ class certifications {
      * @param array $supervisorsid
      * @return void
      */
-    public static function declaration_supervisors_update($declid, $supervisorsid) {
+    public static function declaration_supervisors_update(int $declid, array $supervisorsid, int $studentid) {
         $setsupervisors = self::get_declaration_supervisors($declid);
         foreach ($supervisorsid as $supervisorid) {
             if (!in_array($supervisorid, $setsupervisors)) {
-                self::declaration_supervisor_invite($declid, $supervisorid);
+                self::declaration_supervisor_invite($declid, $supervisorid, $studentid);
             }
         }
         foreach ($setsupervisors as $supervisorid) {
             if (!in_array($supervisorid, $supervisorsid)) {
-                self::declaration_supervisor_remove($declid, $supervisorid);
+                self::declaration_supervisor_remove($declid, $supervisorid, $studentid);
             }
         }
     }
@@ -171,22 +172,14 @@ class certifications {
      *
      * @param int $declid The declaration id
      * @param int $supervisorid The supervisor id
-     * @return ?cert_decl_asso
      */
-    public static function declaration_supervisor_invite($declid, $supervisorid): ?cert_decl_asso {
+    public static function declaration_supervisor_invite($declid, $supervisorid, $studentid): void {
         try {
-            $cert = new cert_decl_asso();
-            $cert->set('declid', $declid);
-            $cert->set('supervisorid', $supervisorid);
-            $cert->create();
-            // Now also ask for a todo.
-            // TODO use events instead of this, so we can modify the workflow more easily.
-            todos::ask_for_certification_validation($declid, $supervisorid);
-
-            return $cert;
+            $event = cert_validation_requested::create_from_decl_and_supervisor($declid, $supervisorid, $studentid);
+            $event->trigger();
         } catch (invalid_persistent_exception $e) {
             debugging($e->getMessage());
-            return null;
+
         }
     }
 
@@ -197,7 +190,7 @@ class certifications {
      * @param int $supervisorid The supervisor id
      * @return bool success
      */
-    public static function declaration_supervisor_remove($declid, $supervisorid) {
+    public static function declaration_supervisor_remove(int $declid, int $supervisorid, int $studentid) {
         $cert = cert_decl_asso::get_record(['declid' => $declid, 'supervisorid' => $supervisorid]);
         if ($cert->delete()) {
             return true;
@@ -446,18 +439,19 @@ class certifications {
      *
      * @param int $declid
      * @param array $supervisors
+     * @param int $studentid
      * @return array a set of supervisor ids.
      */
-    public static function set_declaration_supervisors(int $declid, array $supervisors): array {
+    public static function set_declaration_supervisors(int $declid, array $supervisors, int $studentid): array {
         $setsupervisors = self::get_declaration_supervisors($declid);
         foreach ($supervisors as $supervisorid) {
             if (!in_array($supervisorid, $setsupervisors)) {
-                self::declaration_supervisor_invite($declid, $supervisorid);
+                self::declaration_supervisor_invite($declid, $supervisorid, $studentid);
             }
         }
         foreach ($setsupervisors as $supervisorid) {
             if (!in_array($supervisorid, $supervisors)) {
-                self::declaration_supervisor_remove($declid, $supervisorid);
+                self::declaration_supervisor_remove($declid, $supervisorid, $studentid);
             }
         }
         return self::get_declaration_supervisors($declid);

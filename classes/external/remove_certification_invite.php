@@ -70,14 +70,14 @@ class remove_certification_invite extends external_api {
      * @param int $supervisorid The supervisor id
      * @return stdClass
      */
-    public static function execute($declid, $supervisorid): stdClass {
+    public static function execute(int $declid, int $supervisorid, int $studentid): stdClass {
         self::validate_parameters(self::execute_parameters(), ['declid' => $declid, 'supervisorid' => $supervisorid]);
         $decl = case_entry::get_record(['id' => $declid]);
         $planning  = planning::get_record(['id' => $decl->get('planningid')]);
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
 
-        if (certifications::declaration_supervisor_remove($declid, $supervisorid)) {
+        if (certifications::declaration_supervisor_remove($declid, $supervisorid, $studentid)) {
             return (object) ['success' => true];
         }
         return (object) ['success' => false];

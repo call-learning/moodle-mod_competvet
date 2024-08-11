@@ -71,7 +71,7 @@ export const initUsersAction = (modulename, planningId, studentId, context) => {
                 const askObservationReturn = await Ajax.call(
                     [{methodname: `${modulename}_ask_eval_observation`, args: askEvalPayload}]
                 )[0];
-                if (askObservationReturn.todoid) {
+                if (askObservationReturn.asked) {
                     try {
                         const userInfo = await Ajax.call([
                             {

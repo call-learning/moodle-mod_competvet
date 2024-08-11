@@ -17,24 +17,31 @@
  * Events for CompetVet
  *
  * @package     mod_competvet
- * @category    cach
+ * @category    events
  * @copyright   2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
 $observers = [
-    // We observer those event in order to purge relevant cache.
     [
         'eventname'   => '\core\event\user_enrolment_created',
-        'callback'    => '\mod_competvet\local\observers\user_enrolment_observer::user_enrolment_created',
+        'callback'    => \mod_competvet\local\observers\user_enrolment_observer::class . '::user_enrolment_created',
     ],
     [
         'eventname'   => '\core\event\user_enrolment_deleted',
-        'callback'    => '\mod_competvet\local\observers\user_enrolment_observer::user_enrolment_deleted',
+        'callback'    => \mod_competvet\local\observers\user_enrolment_observer::class . '::user_enrolment_deleted',
     ],
     [
         'eventname'   => '\core\event\user_enrolment_updated',
-        'callback'    => '\mod_competvet\local\observers\user_enrolment_observer::user_enrolment_updated',
+        'callback'    => \mod_competvet\local\observers\user_enrolment_observer::class . '::user_enrolment_updated',
+    ],
+    [
+        'eventname'   => '\mod_competvet\event\observation_requested',
+        'callback'    => \mod_competvet\local\observers\observervation_observer::class . '::observation_requested',
+    ],
+    [
+        'eventname'   => '\mod_competvet\event\cert_validation_requested',
+        'callback'    => \mod_competvet\local\observers\certification_observer::class . '::ask_for_certification_validation',
     ],
 ];

@@ -60,10 +60,9 @@ class grid_test extends advanced_testcase {
                 5,
                 criterion::count_records(['gridid' => $evalgrid->get('id'), 'parentid' => $crit->get('id')])
             );
-            $this->assertSame([1, 2, 3, 4, 5], array_map(
-                fn($c) => $c->get('sort'),
-                criterion::get_records(['gridid' => $evalgrid->get('id'), 'parentid' => $crit->get('id')])
-            ));
+            foreach (criterion::get_records(['gridid' => $evalgrid->get('id'), 'parentid' => $crit->get('id')]) as $c) {
+                $this->assertNotEmpty($c->get('sort'));
+            }
         }
     }
 

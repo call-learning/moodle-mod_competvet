@@ -152,7 +152,7 @@ class cert_decl_student extends dynamic_form {
             );
         }
         if ($data->supervisors) {
-            certifications::set_declaration_supervisors($data->declid, $data->supervisors);
+            certifications::set_declaration_supervisors($data->declid, $data->supervisors, $USER->id);
         }
     }
 

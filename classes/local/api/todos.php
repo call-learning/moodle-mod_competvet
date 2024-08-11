@@ -155,4 +155,12 @@ class todos {
         $todo->set('status', $status);
         $todo->update();
     }
+
+    public static function act_on_todo(int $id) {
+        $todo = todo::get_record(['id' => $id]);
+
+        $todo->set('status', todo::STATUS_DONE);
+        $todo->update();
+        return [];
+    }
 }

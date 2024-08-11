@@ -42,7 +42,7 @@ class search_test extends advanced_testcase {
                 [
                     [
                         'type' => 'situation',
-                        'description' => 'Situation 1',
+                        'description' => 'Test competvet 1',
                         'identifier' => 'SIT1',
                     ],
                 ],
@@ -53,7 +53,7 @@ class search_test extends advanced_testcase {
                 [
                     [
                         'type' => 'situation',
-                        'description' => 'Situation 1',
+                        'description' => 'Test competvet 1',
                         'identifier' => 'SIT1',
                     ],
                 ],
@@ -64,7 +64,7 @@ class search_test extends advanced_testcase {
                 [
                     [
                         'type' => 'situation',
-                        'description' => 'Situation 1',
+                        'description' => 'Test competvet 1',
                         'identifier' => 'SIT1',
                     ],
                 ],

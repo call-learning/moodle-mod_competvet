@@ -96,7 +96,7 @@ class observations_test extends advanced_testcase {
         $plannings = plannings::get_plannings_for_situation_id($situation->get('id'), $student->id);
         $planning = array_shift($plannings);
         // Parse data so to change criteria shortname into criteriaid.
-        $criteria = array_map(function($value) {
+        $criteria = array_map(function ($value) {
             $value['id'] = criterion::get_record(['idnumber' => $value['id']])->get('id');
             return $value;
         }, $criteria);
@@ -118,9 +118,9 @@ class observations_test extends advanced_testcase {
         $this->assertEquals($category, $observation->get('category'));
         $this->assertEquals(3, observation_comment::count_records(['observationid' => $observationid]));
         $this->assertEquals(1, observation_comment::count_records(['observationid' => $observationid,
-            'type' => observation_comment::OBSERVATION_CONTEXT,]));
+            'type' => observation_comment::OBSERVATION_CONTEXT, ]));
         $this->assertEquals(1, observation_comment::count_records(['observationid' => $observationid,
-            'type' => observation_comment::OBSERVATION_PRIVATE_COMMENT,]));
+            'type' => observation_comment::OBSERVATION_PRIVATE_COMMENT, ]));
         $this->assertEquals(7, observation_criterion_level::count_records(['observationid' => $observationid]));
         $this->assertEquals(33, observation_criterion_comment::count_records(['observationid' => $observationid]));
         foreach (array_filter($criteria, fn($crit) => isset($crit['level'])) as $critelevel) {
@@ -145,12 +145,14 @@ class observations_test extends advanced_testcase {
      * @covers       \mod_competvet\local\api\observations::create_observation
      * @dataProvider data_get_all_with_planning_for_user
      */
-    public function test_edit_observation(int $category,
+    public function test_edit_observation(
+        int $category,
         string $student,
         string $observer,
         string $context,
         array $comments,
-        array $criteria) {
+        array $criteria
+    ) {
         $student = core_user::get_user_by_username($student);
         $observer = core_user::get_user_by_username($observer);
         $situation = situation::get_record(['shortname' => 'SIT1']);
@@ -180,7 +182,7 @@ class observations_test extends advanced_testcase {
             $newobs->id,
             null,
             [
-                ['type' => observation_comment::OBSERVATION_COMMENT, 'comment' => 'A new comment']
+                ['type' => observation_comment::OBSERVATION_COMMENT, 'comment' => 'A new comment'],
             ]
         );
         $this->assertEquals('A new comment', observation_comment::get_record([
