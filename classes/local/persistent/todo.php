@@ -42,12 +42,14 @@ class todo extends persistent {
      */
     const STATUS_PENDING = 1;
     const STATUS_DONE = 2;
+    const STATUS_DELETED = 3;
     /**
      * Status definition
      */
     const STATUS = [
         self::STATUS_PENDING => 'pending',
         self::STATUS_DONE => 'done',
+        self::STATUS_DELETED => 'deleted',
     ];
 
     /**

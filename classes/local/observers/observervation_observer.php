@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\local\observers;
 use mod_competvet\event\observation_requested;
+use mod_competvet\local\api\todos;
 use mod_competvet\local\persistent\todo;
 
 /**
@@ -34,29 +35,6 @@ class observervation_observer {
         $eventdata = $event->get_data();
         ['context' => $context, 'planningid' => $planningid, 'observerid' => $observerid, 'studentid' => $studentid] =
             $eventdata['other'];
-        // First check that the same user has not yet asked for an observation.
-        $existingtodos = todo::get_records([
-            'userid' => $observerid,
-            'targetuserid' => $studentid,
-            'planningid' => $planningid,
-            'action' => todo::ACTION_EVAL_OBSERVATION_ASKED,
-            'status' => todo::STATUS_PENDING,
-        ]);
-        if ($existingtodos) {
-            $todo = reset($existingtodos);
-        } else {
-            $todo = new todo(0, (object) [
-                'userid' => $observerid,
-                'status' => todo::STATUS_PENDING,
-                'targetuserid' => $studentid,
-                'planningid' => $planningid,
-                'action' => todo::ACTION_EVAL_OBSERVATION_ASKED,
-            ]);
-            $todo->create();
-        }
-        $todo->set('data', json_encode((object) [
-            'context' => $context,
-        ]));
-        $todo->update();
+        todos::ask_for_observation($context, $planningid, $observerid, $studentid);
     }
 }

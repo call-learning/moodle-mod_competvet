@@ -16,6 +16,7 @@
 namespace mod_competvet\local\api;
 
 use mod_competvet\local\persistent\cert_decl;
+use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\todo;
 use mod_competvet\utils;
 
@@ -32,6 +33,8 @@ use mod_competvet\utils;
 class todos {
     /**
      * Ask for observation : add a todo list item for the observer
+     *
+     * Note: called from observers only !!!
      *
      * @param string $context
      * @param int $planningid
@@ -70,12 +73,14 @@ class todos {
     /**
      * Ask for certification validation : add a todo list item for the observer
      *
+     * Note: called from observers only !!!
+     *
      * @param int $declid
      * @param int $supervisorid
      * @return int the todo id
      */
-    public static function ask_for_certification_validation(string $declid, int $supervisorid): int {
-        // First get the declaration
+    public static function ask_for_certification_validation(int $declid, int $supervisorid): int {
+        // First get the declaration.
         $declaration = cert_decl::get_record(['id' => $declid]);
         // First check that the same user has not yet asked for a certification validation.
         $existingtodos = todo::get_records([
@@ -156,11 +161,79 @@ class todos {
         $todo->update();
     }
 
+    /**
+     * Act on a todo
+     *
+     * @param int $id
+     * @return array
+     */
     public static function act_on_todo(int $id) {
         $todo = todo::get_record(['id' => $id]);
+        switch ($todo->get('action')) {
+            case todo::ACTION_EVAL_OBSERVATION_ASKED:
+                return self::act_on_observation_asked_todo($todo);
+            case todo::ACTION_EVAL_CERTIFICATION_VALIDATION_ASKED:
+                return self::act_on_certification_validation_todo($todo);
+        }
+        return [];
+    }
 
+    /**
+     * Act on a todo for an observation asked
+     *
+     * @param todo $todo
+     * @return array
+     */
+    private static function act_on_observation_asked_todo(todo $todo) {
+        $data = json_decode($todo->get('data'));
+        $context = $data->context ?? '';
+        $observationid = $data->observationid ?? null;
+        $studentid = $todo->get('targetuserid');
+        $planningid = $todo->get('planningid');
+        $observerid = $todo->get('userid');
+        if (!$observationid || !observation::record_exists($observationid)) {
+            $observationid = observations::create_observation(
+                observation::CATEGORY_EVAL_OBSERVATION,
+                $planningid,
+                $studentid,
+                $observerid,
+                $context
+            );
+        }
+        $todo->set('data', json_encode((object) [
+            'observationid' => $observationid,
+        ]));
         $todo->set('status', todo::STATUS_DONE);
         $todo->update();
-        return [];
+        return [
+            'id' => $todo->get('id'),
+            'status' => $todo->get('status'),
+            'message' => get_string('observation:created', 'mod_competvet'),
+            'nextaction' => 'edit_observation',
+            'data' => json_encode((object) [
+                'id' => $observationid,
+            ]),
+        ];
+    }
+
+    /**
+     * Act on a todo for an observation asked
+     *
+     * @param todo $todo
+     * @return array
+     */
+    private static function act_on_certification_validation_todo(todo $todo) {
+        $data = json_decode($todo->get('data'));
+        $todo->set('status', todo::STATUS_DONE);
+        $todo->update();
+        return [
+            'id' => $todo->get('id'),
+            'status' => $todo->get('status'),
+            'message' => get_string('observation:created', 'mod_competvet'),
+            'nextaction' => 'create_certification_validation',
+            'data' => json_encode((object) [
+                'id' => $data->declid,
+            ]),
+        ];
     }
 }

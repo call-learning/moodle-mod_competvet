@@ -16,6 +16,7 @@
 namespace mod_competvet\local\observers;
 
 use mod_competvet\event\cert_validation_requested;
+use mod_competvet\local\api\todos;
 use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\cert_decl_asso;
 use mod_competvet\local\persistent\todo;
@@ -49,41 +50,6 @@ class certification_observer {
             ]);
             $cert->create();
         }
-
-        // Now check that the same user has not yet asked for a certification validation.
-        $existingtodos = todo::get_records([
-            'userid' => $supervisorid,
-            'targetuserid' => $studentid,
-            'planningid' => $planningid,
-            'action' => todo::ACTION_EVAL_CERTIFICATION_VALIDATION_ASKED,
-        ]);
-        $todo = null;
-        if ($existingtodos) {
-            // Find the one with the same declid.
-            foreach ($existingtodos as $todo) {
-                $data = json_decode($todo->get('data'));
-                if ($data->declid == $declid) {
-                    break;
-                }
-                $todo = null;
-            }
-        }
-        if ($todo) {
-            $todo = reset($existingtodos);
-            $todo->set('status', todo::STATUS_PENDING);
-            $todo->update();
-        } else {
-            $todo = new todo(0, (object) [
-                'userid' => $supervisorid,
-                'targetuserid' => $declaration->get('studentid'),
-                'planningid' => $planningid,
-                'action' => todo::ACTION_EVAL_CERTIFICATION_VALIDATION_ASKED,
-                'data' => json_encode((object) [
-                    'declid' => $declid,
-                ]),
-                'status' => todo::STATUS_PENDING,
-            ]);
-            $todo->create();
-        }
+        todos::ask_for_certification_validation($declid, $supervisorid);
     }
 }
