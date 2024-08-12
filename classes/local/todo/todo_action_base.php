@@ -20,8 +20,7 @@ use mod_competvet\local\persistent\todo;
 /**
  * Todo Base Action
  *
- *
- * This is a set of API used both locally by mod_competvet and local_competvet
+ * This will be used later to refactor the todo actions
  *
  * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
@@ -31,7 +30,7 @@ use mod_competvet\local\persistent\todo;
 abstract class todo_action_base {
 
     /**
-     * @var $todo current todo
+     * @var todo $todo current todo
      */
     protected $todo = null;
 
@@ -56,8 +55,8 @@ abstract class todo_action_base {
     /**
      * Create a new todo
      *
-     * @param array $params to create the todo
+     * @param array $params the todo
      * @return void
      */
-    abstract public function create($params);
+    abstract public function create(...$params);
 }

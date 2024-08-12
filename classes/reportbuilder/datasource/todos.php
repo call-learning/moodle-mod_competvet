@@ -49,6 +49,8 @@ class todos extends datasource {
             'todo:status',
             'todo:action',
             'todo:data',
+            'todo:created',
+            'todo:modified',
         ];
     }
 
@@ -61,6 +63,8 @@ class todos extends datasource {
         return [
             'todo:status',
             'todo:action',
+            'todo:created',
+            'todo:modified',
         ];
     }
 

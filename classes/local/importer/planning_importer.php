@@ -75,6 +75,7 @@ class planning_importer extends base_persistent_importer {
      * @return object
      */
     protected function to_persistent_data(array $row, csv_iterator $reader): object {
+
         $groupnametoid = cache::make_from_params(cache_store::MODE_REQUEST, 'local_competvet', 'groupnametoid');
         $data = parent::to_persistent_data($row, $reader);
         $groupname = trim($data->groupid);

@@ -103,6 +103,31 @@ class todo extends base {
             ->add_fields("{$todoalias}.data, {$todoalias}.action, {$todoalias}.status, {$todoalias}.planningid, {$todoalias}.targetuserid")
             ->set_is_sortable(false)
             ->set_callback([format::class, 'format_todo_data']);
+
+
+        $columns[] = (new column(
+            'timecreated',
+            new lang_string('todo:timecreated', 'mod_competvet'),
+            $this->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->set_type(column::TYPE_TIMESTAMP)
+            ->add_fields("{$todoalias}.timecreated")
+            ->set_is_sortable(true)
+            ->add_callback([\core_reportbuilder\local\helpers\format::class, 'userdate'], get_string('strftimedatetimeshortaccurate', 'core_langconfig'));
+        ;
+
+        $columns[] = (new column(
+            'timemodified',
+            new lang_string('todo:timemodified', 'mod_competvet'),
+            $this->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->set_type(column::TYPE_TIMESTAMP)
+            ->add_fields("{$todoalias}.timemodified")
+            ->set_is_sortable(true)
+            ->add_callback([\core_reportbuilder\local\helpers\format::class, 'userdate'], get_string('strftimedatetimeshortaccurate', 'core_langconfig'));
+
         return $columns;
     }
 

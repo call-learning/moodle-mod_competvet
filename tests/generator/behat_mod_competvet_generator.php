@@ -13,11 +13,13 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\observation_comment;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
+use mod_competvet\local\persistent\todo;
 
 /**
  * Behat data generator for mod_competvet.
@@ -27,7 +29,6 @@ use mod_competvet\local\persistent\situation;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_mod_competvet_generator extends behat_generator_base {
-
     /**
      * Get a list of the entities that Behat can create using the generator step.
      *
@@ -93,6 +94,16 @@ class behat_mod_competvet_generator extends behat_generator_base {
                     'planning' => 'planningid',
                 ],
             ],
+            'todos' => [
+                'singular' => 'todo',
+                'datagenerator' => 'todo',
+                'required' => ['student', 'planning', 'action', 'targetuser'],
+                'switchids' => [
+                    'student' => 'studentid',
+                    'planning' => 'planningid',
+                    'targetuser' => 'targetuserid',
+                ],
+            ],
         ];
     }
 
@@ -114,20 +125,6 @@ class behat_mod_competvet_generator extends behat_generator_base {
      */
     protected function get_appraiser_id(string $username): int {
         return $this->get_user_id($username);
-    }
-
-    /**
-     * Gets the criterion id from its shortname.
-     *
-     * @param string $criterionsn
-     * @return int
-     */
-    protected function get_criterion_id(string $criterionsn): int {
-        $criterion = criterion::get_record(['idnumber' => $criterionsn]);
-        if (!$criterion) {
-            throw new moodle_exception("Criterion $criterionsn  not found");
-        }
-        return $criterion->get('id');
     }
 
     /**
@@ -213,6 +210,16 @@ class behat_mod_competvet_generator extends behat_generator_base {
     }
 
     /**
+     * Gets the target user id from its username.
+     *
+     * @param string $username
+     * @return int
+     */
+    protected function get_targetuser_id(string $username): int {
+        return $this->get_user_id($username);
+    }
+
+    /**
      * Preprocess the data so to split the comments into the different types.
      *
      * @param array $data
@@ -273,5 +280,39 @@ class behat_mod_competvet_generator extends behat_generator_base {
             }
         }
         return $data;
+    }
+
+    /**
+     * Preprocess TODO
+     *
+     * @param array $data
+     * @return array
+     */
+    protected function preprocess_todo(array $data): array {
+        if (isset($data['data'])) {
+            $data['data'] = json_decode('{' . $data['data'] . '}');
+            $criteria = $data['data']->criteria ?? null;
+            if (isset($criteria)) {
+                unset($data['data']->criteria);
+                $data['data']->criteriaid = $this->get_criterion_id($criteria);
+            }
+        }
+        $actiontoid = array_flip(todo::ACTIONS);
+        $data['action'] = $actiontoid[trim($data['action'], "' ")] ?? todo::ACTION_EVAL_OBSERVATION_ASKED;
+        return $data;
+    }
+
+    /**
+     * Gets the criterion id from its shortname.
+     *
+     * @param string $criterionsn
+     * @return int
+     */
+    protected function get_criterion_id(string $criterionsn): int {
+        $criterion = criterion::get_record(['idnumber' => $criterionsn]);
+        if (!$criterion) {
+            throw new moodle_exception("Criterion $criterionsn  not found");
+        }
+        return $criterion->get('id');
     }
 }

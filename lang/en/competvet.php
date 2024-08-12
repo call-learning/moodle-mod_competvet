@@ -223,6 +223,8 @@ $string['todo:action:eval:asked'] = 'Observation Asked';
 $string['todo:action:cta:eval:asked'] = 'Create Observation';
 $string['todo:action'] = 'Action';
 $string['todo:data'] = 'Data';
+$string['todo:timecreated'] = 'Time created';
+$string['todo:timemodified'] = 'Time modified';
 
 // Grading interface
 $string['modulename_help'] = 'The Compet Eval Grading interface.';

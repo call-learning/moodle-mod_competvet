@@ -16,6 +16,7 @@
 
 use mod_competvet\local\api\cases;
 use mod_competvet\local\api\certifications;
+use mod_competvet\local\api\todos;
 use mod_competvet\local\persistent\case_entry;
 use mod_competvet\local\persistent\case_field;
 use mod_competvet\local\persistent\cert_decl;
@@ -29,6 +30,7 @@ use mod_competvet\local\persistent\observation_criterion_comment;
 use mod_competvet\local\persistent\observation_criterion_level;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
+use mod_competvet\local\persistent\todo;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -536,5 +538,34 @@ class mod_competvet_generator extends testing_module_generator {
         $caseid = cases::create_case($record->planningid, $record->studentid, $fields);
         $case = case_entry::get_record(['id' => $caseid]);
         return $case->to_record();
+    }
+
+
+    /**
+     * Create a new instance of a Todo
+     *
+     * @param array|stdClass|null $record
+     * @return stdClass
+     */
+    public function create_todo($record = null) {
+        $record = (object) (array) $record;
+        $todo = null;
+        switch ($record->action) {
+            case todo::ACTION_EVAL_OBSERVATION_ASKED:
+                $todo = todos::ask_for_observation($record->data->context, $record->planningid, $record->targetuserid,
+                    $record->studentid);
+                break;
+            case todo::ACTION_EVAL_CERTIFICATION_VALIDATION_ASKED:
+                $decl = cert_decl::get_record(
+                    [
+                        'planningid' => $record->planningid,
+                        'studentid' => $record->studentid,
+                        'criterionid' => $record->data->criteriaid,
+                    ]
+                );
+                $todo = todos::ask_for_certification_validation($decl->get('id'), $record->targetuserid);
+                break;
+        }
+        return !empty($todo) ? $todo->to_record() : null;
     }
 }

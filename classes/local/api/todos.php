@@ -34,15 +34,15 @@ class todos {
     /**
      * Ask for observation : add a todo list item for the observer
      *
-     * Note: called from observers only !!!
+     * Note: called from observers only (or from tests) !!!
      *
      * @param string $context
      * @param int $planningid
      * @param int $observerid
      * @param int $studentid
-     * @return int
+     * @return todo
      */
-    public static function ask_for_observation(string $context, int $planningid, int $observerid, int $studentid): int {
+    public static function ask_for_observation(string $context, int $planningid, int $observerid, int $studentid): todo {
         // First check that the same user has not yet asked for an observation.
         $existingtodos = todo::get_records([
             'userid' => $observerid,
@@ -67,19 +67,19 @@ class todos {
             'context' => $context,
         ]));
         $todo->update();
-        return $todo->get('id');
+        return $todo;
     }
 
     /**
      * Ask for certification validation : add a todo list item for the observer
      *
-     * Note: called from observers only !!!
+     * Note: called from observers only (or from tests) !!!
      *
      * @param int $declid
      * @param int $supervisorid
      * @return int the todo id
      */
-    public static function ask_for_certification_validation(int $declid, int $supervisorid): int {
+    public static function ask_for_certification_validation(int $declid, int $supervisorid): todo {
         // First get the declaration.
         $declaration = cert_decl::get_record(['id' => $declid]);
         // First check that the same user has not yet asked for a certification validation.
@@ -117,7 +117,7 @@ class todos {
             ]);
             $todo->create();
         }
-        return $todo->get('id');
+        return $todo;
     }
 
     /**
@@ -199,11 +199,18 @@ class todos {
                 $observerid,
                 $context
             );
+        } else {
+            $observation = observation::get_record(['id' => $observationid]);
+            if ($observation->get('status') == observation::STATUS_COMPLETED) {
+                $todo->set('status', todo::STATUS_DONE); // Reset the todo status.
+            } else {
+                $todo->set('status', todo::STATUS_PENDING); // Pending.
+            }
+            $todo->update();
         }
         $todo->set('data', json_encode((object) [
             'observationid' => $observationid,
         ]));
-        $todo->set('status', todo::STATUS_DONE);
         $todo->update();
         return [
             'id' => $todo->get('id'),
