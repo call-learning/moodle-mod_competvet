@@ -41,6 +41,10 @@ $observers = [
         'callback'    => \mod_competvet\local\observers\observervation_observer::class . '::observation_requested',
     ],
     [
+        'eventname'   => '\mod_competvet\event\observation_completed',
+        'callback'    => \mod_competvet\local\observers\observervation_observer::class . '::observation_completed',
+    ],
+    [
         'eventname'   => '\mod_competvet\event\cert_validation_requested',
         'callback'    => \mod_competvet\local\observers\certification_observer::class . '::ask_for_certification_validation',
     ],

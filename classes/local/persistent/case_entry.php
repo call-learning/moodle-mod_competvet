@@ -18,6 +18,7 @@ namespace mod_competvet\local\persistent;
 
 use core\persistent;
 use lang_string;
+use mod_competvet\competvet;
 
 /**
  * Case entry template entity
@@ -52,5 +53,35 @@ class case_entry extends persistent {
                 'message' => new lang_string('invaliddata', 'competvet', 'planningid'),
             ],
         ];
+    }
+
+    /**
+     * Can the caselog be edited
+     *
+     * @return bool
+     */
+    public function can_edit() {
+        global $USER;
+        $sameuser = $USER->id == $this->raw_get('studentid');
+        $planning = planning::get_record(['id' => $this->raw_get('planningid')]);
+        $competvet = competvet::get_from_situation($planning->get_situation());
+        $context = $competvet->get_context();
+        $caneditcase = false; // TODO add new capability like caneditothercase.
+        return $caneditcase || $sameuser;
+    }
+
+    /**
+     * Can the caselog be deleted
+     *
+     * @return bool
+     */
+    public function can_delete() {
+        global $USER;
+        $sameuser = $USER->id == $this->raw_get('studentid');
+        $planning = planning::get_record(['id' => $this->raw_get('planningid')]);
+        $competvet = competvet::get_from_situation($planning->get_situation());
+        $context = $competvet->get_context();
+        $caneditcase = false; // TODO add new capability.
+        return $caneditcase || $sameuser;
     }
 }

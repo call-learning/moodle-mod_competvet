@@ -130,6 +130,7 @@ $string['observation:status:archived'] = 'Archivé';
 $string['observation:status:notstarted'] = 'Non commencé';
 $string['observation:status:inprogress'] = 'En cours';
 $string['observation:status:completed'] = 'Terminé';
+$string['observation:created'] = 'Observation créée';
 $string['tab:eval'] = 'Éval ({$a->done}/{$a->required})';
 $string['tab:autoeval'] = 'Auto-Éval ({$a->done}/{$a->required})';
 $string['tab:list'] = 'Liste ({$a->cases})';

@@ -81,6 +81,8 @@ class get_cases extends external_api {
                             ),
                         ])
                     ),
+                    'canedit' => new external_value(PARAM_BOOL, 'Can the user edit this case'),
+                    'candelete' => new external_value(PARAM_BOOL, 'Can the user delete this case'),
                 ])
             ),
         ]);

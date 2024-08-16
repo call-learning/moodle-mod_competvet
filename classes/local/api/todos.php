@@ -70,6 +70,24 @@ class todos {
         return $todo;
     }
 
+    public static function complete_todo_on_observation_completed(int $observationid) {
+        $observation = observation::get_record(['id' => $observationid]);
+        $todos = todo::get_records([
+            'userid' => $observation->get('observerid'),
+            'planningid' => $observation->get('planningid'),
+            'targetuserid' => $observation->get('studentid'),
+            'action' => todo::ACTION_EVAL_OBSERVATION_ASKED,
+        ]);
+        foreach ($todos as $todo) {
+            $data = json_decode($todo->get('data'));
+            if ($data->observationid != $observationid) {
+                continue;
+            }
+            $todo->set('status', todo::STATUS_DONE);
+            $todo->update();
+        }
+    }
+
     /**
      * Ask for certification validation : add a todo list item for the observer
      *

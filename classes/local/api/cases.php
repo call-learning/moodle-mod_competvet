@@ -128,6 +128,8 @@ class cases {
             'timecreated' => $caseentry->get('timecreated'),
             'usermodified' => $caseentry->get('usermodified'),
             'categories' => $case,
+            'canedit' => $caseentry->can_edit(),
+            'candelete' => $caseentry->can_delete(),
         ];
         return $record;
     }
@@ -170,6 +172,13 @@ class cases {
      */
     public static function update_case(int $entryid, array $fields): void {
         // Update the case.
+        $case = case_entry::get_record(['id' => $entryid]);
+        if (empty($case)) {
+            throw new \moodle_exception('case_not_found', 'competvet', '', $entryid);
+        }
+        if (!$case->can_edit()) {
+            throw new \moodle_exception('cannoteditcaselog', 'competvet');
+        }
         foreach ($fields as $fieldid => $value) {
             $records = case_data::get_records(['entryid' => $entryid, 'fieldid' => $fieldid]);
             if (empty($records)) {
@@ -180,7 +189,7 @@ class cases {
                 $data->save();
                 continue;
             }
-            foreach($records as $data) {
+            foreach ($records as $data) {
                 $data->set_value($value);
                 $data->save();
             }
@@ -194,8 +203,15 @@ class cases {
      * @return bool
      */
     public static function delete_case(int $entryid): bool {
+        $case = new case_entry($entryid);
+        if (empty($case)) {
+            throw new \moodle_exception('case_not_found', 'competvet', '', $entryid);
+        }
+        if (!$case->can_delete()) {
+            throw new \moodle_exception('cannotdeletecaselog', 'competvet');
+        }
         try {
-            $case = new case_entry($entryid);
+
             $case->delete();
             $data = case_data::get_records(['entryid' => $entryid]);
             foreach ($data as $d) {
@@ -228,6 +244,8 @@ class cases {
             $casetrans['animal'] = self::get_case_field_value($case, 'nom_animal') ?? '';
             $casetrans['date'] = intval($date);
             $casetrans['label'] = self::get_case_field_value($case, 'motif_presentation') ?? '';
+            $casetrans['canedit'] = $case->canedit;
+            $casetrans['candelete'] = $case->candelete;
             $caselist[] = $casetrans;
         }
         return $caselist;

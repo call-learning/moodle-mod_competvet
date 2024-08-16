@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\local\observers;
+use mod_competvet\event\observation_completed;
 use mod_competvet\event\observation_requested;
 use mod_competvet\local\api\todos;
 use mod_competvet\local\persistent\todo;
@@ -36,5 +37,10 @@ class observervation_observer {
         ['context' => $context, 'planningid' => $planningid, 'observerid' => $observerid, 'studentid' => $studentid] =
             $eventdata['other'];
         todos::ask_for_observation($context, $planningid, $observerid, $studentid);
+    }
+
+    public static function observation_completed(observation_completed $event) {
+        $eventdata = $event->get_data();
+        todos::complete_todo_on_observation_completed($eventdata['objectid']);
     }
 }

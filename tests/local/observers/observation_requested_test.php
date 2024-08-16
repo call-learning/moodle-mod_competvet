@@ -23,8 +23,7 @@ use core_user;
 use mod_competvet\event\observation_requested;
 use mod_competvet\local\api\observations;
 use mod_competvet\local\api\plannings;
-use mod_competvet\local\persistent\observation;
-use mod_competvet\local\persistent\observation_comment;
+use mod_competvet\local\api\todos;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\local\persistent\todo;
@@ -97,4 +96,37 @@ class observation_requested_test extends advanced_testcase {
         $todo = todo::get_record(['userid' => $observer->id, 'targetuserid' => $student->id, 'planningid' => $planning->get('id')]);
         $this->assertEquals(todo::ACTION_EVAL_OBSERVATION_ASKED, $todo->get('action'));
     }
+
+    /**
+     * Test that completing an observation that is marked as todo will complete the todo.
+     *
+     * @return void
+     * @covers       \mod_competvet\local\observers\observervation_observer::observation_requested
+     */
+    public function test_request_observation_complete_todo_status() {
+        $student = core_user::get_user_by_username('student1');
+        $observer = core_user::get_user_by_username('observer1');
+        $situation = situation::get_record(['shortname' => 'SIT1']);
+        $plannings = plannings::get_plannings_for_situation_id($situation->get('id'), $student->id);
+        $planninginfo = array_shift($plannings);
+        $planning = planning::get_record(['id' => $planninginfo['id']]);
+        $event = observation_requested::create_from_planning($planning, 'A context for observation', $observer->id, $student->id);
+        $event->trigger();
+        // Check that a todo has been created.
+        $this->assertEquals(1, todo::count_records());
+        $todo = todo::get_record(['userid' => $observer->id, 'targetuserid' => $student->id, 'planningid' => $planning->get('id')]);
+        $this->assertEquals(todo::STATUS_PENDING, $todo->get('status'));
+        // Now act on the todo.
+        todos::act_on_todo($todo->get('id'));
+        $todo = todo::get_record(['userid' => $observer->id, 'targetuserid' => $student->id, 'planningid' => $planning->get('id')]);
+        $this->assertEquals(todo::STATUS_PENDING, $todo->get('status'));
+        $observationid = json_decode($todo->get('data'))->observationid;
+
+        // Now complete the observation.
+        observations::edit_observation($observationid);
+        $todo->read();
+        $this->assertEquals(todo::STATUS_DONE, $todo->get('status'));
+    }
+
+
 }

@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\local\api;
 
+use mod_competvet\competvet;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\observation_comment;
 use mod_competvet\local\persistent\observation_criterion_comment;
@@ -297,6 +298,18 @@ class observations {
         // We now set the status to completed as we have seen and saved the observation.
         $observation->set('status', observation::STATUS_COMPLETED);
         $observation->update();
+        $planning = planning::get_record(['id' => $observation->get('planningid')]);
+        $competvet = competvet::get_from_situation($planning->get_situation());
+        $event = \mod_competvet\event\observation_completed::create([
+            'context' => $competvet->get_context(),
+            'relateduserid' => $observation->get('studentid'),
+            'objectid' => $observationid,
+            'other' => [
+                'observerid' => $USER->id,
+                'observationid' => $observationid,
+            ],
+        ]);
+        $event->trigger();
         if ($context) {
             $existing = self::get_and_normalise_comments($observationid, observation_comment::OBSERVATION_CONTEXT);
             if (!$existing) {
