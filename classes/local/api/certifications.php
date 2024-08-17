@@ -46,6 +46,7 @@ class certifications {
     const GLOBAL_CERT_STATUS_TYPES_PER_ROLE = [
         'student' => [
             self::GLOBAL_CERT_STATUS_NOT_DECLARED => 'cert:global:notdeclared',
+            self::GLOBAL_CERT_STATUS_NOT_SEEN => 'cert:global:notseen',
             self::GLOBAL_CERT_STATUS_WAITING => 'cert:global:waiting',
             self::GLOBAL_CERT_STATUS_VALIDATED => 'cert:global:validated',
         ],
