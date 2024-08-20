@@ -215,10 +215,6 @@ class competvet {
         if (!$canview) {
             return false;
         }
-        // Check if student is in one of the plannings.
-        if (utils::is_student($userid, $context->id)) {
-            return planning::is_user_in_planned_groups($userid, $this->get_situation());
-        }
         return true;
     }
 

@@ -23,12 +23,12 @@ namespace mod_competvet\local\observers;
  */
 class user_enrolment_observer {
     public static function user_enrolment_created(\core\event\user_enrolment_created $event) {
-        \cache_helper::invalidate_by_event('mod_competvet/usersituationschanged', [$event->relateduserid]);
+        \cache_helper::invalidate_by_definition('mod_competvet', 'usersituations', [], [$event->relateduserid]);
     }
     public static function user_enrolment_deleted(\core\event\user_enrolment_deleted $event) {
-        \cache_helper::invalidate_by_event('mod_competvet/usersituationschanged', [$event->relateduserid]);
+        \cache_helper::invalidate_by_definition('mod_competvet', 'usersituations', [], [$event->relateduserid]);
     }
     public static function user_enrolment_updated(\core\event\user_enrolment_updated $event) {
-        \cache_helper::invalidate_by_event('mod_competvet/usersituationschanged', [$event->relateduserid]);
+        \cache_helper::invalidate_by_definition('mod_competvet', 'usersituations', [], [$event->relateduserid]);
     }
 }

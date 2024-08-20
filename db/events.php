@@ -48,4 +48,12 @@ $observers = [
         'eventname'   => '\mod_competvet\event\cert_validation_requested',
         'callback'    => \mod_competvet\local\observers\certification_observer::class . '::ask_for_certification_validation',
     ],
+    [
+        'eventname'   => '\core\event\course_module_created',
+        'callback'    => \mod_competvet\local\observers\course_module_observer::class . '::module_created',
+    ],
+    [
+        'eventname'   => '\core\event\course_module_deleted',
+        'callback'    => \mod_competvet\local\observers\course_module_observer::class . '::module_deleted',
+    ],
 ];
