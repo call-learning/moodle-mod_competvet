@@ -71,7 +71,7 @@ class student_evaluations extends base {
                     if ($criterion['id'] == $obscrit['criterioninfo']['id']) {
                         $grades[$observation['id']] = [
                             'level' => $obscrit['level'],
-                            'graderinfo' => utils::get_user_info($observation['grader']),
+                            'graderinfo' => $observation['observerinfo'],
                             'timemodified' => $observation['timemodified'],
                             'viewurl' => (new moodle_url(
                                 $this->vieweval,

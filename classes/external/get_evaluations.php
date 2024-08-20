@@ -91,7 +91,7 @@ class get_evaluations extends external_api {
                                 new external_single_structure(
                                     [
                                         'id' => new external_value(PARAM_INT, 'Comment id'),
-                                        'commenttext' => new external_value(PARAM_TEXT, 'Comment'),
+                                        'commenttext' => new external_value(PARAM_RAW, 'Comment'),
                                         'timecreated' => new external_value(PARAM_INT, 'Time created'),
                                         'private' => new external_value(PARAM_BOOL, 'Private comment', VALUE_OPTIONAL),
                                     ]
@@ -110,7 +110,7 @@ class get_evaluations extends external_api {
                                 new external_single_structure(
                                     [
                                         'id' => new external_value(PARAM_INT, 'Comment id'),
-                                        'commenttext' => new external_value(PARAM_TEXT, 'Comment'),
+                                        'commenttext' => new external_value(PARAM_RAW, 'Comment'),
                                         'timecreated' => new external_value(PARAM_INT, 'Time created'),
                                     ]
                                 )
@@ -171,7 +171,7 @@ class get_evaluations extends external_api {
                             'level' => $obscrit['level'],
                             'timemodified' => $observation['timemodified'],
                             'date' => userdate($observation['timemodified'], get_string('strftimedatefullshort')),
-                            'graderinfo' => utils::get_user_info($observation['grader'])
+                            'graderinfo' => $observation['observerinfo'],
                         ];
                     }
                 }
