@@ -68,7 +68,6 @@ class observations {
             'id' => $observation->get('id'),
             'studentinfo' => utils::get_user_info($observation->get('studentid')),
             'observerinfo' => utils::get_user_info($observation->get('observerid')),
-            'grader' => $observation->get('observerid'),
             'isautoeval' => $observation->is_autoeval(),
             'status' => $observation->get('status'),
             'time' => $observation->get('timemodified'),
