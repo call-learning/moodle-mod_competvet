@@ -98,7 +98,7 @@ class student_tabs {
                 'certopen' => 0,
                 'cases' => 0,
             ];
-            foreach ($planninginfo['info'] as $value) {
+            foreach ($planninginfo['stats'] as $value) {
                 if ($value['type'] == 'autoeval' || $value['type'] == 'eval') {
                     $stringcontext->done += $value['nbdone'];
                     $stringcontext->required += $value['nbrequired'];
