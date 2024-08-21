@@ -373,3 +373,5 @@ $string['calc:eval'] = 'The suggested score is equal to the \'Eval\' module scor
 $string['calc:list'] = 'The suggested score is equal to the \'List\' module score.';
 
 $string['search:activity'] = 'Rechercher activités CompetVet';
+$string['search:student'] = 'Search Student';
+$string['search:group'] = 'Search Group';
