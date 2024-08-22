@@ -227,7 +227,6 @@ class situation extends persistent {
             $categories);
     }
 
-
     /**
      * Get evaluation criteria for this situation
      *
@@ -236,13 +235,20 @@ class situation extends persistent {
      * @return array
      */
     public function get_eval_criteria(): array {
+        // We use a cache as this function is called often.
+        $cache = \cache::make_from_params(\cache_store::MODE_REQUEST, 'mod_competvet', 'situationevalcriteria');
         $evalgridid = $this->raw_get('evalgrid');
         if (empty($evalgridid)) {
             $evalgridid = grid::get_default_grid(grid::COMPETVET_CRITERIA_EVALUATION)->get('id');
         }
+        if ($cache->has($evalgridid)) {
+            return $cache->get($evalgridid);
+        }
         // Here we tweak slightly the get_recording sorted by parent id then by sort order.  This might change
         // if the API change as it is not an "official" use.
-        return criterion::get_records(['gridid' => $evalgridid], 'parentid ASC, sort ASC', '') ?: [];
+        $criterion = criterion::get_records(['gridid' => $evalgridid], 'parentid ASC, sort ASC', '') ?: [];
+        $cache->set($evalgridid, $criterion);
+        return $criterion;
     }
 
     /**

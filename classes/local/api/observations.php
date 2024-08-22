@@ -39,14 +39,15 @@ class observations {
      *
      * @param int $planningid
      * @param int $userid
+     * @param bool $includedetails
      * @return array
      */
-    public static function get_user_observations(int $planningid, int $userid): array {
+    public static function get_user_observations(int $planningid, int $userid, bool $includedetails = false): array {
         $observations =
             observation::get_records(['planningid' => $planningid, 'studentid' => $userid]);
         $evalobservations = [];
         foreach ($observations as $observation) {
-            $evalobservations[] = self::get_observation_information($observation->get('id'), false);
+            $evalobservations[] = self::get_observation_information($observation->get('id'), $includedetails);
         }
         return $evalobservations;
     }
@@ -110,13 +111,12 @@ class observations {
             }
             $result['comments'] =
                 array_values(
-                    array_map(function($obscrit) {
-                        $return = (array) $obscrit->to_record();
+                    array_map(function($obscomment) {
+                        $return = (array) $obscomment->to_record();
                         $userinfo = utils::get_user_info($return['usercreated']);
-                        $return['picture'] = $userinfo['userpictureurl'];
-                        $return['fullname'] = $userinfo['fullname'];
+                        $return['userinfo'] = $userinfo;
                         $return['private'] = $return['type'] == observation_comment::OBSERVATION_PRIVATE_COMMENT;
-                        $return['commentlabel'] = ''; // TODO Fill this in with labels for comment/autoeval.
+                        $return['label'] = observation_comment::from_type_to_string($obscomment->get('type'));
                         unset($return['usercreated']);
                         $return['comment'] = format_text($return['comment'], $return['commentformat']);
                         unset($return['commentformat']);
@@ -152,9 +152,11 @@ class observations {
                         fn($comment) => in_array($comment->get('criterionid'), $allchildrencriteriaid)
                     ));
                 $criterion['subcriteria'] = array_map(function($obscrit) use ($criteria) {
+                    $criterioninfo = (array) $criteria[$obscrit->get('criterionid')]->to_record();
                     $return = [
-                        'criterioninfo' => (array) $criteria[$obscrit->get('criterionid')]->to_record(),
+                        'criterioninfo' => $criterioninfo,
                         'comment' => $obscrit->get('comment'),
+                        'timecreated' => $obscrit->get('timecreated'),
                         'id' => $obscrit->get('id'),
                     ];
                     return $return;

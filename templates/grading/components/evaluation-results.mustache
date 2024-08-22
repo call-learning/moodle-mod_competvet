@@ -35,7 +35,7 @@
         <div class="col-12 d-flex justify-content-center">
             {{#evaluations.0}}
                 <a class="btn btn-link mb-3" data-toggle="collapse" href="#evaluations-table" role="button" aria-expanded="false" aria-controls="evaluations-table">
-                    Show as table
+                    {{#str}} showastable, mod_competvet {{/str}}
                 </a>
             {{/evaluations.0}}
         </div>
@@ -58,7 +58,7 @@
             {{#evaluations}}
                 <div class="row no-gutters flex-nowrap">
                     <div class="p-2 cellborder col-6 criterionlabel font-weight-bold">
-                        {{criterion.label}}
+                        {{label}}
                     </div>
                     {{#grades}}
                         <div class="p-2 cellborder col-2 grade text-center">
@@ -81,7 +81,7 @@
                         {{#timecreated}}
                             <div class="small timecreated d-flex justify-content-end">
                                 {{#private}}{{#pix}}t/show, core, {{#str}} observation:comment:privatecomment, mod_competvet{{/str}}{{/pix}}{{/private}}
-                                {{#userdate}} {{timecreated}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}} {{/userdate}} 
+                                {{#userdate}} {{timecreated}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}} {{/userdate}}
                             </div>
                         {{/timecreated}}
                     {{/info}}
