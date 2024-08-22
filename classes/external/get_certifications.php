@@ -65,7 +65,7 @@ class get_certifications extends external_api {
                         'userid' => new external_value(PARAM_INT, 'The user id'),
                         'picture' => new external_value(PARAM_TEXT, 'The picture'),
                         'fullname' => new external_value(PARAM_TEXT, 'The fullname'),
-                        'comment' => new external_value(PARAM_RAW_TRIMMED, 'The comment'),
+                        'comment' => new external_value(PARAM_RAW, 'The comment'),
                         'timestamp' => new external_value(PARAM_INT, 'Creation timestamp'),
                     ], 'The feedback', VALUE_OPTIONAL),
                     'validations' => new external_multiple_structure(
@@ -75,7 +75,7 @@ class get_certifications extends external_api {
                                 'userid' => new external_value(PARAM_INT, 'The user id'),
                                 'picture' => new external_value(PARAM_TEXT, 'The picture'),
                                 'fullname' => new external_value(PARAM_TEXT, 'The fullname'),
-                                'comment' => new external_value(PARAM_RAW_TRIMMED, 'The comment'),
+                                'comment' => new external_value(PARAM_RAW, 'The comment'),
                                 'timestamp' => new external_value(PARAM_INT, 'Creation timestamp'),
                             ]),
                             'status' => new external_value(PARAM_INT, 'The status'),

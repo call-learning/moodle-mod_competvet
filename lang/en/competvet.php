@@ -202,6 +202,7 @@ $string['observation:created'] = 'Created an observation';
 $string['observation:delete'] = 'Delete the observation';
 $string['observation:delete:confirm'] = 'Confirm you want to delete the observation';
 $string['observation:add:save'] = 'Save';
+$string['observation:edit'] = 'Edit the observation';
 $string['observation:edit:save'] = 'Save';
 $string['observation:comment:commentno'] = 'Comment {no}';
 $string['observation:comment:add'] = 'Add comment';

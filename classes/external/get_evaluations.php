@@ -137,7 +137,7 @@ class get_evaluations extends external_api {
         global $PAGE;
 
         ['planningid' => $planningid, 'studentid' => $studentid] =
-        self::validate_parameters(self::execute_parameters(), ['planningid' => $planningid, 'studentid' => $studentid]);
+            self::validate_parameters(self::execute_parameters(), ['planningid' => $planningid, 'studentid' => $studentid]);
 
         $planning = planning::get_record(['id' => $planningid]);
         if (!$planning) {
