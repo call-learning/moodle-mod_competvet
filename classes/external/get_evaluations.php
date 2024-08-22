@@ -43,14 +43,19 @@ use mod_competvet\utils;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_evaluations extends external_api {
+
     /**
      * Returns description of method return value
      *
      * @return external_description
      */
     public static function execute_returns(): external_single_structure {
-        return new external_single_structure(
+        return new external_single_structure
+        (
             [
+                'hasautoevaluations' => new external_value(PARAM_BOOL, 'Has autoevaluations'),
+                'hasobserverevaluations' => new external_value(PARAM_BOOL, 'Has observer evaluations'),
+                'totalaverage' => new external_value(PARAM_INT, 'Total average'),
                 'evaluations' => new external_multiple_structure(
                     new external_single_structure(
                         [
@@ -65,56 +70,43 @@ class get_evaluations extends external_api {
                                     [
                                         'obsid' => new external_value(PARAM_INT, 'Observation id'),
                                         'level' => new external_value(PARAM_INT, 'Grade', VALUE_OPTIONAL),
+                                        'autoeval' => new external_value(PARAM_BOOL, 'Is autoeval', VALUE_OPTIONAL),
                                         'graderinfo' => new external_single_structure(
                                             [
                                                 'id' => new external_value(PARAM_INT, 'Grader id'),
                                                 'fullname' => new external_value(PARAM_TEXT, 'Grader full name'),
                                                 'userpictureurl' => new external_value(PARAM_URL, 'Grader picture url'),
-                                            ],
-                                            'grader info',
-                                            VALUE_OPTIONAL
-                                        ),
+                                            ]
+                                            , 'grader info', VALUE_OPTIONAL),
                                         'timemodified' => new external_value(PARAM_TEXT, 'Date', VALUE_OPTIONAL),
                                         'date' => new external_value(PARAM_TEXT, 'Date', VALUE_OPTIONAL),
                                     ]
                                 )
                             ),
+                            'hasaverage' => new external_value(PARAM_BOOL, 'Has average', VALUE_OPTIONAL),
+                            'average' => new external_value(PARAM_INT, 'Average', VALUE_OPTIONAL),
                         ]
                     ),
                 ),
-                'comments' => new external_multiple_structure(
+                'evalcomments' => new external_multiple_structure(
                     new external_single_structure(
                         [
-                            'userid' => new external_value(PARAM_INT, 'User id'),
-                            'fullname' => new external_value(PARAM_TEXT, 'Full name'),
-                            'picture' => new external_value(PARAM_URL, 'User picture url'),
+                            'isautoeval' => new external_value(PARAM_BOOL, 'Is autoeval'),
+                            'observerinfo' => new external_single_structure(
+                                [
+                                    'id' => new external_value(PARAM_INT, 'Observer id'),
+                                    'fullname' => new external_value(PARAM_TEXT, 'Observer full name'),
+                                    'userpictureurl' => new external_value(PARAM_URL, 'Observer picture url'),
+                                ]
+                            ),
                             'comments' => new external_multiple_structure(
                                 new external_single_structure(
                                     [
                                         'id' => new external_value(PARAM_INT, 'Comment id'),
-                                        'commenttext' => new external_value(PARAM_RAW, 'Comment'),
+                                        'comment' => new external_value(PARAM_RAW, 'Comment'),
                                         'timecreated' => new external_value(PARAM_INT, 'Time created'),
                                         'commenttitle' => new external_value(PARAM_TEXT, 'Comment title'),
                                         'private' => new external_value(PARAM_BOOL, 'Private comment', VALUE_OPTIONAL),
-                                    ]
-                                )
-                            ),
-                        ]
-                    )
-                ),
-                'autoevalcomments' => new external_multiple_structure(
-                    new external_single_structure(
-                        [
-                            'userid' => new external_value(PARAM_INT, 'User id'),
-                            'fullname' => new external_value(PARAM_TEXT, 'Full name'),
-                            'picture' => new external_value(PARAM_URL, 'User picture url'),
-                            'comments' => new external_multiple_structure(
-                                new external_single_structure(
-                                    [
-                                        'id' => new external_value(PARAM_INT, 'Comment id'),
-                                        'commenttext' => new external_value(PARAM_RAW, 'Comment'),
-                                        'commenttitle' => new external_value(PARAM_TEXT, 'Comment title'),
-                                        'timecreated' => new external_value(PARAM_INT, 'Time created'),
                                     ]
                                 )
                             ),
@@ -153,34 +145,56 @@ class get_evaluations extends external_api {
         // This will get the observations for the current user and planning.
         $userobservations = observations::get_user_observations($planningid, $studentid, true);
 
+
         $gradedcriteria = [];
         $comments = [];
-        $autoevalcomments = [];
+        $hasautoevaluations = false;
+        $hasobserverevaluations = false;
         foreach ($userobservations as $userobservation) {
             self::collect_grades($userobservation, $gradedcriteria);
+            self::collect_comments($userobservation, $comments);
+            self::collect_subcriteria_comments($userobservation, $comments);
             if ($userobservation['category'] == observation::CATEGORY_EVAL_OBSERVATION) {
-                self::collect_comments($userobservation, $comments);
-                self::collect_subcriteria_comments($userobservation, $comments);
+                $hasobserverevaluations = true;
             } else {
-                self::collect_comments($userobservation, $autoevalcomments);
-                self::collect_subcriteria_comments($userobservation, $autoevalcomments);
+                $hasautoevaluations = true;
             }
         }
-
         $gradedcriteria = array_filter($gradedcriteria, function ($criterion) {
             return !empty($criterion['grades']);
         });
-        $comments = array_filter($comments, function ($comment) {
-            return !empty($comment['comments']);
-        });
-        $autoevalcomments = array_filter($autoevalcomments, function ($comment) {
-            return !empty($comment['comments']);
-        });
+        // Now process the average and mean for grades.
+        $totalaverage = 0;
+        $totalaveragecount = 0;
+        foreach($gradedcriteria as $index => $gradedcriterion) {
+            $gradesum = 0;
+            $gradescount = 0;
+            $average = 0;
+            $hasaverage = false;
+            foreach ($gradedcriterion['grades'] as $grade) {
+                if (!$grade['autoeval']) {
+                    $gradesum += $grade['level'] ?? 0;
+                    $gradescount++;
+                }
+            }
+            if ($gradesum > 0) {
+                $hasaverage = true;
+                $average = $gradesum / $gradescount;
+            }
+            if ($hasaverage) {
+                $totalaverage += $average;
+                $totalaveragecount++;
+            }
+            $gradedcriteria[$index]['hasaverage'] = $hasaverage;
+            $gradedcriteria[$index]['average'] = round($average);
+        }
         // The data returned by this function is a grid containing the criteria and the evaluations by others.
         return [
             'evaluations' => array_values($gradedcriteria),
-            'comments' => array_values($comments),
-            'autoevalcomments' => array_values($autoevalcomments),
+            'hasobserverevaluations' => $hasobserverevaluations,
+            'hasautoevaluations' => $hasautoevaluations,
+            'evalcomments' => $comments,
+            'totalaverage' =>  $totalaveragecount > 0 ? round($totalaverage / $totalaveragecount) : 0,
         ];
     }
 
@@ -197,6 +211,7 @@ class get_evaluations extends external_api {
             $grade = [
                 'obsid' => $userobservation['id'],
                 'level' => $gradedcriterion['level'],
+                'autoeval' => $userobservation['category'] == observation::CATEGORY_EVAL_AUTOEVAL,
                 'timemodified' => $userobservation['timemodified'],
                 'date' => userdate($userobservation['timemodified'], get_string('strftimedatefullshort')),
                 'graderinfo' => $userobservation['observerinfo'],
@@ -226,9 +241,8 @@ class get_evaluations extends external_api {
         foreach ($userobservation['comments'] as $comment) {
             if (!isset($comments[$observerid])) {
                 $comments[$observerid] = [
-                    'userid' => $observerid,
-                    'fullname' => $userobservation['observerinfo']['fullname'],
-                    'picture' => $userobservation['observerinfo']['userpictureurl'],
+                    'observerinfo' => $userobservation['observerinfo'],
+                    'isautoeval' => $userobservation['category'] == observation::CATEGORY_EVAL_AUTOEVAL,
                     'comments' => [],
                 ];
             }
@@ -237,7 +251,7 @@ class get_evaluations extends external_api {
             }
             $comments[$observerid]['comments'][] = [
                 'id' => $comment['id'],
-                'commenttext' => $comment['comment'],
+                'comment' => $comment['comment'],
                 'timecreated' => $comment['timecreated'],
                 'commenttitle' => $comment['label'],
                 'private' => $comment['private'],
@@ -258,9 +272,8 @@ class get_evaluations extends external_api {
             foreach ($gradedcriterion['subcriteria'] as $commentedsubcriteria) {
                 if (!isset($comments[$observerid])) {
                     $comments[$observerid] = [
-                        'userid' => $observerid,
-                        'fullname' => $userobservation['observerinfo']['fullname'],
-                        'picture' => $userobservation['observerinfo']['userpictureurl'],
+                        'observerinfo' => $userobservation['observerinfo'],
+                        'isautoeval' => $userobservation['category'] == observation::CATEGORY_EVAL_AUTOEVAL,
                         'comments' => [],
                     ];
                 }
@@ -269,9 +282,10 @@ class get_evaluations extends external_api {
                 }
                 $comments[$observerid]['comments'][] = [
                     'id' => $commentedsubcriteria['id'],
-                    'commenttext' => $commentedsubcriteria['comment'],
+                    'comment' => $commentedsubcriteria['comment'],
                     'timecreated' => $commentedsubcriteria['timecreated'],
                     'commenttitle' => $commentedsubcriteria['criterioninfo']['label'],
+                    'private' => false,
                 ];
             }
         }

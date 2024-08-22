@@ -87,6 +87,7 @@ class observations {
                 $criteria
             );
             $comments = $observation->get_comments();
+            $criteriacomments = $observation->get_criteria_comments();
             $contexts = array_filter($comments, fn($comment) => $comment->get('type') == observation_comment::OBSERVATION_CONTEXT);
             if (empty($contexts)) {
                 $context = null;

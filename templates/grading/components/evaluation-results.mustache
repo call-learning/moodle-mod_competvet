@@ -41,65 +41,147 @@
         </div>
     </div>
     <div class="collapse" id="evaluations-table">
-        <div class="evaltable mb-3">
-        <div class="row no-gutters flex-nowrap">
-            <div class="p-2 col-6 criterionlabel cellborder">
-            </div>
-                {{#evaluations.0}}
-                    {{#grades}}
-                        <div class="p-2 cellborder col-2 evaluator font-weight-bold text-center d-flex align-items-center">
-                            <div class="text-truncate" data-toggle="tooltip" title="{{graderinfo.fullname}}  {{#timemodified}}{{#userdate}}{{timemodified}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}}{{/userdate}}{{/timemodified}}">
-                                {{graderinfo.fullname}}
-                            </div>
-                        </div>
-                    {{/grades}}
-                {{/evaluations.0}}
-            </div>
-            {{#evaluations}}
+        {{#hasobserverevaluations}}
+            <div class="evaltable mb-3">
                 <div class="row no-gutters flex-nowrap">
-                    <div class="p-2 cellborder col-6 criterionlabel font-weight-bold">
-                        {{label}}
-                    </div>
-                    {{#grades}}
-                        <div class="p-2 cellborder col-2 grade text-center">
-                            {{level}}
-                            <div class="sr-only">
-                                {{graderinfo.fullname}}
+                    <div class="p-2 col-6 criterionlabel cellborder"></div>
+                    {{#evaluations.0}}
+                        {{#grades}}
+                            {{^autoeval}}
+                                <div class="p-2 cellborder col-2 evaluator font-weight-bold text-center d-flex align-items-center">
+                                    <div class="text-truncate" data-toggle="tooltip" title="{{graderinfo.fullname}}  {{#timemodified}}{{#userdate}}{{timemodified}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}}{{/userdate}}{{/timemodified}}">
+                                        {{graderinfo.fullname}}
+                                    </div>
+                                </div>
+                            {{/autoeval}}
+                        {{/grades}}
+                        {{#hasaverage}}
+                        <div class="p-2 cellborder col-2 evaluator font-weight-bold text-center d-flex align-items-center">
+                            <div class="averagecolumn">
+                                {{#str}}average, mod_competvet{{/str}}
                             </div>
                         </div>
-                    {{/grades}}
+                        {{/hasaverage}}
+                    {{/evaluations.0}}
                 </div>
-            {{/evaluations}}
-        </div>
+                {{#evaluations}}
+                    <div class="row no-gutters flex-nowrap">
+                        <div class="p-2 cellborder col-6 criterionlabel font-weight-bold">
+                            {{criterion.label}}
+                        </div>
+                        {{#grades}}
+                            {{^autoeval}}
+                            <div class="p-2 cellborder col-2 grade text-center">
+                                {{level}}
+                                <div class="sr-only">
+                                    {{graderinfo.fullname}}
+                                </div>
+                            </div>
+                            {{/autoeval}}
+                        {{/grades}}
+                        {{#hasaverage}}
+                        <div class="p-2 cellborder col-2 grade text-center" data-region="averagerow">
+                            {{average}}
+                        </div>
+                        {{/hasaverage}}
+                    </div>
+                {{/evaluations}}
+                <div class="row no-gutters flex-nowrap">
+                    <div class="p-2 cellborder col-6 averages">
+                        {{#str}}average, mod_competvet{{/str}}
+                    </div>
+                    {{#evaluations.0}}
+                        {{#grades}}
+                            {{^autoeval}}
+                            <div class="p-2 cellborder col-2 grade text-center averages">
+                            </div>
+                            {{/autoeval}}
+                        {{/grades}}
+                        <div class="p-2 cellborder col-2 grade text-center averages" data-region="averagerow">
+                            {{totalaverage}}
+                        </div>
+                    {{/evaluations.0}}
+                </div>
+            </div>
+        {{/hasobserverevaluations}}
+        {{#hasautoevaluations}}
+            <div class="evaltable mb-3">
+                <div class="row no-gutters flex-nowrap">
+                    <div class="p-2 col-6 criterionlabel cellborder"></div>
+                    {{#evaluations.0}}
+                        {{#grades}}
+                            {{#autoeval}}
+                            <div class="p-2 cellborder col-2 evaluator font-weight-bold text-center d-flex align-items-center">
+                                <div class="text-truncate" data-toggle="tooltip" title="{{graderinfo.fullname}}  {{#timemodified}}{{#userdate}}{{timemodified}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}}{{/userdate}}{{/timemodified}}">
+                                    {{graderinfo.fullname}}
+                                </div>
+                            </div>
+                            {{/autoeval}}
+                        {{/grades}}
+                    {{/evaluations.0}}
+                </div>
+                {{#evaluations}}
+                    <div class="row no-gutters flex-nowrap">
+                        <div class="p-2 cellborder col-6 criterionlabel font-weight-bold">
+                            {{criterion.label}}
+                        </div>
+                        {{#grades}}
+                            {{#autoeval}}
+                            <div class="p-2 cellborder col-2 grade text-center">
+                                {{level}}
+                                <div class="sr-only">
+                                    {{graderinfo.fullname}}
+                                </div>
+                            </div>
+                            {{/autoeval}}
+                        {{/grades}}
+                    </div>
+                {{/evaluations}}
+            </div>
+        {{/hasautoevaluations}}
     </div>
     <div class="evalcomments d-flex row">
         <div class="span6 col-md-6">
-            {{#comments}}
-                {{< mod_competvet/comment}}
-                    {{$classes}}{{#private}}text-muted{{/private}}{{/classes}}
-                    {{$info}}
-                        {{#timecreated}}
-                            <div class="small timecreated d-flex justify-content-end">
-                                {{#private}}{{#pix}}t/show, core, {{#str}} observation:comment:privatecomment, mod_competvet{{/str}}{{/pix}}{{/private}}
-                                {{#userdate}} {{timecreated}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}} {{/userdate}}
+            {{#evalcomments}}
+                {{^isautoeval}}
+                    {{< mod_competvet/comment}}
+                        {{$classes}}{{#private}}text-muted{{/private}}{{/classes}}
+                        {{$info}}
+                            <div class="d-flex justify-content-between">
+                                <div class="small d-flex font-weight-bold">
+                                    {{categorytext}}
+                                </div>
+                                {{#timecreated}}
+                                    <div class="small timecreated d-flex justify-content-end">
+                                        {{#private}}{{#pix}}t/show, core, {{#str}} observation:comment:privatecomment, mod_competvet{{/str}}{{/pix}}{{/private}}
+                                        {{#userdate}} {{timecreated}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}} {{/userdate}}
+                                    </div>
+                                {{/timecreated}}
                             </div>
-                        {{/timecreated}}
-                    {{/info}}
-                {{/ mod_competvet/comment}}
-            {{/comments}}
+                        {{/info}}
+                    {{/ mod_competvet/comment}}
+                {{/isautoeval}}
+            {{/evalcomments}}
         </div>
         <div class="span6 col-md-6">
-            {{#autoevalcomments}}
-                {{< mod_competvet/comment}}
-                    {{$info}}
-                        {{#timecreated}}
-                        <div class="small timecreated d-flex justify-content-end">
-                            {{#userdate}} {{timecreated}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}} {{/userdate}}
-                        </div>
-                        {{/timecreated}}
-                    {{/info}}
-                {{/ mod_competvet/comment}}
-            {{/autoevalcomments}}
+            {{#evalcomments}}
+                {{#isautoeval}}
+                    {{< mod_competvet/comment}}
+                        {{$info}}
+                            <div class="d-flex justify-content-between">
+                                <div class="small d-flex font-weight-bold">
+                                    {{categorytext}}
+                                </div>
+                                {{#timecreated}}
+                                <div class="small timecreated">
+                                    {{#userdate}} {{timecreated}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}} {{/userdate}}
+                                </div>
+                                {{/timecreated}}
+                            </div>
+                        {{/info}}
+                    {{/ mod_competvet/comment}}
+                {{/isautoeval}}
+            {{/evalcomments}}
         </div>
     </div>
 {{/evaluation-results}}

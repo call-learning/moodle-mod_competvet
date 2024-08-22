@@ -185,7 +185,7 @@ class observation extends persistent {
     private function get_criteria_element_by_criteria_sort_order(string $persistentname) {
         global $DB;
         $fields = $persistentname::get_sql_fields('ocl', '');
-        $sql = 'SELECT ' . $fields . '
+        $sql = 'SELECT ' . $fields . ', c.label as criterionlabel
                 FROM {' . $persistentname::TABLE . '} ocl
                 JOIN {' . criterion::TABLE . '} c ON c.id = ocl.criterionid
                 WHERE ocl.observationid = :observationid

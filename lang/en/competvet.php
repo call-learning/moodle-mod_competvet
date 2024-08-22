@@ -260,6 +260,7 @@ $string['studentprogress'] = 'Student progress';
 // Eval
 $string['evalevaluation'] = 'Eval evaluation';
 $string['evalscore'] = 'Average evaluation score';
+$string['average'] = 'Average';
 $string['numberofobservations'] = 'Number of observations';
 $string['penalty'] = 'Penalty';
 $string['penalty_help'] = 'The number of observations obtained is insufficient. A penalty of -20 points is applied.';
@@ -287,6 +288,7 @@ $string['confirmed'] = 'Confirmed';
 $string['notseen'] = 'Not seen';
 $string['notreached'] = 'Level not reached';
 $string['validated'] = 'Validated';
+$string['notvalidated'] = 'Not validated';
 $string['nocertifications'] = 'No certifications';
 
 $string['evaluation'] = 'Global Evaluation';

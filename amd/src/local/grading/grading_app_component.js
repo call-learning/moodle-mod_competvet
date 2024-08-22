@@ -266,7 +266,7 @@ class Competvet {
         const certifResults = CompetState.getValue('certification-results');
         // Update the values numcertifvalidated and maxcertifvalidated based on the certification-results
         certifGrading.grading.maxcertifvalidated = certifResults.certifications.length;
-        certifGrading.grading.numcertifvalidated = certifResults.certifications.filter(cert => cert.validated === true).length;
+        certifGrading.grading.numcertifvalidated = certifResults.certifications.filter(cert => cert.confirmed === true).length;
         certifGrading.grading.statusproposed = false;
         if (certifGrading.grading.maxcertifvalidated === certifGrading.grading.numcertifvalidated
             && certifGrading.grading.maxcertifvalidated > 0) {
@@ -277,8 +277,7 @@ class Competvet {
         const evalResults = CompetState.getValue('evaluation-results');
         // Update the values numberofobservations and maxobservations based on the evaluation-results
         evalGrading.grading.evalnum = this.gradingApp.dataset.evalnum;
-        let totalEvalScore = 0;
-        let totalGrades = 0;
+
         let numberofobservations = 0;
         let numberofselfevaluations = 0;
         if (evalResults.evaluations.length > 0) {
@@ -295,16 +294,8 @@ class Competvet {
         }
         evalGrading.grading.numberofobservations = numberofobservations;
         evalGrading.grading.haspenalty = evalGrading.grading.evalnum > numberofobservations;
-        evalResults.evaluations.forEach(evaluation => {
-            evaluation.grades.forEach(grade => {
-                if (grade.level === null || grade.graderinfo.id == this.currentUser.id) {
-                    return;
-                }
-                totalEvalScore += grade.level;
-                totalGrades++;
-            });
-        });
-        evalGrading.grading.evalscore = totalGrades > 0 ? Math.round(totalEvalScore / totalGrades) : 0;
+
+        evalGrading.grading.evalscore = evalResults.totalaverage;
         // Set the average evalscore based on the evaluation-results
     }
 
