@@ -377,3 +377,5 @@ $string['search:student'] = 'Search Student';
 $string['search:group'] = 'Search Group';
 $string['showastable'] = 'Show as table';
 $string['invaliddate'] = 'Invalid date {$a}';
+
+$string['atleastone'] = 'At least one of these fields must be checked';

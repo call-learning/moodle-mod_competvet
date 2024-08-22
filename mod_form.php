@@ -142,6 +142,25 @@ class mod_competvet_mod_form extends moodleform_mod {
             $mform->setType($fieldname, PARAM_INT);
         }
     }
+
+    /**
+     * Enforce validation rules here
+     *
+     * @param object $data Post data to validate
+     * @return array
+     **/
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        $haseval = $data['haseval'] == 1 ?? false;
+        $hascase = $data['hascase'] == 1 ?? false;
+
+        if (!$haseval && !$hascase) {
+            $errors['haseval'] = get_string('atleastone', 'competvet');
+            $errors['hascase'] = get_string('atleastone', 'competvet');
+        }
+        return $errors;
+    }
     /**
      * Definition after data
      *
