@@ -16,6 +16,7 @@
 
 namespace mod_competvet\local\importer;
 
+use DateTime;
 use mod_competvet\local\persistent\planning;
 use cache;
 use cache_store;
@@ -42,9 +43,7 @@ class planning_importer extends base_persistent_importer {
      * CSV to persistent
      */
     const CSV_TO_PERSISTENT = [
-        'Planning Id' => 'id',
-        'Situation Id' => 'situationid',
-        'Group Id' => 'groupid',
+        'Group Name' => 'groupid',
         'Start Date' => 'startdate',
         'End Date' => 'enddate',
         'Session' => 'session',
@@ -60,7 +59,7 @@ class planning_importer extends base_persistent_importer {
      */
     public function __construct(string $persistenclass, int $courseid, int $situationid) {
         parent::__construct($persistenclass, []);
-        $this->options['uniquekeys'] = ['id', 'session'];
+        $this->options['uniquekeys'] = ['groupid', 'session', 'startdate', 'enddate', 'situationid'];
         $this->courseid = $courseid;
         $this->situationid = $situationid;
     }
@@ -75,7 +74,6 @@ class planning_importer extends base_persistent_importer {
      * @return object
      */
     protected function to_persistent_data(array $row, csv_iterator $reader): object {
-
         $groupnametoid = cache::make_from_params(cache_store::MODE_REQUEST, 'local_competvet', 'groupnametoid');
         $data = parent::to_persistent_data($row, $reader);
         $groupname = trim($data->groupid);
@@ -83,14 +81,27 @@ class planning_importer extends base_persistent_importer {
         if (empty($data->groupid)) {
             $groupid = groups_get_group_by_name($this->courseid, $groupname);
             if (empty($groupid)) {
-                throw new \moodle_exception('groupnotfound', 'mod_competvet', $data->groupid);
+                groups_get_group_by_idnumber($this->courseid, $groupname);
+                if (empty($groupid)) {
+                    throw new \moodle_exception('groupnotfound', 'mod_competvet', null, $groupname);
+                }
             }
             $groupnametoid->set($groupname, $groupid);
             $data->groupid = $groupid;
         }
-        $data->startdate = strtotime($data->startdate);
-        $data->enddate = strtotime($data->enddate);
+        $format = 'd/m/Y'; // Adjust this to match the format of your input date.
+        $dt = DateTime::createFromFormat($format, $data->startdate);
+        if (!$dt) {
+            throw new \moodle_exception('invaliddate', 'mod_competvet', null, $data->enddate);
+        }
+        $data->startdate = planning::round_start_date($dt->getTimestamp());
+        $dt = DateTime::createFromFormat($format, $data->enddate);
+        if (!$dt) {
+            throw new \moodle_exception('invaliddate', 'mod_competvet', null, $data->enddate);
+        }
+        $data->enddate = planning::round_end_date($dt->getTimestamp());
         $data->situationid = $this->situationid;
+
         return $data;
     }
 

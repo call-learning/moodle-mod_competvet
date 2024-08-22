@@ -42,6 +42,9 @@ Feature: Edit completion settings of an activity
       | student1 | observer1 | last Monday > Monday next week > SESSION1 > SIT1           | Context for this obs | Comment for this obs (obs1) | Private comment(obs1) | eval:observation | completed |
       | student1 | observer2 | last Monday > Monday next week > SESSION1 > SIT1           | Context for this obs | Comment for this obs (obs2) | Private comment(obs1) | eval:observation | completed |
       | student2 | observer1 | Monday next week > Monday next fortnight > SESSION1 > SIT1 | Context for this obs | Comment for this obs        | Private comment(obs1) | eval:observation | completed |
+    And the following "mod_competvet > observations" exist:
+      | student  | observer | planning                                         | context              | comment                     | progress         | improvement         | missing         | category      | status    |
+      | student1 | student1 | last Monday > Monday next week > SESSION1 > SIT1 | Context for this obs | Comment for this obs (obs1) | Progress comment | Improvement comment | Missing comment | eval:autoeval | completed |
     And the following "mod_competvet > observation_criterion_value" exist:
       | observation                                                             | criterion | value                          |
       | last Monday > Monday next week > SESSION1 > SIT1 > student1 > observer1 | Q001      | 5                              |
@@ -53,6 +56,15 @@ Feature: Edit completion settings of an activity
       | last Monday > Monday next week > SESSION1 > SIT1 > student1 > observer2 | Q001      | 6                              |
       | last Monday > Monday next week > SESSION1 > SIT1 > student1 > observer2 | Q002      | Comment for this criteria Q002 |
       | last Monday > Monday next week > SESSION1 > SIT1 > student1 > observer2 | Q007      | 10                             |
+    And the following "mod_competvet > observation_criterion_value" exist:
+      | observation                                                            | criterion | value                                   |
+      | last Monday > Monday next week > SESSION1 > SIT1 > student1 > student1 | Q001      | 5                                       |
+      | last Monday > Monday next week > SESSION1 > SIT1 > student1 > student1 | Q002      | Comment for this criteria student  Q002 |
+      | last Monday > Monday next week > SESSION1 > SIT1 > student1 > student1 | Q003      | Comment for this criteria Q003          |
+      | last Monday > Monday next week > SESSION1 > SIT1 > student1 > student1 | Q004      | Comment for this criteria Q004          |
+      | last Monday > Monday next week > SESSION1 > SIT1 > student1 > student1 | Q005      | Comment for this criteria Q005          |
+      | last Monday > Monday next week > SESSION1 > SIT1 > student1 > student1 | Q007      | 8                                       |
+      | last Monday > Monday next week > SESSION1 > SIT1 > student1 > student1 | Q002      | Comment for this criteria Q002          |
     And the following "mod_competvet > certification" exist:
       | student  | planning                                         | criterion | level | comment               | status        | supervisors          | validations                                                                           |
       | student1 | last Monday > Monday next week > SESSION1 > SIT1 | CERT1     | 50    | Comment for this cert | cert:seendone | observer1, observer2 | {observer1: "cert:seendone", "My comment"},{observer2: "cert:seendone", "My comment"} |
@@ -62,6 +74,6 @@ Feature: Edit completion settings of an activity
       | student1 | last Monday > Monday next week > SESSION1 > SIT1 | "nom_animal": "Brian", "espece": "Oiseau", "race": "Perroquet", "sexe": "M", "date_naissance": "2014-07-05", "num_dossier": "2502698068764105", "date_cas": "2023-06-10", "motif_presentation": "Vomissement", "resultats_examens": "Anomalie détectée", "diag_final": "Dermatite", "traitement": "Repos", "evolution": "Stable", "taches_effectuees": "Consultation, examen clinique, diagnostic, traitement", "reflexions_cas": "Réponse positive au traitement.", "role_charge": "Assistant" |
       | student1 | last Monday > Monday next week > SESSION1 > SIT1 | "nom_animal": "Michelle", "espece": "Oiseau", "race": "Canari", "sexe": "F", "date_naissance": "2012-01-21", "num_dossier": "2502698078674955", "date_cas": "2023-10-21", "motif_presentation": "Diarrhée", "resultats_examens": "Autres examens à faire", "diag_final": "Infection urinaire", "traitement": "Rien", "evolution": "Bon", "taches_effectuees": "Consultation, examen clinique", "reflexions_cas": "Cas complexe. Suivi nécessaire.", "role_charge": "Assistant"                  |
     And the following "mod_competvet > todo" exist:
-      | student  | planning                                         | action               | targetuser | data                          |
+      | student  | planning                                         | action               | targetuser | data                               |
       | student1 | last Monday > Monday next week > SESSION1 > SIT1 | 'eval:asked'         | observer1  | "context": "Context for this todo" |
       | student1 | last Monday > Monday next week > SESSION1 > SIT1 | 'certif:valid:asked' | observer1  | "criteria": "CERT1"                |

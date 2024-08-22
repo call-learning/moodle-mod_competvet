@@ -81,5 +81,25 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2024060705, 'competvet');
     }
 
+    if ($oldversion < 2024082200) {
+
+        // Define index planning_ux (unique) to be dropped form competvet_planning.
+        $table = new xmldb_table('competvet_planning');
+        $index = new xmldb_index('planning_ux', XMLDB_INDEX_UNIQUE, ['situationid', 'groupid', 'startdate', 'enddate']);
+        // Conditionally launch drop index planning_ux.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+        $index = new xmldb_index('planning_ux', XMLDB_INDEX_UNIQUE, ['situationid', 'groupid', 'startdate', 'enddate', 'session']);
+
+        // Conditionally launch add index planning_ux.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024082200, 'competvet');
+    }
+
     return true;
 }

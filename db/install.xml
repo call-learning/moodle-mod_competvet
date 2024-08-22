@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/competvet/db" VERSION="20240618" COMMENT="XMLDB file for Moodle mod_competvet"
+<XMLDB PATH="mod/competvet/db" VERSION="20240822" COMMENT="XMLDB file for Moodle mod_competvet"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -73,7 +73,7 @@
         <KEY NAME="group_fk" TYPE="foreign" FIELDS="groupid" REFTABLE="groups" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="planning_ux" UNIQUE="true" FIELDS="situationid, groupid, startdate, enddate"/>
+        <INDEX NAME="planning_ux" UNIQUE="true" FIELDS="situationid, groupid, startdate, enddate, session"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="competvet_grid" COMMENT="Grids for linking criteria">

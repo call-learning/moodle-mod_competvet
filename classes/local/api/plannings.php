@@ -312,7 +312,8 @@ class plannings {
         $info['cert'] = [
             'type' => 'cert',
             'nbdone' => $numvalidated,
-            'nbrequired' => round(count($criteria) * $situation->get('certifpnum') / 100),
+            // Change here, we consider all the criteria in the stats even if we need only certpnum / 100 * count($criteria).
+            'nbrequired' => count($criteria), // TODO: this is not really nb required so we might change the wording here.
             'pass' => 0,
         ];
         $info['list'] = [
@@ -335,7 +336,11 @@ class plannings {
 
         // Set the pass to 1 if nbdone >= nbrequired.
         foreach ($info as $type => $data) {
-            $info[$type]['pass'] = $data['nbdone'] >= $data['nbrequired'] ? 1 : 0;
+            if ($type == 'cert') {
+                $info[$type]['pass'] = $data['nbdone'] >= round(count($criteria) * $situation->get('certifpnum') / 100) ? 1 : 0;
+            } else {
+                $info[$type]['pass'] = $data['nbdone'] >= $data['nbrequired'] ? 1 : 0;
+            }
         }
 
         return $info;

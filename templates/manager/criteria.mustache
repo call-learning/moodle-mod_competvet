@@ -83,9 +83,6 @@
         <div class="navigation" data-region="navigation">
             {{> mod_competvet/manager/criteria/navigation}}
         </div>
-        <a class="btn btn-link addsituation jsbutton ml-auto" href="#" data-action="add" data-type="grid">
-            {{#str}}addgrid, mod_competvet{{/str}}
-        </a>
     </div>
     <div class="grids" data-region="grids">
         {{> mod_competvet/manager/criteria/grids}}
@@ -101,6 +98,9 @@
 {{/debug}}
 {{#js}}
 require(['mod_competvet/local/manager/manager_app_criteria'], function(manager) {
-    manager.init();
+    // Prevent init if the page is not the criteria page.
+    if (document.querySelector('[data-region="criteria"]')) {
+        manager.init();
+    }
 });
 {{/js}}

@@ -81,6 +81,8 @@ class get_plannings extends external_api {
             }, $groups);
             $plannings[$key]['startdate'] = userdate($planning['startdate'], '%Y-%m-%d', $timezone, false);
             $plannings[$key]['enddate'] = userdate($planning['enddate'], '%Y-%m-%d', $timezone, false);
+            $plannings[$key]['startdatets'] = $planning['startdate'];
+            $plannings[$key]['enddatets'] = $planning['enddate'];
             $plannings[$key]['groups'] = $planninggroups;
         }
 
@@ -101,9 +103,11 @@ class get_plannings extends external_api {
             'plannings' => new external_multiple_structure(new external_single_structure([
                 'id' => new external_value(PARAM_INT, 'Id', VALUE_REQUIRED),
                 'startdate' => new external_value(PARAM_TEXT, 'Start date', VALUE_REQUIRED),
+                'startdatets' => new external_value(PARAM_INT, 'Start date timestamp', VALUE_OPTIONAL),
                 'situationid' => new external_value(PARAM_INT, 'Situation id', VALUE_REQUIRED),
                 'groupid' => new external_value(PARAM_INT, 'Group id', VALUE_REQUIRED),
                 'enddate' => new external_value(PARAM_TEXT, 'End date', VALUE_REQUIRED),
+                'enddatets' => new external_value(PARAM_INT, 'End date timestamp', VALUE_OPTIONAL),
                 'groupname' => new external_value(PARAM_TEXT, 'Group name', VALUE_REQUIRED),
                 'session' => new external_value(PARAM_TEXT, 'Session name', VALUE_REQUIRED),
                 'groups' => new external_multiple_structure(new external_single_structure([

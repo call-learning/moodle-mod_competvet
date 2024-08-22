@@ -32,10 +32,24 @@
 }}
 <div class="row" data-region="planitem" data-id="{{id}}">
     <div class="col-3 tcell {{#edit}}editable{{/edit}}">
-        <input type="date" name="startdate" value="{{startdate}}" data-field="startdate" class="form-control {{#errorstartdate}}error{{/errorstartdate}}" {{^edit}}disabled{{/edit}}>
+        {{#edit}}
+            <input type="date" name="startdate" value="{{startdate}}" data-field="startdate" class="form-control {{#errorstartdate}}error{{/errorstartdate}}">
+        {{/edit}}
+        {{^edit}}
+            {{#startdatets}}
+                {{#userdate}} {{startdatets}}, {{#str}} strftimedatetimeshort, core_langconfig {{/str}} {{/userdate}}
+            {{/startdatets}}
+        {{/edit}}
     </div>
     <div class="col-3 tcell {{#edit}}editable{{/edit}}">
-        <input type="date" name="enddate" value="{{enddate}}" data-field="enddate" class="form-control {{#errorenddate}}error{{/errorenddate}}" {{^edit}}disabled{{/edit}}>
+        {{#edit}}
+            <input type="date" name="enddate" value="{{enddate}}" data-field="enddate" class="form-control {{#errorenddate}}error{{/errorenddate}}">
+        {{/edit}}
+        {{^edit}}
+            {{#enddatets}}
+                {{#userdate}} {{enddatets}}, {{#str}} strftimedatetimeshort, core_langconfig {{/str}} {{/userdate}}
+            {{/enddatets}}
+        {{/edit}}
     </div>
     <div class="col-2 tcell {{#edit}}editable{{/edit}}">
         {{#edit}}

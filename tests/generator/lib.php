@@ -419,6 +419,8 @@ class mod_competvet_generator extends testing_module_generator {
         if (is_string($record->enddate)) {
             $record->enddate = ((new DateTime($record->enddate)))->getTimestamp();
         }
+        $record->startdate = planning::round_start_date($record->startdate);
+        $record->enddate = planning::round_end_date($record->enddate);
         return $this->create_from_entity_name(planning::class, $record);
     }
 
