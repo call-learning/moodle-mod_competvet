@@ -172,7 +172,7 @@ class get_evaluations extends external_api {
             $average = 0;
             $hasaverage = false;
             foreach ($gradedcriterion['grades'] as $grade) {
-                if (!$grade['autoeval']) {
+                if (!$grade['autoeval'] && $grade['level'] !== null) {
                     $gradesum += $grade['level'] ?? 0;
                     $gradescount++;
                 }
@@ -188,6 +188,9 @@ class get_evaluations extends external_api {
             $gradedcriteria[$index]['hasaverage'] = $hasaverage;
             $gradedcriteria[$index]['average'] = round($average);
         }
+        usort($gradedcriteria, function ($a, $b) {
+            return $a['criterion']['sort'] <=> $b['criterion']['sort'];
+        });
         // The data returned by this function is a grid containing the criteria and the evaluations by others.
         return [
             'evaluations' => array_values($gradedcriteria),
@@ -216,9 +219,6 @@ class get_evaluations extends external_api {
                 'date' => userdate($userobservation['timemodified'], get_string('strftimedatefullshort')),
                 'graderinfo' => $userobservation['observerinfo'],
             ];
-            if (empty($gradedcriterion['level'])) {
-                continue;
-            }
             if (!isset($gradedcriteria[$criterionid])) {
                 $gradedcriteria[$criterionid] = [
                     'criterion' => $gradedcriterion['criterioninfo'],
