@@ -107,7 +107,7 @@ class todo extends persistent {
 
     public static function get_all_todos_for_user(int $userid): array {
         global $DB;
-        $todos = $DB->get_records(self::TABLE, ['userid' => $userid]);
+        $todos = $DB->get_records(self::TABLE, ['userid' => $userid],  'timecreated');
         return $todos;
     }
 }

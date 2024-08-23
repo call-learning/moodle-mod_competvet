@@ -160,7 +160,7 @@ class certifications {
      * @return array The supervisor ids
      */
     public static function get_declaration_supervisors($declid) {
-        $certsdecl = cert_decl_asso::get_records(['declid' => $declid]);
+        $certsdecl = cert_decl_asso::get_records(['declid' => $declid],  'timecreated');
         $supervisors = [];
         foreach ($certsdecl as $cert) {
             $supervisors[] = $cert->get('supervisorid');
@@ -320,7 +320,7 @@ class certifications {
             if (!empty($studentid)) {
                 $certfilter['studentid'] = $studentid;
             }
-            $certdecls = cert_decl::get_records($certfilter);
+            $certdecls = cert_decl::get_records($certfilter,  'timecreated');
             if ($certdecls) {
                 foreach ($certdecls as $certdecl) {
                     $certrecord = self::get_empty_cert_from_criterion($criterion);

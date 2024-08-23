@@ -44,7 +44,7 @@ class observations {
      */
     public static function get_user_observations(int $planningid, int $userid, bool $includedetails = false): array {
         $observations =
-            observation::get_records(['planningid' => $planningid, 'studentid' => $userid]);
+            observation::get_records(['planningid' => $planningid, 'studentid' => $userid], 'timecreated');
         $evalobservations = [];
         foreach ($observations as $observation) {
             $evalobservations[] = self::get_observation_information($observation->get('id'), $includedetails);
@@ -385,7 +385,7 @@ class observations {
     }
 
     private static function get_and_normalise_comments(int $observationid, int $commentype): ?observation_comment {
-        $comments = observation_comment::get_records(['observationid' => $observationid, 'type' => $commentype]);
+        $comments = observation_comment::get_records(['observationid' => $observationid, 'type' => $commentype], 'timecreated');
         if (empty($comments)) {
             return null;
         }

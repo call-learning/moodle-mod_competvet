@@ -89,7 +89,7 @@ class cases {
      * @return object
      */
     private static function do_get_entry_content(array $casestructure, case_entry $caseentry): object {
-        $data = case_data::get_records(['entryid' => $caseentry->get('id')]);
+        $data = case_data::get_records(['entryid' => $caseentry->get('id')], 'timecreated');
         // Now we need to map the data to the structure.
         $case = [];
         // The structure holds the form structure, the data holds the from values.
@@ -180,7 +180,7 @@ class cases {
             throw new \moodle_exception('cannoteditcaselog', 'competvet');
         }
         foreach ($fields as $fieldid => $value) {
-            $records = case_data::get_records(['entryid' => $entryid, 'fieldid' => $fieldid]);
+            $records = case_data::get_records(['entryid' => $entryid, 'fieldid' => $fieldid],  'timecreated');
             if (empty($records)) {
                 $data = new case_data();
                 $data->set('fieldid', $fieldid);

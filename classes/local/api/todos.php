@@ -50,7 +50,7 @@ class todos {
             'planningid' => $planningid,
             'action' => todo::ACTION_EVAL_OBSERVATION_ASKED,
             'status' => todo::STATUS_PENDING,
-        ]);
+        ],  'timecreated');
         if ($existingtodos) {
             $todo = reset($existingtodos);
         } else {
@@ -77,7 +77,7 @@ class todos {
             'planningid' => $observation->get('planningid'),
             'targetuserid' => $observation->get('studentid'),
             'action' => todo::ACTION_EVAL_OBSERVATION_ASKED,
-        ]);
+        ],  'timecreated');
         foreach ($todos as $todo) {
             $data = json_decode($todo->get('data'));
             if ($data->observationid != $observationid) {
@@ -148,7 +148,7 @@ class todos {
         $todos = todo::get_records([
             'userid' => $userid,
             'status' => todo::STATUS_PENDING,
-        ]);
+        ],  'timecreated');
         $todoarray = [];
         foreach ($todos as $todo) {
             $todorecord = [];
