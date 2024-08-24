@@ -29,7 +29,7 @@ use test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class situation_test extends advanced_testcase {
+class observation_tests extends advanced_testcase {
     use test_data_definition;
 
     /**

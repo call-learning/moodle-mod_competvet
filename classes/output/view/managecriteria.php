@@ -82,8 +82,8 @@ class managecriteria extends base {
      */
     public function check_access(): void {
         $context = context_system::instance();
-        if (!has_capability('mod/competvet:candoeverything', $context)) {
-            throw new \moodle_exception('noaccess', 'data');
+        if (!has_capability('mod/competvet:editcriteria', $context)) {
+            throw new \moodle_exception('noaccess', 'mod_competvet');
         }
     }
 

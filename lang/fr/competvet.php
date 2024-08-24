@@ -351,5 +351,7 @@ $string['search:student'] = 'Rechercher étudiants';
 $string['search:group'] = 'Rechercher groupes';
 
 $string['showastable'] = 'Montrer sous forme de tableau';
-$string['groupnotfound'] = 'The group with name {$a} was not found';
-$string['invaliddate'] = 'Invalid date {$a}';
+$string['groupnotfound'] = 'Le groupe avec le nom {$a} n\'a pas été trouvé';
+$string['invaliddate'] = 'Date invalide {$a}, elle doit être au format jj/mm/aaaa';
+$string['confirmplanningdelete'] = 'Êtes-vous sûr de vouloir supprimer cette planification (il y a des données utilisateurs) ?';
+$string['noaccess'] = 'Vous n\'avez pas accès à cette ressource';

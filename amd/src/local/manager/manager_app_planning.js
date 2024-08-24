@@ -26,6 +26,9 @@
 import CompetState from 'mod_competvet/local/competstate';
 import Repository from 'mod_competvet/local/new-repository';
 import './plannings';
+import ModalSaveCancel from 'core/modal_save_cancel';
+import { getString } from 'core/str';
+import ModalEvents from 'core/modal_events';
 
 /*
 * A CRUD manager for data.
@@ -117,13 +120,30 @@ class Manager {
      * Delete a planning or category by manipulating the state, for the state structure see the example data structure.
      * @param {object} btn The button that was clicked.
      */
-    delete(btn) {
+    async delete(btn) {
         let state = CompetState.getData();
         if (btn.dataset.type === 'planning') {
-            state.plannings.find((element) => element.id === parseInt(btn.dataset.id)).deleted = true;
+            const planning = state.plannings.find((element) => element.id === parseInt(btn.dataset.id));
+            const deletePlanning = () => {
+                state.plannings.find((element) => element.id === parseInt(btn.dataset.id)).deleted = true;
+                CompetState.setData(state);
+                this.save();
+            };
+            if (planning.hasuserdata) {
+                const modal = await ModalSaveCancel.create({
+                    title: getString('delete', 'mod_competvet'),
+                    body: getString('confirmplanningdelete', 'mod_competvet'),
+                });
+                modal.show();
+                modal.getRoot().on(ModalEvents.save, () => {
+                    deletePlanning();
+                });
+            } else {
+                deletePlanning();
+            }
+
         }
-        CompetState.setData(state);
-        this.save();
+
     }
 
     /**

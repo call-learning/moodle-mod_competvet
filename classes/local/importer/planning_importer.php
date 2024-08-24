@@ -91,7 +91,11 @@ class planning_importer extends base_persistent_importer {
         }
         $format = 'd/m/Y'; // Adjust this to match the format of your input date.
         $dt = DateTime::createFromFormat($format, $data->startdate);
-        if (!$dt) {
+        if ($dt === false || array_sum($dt::getLastErrors()) > 0) {
+            throw new \moodle_exception('invaliddate', 'mod_competvet', null, $data->enddate);
+        }
+        $year = (int)$dt->format('Y');
+        if ($year < 1900 || $year > 2099) {
             throw new \moodle_exception('invaliddate', 'mod_competvet', null, $data->enddate);
         }
         $data->startdate = planning::round_start_date($dt->getTimestamp());

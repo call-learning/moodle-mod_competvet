@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet\output\view;
 
+use context_system;
 use mod_competvet\competvet;
 use renderer_base;
 use stdClass;
@@ -78,4 +79,18 @@ class manageplanning extends base {
     public function get_template_name(\renderer_base $renderer): string {
         return 'mod_competvet/manager/planning';
     }
+
+    /**
+     * Check if current user has access to this page and throw an exception if not.
+     *
+     * @return void
+     */
+    public function check_access(): void {
+        global $PAGE;
+        $context = $PAGE->context;
+        if (!has_capability('mod/competvet:editplanning', $context)) {
+            throw new \moodle_exception('noaccess', 'mod_competvet');
+        }
+    }
+
 }

@@ -84,6 +84,7 @@ class get_plannings extends external_api {
             $plannings[$key]['startdatets'] = $planning['startdate'];
             $plannings[$key]['enddatets'] = $planning['enddate'];
             $plannings[$key]['groups'] = $planninggroups;
+            $plannings[$key]['hasuserdata'] = plannings_api::has_user_data($planning['id']);
         }
 
         return [
@@ -110,6 +111,7 @@ class get_plannings extends external_api {
                 'enddatets' => new external_value(PARAM_INT, 'End date timestamp', VALUE_OPTIONAL),
                 'groupname' => new external_value(PARAM_TEXT, 'Group name', VALUE_REQUIRED),
                 'session' => new external_value(PARAM_TEXT, 'Session name', VALUE_REQUIRED),
+                'hasuserdata' => new external_value(PARAM_BOOL, 'Has user data attached to planning?', VALUE_REQUIRED),
                 'groups' => new external_multiple_structure(new external_single_structure([
                     'id' => new external_value(PARAM_INT, 'Id', VALUE_REQUIRED),
                     'name' => new external_value(PARAM_TEXT, 'Name', VALUE_REQUIRED),

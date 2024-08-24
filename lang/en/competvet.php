@@ -379,6 +379,8 @@ $string['search:activity'] = 'Rechercher activités CompetVet';
 $string['search:student'] = 'Search Student';
 $string['search:group'] = 'Search Group';
 $string['showastable'] = 'Show as table';
-$string['invaliddate'] = 'Invalid date {$a}';
+$string['invaliddate'] = 'Invalid date {$a}, it should be in the format dd/mm/yyyy';
 
 $string['atleastone'] = 'At least one of these fields must be checked';
+$string['confirmplanningdelete'] = 'Are you sure you want to delete this planning (there are user data)?';
+$string['noaccess'] = 'You don\'t have access to this page';

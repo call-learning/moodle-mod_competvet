@@ -36,6 +36,12 @@ class student_eval_subcriteria extends base {
     protected array $subcriteria;
 
     /**
+     * @var int $studentid The student id.
+     */
+    protected $studentid;
+
+
+    /**
      * Export this data so it can be used in a mustache template.
      *
      * @param renderer_base $output
@@ -50,6 +56,26 @@ class student_eval_subcriteria extends base {
             ];
         }
         return $data;
+    }
+
+    /**
+     * Is the evaluation enabled?
+     *
+     * @return void
+     */
+    public function check_access(): void {
+        global $PAGE, $USER;
+        $context = $PAGE->context;
+        $competvet = competvet::get_from_context($context);
+        $situation = $competvet->get_situation();
+        if (!$situation->get('haseval')) {
+            throw new \moodle_exception('situation:haseval', 'mod_competvet');
+        }
+        if ($USER->id != $this->studentid) {
+            if (!has_capability('mod/competvet:viewother', $context)) {
+                throw new \moodle_exception('noaccess', 'mod_competvet');
+            }
+        }
     }
 
     /**
@@ -76,8 +102,10 @@ class student_eval_subcriteria extends base {
                     break;
                 }
             }
+            $studentid = $userevaluations['studentinfo']['id'];
             $data = [
                 $criterion['subcriteria'] ?? null,
+                $studentid,
             ];
             $context = $PAGE->context;
             $competvet = competvet::get_from_context($context);
@@ -87,6 +115,6 @@ class student_eval_subcriteria extends base {
                 ['pagetype' => 'student_eval', 'id' => $cmid, 'obsid' => $evaluationid]
             ));
         }
-        [$this->subcriteria] = $data;
+        [$this->subcriteria, $this->studentid] = $data;
     }
 }

@@ -161,15 +161,21 @@ class observation extends persistent {
      *
      * @return void
      */
-    public function before_delete() {
-        foreach ($this->get_criteria_comments() as $comment) {
+    public function after_delete($result) {
+        if (!$result) {
+            return;
+        }
+        $observationcomment = observation_comment::get_records(['observationid' => $this->raw_get('id')]);
+        foreach ($observationcomment as $comment) {
             $comment->delete();
         }
-        foreach ($this->get_criteria_levels() as $level) {
-            $level->delete();
+        $obscriteria = observation_criterion_level::get_records(['observationid' => $this->raw_get('id')]);
+        foreach ($obscriteria as $criterion) {
+            $criterion->delete();
         }
-        foreach ($this->get_comments() as $comment) {
-            $comment->delete();
+        $obscriteria = observation_criterion_comment::get_records(['observationid' => $this->raw_get('id')]);
+        foreach ($obscriteria as $criterion) {
+            $criterion->delete();
         }
     }
 

@@ -50,6 +50,11 @@ class student_list extends base  {
     protected object $cases;
 
     /**
+     * @var int $studentid The student id.
+     */
+    protected $studentid;
+
+    /**
      * Export this data so it can be used in a mustache template.
      *
      * @param renderer_base $output
@@ -93,14 +98,15 @@ class student_list extends base  {
             $competvet = competvet::get_from_situation_id($situationid);
             $data = [
                 $planninginfo,
-                $cases
+                $cases,
+                $studentid,
             ];
             $this->set_backurl(new moodle_url(
                 $this->baseurl,
                 ['pagetype' => 'planning', 'id' => $competvet->get_course_module_id(), 'planningid' => $planningid]
             ));
         }
-        [$this->planninginfo, $this->cases] = $data;
+        [$this->planninginfo, $this->cases, $this->studentid] = $data;
     }
 
     /**
@@ -109,12 +115,17 @@ class student_list extends base  {
      * @return void
      */
     public function check_access(): void {
-        global $PAGE;
+        global $PAGE, $USER;
         $context = $PAGE->context;
         $competvet = competvet::get_from_context($context);
         $situation = $competvet->get_situation();
         if (!$situation->get('hascase')) {
             throw new \moodle_exception('situation:hascase', 'mod_competvet');
+        }
+        if ($USER->id != $this->studentid) {
+            if (!has_capability('mod/competvet:viewother', $context)) {
+                throw new \moodle_exception('noaccess', 'mod_competvet');
+            }
         }
     }
 

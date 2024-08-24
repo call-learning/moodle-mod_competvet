@@ -53,6 +53,11 @@ class student_evaluations extends base {
      * @var moodle_url $vieweval The url to view different evaluation types.
      */
     protected $vieweval;
+    /**
+     * @var int $studentid The student id.
+     */
+    protected $studentid;
+
 
     /**
      * Export this data so it can be used in a mustache template.
@@ -141,13 +146,14 @@ class student_evaluations extends base {
                 ),
                 $userevals,
                 $criteria,
+                $studentid,
             ];
             $this->set_backurl(new moodle_url(
                 $this->baseurl,
                 ['pagetype' => 'planning', 'id' => $competvet->get_course_module_id(), 'planningid' => $planningid]
             ));
         }
-        [$this->planninginfo, $this->vieweval, $this->observations, $this->criteria] = $data;
+        [$this->planninginfo, $this->vieweval, $this->observations, $this->criteria, $this->studentid] = $data;
     }
 
     /**
@@ -156,12 +162,17 @@ class student_evaluations extends base {
      * @return void
      */
     public function check_access(): void {
-        global $PAGE;
+        global $PAGE, $USER;
         $context = $PAGE->context;
         $competvet = competvet::get_from_context($context);
         $situation = $competvet->get_situation();
         if (!$situation->get('haseval')) {
             throw new \moodle_exception('situation:haseval', 'mod_competvet');
+        }
+        if ($USER->id != $this->studentid) {
+            if (!has_capability('mod/competvet:viewother', $context)) {
+                throw new \moodle_exception('noaccess', 'mod_competvet');
+            }
         }
     }
 

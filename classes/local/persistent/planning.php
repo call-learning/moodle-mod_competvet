@@ -197,6 +197,8 @@ class planning extends persistent {
     /**
      * Hook to execute after a delete.
      *
+     * Here we try to delete all the related data to this planning.
+     *
      * As situations are visible when the user (student) belongs to one of the groups, we need to make
      *  sure that we send an event that will be observed so we clear the cache
      *
@@ -204,6 +206,27 @@ class planning extends persistent {
      * @return void
      */
     protected function after_delete($result) {
+        if (!$result) {
+            return;
+        }
+        $observations = observation::get_records(['planningid' => $this->raw_get('id')]);
+        foreach ($observations as $observation) {
+
+            $observation->delete();
+        }
+        $certdecl = cert_decl::get_records(['planningid' => $this->raw_get('id')]);
+        foreach ($certdecl as $cert) {
+
+            $cert->delete();
+        }
+        $caselogs = case_entry::get_records(['planningid' => $this->raw_get('id')]);
+        foreach ($caselogs as $caselog) {
+            $casedata = case_data::get_records(['entryid' => $caselog->get('id')]);
+            foreach ($casedata as $data) {
+                $data->delete();
+            }
+            $caselog->delete();
+        }
     }
 
     /**

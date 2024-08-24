@@ -17,6 +17,7 @@ namespace mod_competvet\local\api;
 
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\case_entry;
+use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\utils;
@@ -78,7 +79,7 @@ class plannings {
             $planningfilters['minstartdate'] = (new \DateTime('next Monday'))->getTimestamp();
             $planninngssql .= " AND startdate < :minstartdate";
         }
-        $allplannings = planning::get_records_select($planninngssql, $planningfilters);
+        $allplannings = planning::get_records_select($planninngssql, $planningfilters, 'startdate ASC');
         $plannings = [];
         foreach ($allplannings as $planning) {
             $newplanning = (array) $planning->to_record();
@@ -446,5 +447,18 @@ class plannings {
     public static function get_students_info_for_planning_id(int $planningid) {
         $users = static::get_students_for_planning_id($planningid);
         return array_map(fn($user) => utils::get_user_info($user->id), $users);
+    }
+
+    /**
+     * Return true if the planning has user data (observations, evaluations, etc.)
+     *
+     * @param int $planningid
+     * @return bool
+     */
+    public static function has_user_data(int $planningid): bool {
+        $hasobservations = observation::count_records(['planningid' => $planningid]) > 0;
+        $hascases = case_entry::count_records(['planningid' => $planningid]) > 0;
+        $hascertifications = cert_decl::count_records(['planningid' => $planningid]) > 0;
+        return $hasobservations || $hascases || $hascertifications;
     }
 }

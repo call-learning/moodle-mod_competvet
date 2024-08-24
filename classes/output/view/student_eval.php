@@ -48,6 +48,11 @@ class student_eval extends base {
     private mixed $subcriteriaurl;
 
     /**
+     * @var int $studentid The student id.
+     */
+    protected $studentid;
+
+    /**
      * Export this data so it can be used in a mustache template.
      *
      * @param renderer_base $output
@@ -82,7 +87,25 @@ class student_eval extends base {
         $data['cmid'] = $competvet->get_course_module_id();
         return $data;
     }
-
+    /**
+     * Is the evaluation enabled?
+     *
+     * @return void
+     */
+    public function check_access(): void {
+        global $PAGE, $USER;
+        $context = $PAGE->context;
+        $competvet = competvet::get_from_context($context);
+        $situation = $competvet->get_situation();
+        if (!$situation->get('haseval')) {
+            throw new \moodle_exception('situation:haseval', 'mod_competvet');
+        }
+        if ($USER->id != $this->studentid) {
+            if (!has_capability('mod/competvet:viewother', $context)) {
+                throw new \moodle_exception('noaccess', 'mod_competvet');
+            }
+        }
+    }
     /**
      * Set data for the object.
      *
@@ -101,6 +124,8 @@ class student_eval extends base {
             $competvet = competvet::get_from_context($context);
             $observationid = required_param('obsid', PARAM_INT);
             $userevaluations = observations::get_observation_information($observationid);
+            $observation = observation::get_record(['id' => $observationid]);
+            $studentid = $observation->get('studentid');
             $data = [$userevaluations,
                 new moodle_url(
                     $this->baseurl,
@@ -110,10 +135,9 @@ class student_eval extends base {
                         'obsid' => $observationid,
                     ]
                 ),
+                $studentid
             ];
-            $observation = observation::get_record(['id' => $observationid]);
             $planningid = $observation->get('planningid');
-            $studentid = $observation->get('studentid');
             $this->set_backurl(
                 new moodle_url(
                     $this->baseurl,
@@ -126,6 +150,6 @@ class student_eval extends base {
                 )
             );
         }
-        [$this->evaluation, $this->subcriteriaurl] = $data;
+        [$this->evaluation, $this->subcriteriaurl, $this->studentid] = $data;
     }
 }

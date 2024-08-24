@@ -93,4 +93,23 @@ class cert_decl extends persistent {
             ],
         ];
     }
+
+    /**
+     * Delete dependencies
+     *
+     * @return void
+     */
+    protected function after_delete($result) {
+        if (!$result) {
+            return;
+        }
+        $certvalid = cert_valid::get_records(['declid' => $this->raw_get('id')]);
+        foreach ($certvalid as $valid) {
+            $valid->delete();
+        }
+        $certasso = cert_decl_asso::get_records(['declid' => $this->raw_get('id')]);
+        foreach ($certasso as $asso) {
+            $asso->delete();
+        }
+    }
 }

@@ -28,6 +28,7 @@
         "sessionname": "Session 2023",
         "nbstudents": 10,
         "viewurl": "http://localhost/moodle/mod/competvet/view.php?id=1",
+        "hasuserdata": true,
     }
 }}
 <div class="row" data-region="planitem" data-id="{{id}}">
@@ -73,6 +74,6 @@
             <span class="savingicon">{{#pix}}i/loading, core, {{#str}}saving, mod_competvet{{/str}}{{/pix}}</span>
         </button>
         {{/edit}}
-        <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-id="{{id}}" data-action="delete" data-type="planning">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
+        <button class="btn btn-icon icon-no-margin mr-1 jsbutton {{#hasuserdata}}btn-warning{{/hasuserdata}}" data-id="{{id}}" data-action="delete" data-type="planning">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
     </div>
 </div>
