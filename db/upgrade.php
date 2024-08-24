@@ -100,6 +100,25 @@ function xmldb_competvet_upgrade($oldversion) {
         // Competvet savepoint reached.
         upgrade_mod_savepoint(true, 2024082200, 'competvet');
     }
+    if ($oldversion < 2024082400) {
+
+        // Define index competvetusergrade_ux (unique) to be dropped form competvet_grades.
+        $table = new xmldb_table('competvet_grades');
+        $index = new xmldb_index('competvetusergrade_ux', XMLDB_INDEX_UNIQUE, ['competvet', 'type']);
+
+        // Conditionally launch drop index competvetusergrade_ux.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+        $index = new xmldb_index('competvetusergrade_ux', XMLDB_INDEX_UNIQUE, ['competvet', 'studentid', 'planningid', 'type']);
+
+        // Conditionally launch add index competvetusergrade_ux.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024082400, 'competvet');
+    }
 
     return true;
 }

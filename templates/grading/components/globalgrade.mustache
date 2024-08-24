@@ -27,7 +27,7 @@
     <div class="user-grade {{#validated}}was-validated{{/validated}}">
         <div class="h4 text-center border-bottom pb-2">{{#str}}evaluation, mod_competvet{{/str}}</div>
         <div class="d-flex">
-            <div class="form-group">
+            <div class="form-group {{^cangrade}}d-none{{/cangrade}}">
                 <label >
                     {{#str}}suggestedgrade, mod_competvet{{/str}} :
                 </label>

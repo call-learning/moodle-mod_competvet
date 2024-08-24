@@ -25,7 +25,7 @@
 }}
 {{#certification-grading}}
     {{#grading}}
-        <div class="mb-5">
+        <div class="mb-5 {{^cangrade}}d-none{{/cangrade}}">
             <div class="d-flex justify-content-between mb-2">
                 {{#str}}numcertifvalidated, mod_competvet{{/str}}
                 <div class="ml-auto">

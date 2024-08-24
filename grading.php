@@ -45,6 +45,12 @@ $title = $courseshortname . ': ' . $title;
 $PAGE->set_title($title);
 
 $compevet = competvet::get_from_context($modulecontext);
+$studentid = optional_param('studentid', 0, PARAM_INT);
+if ($studentid && $USER->id != $studentid) {
+    if (!has_capability('mod/competvet:viewother', $modulecontext)) {
+        throw new \moodle_exception('noaccess', 'mod_competvet');
+    }
+}
 $gradingapp = new app($USER->id, 0, $compevet);
 echo $OUTPUT->header();
 
