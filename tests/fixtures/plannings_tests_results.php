@@ -13,6 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+use mod_competvet\local\persistent\planning;
+
 defined('MOODLE_INTERNAL') || die();
 $oneweek = 60 * 60 * 24 * 7; // 1 week in seconds.
 $onemonth = $oneweek * 4; // 1 month in seconds.
@@ -21,8 +23,8 @@ $results['student1results'] = [
     'SIT1' =>
         [
             [
-                'startdate' => (string) $startdate,
-                'enddate' => (string) ($startdate + $oneweek),
+                'startdate' => (string) planning::round_start_date($startdate),
+                'enddate' => (string) planning::round_end_date(($startdate + $oneweek)),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
@@ -30,8 +32,8 @@ $results['student1results'] = [
     'SIT2' =>
         [
             [
-                'startdate' => (string) $startdate,
-                'enddate' => (string) ($startdate + $oneweek * 2),
+                'startdate' => (string) planning::round_start_date($startdate),
+                'enddate' => (string) planning::round_end_date(($startdate + $oneweek * 2)),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
@@ -39,27 +41,31 @@ $results['student1results'] = [
     'SIT3' =>
         [
             [
-                'startdate' => (string) $startdate,
-                'enddate' => (string) ($startdate + $oneweek),
+                'startdate' => (string) planning::round_start_date($startdate),
+                'enddate' => (string) planning::round_end_date(($startdate + $oneweek)),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
         ],
     'SIT4' => [],
+    'SIT5' => [],
+    'SIT6' => [],
     'SIT7' => [],
+    'SIT8' => [],
+    'SIT9' => [],
 ];
 $results['student1resultswithfuture'] = [
     'SIT1' =>
         [
             [
-                'startdate' => (string) $startdate,
-                'enddate' => (string) ($startdate + $oneweek),
+                'startdate' => (string) planning::round_start_date($startdate),
+                'enddate' => (string) planning::round_end_date(($startdate + $oneweek)),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
             [
-                'startdate' => (string) ($startdate + $onemonth * 12),
-                'enddate' => (string) ($startdate + $onemonth * 12 + $oneweek),
+                'startdate' => (string) planning::round_start_date(($startdate + $onemonth * 12)),
+                'enddate' => (string) planning::round_end_date(($startdate + $onemonth * 12 + $oneweek)),
                 'session' => '2030',
                 'groupname' => 'group 8.1',
             ],
@@ -67,8 +73,8 @@ $results['student1resultswithfuture'] = [
     'SIT2' =>
         [
             [
-                'startdate' => (string) ($startdate),
-                'enddate' => (string) ($startdate + $oneweek * 2),
+                'startdate' => (string) planning::round_start_date(($startdate)),
+                'enddate' => (string) planning::round_end_date(($startdate + $oneweek * 2)),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
@@ -76,8 +82,8 @@ $results['student1resultswithfuture'] = [
     'SIT3' =>
         [
             [
-                'startdate' => (string) ($startdate),
-                'enddate' => (string) ($startdate + $oneweek),
+                'startdate' => (string) planning::round_start_date(($startdate)),
+                'enddate' => (string) planning::round_end_date(($startdate + $oneweek)),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
@@ -85,28 +91,32 @@ $results['student1resultswithfuture'] = [
     'SIT4' =>
         [
             [
-                'startdate' => (string) ($startdate + $onemonth * 3),
-                'enddate' => (string) ($startdate + $onemonth * 3 + $oneweek),
+                'startdate' => (string) planning::round_start_date(($startdate + $onemonth * 3)),
+                'enddate' => (string) planning::round_end_date(($startdate + $onemonth * 3 + $oneweek)),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
         ],
+    'SIT5' => [],
+    'SIT6' => [],
     'SIT7' =>
         [
             [
-                'startdate' => (string) ($startdate + $onemonth * 6),
-                'enddate' => (string) ($startdate + $onemonth * 6 + $oneweek),
+                'startdate' => (string) planning::round_start_date(($startdate + $onemonth * 6)),
+                'enddate' => (string) planning::round_end_date(($startdate + $onemonth * 6 + $oneweek)),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
         ],
+    'SIT8' => [],
+    'SIT9' => [],
 ];
 $results['observer1results'] = [
     'SIT1' =>
         [
             [
-                'startdate' => (string) $startdate,
-                'enddate' => (string) ($startdate + $oneweek),
+                'startdate' => (string) planning::round_start_date($startdate),
+                'enddate' => (string) planning::round_end_date(($startdate + $oneweek)),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
@@ -114,8 +124,8 @@ $results['observer1results'] = [
     'SIT2' =>
         [
             [
-                'startdate' => (string) $startdate,
-                'enddate' => (string) ($startdate + $oneweek * 2),
+                'startdate' => (string) planning::round_start_date($startdate),
+                'enddate' => (string) planning::round_end_date(($startdate + $oneweek * 2)),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
@@ -123,8 +133,8 @@ $results['observer1results'] = [
     'SIT3' =>
         [
             [
-                'startdate' => (string) ($startdate),
-                'enddate' => (string) ($startdate + $oneweek),
+                'startdate' => (string) planning::round_start_date(($startdate)),
+                'enddate' => (string) planning::round_end_date(($startdate + $oneweek)),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
@@ -134,20 +144,20 @@ $results['observer1resultswithfuture'] = [
     'SIT1' =>
         [
             [
-                'startdate' => (string) $startdate,
-                'enddate' => (string) ($startdate + $oneweek),
+                'startdate' => (string) planning::round_start_date($startdate),
+                'enddate' => (string) planning::round_end_date(($startdate + $oneweek)),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
             [
-                'startdate' => (string) ($startdate + $oneweek),
-                'enddate' => (string) ($startdate + $oneweek * 2),
+                'startdate' => (string) planning::round_start_date(($startdate + $oneweek)),
+                'enddate' => (string) planning::round_end_date(($startdate + $oneweek * 2)),
                 'session' => '2023',
                 'groupname' => 'group 8.2',
             ],
             [
-                'startdate' => (string) ($startdate + $onemonth * 12),
-                'enddate' => (string) ($startdate + $onemonth * 12 + $oneweek),
+                'startdate' => (string) planning::round_start_date(($startdate + $onemonth * 12)),
+                'enddate' => (string) planning::round_end_date(($startdate + $onemonth * 12 + $oneweek)),
                 'session' => '2030',
                 'groupname' => 'group 8.1',
             ],
@@ -155,8 +165,8 @@ $results['observer1resultswithfuture'] = [
     'SIT2' =>
         [
             [
-                'startdate' => (string) $startdate,
-                'enddate' => (string) ($startdate + $oneweek * 2),
+                'startdate' => (string) planning::round_start_date($startdate),
+                'enddate' => (string) planning::round_end_date(($startdate + $oneweek * 2)),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
@@ -164,14 +174,14 @@ $results['observer1resultswithfuture'] = [
     'SIT3' =>
         [
             [
-                'startdate' => (string) ($startdate),
-                'enddate' => (string) ($startdate + $oneweek),
+                'startdate' => (string) planning::round_start_date(($startdate)),
+                'enddate' => (string) planning::round_end_date(($startdate + $oneweek)),
                 'session' => '2023',
                 'groupname' => 'group 8.1',
             ],
             [
-                'startdate' => (string) ($startdate + $onemonth * 2 + $oneweek),
-                'enddate' => (string) ($startdate + $onemonth * 2 + $oneweek * 2),
+                'startdate' => (string) planning::round_start_date(($startdate + $onemonth * 2 + $oneweek)),
+                'enddate' => (string) planning::round_end_date(($startdate + $onemonth * 2 + $oneweek * 2)),
                 'session' => '2023',
                 'groupname' => 'group 8.2',
             ],

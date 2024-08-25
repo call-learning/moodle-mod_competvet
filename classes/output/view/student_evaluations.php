@@ -58,7 +58,6 @@ class student_evaluations extends base {
      */
     protected $studentid;
 
-
     /**
      * Export this data so it can be used in a mustache template.
      *
@@ -146,14 +145,14 @@ class student_evaluations extends base {
                 ),
                 $userevals,
                 $criteria,
-                $studentid,
+                $studentid
             ];
             $this->set_backurl(new moodle_url(
                 $this->baseurl,
-                ['pagetype' => 'planning', 'id' => $competvet->get_course_module_id(), 'planningid' => $planningid]
+                ['pagetype' => 'plannings', 'id' => $competvet->get_course_module_id(), 'planningid' => $planningid]
             ));
         }
-        [$this->planninginfo, $this->vieweval, $this->observations, $this->criteria, $this->studentid] = $data;
+        [$this->planninginfo, $this->vieweval, $this->observations, $this->criteria, $this->studentid, $this->cmid] = $data;
     }
 
     /**
@@ -183,6 +182,8 @@ class student_evaluations extends base {
      */
     public function get_button($context): ?single_button {
         $query = [];
+        $cangrade = has_capability('mod/competvet:cangrade',$context);
+
         parse_str(parse_url($_SERVER['REQUEST_URI'])['query'], $query);
         $query['returnurl'] = $_SERVER['REQUEST_URI'];
         return new single_button(
@@ -190,7 +191,8 @@ class student_evaluations extends base {
                 '/mod/competvet/grading.php',
                 $query
             ),
-            get_string('gradeverb')
+            $cangrade ? get_string('gradeverb'): get_string('view'),
+            single_button::BUTTON_PRIMARY,
         );
     }
 }

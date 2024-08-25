@@ -74,14 +74,14 @@
                     <span class="sr-only">{{#str}}search:student, mod_competvet{{/str}}</span>
                 </label>
                 <input type="text"
-                id="studentsearch-{{uniqid}}"
-                class="form-control"
-                placeholder="{{#str}}search:student, mod_competvet{{/str}}"
-                aria-label="{{#str}}search:student, mod_competvet{{/str}}"
-                name="studentsearch"
-                data-region="input"
-                autocomplete="off"
-                value="{{studentsearch}}"
+                       id="studentsearch-{{uniqid}}"
+                       class="form-control"
+                       placeholder="{{#str}}search:student, mod_competvet{{/str}}"
+                       aria-label="{{#str}}search:student, mod_competvet{{/str}}"
+                       name="studentsearch"
+                       data-region="input"
+                       autocomplete="off"
+                       value="{{studentsearch}}"
                 >
             </div>
             <div class="input-group ml-3">
@@ -89,14 +89,14 @@
                     <span class="sr-only">{{#str}}search:group, mod_competvet{{/str}}</span>
                 </label>
                 <input type="text"
-                id="groupsearch-{{uniqid}}"
-                class="form-control"
-                placeholder="{{#str}}search:group, mod_competvet{{/str}}"
-                aria-label="{{#str}}search:group, mod_competvet{{/str}}"
-                name="groupsearch"
-                data-region="input"
-                autocomplete="off"
-                value="{{groupsearch}}"
+                       id="groupsearch-{{uniqid}}"
+                       class="form-control"
+                       placeholder="{{#str}}search:group, mod_competvet{{/str}}"
+                       aria-label="{{#str}}search:group, mod_competvet{{/str}}"
+                       name="groupsearch"
+                       data-region="input"
+                       autocomplete="off"
+                       value="{{groupsearch}}"
                 >
             </div>
         </div>
@@ -127,52 +127,64 @@
             </tr>
             {{#students}}
                 <tr class="student collapse {{^contentcollapsed}}show{{/contentcollapsed}}" data-planningid="{{planninginfo.planningid}}" id="collapse{{planninginfo.planningid}}">
-                    <th class="user student-name position-relative">
-                        <div class="d-flex align-items-center">
+                    <th class="user student-name">
+                        <div class="d-flex align-items-center position-relative">
                             <img src="{{userinfo.userpictureurl}}" alt="{{userinfo.fullname}}" class="userpicture">
-                            <a class="stretched-link" href="{{{gradeurl}}}" data-region="studentname">{{userinfo.fullname}}</a>
+                            <a class="stretched-link" href="{{{profileurl}}}" data-region="studentname">{{userinfo.fullname}}</a>
                         </div>
-                    </td>
+                        <div class="d-flex justify-content-center">
+                            <a class="btn btn-secondary btn-small text-center m-t-1" href="{{{gradeurl}}}" data-region="studentname">
+                                {{#pix}}i/grades, core{{/pix}}
+                                {{#str}}view, mod_competvet{{/str}}
+                            </a>
+                        </div>
+                        </td>
                     <td class="t-grade stats">
-                        {{#planninginfo}}
-                            {{#stats.eval}}
-                            <span class="evalutations">
-                                <span class="badge {{#pass}}badge-success{{/pass}}{{^pass}}badge-secondary{{/pass}} badge-pill" data-toggle="tooltip" title="{{#str}}planning:page:info:eval, mod_competvet{{/str}}">
+                        <div class="position-relative">
+                            {{#planninginfo}}
+                                {{#stats.eval}}
+                                    <span class="evalutations">
+                                <span class="badge {{#pass}}badge-success{{/pass}}{{^pass}}badge-secondary{{/pass}} badge-pill" data-toggle="tooltip"
+                                      title="{{#str}}planning:page:info:eval, mod_competvet{{/str}}">
                                     {{nbrequired}}/{{nbdone}}
                                     {{> mod_competvet/grading/svg/chat}}
                                 </span>
                             </span>
-                            {{/stats.eval}}
-                            {{#stats.autoeval}}
-                            <span class="autoevaluations">
-                                <span class="badge {{#pass}}badge-success{{/pass}}{{^pass}}badge-secondary{{/pass}} badge-pill" data-toggle="tooltip" title="{{#str}}planning:page:info:autoeval, mod_competvet{{/str}}">
+                                {{/stats.eval}}
+                                {{#stats.autoeval}}
+                                    <span class="autoevaluations">
+                                <span class="badge {{#pass}}badge-success{{/pass}}{{^pass}}badge-secondary{{/pass}} badge-pill" data-toggle="tooltip"
+                                      title="{{#str}}planning:page:info:autoeval, mod_competvet{{/str}}">
                                     {{nbrequired}}/{{nbdone}}
                                     {{> mod_competvet/grading/svg/chat}}
                                 </span>
                             </span>
-                            {{/stats.autoeval}}
-                            {{#stats.cert}}
-                            <span class="certications">
-                                <span class="badge {{#pass}}badge-success{{/pass}}{{^pass}}badge-secondary{{/pass}} badge-pill" data-toggle="tooltip" title="{{#str}}planning:page:info:cert, mod_competvet{{/str}}">
+                                {{/stats.autoeval}}
+                                {{#stats.cert}}
+                                    <span class="certications">
+                                <span class="badge {{#pass}}badge-success{{/pass}}{{^pass}}badge-secondary{{/pass}} badge-pill" data-toggle="tooltip"
+                                      title="{{#str}}planning:page:info:cert, mod_competvet{{/str}}">
                                     {{nbrequired}}/{{nbdone}}
                                     {{> mod_competvet/grading/svg/certif}}
                                 </span>
                             </span>
-                            {{/stats.cert}}
-                            {{#stats.list}}
-                            <span class="cases">
-                                <span class="badge {{#pass}}badge-success{{/pass}}{{^pass}}badge-secondary{{/pass}} badge-pill"  data-toggle="tooltip" title="{{#str}}planning:page:info:list, mod_competvet{{/str}}">
+                                {{/stats.cert}}
+                                {{#stats.list}}
+                                    <span class="cases">
+                                <span class="badge {{#pass}}badge-success{{/pass}}{{^pass}}badge-secondary{{/pass}} badge-pill" data-toggle="tooltip"
+                                      title="{{#str}}planning:page:info:list, mod_competvet{{/str}}">
                                     {{nbrequired}}/{{nbdone}}
                                     {{> mod_competvet/grading/svg/list}}
                                 </span>
                             </span>
-                            {{/stats.list}}
-                        {{/planninginfo}}
-                        <span class="badge badge-info icon-no-margin ml-4 badge-pill" data-toggle="tooltip" title="{{#str}}studentprogress, mod_competvet{{/str}}">
-                            <a class="text-white" href="{{{studenturl}}}">
+                                {{/stats.list}}
+                            {{/planninginfo}}
+                            <span class="badge badge-info icon-no-margin ml-4 badge-pill" data-toggle="tooltip" title="{{#str}}studentprogress, mod_competvet{{/str}}">
+                            <a class="text-white stretched-link" href="{{{studenturl}}}">
                                 {{#pix}}i/info, core{{/pix}}
                             </a>
                         </span>
+                        </div>
                     </td>
                     <td class="t-grade globalgrade">{{#grade}}<span class="circle {{#failure}}fail{{/failure}}">{{grade}}</span>{{/grade}}</td>
                     <td class="t-grade comments">{{feedback}}</td>
@@ -183,7 +195,7 @@
     {{/categories}}
 </table>
 {{#js}}
-require(['{{modulename}}/local/view/plannings'], function(Plannings) {
+    require(['{{modulename}}/local/view/plannings'], function(Plannings) {
     Plannings.init();
-});
+    });
 {{/js}}

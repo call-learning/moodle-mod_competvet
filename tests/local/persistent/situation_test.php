@@ -40,8 +40,8 @@ class situation_test extends advanced_testcase {
      */
     public static function all_for_user_provider(): array {
         return [
-            'student1 situations' => ['student1', ['SIT1', 'SIT2', 'SIT3', 'SIT4', 'SIT7']],
-            'student2 situations' => ['student2', ['SIT1', 'SIT3', 'SIT4', 'SIT7']],
+            'student1 situations' => ['student1', ['SIT1', 'SIT2', 'SIT3', 'SIT4', 'SIT5', 'SIT6', 'SIT7', 'SIT8', 'SIT9']],
+            'student3 situations' => ['student3', ['SIT4', 'SIT5', 'SIT6', 'SIT7', 'SIT8', 'SIT9']],
             'observer1 situations' => ['observer1', ['SIT1', 'SIT2', 'SIT3']],
             'observer2 situations' => ['observer2', ['SIT4', 'SIT5', 'SIT6', 'SIT7', 'SIT8', 'SIT9']],
             'teacher1 situations' => ['teacher1', ['SIT1', 'SIT2', 'SIT3']],

@@ -47,17 +47,24 @@ $widget = base::factory($USER->id);
 $widget->set_data();
 $widget->check_access();
 $renderer = $PAGE->get_renderer('mod_competvet');
-echo $OUTPUT->header();
-
-echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
+$buttons = [];
 $button = $widget->get_button($modulecontext);
 if (!empty($button)) {
-    echo $OUTPUT->render($button);
+    $buttons[] = $OUTPUT->render($button);
 }
 $backbutton = $widget->get_back_button();
 if (!empty($backbutton)) {
-    echo $OUTPUT->container($OUTPUT->render($backbutton), 'd-flex justify-content-end');
+    $buttons[] = $OUTPUT->render($backbutton);
 }
+foreach ($buttons as $button) {
+    $buttonhtml .= $OUTPUT->container($button, 'm-1');
+}
+$PAGE->set_button(
+    $OUTPUT->container($buttonhtml, 'd-flex justify-content-end')
+);
+echo $OUTPUT->header();
+
+echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
 echo $OUTPUT->box_end('generalbox boxaligncenter', 'intro');
 echo $renderer->render($widget);
 echo $OUTPUT->footer();

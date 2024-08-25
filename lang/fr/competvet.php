@@ -355,3 +355,5 @@ $string['groupnotfound'] = 'Le groupe avec le nom {$a} n\'a pas été trouvé';
 $string['invaliddate'] = 'Date invalide {$a}, elle doit être au format jj/mm/aaaa';
 $string['confirmplanningdelete'] = 'Êtes-vous sûr de vouloir supprimer cette planification (il y a des données utilisateurs) ?';
 $string['noaccess'] = 'Vous n\'avez pas accès à cette ressource';
+$string['cachedef_usersituations'] = 'Cache des situations des utilisateurs';
+$string['cachedef_casestructures'] = 'Cache des structures de cas';

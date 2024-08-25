@@ -61,6 +61,15 @@ $capabilities = [
             'manager' => CAP_ALLOW,
         ],
     ],
+    'mod/competvet:caneditother' => [
+        'riskbitmask' => RISK_XSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => [
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ],
+    ],
     'mod/competvet:canobserve' => [
         'riskbitmask' => RISK_XSS,
         'captype' => 'write',

@@ -107,6 +107,7 @@ class cases_test extends advanced_testcase {
         // Adjust based on actual fields.
 
         // Perform update.
+        $this->setAdminUser();
         cases::update_case($caseid, $newdata);
 
         $updatedcase = cases::get_entry($caseid);
@@ -142,6 +143,7 @@ class cases_test extends advanced_testcase {
         $caseid = $case->id;
 
         // Perform delete.
+        $this->setAdminUser();
         $result = cases::delete_case($caseid);
 
         // Assertions.

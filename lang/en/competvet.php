@@ -384,3 +384,5 @@ $string['invaliddate'] = 'Invalid date {$a}, it should be in the format dd/mm/yy
 $string['atleastone'] = 'At least one of these fields must be checked';
 $string['confirmplanningdelete'] = 'Are you sure you want to delete this planning (there are user data)?';
 $string['noaccess'] = 'You don\'t have access to this page';
+$string['cachedef_usersituations'] = 'Cache des situations des utilisateurs';
+$string['cachedef_casestructures'] = 'Cache des structures de cas';

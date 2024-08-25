@@ -18,6 +18,7 @@ namespace mod_competvet\local\api;
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\utils;
+use moodle_url;
 
 global $CFG;
 require_once($CFG->libdir . '/gradelib.php');
@@ -74,11 +75,16 @@ class grading {
      * @return array An array of users.
      */
     protected static function get_students_with_grade_info_for_planning_id(int $planningid): array {
+        global $USER;
         $planning = planning::get_record(['id' => $planningid]);
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         $students = plannings::get_students_for_planning_id($planningid);
         $groupmembers = [];
+        $canseeother = has_capability('mod/competvet:viewother', $competvet->get_context());
         foreach ($students as $student) {
+            if (!$canseeother && $student->id != $USER->id) {
+                continue;
+            }
             $studentgrade = '';
             $grade = $competvet->get_final_grade_for_student($student->id);
             if ($grade->finalgrade) {
@@ -93,6 +99,11 @@ class grading {
             $groupmember->feedback = format_text($grade->feedback, FORMAT_HTML);
             $groupmember->studenturl = $competvet->get_user_planning_url($student->id, $planningid);
             $groupmember->gradeurl = $competvet->get_user_grading_url($groupmember->id, $planningid);
+            $profileparams = [
+                'id' => $student->id,
+                'course' => $competvet->get_course_id(),
+            ];
+            $groupmember->profileurl = (new moodle_url('/user/profile.php', $profileparams))->out();
             $groupmembers[] = $groupmember;
         }
         return $groupmembers;
