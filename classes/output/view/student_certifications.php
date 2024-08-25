@@ -96,7 +96,7 @@ class student_certifications extends base {
             $data = [
                 $planninginfo,
                 $certifcations,
-                $studentid
+                $studentid,
             ];
             $this->set_backurl(new moodle_url(
                 $this->baseurl,

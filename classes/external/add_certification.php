@@ -25,9 +25,8 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use mod_competvet\competvet;
-use mod_competvet\local\persistent\planning;
-use stdClass;
 use mod_competvet\local\api\certifications;
+use mod_competvet\local\persistent\planning;
 
 /**
  * Class Webservice add_certification, calls the add_certification method from the certifications class
@@ -37,24 +36,6 @@ use mod_competvet\local\api\certifications;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class add_certification extends external_api {
-
-    /**
-     * Returns description of method parameters
-     *
-     * @return external_function_parameters
-     */
-    public static function execute_parameters(): external_function_parameters {
-        return new external_function_parameters([
-            'declid' => new external_value(PARAM_INT, 'The certification declaration id', VALUE_OPTIONAL),
-            'criterionid' => new external_value(PARAM_INT, 'The criterion id', VALUE_REQUIRED),
-            'studentid' => new external_value(PARAM_INT, 'The student id', VALUE_REQUIRED),
-            'planningid' => new external_value(PARAM_INT, 'The planning id', VALUE_REQUIRED),
-            'level' => new external_value(PARAM_INT, 'The level', VALUE_REQUIRED),
-            'comment' => new external_value(PARAM_TEXT, 'The comment', VALUE_REQUIRED),
-            'commentformat' => new external_value(PARAM_INT, 'The comment format', VALUE_REQUIRED),
-            'status' => new external_value(PARAM_INT, 'The status', VALUE_REQUIRED),
-        ]);
-    }
 
     /**
      * Returns description of method return value
@@ -80,7 +61,8 @@ class add_certification extends external_api {
      * @param int $status The status
      * @return array
      */
-    public static function execute($declid, $criterionid, $studentid, $planningid, $level, $comment, $commentformat, $status): array {
+    public static function execute($declid, $criterionid, $studentid, $planningid, $level, $comment, $commentformat,
+        $status): array {
         self::validate_parameters(self::execute_parameters(), [
             'criterionid' => $criterionid,
             'studentid' => $studentid,
@@ -91,7 +73,7 @@ class add_certification extends external_api {
             'status' => $status,
         ]);
         // Validate context : important as it also require the user to be logged in.
-        $planning  = planning::get_record(['id' => $planningid]);
+        $planning = planning::get_record(['id' => $planningid]);
         // Check if we can add.
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
@@ -110,5 +92,23 @@ class add_certification extends external_api {
             $status,
         );
         return ['declid' => $certid];
+    }
+
+    /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     */
+    public static function execute_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'declid' => new external_value(PARAM_INT, 'The certification declaration id', VALUE_OPTIONAL),
+            'criterionid' => new external_value(PARAM_INT, 'The criterion id', VALUE_REQUIRED),
+            'studentid' => new external_value(PARAM_INT, 'The student id', VALUE_REQUIRED),
+            'planningid' => new external_value(PARAM_INT, 'The planning id', VALUE_REQUIRED),
+            'level' => new external_value(PARAM_INT, 'The level', VALUE_REQUIRED),
+            'comment' => new external_value(PARAM_TEXT, 'The comment', VALUE_REQUIRED),
+            'commentformat' => new external_value(PARAM_INT, 'The comment format', VALUE_REQUIRED),
+            'status' => new external_value(PARAM_INT, 'The status', VALUE_REQUIRED),
+        ]);
     }
 }

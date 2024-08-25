@@ -157,12 +157,10 @@ class mod_competvet_generator extends testing_module_generator {
                 );
         } else {
             $comments = [];
-            foreach (
-                [
+            foreach ([
                     observation_comment::OBSERVATION_COMMENT => 'comment',
                     observation_comment::OBSERVATION_PRIVATE_COMMENT => 'privatecomment',
-                ] as $key => $value
-            ) {
+                ] as $key => $value) {
                 if ($record->{$value}) {
                     $comments[$key] = $record->{$value};
                 }

@@ -42,7 +42,7 @@ if ($hassiteconfig) {
                 PARAM_INT,
             )
         );
-        // Set the grade calculation constant K1
+        // Set the grade calculation constant K1.
         $settings->add(
             new admin_setting_configtext(
                 'mod_competvet/gradeK1',
@@ -52,7 +52,7 @@ if ($hassiteconfig) {
                 PARAM_FLOAT,
             )
         );
-        // Set the grade calculation constant K2
+        // Set the grade calculation constant K2.
         $settings->add(
             new admin_setting_configtext(
                 'mod_competvet/gradeK2',
@@ -62,7 +62,7 @@ if ($hassiteconfig) {
                 PARAM_FLOAT,
             )
         );
-        // Set the situation Categories
+        // Set the situation Categories.
         $settings->add(
             new admin_setting_configtextarea(
                 'mod_competvet/situationcategories',

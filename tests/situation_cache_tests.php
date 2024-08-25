@@ -134,7 +134,7 @@ class situation_cache_tests extends advanced_testcase {
         $situations = situation::get_all_situations_id_for($student1->id);
         $this->assertCount(1, $situations);
         $plugin = enrol_get_plugin('manual');
-        $manualenrol = $DB->get_record('enrol', array('courseid' => $course->id, 'enrol' => 'manual'), '*', MUST_EXIST);
+        $manualenrol = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'manual'], '*', MUST_EXIST);
         $plugin->unenrol_user($manualenrol, $student1->id);
         $situations = situation::get_all_situations_id_for($student1->id);
         $this->assertCount(0, $situations);

@@ -88,7 +88,6 @@ class student_per_situation extends system_report {
             ON {$groupscontextalias}.contextlevel = " . CONTEXT_COURSE . "
            AND {$groupscontextalias}.instanceid = {$groupsalias}.courseid"));
 
-
         // Now we can call our helper methods to add the content we want to include in the report.
         $this->add_columns();
         $this->add_filters();

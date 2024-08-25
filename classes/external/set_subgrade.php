@@ -84,8 +84,8 @@ class set_subgrade extends external_api {
                 'warnings' => [[
                     'item' => $type,
                     'warningcode' => 'nopermission',
-                    'message' => 'Capability error: you do not have permission to grade this item.'
-                ]]
+                    'message' => 'Capability error: you do not have permission to grade this item.',
+                ], ],
             ];
         }
         return grades::set_grade($studentid, $planningid, $type, $grade);

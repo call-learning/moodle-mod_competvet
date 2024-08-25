@@ -39,10 +39,10 @@ use mod_competvet\local\api\certifications;
 class get_certification_supervisors extends external_api {
 
     /**
-    * Returns description of method parameters
-    *
-    * @return external_function_parameters
-    */
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'declid' => new external_value(PARAM_INT, 'The certification declaration id', VALUE_REQUIRED),
@@ -50,10 +50,10 @@ class get_certification_supervisors extends external_api {
     }
 
     /**
-    * Returns description of method return value
-    *
-    * @return external_single_structure
-    */
+     * Returns description of method return value
+     *
+     * @return external_single_structure
+     */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'supervisors' => new external_value(PARAM_RAW, 'The supervisors of the certification declaration'),
@@ -61,11 +61,11 @@ class get_certification_supervisors extends external_api {
     }
 
     /**
-    * Get the supervisors of a certification declaration
-    *
-    * @param int $declid The certification declaration id
-    * @return array The supervisors of the certification declaration
-    */
+     * Get the supervisors of a certification declaration
+     *
+     * @param int $declid The certification declaration id
+     * @return array The supervisors of the certification declaration
+     */
     public static function execute($declid) {
         ['declid' => $declid] = self::validate_parameters(self::execute_parameters());
         $decl = cert_decl::get_record(['id' => $declid]);

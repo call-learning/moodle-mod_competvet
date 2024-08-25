@@ -104,7 +104,6 @@ class todo extends base {
             ->set_is_sortable(false)
             ->set_callback([format::class, 'format_todo_data']);
 
-
         $columns[] = (new column(
             'timecreated',
             new lang_string('todo:timecreated', 'mod_competvet'),

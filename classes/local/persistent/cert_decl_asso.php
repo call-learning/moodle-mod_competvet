@@ -26,7 +26,7 @@ use lang_string;
  * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class cert_decl_asso extends persistent  {
+class cert_decl_asso extends persistent {
     /**
      * Current table
      */

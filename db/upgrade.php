@@ -76,7 +76,6 @@ function xmldb_competvet_upgrade($oldversion) {
             $dbman->drop_field($table, $field);
         }
 
-
         // Competvet savepoint reached.
         upgrade_mod_savepoint(true, 2024060705, 'competvet');
     }

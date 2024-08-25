@@ -145,7 +145,6 @@ class get_evaluations extends external_api {
         // This will get the observations for the current user and planning.
         $userobservations = observations::get_user_observations($planningid, $studentid, true);
 
-
         $gradedcriteria = [];
         $comments = [];
         $hasautoevaluations = false;
@@ -197,7 +196,7 @@ class get_evaluations extends external_api {
             'hasobserverevaluations' => $hasobserverevaluations,
             'hasautoevaluations' => $hasautoevaluations,
             'evalcomments' => $comments,
-            'totalaverage' =>  $totalaveragecount > 0 ? round($totalaverage / $totalaveragecount) : 0,
+            'totalaverage' => $totalaveragecount > 0 ? round($totalaverage / $totalaveragecount) : 0,
         ];
     }
 

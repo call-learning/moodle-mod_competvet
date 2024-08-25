@@ -135,7 +135,7 @@ class student_eval extends base {
                         'obsid' => $observationid,
                     ]
                 ),
-                $studentid
+                $studentid,
             ];
             $planningid = $observation->get('planningid');
             $this->set_backurl(

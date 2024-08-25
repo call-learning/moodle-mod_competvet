@@ -57,7 +57,7 @@ class observation_criterion_comment extends persistent {
             'commentformat' => [
                 'type' => PARAM_INT,
                 'default' => FORMAT_PLAIN,
-            ]
+            ],
         ];
     }
 }

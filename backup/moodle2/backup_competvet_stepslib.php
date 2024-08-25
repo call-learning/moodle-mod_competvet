@@ -34,7 +34,7 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
         $situation = new backup_nested_element('situation', ['id'], [
             'competvetid', 'shortname', 'evalnum', 'autoevalnum', 'certifpnum',
             'casenum', 'haseval', 'hascertif', 'hascase', 'evalgrid',
-            'certifgrid', 'listgrid','category', 'usermodified', 'timecreated', 'timemodified',
+            'certifgrid', 'listgrid', 'category', 'usermodified', 'timecreated', 'timemodified',
         ]);
 
         $plannings = new backup_nested_element('plannings');

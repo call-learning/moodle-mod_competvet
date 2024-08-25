@@ -26,7 +26,7 @@ use mod_competvet\local\persistent\case_cat;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class fields_importer extends base_persistent_importer {
-    protected $categoryCache = [];
+    protected $categorycache = [];
 
     /**
      * Constructor
@@ -44,32 +44,32 @@ class fields_importer extends base_persistent_importer {
      * @return object De data klaar om te worden opgeslagen.
      */
     protected function to_persistent_data(array $row, csv_iterator $reader): object {
-        $categoryName = $row[0];
-        if (!isset($this->categoryCache[$categoryName])) {
-            $category = case_cat::get_record(['name' => $categoryName]);
+        $categoryname = $row[0];
+        if (!isset($this->categoryCache[$categoryname])) {
+            $category = case_cat::get_record(['name' => $categoryname]);
             $sortorder = case_cat::count_records() + 1;
             if (!$category) {
                 $category = new case_cat(null, (object) [
-                    'name' => $categoryName,
+                    'name' => $categoryname,
                     'idnumber' => 'c'.$sortorder,
                     'sortorder' => $sortorder,
-                    'description' => ""
+                    'description' => "",
                 ]);
                 $category->save();
             }
-            $this->categoryCache[$categoryName] = $category->get('id');
+            $this->categoryCache[$categoryname] = $category->get('id');
         }
         $fieldorder = 0;
-        $fieldData = parent::to_persistent_data($row, $reader);
-        $fieldData->categoryid = $this->categoryCache[$categoryName];
-        $fieldData->idnumber = $row[1];
-        $fieldData->name = $row[2];
-        $fieldData->type = $row[3];
-        $fieldData->description = $row[4];
-        $fieldData->configdata = $row[5];
-        $fieldData->sortorder = $fieldorder++;
+        $fielddata = parent::to_persistent_data($row, $reader);
+        $fielddata->categoryid = $this->categoryCache[$categoryname];
+        $fielddata->idnumber = $row[1];
+        $fielddata->name = $row[2];
+        $fielddata->type = $row[3];
+        $fielddata->description = $row[4];
+        $fielddata->configdata = $row[5];
+        $fielddata->sortorder = $fieldorder++;
 
-        return $fieldData;
+        return $fielddata;
     }
 
     /**
@@ -85,7 +85,7 @@ class fields_importer extends base_persistent_importer {
             'name' => 'name',
             'type' => 'type',
             'description' => 'description',
-            'configdata' => 'configdata'
+            'configdata' => 'configdata',
         ];
 
         foreach ($columns as $key => $value) {

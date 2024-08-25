@@ -47,7 +47,7 @@ class criteria {
         if (!$grid) {
             $grid = new grid(0);
             $grid->set('name', $gridname);
-            // Generate a unique idnumber
+            // Generate a unique idnumber.
             $idnumber = time();
             $grid->set('idnumber', $idnumber);
             $grid->set('situationid', $situationid);

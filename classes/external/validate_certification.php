@@ -66,7 +66,7 @@ class validate_certification extends external_api {
                 self::execute_parameters(),
                 ['validid' => $validid,
                     'declid' => $declid, 'level' => $level, 'comment' => $comment, 'commentformat' => $commentformat,
-                    'status' => $status]
+                    'status' => $status, ]
             );
         $decl = cert_decl::get_record(['id' => $declid]);
         $planning = planning::get_record(['id' => $decl->get('planningid')]);

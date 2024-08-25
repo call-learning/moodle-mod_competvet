@@ -429,7 +429,7 @@ class competvet {
             [
                 'id' => $this->get_course_module_id(),
                 'studentid' => $userid,
-                'planningid' => $planningid
+                'planningid' => $planningid,
             ]
         );
     }

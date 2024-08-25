@@ -197,14 +197,14 @@ class eval_observation_helper {
             $comments[] = [
                 'id' => empty($data->comments_id[$commentindex]) ? 0 : $data->comments_id[$commentindex],
                 'comment' => $comment,
-                'type' => observation_comment::OBSERVATION_COMMENT
+                'type' => observation_comment::OBSERVATION_COMMENT,
             ];
         }
         foreach ($data->privatecomments as $commentindex => $comment) {
             $comments[] = [
                 'id' => empty($data->privatecomments_id[$commentindex]) ? 0 : $data->privatecomments_id[$commentindex],
                 'comment' => $comment,
-                'type' => observation_comment::OBSERVATION_PRIVATE_COMMENT
+                'type' => observation_comment::OBSERVATION_PRIVATE_COMMENT,
             ];
         }
         return $comments;

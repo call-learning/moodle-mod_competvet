@@ -179,7 +179,6 @@ class manage_criteria extends external_api {
             }
         }
 
-
         if (count($results) === 0) {
             $result = true;
         } else {
@@ -261,7 +260,7 @@ class manage_criteria extends external_api {
                 'haschanged' => false,
                 'timemodified' => $grid->get('timemodified'),
                 'canedit' => $grid->canedit(),
-                'criteria' => criteria::get_sorted_criteria($grid->get('id'))
+                'criteria' => criteria::get_sorted_criteria($grid->get('id')),
             ];
             return $newgrid;
         }, $grids);

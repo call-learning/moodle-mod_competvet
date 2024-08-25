@@ -145,7 +145,7 @@ class student_evaluations extends base {
                 ),
                 $userevals,
                 $criteria,
-                $studentid
+                $studentid,
             ];
             $this->set_backurl(new moodle_url(
                 $this->baseurl,
@@ -182,7 +182,7 @@ class student_evaluations extends base {
      */
     public function get_button($context): ?single_button {
         $query = [];
-        $cangrade = has_capability('mod/competvet:cangrade',$context);
+        $cangrade = has_capability('mod/competvet:cangrade', $context);
 
         parse_str(parse_url($_SERVER['REQUEST_URI'])['query'], $query);
         $query['returnurl'] = $_SERVER['REQUEST_URI'];
@@ -191,7 +191,7 @@ class student_evaluations extends base {
                 '/mod/competvet/grading.php',
                 $query
             ),
-            $cangrade ? get_string('gradeverb'): get_string('view'),
+            $cangrade ? get_string('gradeverb') : get_string('view'),
             single_button::BUTTON_PRIMARY,
         );
     }

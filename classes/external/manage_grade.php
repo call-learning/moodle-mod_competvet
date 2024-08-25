@@ -86,8 +86,8 @@ class manage_grade extends external_api {
                 'warnings' => [[
                     'item' => $cmid,
                     'warningcode' => 'nopermission',
-                    'message' => 'Capability error: you do not have permission to grade this item.'
-                ]]
+                    'message' => 'Capability error: you do not have permission to grade this item.',
+                ], ],
             ];
         }
 
@@ -159,7 +159,7 @@ class manage_grade extends external_api {
         $usergrade = $competvet->get_final_grade_for_student($userid);
         $grade = new stdClass();
         $grade->suggestedgrade = '';
-        $grade->finalgrade = IntVal($usergrade->finalgrade);
+        $grade->finalgrade = intval($usergrade->finalgrade);
         $grade->comment = $usergrade->feedback;
         $grade->cangrade = has_capability('mod/competvet:cangrade', $competvet->get_context());
 

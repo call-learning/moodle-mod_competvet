@@ -38,10 +38,10 @@ use mod_competvet\local\persistent\grade;
  */
 class get_subgrades extends external_api {
         /**
-     * Returns description of method return value
-     *
-     * @return external_single_structure
-     */
+         * Returns description of method return value
+         *
+         * @return external_single_structure
+         */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'EVALUATION_GRADE' => new external_value(PARAM_FLOAT, 'The suggested grade', VALUE_OPTIONAL),

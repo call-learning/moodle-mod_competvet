@@ -32,7 +32,7 @@ use single_button;
  * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class student_list extends base  {
+class student_list extends base {
 
     /**
      * @var array $planninginfo The planning information.
@@ -65,7 +65,7 @@ class student_list extends base  {
 
         $data['cases'] = $this->cases;
         $data['list-results'] = [
-            'cases' => $this->cases->cases
+            'cases' => $this->cases->cases,
         ];
         $planning = planning::get_record(['id' => $this->planninginfo['planningid']]);
         $data['cmid'] = competvet::get_from_situation_id($planning->get('situationid'))->get_course_module_id();
