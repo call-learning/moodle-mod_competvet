@@ -140,7 +140,7 @@ trait test_data_definition {
                 'users' => [
                     'student' => ['student1', 'student2'],
                     'observer' => ['observer1', 'observerandevaluator'],
-                    'teacher' => ['teacher1'],
+                    'teacher' => ['teacher1', 'observerandteacher'],
                     'manager' => ['manager'],
                 ],
                 'groups' => [
@@ -280,7 +280,7 @@ trait test_data_definition {
             'course 3' => [
                 'users' => [
                     'student' => ['student1', 'student2', 'student3', 'student4', 'studentandobserver'],
-                    'observer' => ['observer2', 'studentandobserver'],
+                    'observer' => ['observer2', 'studentandobserver', 'observerandteacher'],
                     'evaluator' => ['observerandevaluator'],
                 ],
                 'groups' => [
@@ -516,7 +516,7 @@ trait test_data_definition {
                                         'comments' => [
                                             ['type' => observation_comment::OBSERVATION_COMMENT, 'comment' => 'A comment'],
                                             ['type' => observation_comment::AUTOEVAL_OBSERVER_COMMENT,
-                                                'comment' => 'Another comment', ],
+                                                'comment' => 'Another comment',],
                                         ],
                                         'criteria' => [
                                             ['id' => 'Q001', 'value' => 1],
@@ -532,7 +532,7 @@ trait test_data_definition {
                                         'comments' => [
                                             ['type' => observation_comment::OBSERVATION_COMMENT, 'comment' => 'A comment'],
                                             ['type' => observation_comment::OBSERVATION_PRIVATE_COMMENT,
-                                                'comment' => 'Another comment', ],
+                                                'comment' => 'Another comment',],
                                         ],
                                         'criteria' => [
                                             ['id' => 'Q001', 'value' => 5],

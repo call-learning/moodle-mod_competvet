@@ -16,9 +16,11 @@
 namespace mod_competvet\local\persistent;
 
 use cache;
+use cache_store;
 use core\persistent;
 use lang_string;
 use mod_competvet\competvet;
+use mod_competvet\local\api\user_role;
 use mod_competvet\utils;
 
 /**
@@ -33,6 +35,10 @@ class situation extends persistent {
      * Current table
      */
     const TABLE = 'competvet_situation';
+    /**
+     * Declares the Unknow role type
+     */
+    const UNKNOWN_ROLE_TYPE = 'unknown';
 
     /**
      * Get all situations for a given user
@@ -57,13 +63,70 @@ class situation extends persistent {
         $situationsid = [];
         foreach ($rs as $competvetmodule) {
             $competvet = competvet::get_from_instance_id($competvetmodule->id);
-            if ($competvet->has_view_access($userid)) {
-                $situationsid[] = $competvet->get_situation()->get('id');
+            $situation = $competvet->get_situation();
+            if ($competvet->has_view_access($userid) && $situation->get_top_role($userid) !== self::UNKNOWN_ROLE_TYPE) {
+                $userrole = user_role::get_top($userid, $competvet->get_situation()->get('id'));
+                // We only list situation of the user if he/she has not an unknown role.
+                if ($userrole !== self::UNKNOWN_ROLE_TYPE) {
+                    $situationsid[] = $competvet->get_situation()->get('id');
+                }
             }
         }
         $rs->close();
         $situationcache->set($userid, $situationsid);
         return $situationsid;
+    }
+
+    /**
+     * Get a unique user type for a given user and situation
+     *
+     * @return string
+     */
+    public function get_top_role(int $userid): string {
+        $allroles = $this->get_all_roles($userid);
+        $rolespriority = array_keys(competvet::COMPETVET_ROLES);
+        // Sort roles according to role priority.
+        uksort($allroles, function($a, $b) use ($rolespriority) {
+            $apos = array_search($a, $rolespriority);
+            $bpos = array_search($b, $rolespriority);
+            return $apos <=> $bpos;
+        });
+        // Get the first element of the array.
+        $toprole = array_shift($allroles);
+        return $toprole;
+    }
+
+    /**
+     * Get all roles for a given user for this situation
+     *
+     * @param int $userid
+     * @return string[]
+     */
+    public function get_all_roles(int $userid): array {
+        $allrolescache = cache::make_from_params(cache_store::MODE_REQUEST, 'mod_competvet', 'userrolecache');
+        $cachekey = $this->raw_get('id') . '-' . $userid;
+        if ($allrolescache->has($cachekey)) {
+            return $allrolescache->get($cachekey);
+        }
+        $competvet = competvet::get_from_instance_id($this->raw_get('competvetid'));
+        $roles = get_user_roles($competvet->get_context(), $userid);
+        $rolessn = array_map(function($role) {
+            return $role->shortname;
+        }, $roles);
+        $rolefullname = array_map(function($role) {
+            return $role->name;
+        }, $roles);
+        $roles = array_combine($rolessn, $rolefullname);
+        // Remove roles which are not in the competvet roles.
+        $possibleroles = competvet::COMPETVET_ROLES + ['student' => null];
+        $roles = array_intersect_key($roles, $possibleroles);
+        $roles = array_unique($roles);
+        if (empty($roles)) {
+            $roles = [self::UNKNOWN_ROLE_TYPE => null];
+        }
+        $returnedroles = array_keys($roles);
+        $allrolescache->set($cachekey, $returnedroles);
+        return $returnedroles;
     }
 
     /**
@@ -220,7 +283,7 @@ class situation extends persistent {
     public static function get_categories_choices_for_display(): array {
         $categories = self::get_categories_choices();
         return array_map(
-            function ($category) {
+            function($category) {
                 $languages = json_decode($category, true);
                 return $languages[current_language()] ?? '';
             },

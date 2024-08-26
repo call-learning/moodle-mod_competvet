@@ -72,6 +72,10 @@ class situations_test extends advanced_testcase {
                 'teacher1',
                 $results['teacher1results'],
             ],
+            'observer and teacher'  => [
+                'observerandteacher',
+                $results['observerandteacherresults'],
+            ],
         ];
     }
 

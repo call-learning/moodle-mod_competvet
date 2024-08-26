@@ -495,33 +495,24 @@ $results['observer2results'] = [
         'hascase' => true,
     ],
 ];
-$results['teacher1results'] = [
+$results['teacher1results'] = []; // Teacher should not see the situations on the mobile application.
+
+$results['observerandteacherresults'] = [
     [
         'plannings' =>
             [
+
                 [
-                    'startdate' => (string) planning::round_start_date($startdate),
-                    'enddate' => (string) planning::round_end_date(($startdate + $oneweek)),
+                    'startdate' => (string) planning::round_start_date(($startdate + $onemonth * 6)),
+                    'enddate' => (string) planning::round_end_date(($startdate + $onemonth * 6 + $oneweek)),
                     'session' => '2023',
-                    'groupname' => 'group 8.1',
-                ],
-                [
-                    'startdate' => (string) planning::round_start_date(($startdate + $oneweek)),
-                    'enddate' => (string) planning::round_end_date(($startdate + $oneweek * 2)),
-                    'session' => '2023',
-                    'groupname' => 'group 8.2',
-                ],
-                [
-                    'startdate' => (string) planning::round_start_date(($startdate + $onemonth * 12)), // Future time.
-                    'enddate' => (string) planning::round_end_date(($startdate + $onemonth * 12 + $oneweek)),
-                    'session' => '2030',
                     'groupname' => 'group 8.1',
                 ],
             ],
         'category' => 'Y1',
         'translatedcategory' => "{\"fr\":\"Premi\\u00e8re ann\\u00e9e\",\"en\":\"First year\"}",
-        'shortname' => 'SIT1',
-        'name' => 'SIT1',
+        'shortname' => 'SIT7',
+        'name' => 'SIT7',
         'evalnum' => 1,
         'autoevalnum' => 1,
         'certifpnum' => 80,
@@ -529,24 +520,28 @@ $results['teacher1results'] = [
         'haseval' => true,
         'hascertif' => true,
         'hascase' => true,
-
     ],
     [
         'plannings' =>
             [
 
                 [
-                    'startdate' => (string) planning::round_start_date(($startdate)),
-                    'enddate' => (string) planning::round_end_date(($startdate + $oneweek * 2)),
+                    'startdate' => (string) planning::round_start_date(($startdate + $onemonth * 7)),
+                    'enddate' => (string) planning::round_end_date(($startdate + $onemonth * 7 + $oneweek)),
                     'session' => '2023',
-                    'groupname' => 'group 8.1',
+                    'groupname' => 'group 8.3',
+                ],
+                [
+                    'startdate' => (string) planning::round_start_date(($startdate + $onemonth * 12)),
+                    'enddate' => (string) planning::round_end_date(($startdate + $onemonth * 12 + $oneweek)),
+                    'session' => '2030',
+                    'groupname' => 'group 8.3',
                 ],
             ],
         'category' => 'Y2',
         'translatedcategory' => "{\"fr\":\"Deuxi\\u00e8me ann\\u00e9e\",\"en\":\"Second year\"}",
-        'shortname' => 'SIT2',
-        'name' => 'SIT2',
-
+        'shortname' => 'SIT8',
+        'name' => 'SIT8',
         'evalnum' => 1,
         'autoevalnum' => 1,
         'certifpnum' => 80,
@@ -554,28 +549,27 @@ $results['teacher1results'] = [
         'haseval' => true,
         'hascertif' => true,
         'hascase' => true,
-
     ],
     [
         'plannings' =>
             [
                 [
-                    'startdate' => (string) planning::round_start_date(($startdate)),
-                    'enddate' => (string) planning::round_end_date(($startdate + $oneweek)),
+                    'startdate' => (string) planning::round_start_date(($startdate + $onemonth * 8)),
+                    'enddate' => (string) planning::round_end_date(($startdate + $onemonth * 8 + $oneweek)),
                     'session' => '2023',
-                    'groupname' => 'group 8.1',
+                    'groupname' => 'group 8.4',
                 ],
                 [
-                    'startdate' => (string) planning::round_start_date(($startdate + $onemonth * 2 + $oneweek)),
-                    'enddate' => (string) planning::round_end_date(($startdate + $onemonth * 2 + $oneweek * 2)),
-                    'session' => '2023',
-                    'groupname' => 'group 8.2',
+                    'startdate' => (string) planning::round_start_date(($startdate + $onemonth * 12)),
+                    'enddate' => (string) planning::round_end_date(($startdate + $onemonth * 12 + $oneweek)),
+                    'session' => '2030',
+                    'groupname' => 'group 8.4',
                 ],
             ],
         'category' => 'Y3',
         'translatedcategory' => "{\"fr\":\"Troisi\\u00e8me ann\\u00e9e\",\"en\":\"Third year\"}",
-        'shortname' => 'SIT3',
-        'name' => 'SIT3',
+        'shortname' => 'SIT9',
+        'name' => 'SIT9',
         'evalnum' => 1,
         'autoevalnum' => 1,
         'certifpnum' => 80,
@@ -583,6 +577,5 @@ $results['teacher1results'] = [
         'haseval' => true,
         'hascertif' => true,
         'hascase' => true,
-
     ],
 ];

@@ -28,8 +28,6 @@ use mod_competvet\local\persistent\situation;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class user_role {
-    const UNKNOWN_TYPE = 'unknown';
-
     const ROLES_CONFLICTS = [
         ['student', 'teacher'],
         ['student', 'evaluator'],
@@ -63,7 +61,7 @@ class user_role {
         static::assert_no_conflicts($allroles);
         // Get the first element of the array.
         $toprole = array_shift($allroles);
-        return $toprole ?? 'unknown';
+        return $toprole ?? situation::UNKNOWN_ROLE_TYPE;
     }
 
     /**
@@ -75,23 +73,7 @@ class user_role {
      */
     public static function get_all(int $userid, int $situationid): array {
         $situation = new situation($situationid);
-        $competvet = competvet::get_from_instance_id($situation->get('competvetid'));
-        $roles = get_user_roles($competvet->get_context(), $userid);
-        $rolessn = array_map(function ($role) {
-            return $role->shortname;
-        }, $roles);
-        $rolefullname = array_map(function ($role) {
-            return $role->name;
-        }, $roles);
-        $roles = array_combine($rolessn, $rolefullname);
-        // Remove roles which are not in the competvet roles.
-        $possibleroles = competvet::COMPETVET_ROLES + ['student' => null];
-        $roles = array_intersect_key($roles, $possibleroles);
-        $roles = array_unique($roles);
-        if (empty($roles)) {
-            $roles = [self::UNKNOWN_TYPE => null];
-        }
-        return array_keys($roles);
+        return $situation->get_all_roles($userid);
     }
 
     /**
@@ -105,18 +87,10 @@ class user_role {
      * @return string
      */
     public static function get_top(int $userid, int $situationid): string {
-        $allroles = self::get_all($userid, $situationid);
-        $rolespriority = array_keys(competvet::COMPETVET_ROLES);
-        // Sort roles according to role priority.
-        uksort($allroles, function ($a, $b) use ($rolespriority) {
-            $apos = array_search($a, $rolespriority);
-            $bpos = array_search($b, $rolespriority);
-            return $apos <=> $bpos;
-        });
+        $situation = new situation($situationid);
+        $allroles = $situation->get_all_roles($userid);
         static::assert_no_conflicts($allroles);
-        // Get the first element of the array.
-        $toprole = array_shift($allroles);
-        return $toprole;
+        return $situation->get_top_role($userid);
     }
 
     /**

@@ -93,6 +93,15 @@ class user_role_test extends advanced_testcase {
                     'SIT8' => ['student', 'observer'],
                     'SIT9' => ['student', 'observer'], ],
             ],
+            'observer and teacher' => [
+                'user' => 'observerandteacher',
+                'expected_top' => ['SIT1' => 'unknown', 'SIT2' => 'unknown', 'SIT3' => 'unknown', 'SIT4' => 'unknown',
+                    'SIT5' => 'unknown', 'SIT6' => 'unknown', 'SIT7' => 'observer', 'SIT8' => 'observer', 'SIT9' => 'observer', ],
+                'expected_all' => ['SIT1' => ['unknown'], 'SIT2' => ['unknown'], 'SIT3' => ['unknown'], 'SIT4' => ['unknown'],
+                    'SIT5' => ['unknown'], 'SIT6' => ['unknown'], 'SIT7' => ['observer'],
+                    'SIT8' => ['observer'],
+                    'SIT9' => ['observer'], ],
+            ],
         ];
     }
 
@@ -130,6 +139,10 @@ class user_role_test extends advanced_testcase {
                 'user' => 'studentandobserver',
                 'expected' => 'exception',
             ],
+            'observer and teacher' => [
+                'user' => 'observerandteacher',
+                'expected' => 'observer',
+            ]
         ];
     }
 
