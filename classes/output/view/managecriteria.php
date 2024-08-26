@@ -81,7 +81,8 @@ class managecriteria extends base {
      * @return void
      */
     public function check_access(): void {
-        $context = context_system::instance();
+        global $PAGE;
+        $context = $PAGE->context;
         if (!has_capability('mod/competvet:editcriteria', $context)) {
             throw new \moodle_exception('noaccess', 'mod_competvet');
         }
