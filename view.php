@@ -48,6 +48,7 @@ $widget->set_data();
 $widget->check_access();
 $renderer = $PAGE->get_renderer('mod_competvet');
 $buttons = [];
+$buttonhtml = '';
 $button = $widget->get_button($modulecontext);
 if (!empty($button)) {
     $buttons[] = $OUTPUT->render($button);

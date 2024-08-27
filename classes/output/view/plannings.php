@@ -73,6 +73,7 @@ class plannings extends base {
                 $planning = $planningwithids[$planningstat['id']];
                 $planningresult = new stdClass();
                 $planningresult->id = $planningstat['id'];
+                $planningresult->starttimestamp = $planning['startdate'];
                 $planningresult->startdate = planning::get_planning_date_string($planning['startdate']);
                 $planningresult->enddate = planning::get_planning_date_string($planning['enddate']);
                 $planningresult->groupname = $planning['groupname'];

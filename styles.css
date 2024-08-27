@@ -722,6 +722,10 @@
     border-bottom: 1px solid #dee2e6;
 }
 
+.competvet-grade-table .t-grade.stats {
+    width: 400px;
+}
+
 .competvet-grade-table .t-grade.comments {
     text-align: left;
 }
@@ -755,4 +759,11 @@
 
 .competvet-grade-table svg .svg-stroke {
     stroke: #fff;
+}
+
+.competvet-grade-table .studentname-d-none,
+.competvet-grade-table .groupname-d-none,
+.competvet-grade-table .ungraded-d-none,
+.competvet-grade-table .startdate-d-none {
+    display: none;
 }

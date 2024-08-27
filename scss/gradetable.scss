@@ -71,4 +71,10 @@
             stroke: #fff;;
         }
     }
+    .studentname-d-none,
+    .groupname-d-none,
+    .ungraded-d-none,
+    .startdate-d-none {
+        display: none;
+    }
 }

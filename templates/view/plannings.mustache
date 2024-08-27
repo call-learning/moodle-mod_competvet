@@ -99,6 +99,24 @@
                        value="{{groupsearch}}"
                 >
             </div>
+            <div class="input-group ml-3">
+                <label for="startdate">
+                    <span class="sr-only">{{#str}}search:startdate, mod_competvet{{/str}}</span>
+                </label>
+                <input type="date" name="startdate" value="{{startdate}}" data-field="startdate" class="form-control {{#errorenddate}}error{{/errorenddate}}">
+                <div class="input-group-append">
+                    <button id="clearstartdate" type="clear" class="btn btn-outline-secondary">
+                       <i class="icon fa fa-times"></i>
+                       <span class="sr-only">{{#str}}search:clearstartdate, mod_competvet{{/str}}</span>
+                    </button>
+                </div>
+            </div>
+            <div class="input-group ml-3">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="searchungraded">
+                    <label class="custom-control-label" for="searchungraded">{{#str}}search:ungraded, mod_competvet{{/str}}</label>
+                </div>
+            </div>
         </div>
     </div>
 </form>
@@ -111,7 +129,7 @@
     </tr>
     {{#categories}}
         {{#plannings}}
-            <tr class="planning" data-planningid="{{id}}">
+            <tr class="planning" data-planningid="{{id}}" data-starttimestamp="{{starttimestamp}}">
                 <th class="planning-name" colspan="7">
                     <div class="position-relative d-flex align-items-center">
                         {{< mod_competvet/expandcollapse}}
@@ -126,19 +144,13 @@
                 </th>
             </tr>
             {{#students}}
-                <tr class="student collapse {{^contentcollapsed}}show{{/contentcollapsed}}" data-planningid="{{planninginfo.planningid}}" id="collapse{{planninginfo.planningid}}">
+                <tr class="student collapse {{^contentcollapsed}}show{{/contentcollapsed}}" data-planningid="{{planninginfo.planningid}}" id="collapse{{planninginfo.planningid}}" data-hasgrade="{{#grade}}1{{/grade}}">
                     <th class="user student-name">
                         <div class="d-flex align-items-center position-relative">
                             <img src="{{userinfo.userpictureurl}}" alt="{{userinfo.fullname}}" class="userpicture">
                             <a class="stretched-link" href="{{{profileurl}}}" data-region="studentname">{{userinfo.fullname}}</a>
                         </div>
-                        <div class="d-flex justify-content-center">
-                            <a class="btn btn-secondary btn-small text-center m-t-1" href="{{{gradeurl}}}" data-region="studentname">
-                                {{#pix}}i/grades, core{{/pix}}
-                                {{#str}}view, mod_competvet{{/str}}
-                            </a>
-                        </div>
-                        </td>
+                    </th>
                     <td class="t-grade stats">
                         <div class="position-relative">
                             {{#planninginfo}}
@@ -186,7 +198,16 @@
                         </span>
                         </div>
                     </td>
-                    <td class="t-grade globalgrade">{{#grade}}<span class="circle {{#failure}}fail{{/failure}}">{{grade}}</span>{{/grade}}</td>
+                    <td class="t-grade globalgrade">
+                        {{#grade}}
+                            <a class="circle {{#failure}}fail{{/failure}}" href="{{{gradeurl}}}">{{grade}}</a>
+                        {{/grade}}
+                        {{^grade}}
+                            <a class="btn btn-secondary" href="{{{gradeurl}}}">
+                                {{#str}}grade, mod_competvet{{/str}}
+                            </a>
+                        {{/grade}}
+                    </td>
                     <td class="t-grade comments">{{feedback}}</td>
                 </tr>
             {{/students}}

@@ -349,6 +349,9 @@ $string['calc:list'] = 'Le score suggéré est égal au score du module \'List\'
 $string['search:activity'] = 'Rechercher activités CompetVet';
 $string['search:student'] = 'Rechercher étudiants';
 $string['search:group'] = 'Rechercher groupes';
+$string['search:ungraded'] = 'Rechercher non notés';
+$string['search:startdate'] = 'Date de début';
+$string['search:clearstartdate'] = 'Effacer la date de début';
 
 $string['showastable'] = 'Montrer sous forme de tableau';
 $string['groupnotfound'] = 'Le groupe avec le nom {$a} n\'a pas été trouvé';

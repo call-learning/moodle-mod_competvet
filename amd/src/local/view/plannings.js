@@ -29,10 +29,44 @@ export const init = () => {
     studentSearchInput.addEventListener('input', (e) => {
         studentSearch(e);
     });
+
     // Group Search
     const groupSearchInput = document.querySelector('input[name="groupsearch"]');
     groupSearchInput.addEventListener('input', (e) => {
         groupSearch(e);
+    });
+
+    // Ungraded checkbox
+    const ungradedCheckbox = document.querySelector('input[id="searchungraded"]');
+    ungradedCheckbox.addEventListener('change', (e) => {
+        ungradedSearch(e);
+    });
+
+    // Start date search
+    const startDateInput = document.querySelector('input[name="startdate"]');
+    startDateInput.addEventListener('change', (e) => {
+        let unixTimestamp = 0;
+        if (e.target.value) {
+            // Convert the date string to a Date object
+            const dateObject = new Date(e.target.value);
+
+            // Convert the date object to a UNIX timestamp in milliseconds
+            const timestamp = dateObject.getTime();
+
+            // If you want the timestamp in seconds (like PHP's time() function),
+            // you can divide by 1000 and round it or floor it:
+            unixTimestamp = Math.floor(timestamp / 1000);
+        }
+        // Minus 1 day to include the selected day
+        unixTimestamp = unixTimestamp - 86400;
+        startDateSearch(unixTimestamp);
+    });
+
+    // Clear the startDateInput and reset the search.
+    const clearStartDate = document.querySelector('button[id="clearstartdate"]');
+    clearStartDate.addEventListener('click', () => {
+        startDateInput.value = '';
+        startDateSearch(0);
     });
 
 };
@@ -44,23 +78,13 @@ const studentSearch = (e) => {
         const studentName = student.textContent;
         const row = student.closest('tr');
         if (studentName.toLowerCase().includes(search.toLowerCase())) {
-            row.classList.remove('d-none');
+            row.classList.remove('studentname-d-none');
         } else {
-            row.classList.add('d-none');
+            row.classList.add('studentname-d-none');
         }
         // Check if all rows with the same planningid are hidden
-        const planningid = row.dataset.planningid;
-        const rows = document.querySelectorAll(`.student[data-planningid="${planningid}"]`);
-        const hiddenRows = document.querySelectorAll(`.student[data-planningid="${planningid}"].d-none`);
-        // If all rows are hidden, hide the planning row
-        if (rows.length === hiddenRows.length) {
-            const planningRow = document.querySelector(`.planning[data-planningid="${planningid}"]`);
-            planningRow.classList.add('d-none');
-        } else {
-            const planningRow = document.querySelector(`.planning[data-planningid="${planningid}"]`);
-            planningRow.classList.remove('d-none');
-        }
     });
+    hideEmptyPlannings();
 };
 
 const groupSearch = (e) => {
@@ -70,24 +94,75 @@ const groupSearch = (e) => {
         const groupName = group.textContent;
         const row = group.closest('tr');
         if (groupName.toLowerCase().includes(search.toLowerCase())) {
-            row.classList.remove('d-none');
+            row.classList.remove('groupname-d-none');
         } else {
-            row.classList.add('d-none');
+            row.classList.add('groupname-d-none');
         }
         // If a planning row is hidden, hide all student rows with the same planningid
         const planningid = row.dataset.planningid;
-        const planningRow = document.querySelector(`.planning[data-planningid="${planningid}"].d-none`);
-        if (planningRow) {
-            const studentRows = document.querySelectorAll(`.student[data-planningid="${planningid}"]`);
-            studentRows.forEach((studentRow) => {
-                studentRow.classList.add('d-none');
-            });
+        hideStudentsInPlanning(planningid, 'groupname-d-none');
+    });
+    hideEmptyPlannings();
+};
+
+const ungradedSearch = (e) => {
+    const checked = e.target.checked;
+    const hasgrade = document.querySelectorAll('.student[data-hasgrade="1"]');
+    if (checked) {
+        hasgrade.forEach((student) => {
+            student.classList.add('ungraded-d-none');
+        });
+    } else {
+        hasgrade.forEach((student) => {
+            student.classList.remove('ungraded-d-none');
+        });
+    }
+    hideEmptyPlannings();
+};
+
+const startDateSearch = (value) => {
+    const plannings = document.querySelectorAll('.planning');
+    plannings.forEach((planning) => {
+        const startDate = planning.dataset.starttimestamp;
+        const row = planning.closest('tr');
+        if (value < startDate) {
+            row.classList.remove('startdate-d-none');
         } else {
-            const studentRows = document.querySelectorAll(`.student[data-planningid="${planningid}"]`);
-            studentRows.forEach((studentRow) => {
-                studentRow.classList.remove('d-none');
-            });
+            row.classList.add('startdate-d-none');
+        }
+        const planningid = row.dataset.planningid;
+        hideStudentsInPlanning(planningid, 'startdate-d-none');
+    });
+};
+
+const hideEmptyPlannings = () => {
+    const plannings = document.querySelectorAll('tr.planning');
+    plannings.forEach((planning) => {
+        const planningid = planning.dataset.planningid;
+        const students = document.querySelectorAll(`.student[data-planningid="${planningid}"]`);
+        const hiddenStudents = document.querySelectorAll(`.student[data-planningid="${planningid}"].studentname-d-none,
+            .student[data-planningid="${planningid}"].groupname-d-none, .student[data-planningid="${planningid}"].ungraded-d-none`);
+        if (students.length === hiddenStudents.length) {
+            const planningRow = document.querySelector(`.planning[data-planningid="${planningid}"]`);
+            planningRow.classList.add('d-none');
+        } else {
+            const planningRow = document.querySelector(`.planning[data-planningid="${planningid}"]`);
+            planningRow.classList.remove('d-none');
         }
     });
 };
 
+const hideStudentsInPlanning = (planningid, hideclass) => {
+    const planningRow = document.querySelector(`.planning[data-planningid="${planningid}"].${hideclass}`);
+    if (planningRow) {
+        const studentRows = document.querySelectorAll(`.student[data-planningid="${planningid}"]`);
+        studentRows.forEach((studentRow) => {
+            studentRow.classList.add(hideclass);
+        });
+    } else {
+        const studentRows = document.querySelectorAll(`.student[data-planningid="${planningid}"]`);
+        studentRows.forEach((studentRow) => {
+            studentRow.classList.remove(hideclass);
+        });
+    }
+};

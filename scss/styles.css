@@ -525,4 +525,10 @@
   .competvet-grade-table svg .svg-stroke {
     stroke: #fff; }
 
+.competvet-grade-table .studentname-d-none,
+.competvet-grade-table .groupname-d-none,
+.competvet-grade-table .ungraded-d-none,
+.competvet-grade-table .startdate-d-none {
+  display: none; }
+
 /*# sourceMappingURL=styles.css.map */

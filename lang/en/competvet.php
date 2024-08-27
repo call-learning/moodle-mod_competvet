@@ -378,6 +378,9 @@ $string['calc:list'] = 'The suggested score is equal to the \'List\' module scor
 $string['search:activity'] = 'Rechercher activités CompetVet';
 $string['search:student'] = 'Search Student';
 $string['search:group'] = 'Search Group';
+$string['search:ungraded'] = 'Ungraded only';
+$string['search:startdate'] = 'Start date';
+$string['search:clearstartdate'] = 'Clear start date';
 $string['showastable'] = 'Show as table';
 $string['invaliddate'] = 'Invalid date {$a}, it should be in the format dd/mm/yyyy';
 
