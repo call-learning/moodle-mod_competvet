@@ -352,6 +352,7 @@ $string['search:group'] = 'Rechercher groupes';
 $string['search:ungraded'] = 'Rechercher non notés';
 $string['search:startdate'] = 'Date de début';
 $string['search:clearstartdate'] = 'Effacer la date de début';
+$string['exportxls'] = 'Exporter en Excel';
 
 $string['showastable'] = 'Montrer sous forme de tableau';
 $string['groupnotfound'] = 'Le groupe avec le nom {$a} n\'a pas été trouvé';

@@ -381,6 +381,7 @@ $string['search:group'] = 'Search Group';
 $string['search:ungraded'] = 'Ungraded only';
 $string['search:startdate'] = 'Start date';
 $string['search:clearstartdate'] = 'Clear start date';
+$string['exportxls'] = 'Export to Excel';
 $string['showastable'] = 'Show as table';
 $string['invaliddate'] = 'Invalid date {$a}, it should be in the format dd/mm/yyyy';
 

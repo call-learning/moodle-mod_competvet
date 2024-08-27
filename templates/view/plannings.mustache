@@ -67,9 +67,8 @@
 <link rel="stylesheet" href="{{wwwroot}}/mod/competvet/scss/styles.css?v={{version}}" />
 <form class="form mb-5 simplesearchform">
     <div class="d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center">
-            <input type="hidden" name="id" value="255">
-            <div class="input-group">
+        <div class="d-flex align-items-center w-100 flex-column flex-lg-row">
+            <div class="input-group mb-2 mb-lg-0 ">
                 <label for="studentsearch-{{uniqid}}">
                     <span class="sr-only">{{#str}}search:student, mod_competvet{{/str}}</span>
                 </label>
@@ -84,7 +83,7 @@
                        value="{{studentsearch}}"
                 >
             </div>
-            <div class="input-group ml-3">
+            <div class="input-group mb-2 mb-lg-0 ml-lg-3">
                 <label for="groupsearch-{{uniqid}}">
                     <span class="sr-only">{{#str}}search:group, mod_competvet{{/str}}</span>
                 </label>
@@ -99,7 +98,7 @@
                        value="{{groupsearch}}"
                 >
             </div>
-            <div class="input-group ml-3">
+            <div class="input-group mb-2 mb-lg-0  ml-lg-3">
                 <label for="startdate">
                     <span class="sr-only">{{#str}}search:startdate, mod_competvet{{/str}}</span>
                 </label>
@@ -111,11 +110,16 @@
                     </button>
                 </div>
             </div>
-            <div class="input-group ml-3">
+            <div class="input-group mb-2 mb-lg-0  ml-lg-3">
                 <div class="custom-control custom-checkbox">
                     <input type="checkbox" class="custom-control-input" id="searchungraded">
                     <label class="custom-control-label" for="searchungraded">{{#str}}search:ungraded, mod_competvet{{/str}}</label>
                 </div>
+            </div>
+            <div class="ml-lg-auto mb-2 mb-lg-0 ">
+                <button data-action="exportcsv" class="btn btn-primary text-nowrap">
+                    {{#str}}exportxls, mod_competvet{{/str}}
+                </button>
             </div>
         </div>
     </div>
@@ -129,7 +133,7 @@
     </tr>
     {{#categories}}
         {{#plannings}}
-            <tr class="planning" data-planningid="{{id}}" data-starttimestamp="{{starttimestamp}}">
+            <tr class="planning" data-planningid="{{id}}" data-starttimestamp="{{starttimestamp}}" data-startdate="{{startdate}}">
                 <th class="planning-name" colspan="7">
                     <div class="position-relative d-flex align-items-center">
                         {{< mod_competvet/expandcollapse}}
@@ -200,7 +204,7 @@
                     </td>
                     <td class="t-grade globalgrade">
                         {{#grade}}
-                            <a class="circle {{#failure}}fail{{/failure}}" href="{{{gradeurl}}}">{{grade}}</a>
+                            <a class="circle {{#failure}}fail{{/failure}}" data-region="usergrade" href="{{{gradeurl}}}">{{grade}}</a>
                         {{/grade}}
                         {{^grade}}
                             <a class="btn btn-secondary" href="{{{gradeurl}}}">
@@ -208,7 +212,7 @@
                             </a>
                         {{/grade}}
                     </td>
-                    <td class="t-grade comments">{{feedback}}</td>
+                    <td class="t-grade comments" data-region="comments">{{feedback}}</td>
                 </tr>
             {{/students}}
 

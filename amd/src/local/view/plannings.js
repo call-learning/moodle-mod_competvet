@@ -21,6 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import {get_strings as getStrings} from 'core/str';
+import XLSX from 'mod_competvet/local/xlsx.mini.min';
 
 
 export const init = () => {
@@ -64,9 +66,17 @@ export const init = () => {
 
     // Clear the startDateInput and reset the search.
     const clearStartDate = document.querySelector('button[id="clearstartdate"]');
-    clearStartDate.addEventListener('click', () => {
+    clearStartDate.addEventListener('click', (e) => {
         startDateInput.value = '';
         startDateSearch(0);
+        e.preventDefault();
+    });
+
+    // Export to CSV button
+    const exportButton = document.querySelector('button[data-action="exportcsv"]');
+    exportButton.addEventListener('click', (e) => {
+        exportToCsv();
+        e.preventDefault();
     });
 
 };
@@ -166,3 +176,45 @@ const hideStudentsInPlanning = (planningid, hideclass) => {
         });
     }
 };
+
+const exportToCsv = async() => {
+    // If the row is hidden it has a class like studentname-d-none or groupname-d-none. Use a wildcard to select all hidden rows.
+    const rows = document.querySelectorAll('tr.student:not([class*="-d-none"])');
+    const csv = [];
+    const [name, group, grade, comment, date] = await getStrings([
+        {key: 'name', component: 'moodle'},
+        {key: 'group', component: 'mod_competvet'},
+        {key: 'grade', component: 'mod_competvet'},
+        {key: 'comment', component: 'mod_competvet'},
+        {key: 'date', component: 'moodle'},
+    ]);
+    csv.push([name, group, grade, comment, date]);
+    rows.forEach((row) => {
+        // Student name.
+        const student = row.querySelector('[data-region="studentname"]').textContent;
+
+        // Group name.
+        const planningid = row.dataset.planningid;
+        const planningrow = document.querySelector(`tr.planning[data-planningid="${planningid}"]`);
+        const group = planningrow.querySelector('[data-region="groupname"]').textContent;
+
+        // Grade.
+        const usergrade = row.querySelector('[data-region="usergrade"]');
+        const grade = usergrade ? usergrade.textContent : '';
+
+        // Comments.
+        const comment = row.querySelector('[data-region="comments"]').textContent;
+
+        // Date.
+        const date = planningrow.dataset.startdate;
+
+        csv.push([student, group, grade, `"${comment}"`, date]);
+    });
+
+    // Export to XLSX
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(csv);
+    XLSX.utils.book_append_sheet(wb, ws, 'Plannings');
+    XLSX.writeFile(wb, 'plannings.xlsx');
+};
+

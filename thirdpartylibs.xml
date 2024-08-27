@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<libraries>
+  <library>
+    <location>amd/src/local/xlsx.mini.min.js</location>
+    <name>Sheetjs</name>
+    <description>SheetJS Community Edition -- Spreadsheet Data Toolkit </description>
+    <version>0.20.3</version>
+    <license>Apache</license>
+    <repository>https://git.sheetjs.com/sheetjs/sheetjs</repository>
+    <customised/>
+  </library>
+</libraries>
