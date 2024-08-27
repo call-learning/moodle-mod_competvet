@@ -531,4 +531,9 @@
 .competvet-grade-table .startdate-d-none {
   display: none; }
 
+.competvet-grade-table .userpicturesmall {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 100%; }
+
 /*# sourceMappingURL=styles.css.map */

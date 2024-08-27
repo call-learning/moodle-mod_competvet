@@ -212,7 +212,17 @@
                             </a>
                         {{/grade}}
                     </td>
-                    <td class="t-grade comments" data-region="comments">{{feedback}}</td>
+                    <td class="t-grade comments" data-region="comments">
+                        {{#grader}}
+                            <div class="media small align-items-end">
+                                <img class="userpicturesmall mr-1" src="{{userpictureurl}}">
+                                <div class="media-body">
+                                    {{fullname}}
+                                </div>
+                            </div>
+                        {{/grader}}
+                        {{feedback}}
+                    </td>
                 </tr>
             {{/students}}
 

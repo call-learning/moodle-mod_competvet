@@ -97,6 +97,9 @@ class grading {
             $groupmember->planninginfo = plannings::get_planning_stats_for_student($planningid, $student->id, true);
             $groupmember->grade = $studentgrade;
             $groupmember->feedback = format_text($grade->feedback, FORMAT_HTML);
+            if ($grade->usermodified) {
+                $groupmember->grader = utils::get_user_info($grade->usermodified);
+            }
             $groupmember->studenturl = $competvet->get_user_planning_url($student->id, $planningid);
             $groupmember->gradeurl = $competvet->get_user_grading_url($groupmember->id, $planningid);
             $profileparams = [
