@@ -49,7 +49,7 @@ const stateTemplate = () => {
             // Render the Evaluation Chart.
             const evalchart = document.getElementById('evaluation-chart');
             const config = await chartConfig();
-            config.data = transformContext(context);
+            config.data = await transformContext(context);
             if (config.data.datasets.length > 0) {
                 new ChartJS(evalchart, config);
             }
@@ -57,7 +57,7 @@ const stateTemplate = () => {
             // Render the Auto Evaluation Chart.
             const autoeval = document.getElementById('auto-evaluation-chart');
             const autoevalConfig = await chartConfig(true);
-            autoevalConfig.data = transformContext(context, true);
+            autoevalConfig.data = await transformContext(context, true);
             if (autoevalConfig.data.datasets.length > 0) {
                 new ChartJS(autoeval, autoevalConfig);
             }
@@ -76,9 +76,9 @@ const stateTemplate = () => {
  * Transform the context to a format that can be used by the chart.
  * @param {Object} context The context object.
  * @param {Boolean} autoeval The autoeval flag.
- * @return {Object} The transformed context.
+ * @return {Promise<Object>} A promise that resolves to the transformed context.
  */
-const transformContext = (context, autoeval) => {
+const transformContext = async(context, autoeval) => {
     const currentUser = CompetState.getValue('user');
     const self = currentUser.id;
     const data = context['evaluation-results'];
@@ -86,7 +86,6 @@ const transformContext = (context, autoeval) => {
     const graders = [];
     const colors = [
         'rgba(255, 99, 132, 0.6)',
-        'rgba(54, 162, 235, 0.6)',
         'rgba(255, 206, 86, 0.6)',
         'rgba(75, 192, 192, 0.6)',
         'rgba(153, 102, 255, 0.6)',
@@ -95,12 +94,13 @@ const transformContext = (context, autoeval) => {
 
     const backgroundColors = [
         'rgba(255, 99, 132, 0.2)',
-        'rgba(54, 162, 235, 0.2)',
         'rgba(255, 206, 86, 0.2)',
         'rgba(75, 192, 192, 0.2)',
         'rgba(153, 102, 255, 0.2)',
         'rgba(255, 159, 64, 0.2)',
     ];
+
+    let numGraders = 0;
 
     data.evaluations.forEach(criterion => {
         criterion.grades.forEach(grade => {
@@ -112,30 +112,56 @@ const transformContext = (context, autoeval) => {
             } else if (!autoeval && grade.graderinfo.id === self) {
                 return;
             }
+            let backgroundColor = backgroundColors.shift();
+            if (!autoeval) {
+                backgroundColor = 'rgba(0, 0, 0, 0)';
+            }
 
             if (!graders[grade.obsid]) {
                 const color = colors.shift();
-                const backgroundColor = backgroundColors.shift();
                 graders[grade.obsid] = {
                     label: grade.graderinfo.fullname + ' (' + grade.date + ')',
                     data: [],
                     fill: true,
                     backgroundColor: backgroundColor,
+                    pointRadius: 8,
                     bordercolor: color,
                     pointBackgroundColor: color,
                     pointBorderColor: 'rgba(255, 255, 255, 1)',
                     pointHoverBackgroundColor: 'rgba(255, 255, 255, 1)',
                     pointHoverBorderColor: color,
                 };
+                numGraders++;
             }
             graders[grade.obsid].data.push(grade.level);
         });
     });
 
-    return {
+    // Add the average line.
+    if (!autoeval && numGraders > 1) {
+        const averageString = await getString('average', 'mod_competvet');
+        const average = {
+            label: averageString,
+            data: data.evaluations.map(criterion => criterion.average),
+            fill: true,
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            pointRadius: 8,
+            bordercolor: 'rgba(0, 0, 0, 1)',
+            pointBackgroundColor: 'rgba(0, 0, 0, 1)',
+            pointBorderColor: 'rgba(255, 255, 255, 1)',
+            pointHoverBackgroundColor: 'rgba(255, 255, 255, 1)',
+            pointHoverBorderColor: 'rgba(0, 0, 0, 1)',
+        };
+        graders['average'] = average;
+    }
+
+    const result = {
         labels,
         datasets: Object.values(graders)
     };
+
+    // Resolve the promise with the transformed context.
+    return result;
 };
 
 const chartConfig = async(autoeval) => {
