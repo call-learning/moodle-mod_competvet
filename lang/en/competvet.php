@@ -47,6 +47,7 @@ $string['competvet:managecompetencies'] = 'Manage CompetVet competencies';
 $string['competvet:managecompetencyframeworks'] = 'Manage CompetVet competency frameworks';
 $string['competvet:managesituationtemplates'] = 'Manage CompetVet situation templates';
 $string['competvet:editcriteria'] = 'Edit CompetVet criteria';
+$string['competvet:caneditother'] = 'Can edit other\'s observations and certifications';
 $string['criterion:label'] = 'Criterion label';
 $string['criterion:sort'] = 'Criterion sort';
 $string['criterion:grid'] = 'Criterion evaluation grid';
@@ -55,6 +56,7 @@ $string['criterion:parentid'] = 'Criterion Parent ID';
 $string['criterion:parentlabel'] = 'Criterion Parent Label';
 $string['criterion:parentidnumber'] = 'Criterion Parent ID Number';
 $string['criterion:evalgrid'] = 'Evaluation grid';
+
 $string['editplanning'] = 'Edit planning';
 $string['grid:selector'] = 'Evaluation grid selector';
 $string['grid:name'] = 'Evaluation grid name';

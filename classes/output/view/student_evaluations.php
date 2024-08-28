@@ -53,10 +53,16 @@ class student_evaluations extends base {
      * @var moodle_url $vieweval The url to view different evaluation types.
      */
     protected $vieweval;
+
     /**
      * @var int $studentid The student id.
      */
     protected $studentid;
+
+    /**
+     * @var int $cmid The course module id.
+     */
+    protected $cmid;
 
     /**
      * Export this data so it can be used in a mustache template.
@@ -146,6 +152,7 @@ class student_evaluations extends base {
                 $userevals,
                 $criteria,
                 $studentid,
+                $competvet->get_course_module_id(),
             ];
             $this->set_backurl(new moodle_url(
                 $this->baseurl,

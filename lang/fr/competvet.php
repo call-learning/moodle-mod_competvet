@@ -46,6 +46,7 @@ $string['competvet:managecompetencies'] = 'Gérer les compétences CompetVet';
 $string['competvet:managecompetencyframeworks'] = 'Gérer les grilles de compétences CompetVet';
 $string['competvet:managesituationtemplates'] = 'Gérer les modèles de situation CompetVet';
 $string['competvet:editcriteria'] = 'Modifier les critères CompetVet';
+$string['competvet:caneditother'] = 'Peut modifier les situations et la planification des autres';
 $string['criterion:label'] = 'Libellé du critère';
 $string['criterion:sort'] = 'Trier les critères';
 $string['criterion:grid'] = 'Grille d\'évaluation des critères';
