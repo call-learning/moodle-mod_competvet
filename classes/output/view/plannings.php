@@ -46,6 +46,11 @@ class plannings extends base {
     protected moodle_url $viewplanning;
 
     /**
+     * @var string $situationname The name of the situation.
+     */
+    protected string $situationname;
+
+    /**
      * Export this data so it can be used in a mustache template.
      *
      * @param renderer_base $output
@@ -74,6 +79,7 @@ class plannings extends base {
                 $planningresult = new stdClass();
                 $planningresult->id = $planningstat['id'];
                 $planningresult->starttimestamp = $planning['startdate'];
+                $planningresult->endtimestamp = $planning['enddate'];
                 $planningresult->startdate = planning::get_planning_date_string($planning['startdate']);
                 $planningresult->enddate = planning::get_planning_date_string($planning['enddate']);
                 $planningresult->groupname = $planning['groupname'];
@@ -88,6 +94,7 @@ class plannings extends base {
             }
             $data['categories'][] = $category;
         }
+        $data['situationname'] = $this->situationname;
         return $data;
     }
 
@@ -107,6 +114,7 @@ class plannings extends base {
             global $USER, $PAGE;
             $context = $PAGE->context;
             $competvet = competvet::get_from_context($context);
+            $situationname = $competvet->get_instance()->name;
             $currentplannings =
                 \mod_competvet\local\api\plannings::get_plannings_for_situation_id($competvet->get_situation()->get('id'),
                     $USER->id);
@@ -116,8 +124,8 @@ class plannings extends base {
             $planningstats = grading_api::get_planning_infos_for_grading($planningids, $USER->id);
             $viewplanning =
                 new moodle_url($this->baseurl, ['pagetype' => 'planning', 'id' => $competvet->get_course_module_id()]);
-            $data = [$currentplannings, $planningstats, $viewplanning];
+            $data = [$currentplannings, $planningstats, $viewplanning, $situationname];
         }
-        [$this->plannings, $this->planningstats, $this->viewplanning] = $data;
+        [$this->plannings, $this->planningstats, $this->viewplanning, $this->situationname] = $data;
     }
 }

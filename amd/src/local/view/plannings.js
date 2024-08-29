@@ -24,8 +24,12 @@
 import {get_strings as getStrings} from 'core/str';
 import XLSX from 'mod_competvet/local/xlsx.mini.min';
 
-
-export const init = () => {
+/**
+ * Initialize the plannings view and add event listeners to the search fields.
+ * @param {string} situationname The name of the situation.
+ * @return {void}
+ */
+export const init = (situationname) => {
     // Student Search
     const studentSearchInput = document.querySelector('input[name="studentsearch"]');
     studentSearchInput.addEventListener('input', (e) => {
@@ -75,12 +79,17 @@ export const init = () => {
     // Export to CSV button
     const exportButton = document.querySelector('button[data-action="exportcsv"]');
     exportButton.addEventListener('click', (e) => {
-        exportToCsv();
+        exportToCsv(situationname);
         e.preventDefault();
     });
 
 };
 
+/**
+ * Search for students in the plannings table.
+ * @param {Event} e The event object.
+ * @return {void}
+ */
 const studentSearch = (e) => {
     const search = e.target.value;
     const students = document.querySelectorAll('[data-region="studentname"]');
@@ -97,6 +106,11 @@ const studentSearch = (e) => {
     hideEmptyPlannings();
 };
 
+/**
+ * Search for groups in the plannings table.
+ * @param {Event} e The event object.
+ * @return {void}
+ */
 const groupSearch = (e) => {
     const search = e.target.value;
     const groups = document.querySelectorAll('[data-region="groupname"]');
@@ -115,6 +129,11 @@ const groupSearch = (e) => {
     hideEmptyPlannings();
 };
 
+/**
+ * Search for ungraded students in the plannings table.
+ * @param {Event} e The event object.
+ * @return {void}
+ */
 const ungradedSearch = (e) => {
     const checked = e.target.checked;
     const hasgrade = document.querySelectorAll('.student[data-hasgrade="1"]');
@@ -130,12 +149,17 @@ const ungradedSearch = (e) => {
     hideEmptyPlannings();
 };
 
+/**
+ * Search for students with a start date in the plannings table.
+ * @param {number} value The UNIX timestamp of the start date.
+ * @return {void}
+ */
 const startDateSearch = (value) => {
     const plannings = document.querySelectorAll('.planning');
     plannings.forEach((planning) => {
-        const startDate = planning.dataset.starttimestamp;
+        const endDate = planning.dataset.endtimestamp;
         const row = planning.closest('tr');
-        if (value < startDate) {
+        if (value < endDate) {
             row.classList.remove('startdate-d-none');
         } else {
             row.classList.add('startdate-d-none');
@@ -145,6 +169,10 @@ const startDateSearch = (value) => {
     });
 };
 
+/**
+ * Hide empty plannings.
+ * @return {void}
+ */
 const hideEmptyPlannings = () => {
     const plannings = document.querySelectorAll('tr.planning');
     plannings.forEach((planning) => {
@@ -162,6 +190,12 @@ const hideEmptyPlannings = () => {
     });
 };
 
+/**
+ * Hide students in a planning.
+ * @param {number} planningid The id of the planning.
+ * @param {string} hideclass The class to hide the students.
+ * @return {void}
+ */
 const hideStudentsInPlanning = (planningid, hideclass) => {
     const planningRow = document.querySelector(`.planning[data-planningid="${planningid}"].${hideclass}`);
     if (planningRow) {
@@ -177,21 +211,31 @@ const hideStudentsInPlanning = (planningid, hideclass) => {
     }
 };
 
-const exportToCsv = async() => {
+/**
+ * Export the plannings to a CSV file.
+ * @param {string} situationname The name of the situation.
+ * @return {void}
+ */
+const exportToCsv = async(situationname) => {
     // If the row is hidden it has a class like studentname-d-none or groupname-d-none. Use a wildcard to select all hidden rows.
     const rows = document.querySelectorAll('tr.student:not([class*="-d-none"])');
     const csv = [];
-    const [name, group, grade, comment, date] = await getStrings([
+    const [name, email, group, grade, grader, comment, date] = await getStrings([
         {key: 'name', component: 'moodle'},
+        {key: 'email', component: 'moodle'},
         {key: 'group', component: 'mod_competvet'},
         {key: 'grade', component: 'mod_competvet'},
+        {key: 'grader', component: 'mod_competvet'},
         {key: 'comment', component: 'mod_competvet'},
         {key: 'date', component: 'moodle'},
     ]);
-    csv.push([name, group, grade, comment, date]);
+    csv.push([name, email, group, grade, grader, comment, date]);
     rows.forEach((row) => {
         // Student name.
         const student = row.querySelector('[data-region="studentname"]').textContent;
+
+        // Student email.
+        const email = row.querySelector('[data-region="studentname"]').dataset.email;
 
         // Group name.
         const planningid = row.dataset.planningid;
@@ -202,19 +246,24 @@ const exportToCsv = async() => {
         const usergrade = row.querySelector('[data-region="usergrade"]');
         const grade = usergrade ? usergrade.textContent : '';
 
+        // Grader.
+        const gradercontainer = row.querySelector('[data-region="grader"]');
+        const grader = gradercontainer ? gradercontainer.textContent.trim() : '';
+
         // Comments.
-        const comment = row.querySelector('[data-region="comments"]').textContent;
+        const comment = row.querySelector('[data-region="comments"]').textContent.trim();
 
         // Date.
         const date = planningrow.dataset.startdate;
 
-        csv.push([student, group, grade, `"${comment}"`, date]);
+        csv.push([student, email, group, grade, grader, `"${comment}"`, date]);
     });
 
     // Export to XLSX
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(csv);
+    const filename = `${situationname}-${new Date().toISOString().slice(0, 10)}-export.xlsx`;
     XLSX.utils.book_append_sheet(wb, ws, 'Plannings');
-    XLSX.writeFile(wb, 'plannings.xlsx');
+    XLSX.writeFile(wb, filename);
 };
 

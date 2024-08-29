@@ -163,6 +163,7 @@ class utils {
         return [
             'id' => $userid,
             'fullname' => fullname($user),
+            'email' => $user->email,
             'userpictureurl' => $userpicture->get_url($PAGE)->out(false),
         ];
     }

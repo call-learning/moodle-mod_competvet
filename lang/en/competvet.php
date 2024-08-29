@@ -73,6 +73,7 @@ $string['layout:default'] = 'Click to expand review panel';
 $string['layout:collapsegradepanel'] = 'Collapse grade panel';
 $string['layout:collapsereviewpanel'] = 'Collapse review panel';
 $string['grade'] = 'Grade';
+$string['grader'] = 'Graded by';
 $string['gradefor'] = 'Grade for {$a}';
 $string['gradeedit'] = 'Edit grades';
 $string['grade_eval_name'] = 'Eval. Observations';

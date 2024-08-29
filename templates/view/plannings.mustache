@@ -128,12 +128,12 @@
     <tr class="legend">
         <th class="label first"></th>
         <th class="label">{{#str}}stats, mod_competvet{{/str}}</th>
-        <th class="label">{{#str}}grade, mod_competvet{{/str}}</th>
+        <th class="label">{{#str}}grade, mod_competvet{{/str}} / 100</th>
         <th class="label last">{{#str}}comments, mod_competvet{{/str}}</th>
     </tr>
     {{#categories}}
         {{#plannings}}
-            <tr class="planning" data-planningid="{{id}}" data-starttimestamp="{{starttimestamp}}" data-startdate="{{startdate}}">
+            <tr class="planning" data-planningid="{{id}}" data-starttimestamp="{{starttimestamp}}" data-endtimestamp="{{endtimestamp}}" data-startdate="{{startdate}}">
                 <th class="planning-name" colspan="7">
                     <div class="position-relative d-flex align-items-center">
                         {{< mod_competvet/expandcollapse}}
@@ -152,7 +152,7 @@
                     <th class="user student-name">
                         <div class="d-flex align-items-center position-relative">
                             <img src="{{userinfo.userpictureurl}}" alt="{{userinfo.fullname}}" class="userpicture">
-                            <a class="stretched-link" href="{{{profileurl}}}" data-region="studentname">{{userinfo.fullname}}</a>
+                            <a class="stretched-link" href="{{{profileurl}}}" data-region="studentname" data-email="{{userinfo.email}}">{{userinfo.fullname}}</a>
                         </div>
                     </th>
                     <td class="t-grade stats">
@@ -212,16 +212,18 @@
                             </a>
                         {{/grade}}
                     </td>
-                    <td class="t-grade comments" data-region="comments">
+                    <td class="t-grade comments">
                         {{#grader}}
                             <div class="media small align-items-end">
                                 <img class="userpicturesmall mr-1" src="{{userpictureurl}}">
-                                <div class="media-body">
+                                <div class="media-body" data-region="grader">
                                     {{fullname}}
                                 </div>
                             </div>
                         {{/grader}}
-                        {{feedback}}
+                        <div data-region="comments">
+                            {{feedback}}
+                        </div>
                     </td>
                 </tr>
             {{/students}}
@@ -231,6 +233,6 @@
 </table>
 {{#js}}
     require(['{{modulename}}/local/view/plannings'], function(Plannings) {
-    Plannings.init();
+    Plannings.init("{{situationname}}");
     });
 {{/js}}

@@ -71,6 +71,7 @@ $string['layout:default'] = 'Cliquez pour agrandir le panneau de révision';
 $string['layout:collapsegradepanel'] = 'Réduire le panneau de note';
 $string['layout:collapsereviewpanel'] = 'Réduire le panneau de révision';
 $string['grade'] = 'Note';
+$string['grader'] = 'Noté par';
 $string['gradefor'] = 'Note pour {$a}';
 $string['gradeedit'] = 'Modifier les notes';
 $string['grade_eval_name'] = 'Obs. Éval.';
