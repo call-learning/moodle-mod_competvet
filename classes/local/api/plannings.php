@@ -71,6 +71,9 @@ class plannings {
             // Remove planning for which this user is not involved.
             $allusergroups = groups_get_all_groups($situationcontext->get_course_context()->instanceid, $userid);
             $allusergroupsid = array_keys($allusergroups);
+            if (empty($allusergroupsid)) {
+                return [];
+            }
             [$sql, $params] = $DB->get_in_or_equal($allusergroupsid, SQL_PARAMS_NAMED, 'allusergroupsid');
             $planninngssql .= " AND groupid $sql";
             $planningfilters = array_merge($planningfilters, $params);
