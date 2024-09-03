@@ -17,6 +17,7 @@ namespace mod_competvet\local\api;
 
 use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\observation;
+use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\todo;
 use mod_competvet\utils;
 
@@ -151,6 +152,13 @@ class todos {
         ],  'timecreated');
         $todoarray = [];
         foreach ($todos as $todo) {
+            if (
+                planning::record_exists($todo->get('planningid')) === false ||
+                utils::user_exists($todo->get('targetuserid')) === false ||
+                utils::user_exists($todo->get('userid')) === false
+            ) {
+                continue;
+            }
             $todorecord = [];
             $todorecord['id'] = $todo->get('id');
             $todorecord['user'] = utils::get_user_info($todo->get('userid'));

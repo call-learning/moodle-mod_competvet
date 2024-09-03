@@ -170,4 +170,23 @@ class utils {
 
     const SITUATION_CATEGORIES_DEF = "Y1|fr:Première année|en:First year\nY2|fr:Deuxième année|en:Second year
 Y3|fr:Troisième année|en:Third year\nY4|fr:Quatrième année|en:Fourth year\nY5|fr:Cinquième année|en:Fifth year";
+
+    /**
+     * User exists ?
+     *
+     * @param int $userid
+     * @param bool $shouldbeactive
+     * @return bool
+     */
+    public static function user_exists(int $userid, bool $shouldbeactive = true): bool {
+        global $DB;
+        $criteria = [
+            'id' => $userid,
+        ];
+        if ($shouldbeactive) {
+            $criteria['suspended'] = false;
+            $criteria['deleted'] = false;
+        }
+        return $DB->record_exists('user', $criteria);
+    }
 }

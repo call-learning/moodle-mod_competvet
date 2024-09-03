@@ -114,12 +114,16 @@ class plannings {
                 continue;
             }
             $planningid = $planning->get('id');
+            $planninginfo = self::get_planning_info($planningid);
+            if (!$planninginfo) {
+                continue;
+            }
             $groupstats = self::get_group_infos_for_planning($planningid);
             $category = self::get_category_for_planning_id($planningid);
             $stats[] = [
                 'id' => $planning->get('id'),
                 'groupstats' => $groupstats,
-                'info' => self::get_planning_info($planningid),
+                'info' => $planninginfo,
                 'category' => $category,
                 'categorytext' => self::get_category_text_for_planning_id($planningid, $category),
             ];
@@ -201,10 +205,13 @@ class plannings {
      * Get information for planning
      *
      * @param int $planningid
-     * @return array
+     * @return array|null
      */
-    public static function get_planning_info(int $planningid): array {
+    public static function get_planning_info(int $planningid): ?array {
         $planning = planning::get_record(['id' => $planningid]);
+        if (!$planning) {
+            return null;
+        }
         $planningarray = (array) $planning->to_record();
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         $planningarray = array_intersect_key(
