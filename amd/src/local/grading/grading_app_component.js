@@ -289,13 +289,22 @@ class Competvet {
                 numberofobservations++;
             });
         }
+        let noSelfEvalPenalty = -30;
         if (numberofselfevaluations > 0) {
             evalGrading.grading.selfevalselectoptions[1].selected = true;
+            noSelfEvalPenalty = 0;
         }
         evalGrading.grading.numberofobservations = numberofobservations;
         evalGrading.grading.haspenalty = evalGrading.grading.evalnum > numberofobservations;
 
         evalGrading.grading.evalscore = evalResults.totalaverage;
+        let penalty = evalGrading.grading.deactivatepenalty ? 0 : 1;
+        penalty = evalGrading.grading.haspenalty * penalty;
+        evalGrading.grading.finalscore = evalGrading.grading.evalscore +
+            (evalGrading.grading.penalty * penalty) + noSelfEvalPenalty;
+        if (evalGrading.grading.finalscore < 0) {
+            evalGrading.grading.finalscore = 0;
+        }
         // Set the average evalscore based on the evaluation-results
     }
 
