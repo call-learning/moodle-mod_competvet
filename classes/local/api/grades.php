@@ -120,8 +120,8 @@ class grades {
         // Remove the last colon if it is there.
         $stringkey = rtrim($string, ':');
 
-        $eval = $evaluationgrade->get('grade');
-        $cert = $certificationgrade->get('grade');
+        $eval = $haseval ? $evaluationgrade->get('grade') : 1;
+        $cert = $hascertif ? $certificationgrade->get('grade') : 1;
         $list = $haslist ? $listgrade->get('grade') : 1;
 
         $k1 = $haseval ? intval(get_config('mod_competvet', 'gradeK1')) : 0;
