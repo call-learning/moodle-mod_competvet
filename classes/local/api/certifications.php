@@ -396,7 +396,7 @@ class certifications {
                 'userid' => $student['id'],
                 'picture' => $student['userpictureurl'],
                 'fullname' => $student['fullname'],
-                'comment' => format_text($cert->get('comment'), $cert->get('commentformat')),
+                'comment' => format_text($cert->get('comment'), $cert->get('commentformat')) . " ",
                 'timestamp' => $cert->get('timemodified'),
             ];
         }
@@ -421,7 +421,7 @@ class certifications {
                     'userid' => $supervisor['id'],
                     'picture' => $supervisor['userpictureurl'],
                     'fullname' => $supervisor['fullname'],
-                    'comment' => format_text($valid->get('comment'), $valid->get('commentformat')),
+                    'comment' => format_text($valid->get('comment'), $valid->get('commentformat')) . " ",
                     'timestamp' => $valid->get('timemodified'),
                 ];
             }
