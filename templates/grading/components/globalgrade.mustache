@@ -48,14 +48,14 @@
                 </a>
             </div>
             <div class="form-group">
-                <label for="finalgrade">
+                <label class="h5" for="finalgrade">
                     {{#str}}finalgrade, mod_competvet{{/str}} : / 100
                 </label>
                 <div>
                     <input
                         id="moodlegrade"
                         type="number"
-                        class="form-control w-auto{{!
+                        class="form-control form-control-lg w-auto{{!
                         }}{{#gradesuccess}} is-valid{{/gradesuccess}}{{!
                         }}{{#gradeerror}} is-invalid{{/gradeerror}}"
                         name="finalgrade"
