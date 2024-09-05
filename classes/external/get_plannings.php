@@ -79,8 +79,8 @@ class get_plannings extends external_api {
                     'selected' => $group['id'] === $planning['groupid'],
                 ];
             }, $groups);
-            $plannings[$key]['startdate'] = userdate($planning['startdate'], '%Y-%m-%d', $timezone, false);
-            $plannings[$key]['enddate'] = userdate($planning['enddate'], '%Y-%m-%d', $timezone, false);
+            $plannings[$key]['startdate'] = userdate($planning['startdate'], '%Y-%m-%dT%H:%M', $timezone, false);
+            $plannings[$key]['enddate'] = userdate($planning['enddate'], '%Y-%m-%dT%H:%M', $timezone, false);
             $plannings[$key]['startdatets'] = $planning['startdate'];
             $plannings[$key]['enddatets'] = $planning['enddate'];
             $plannings[$key]['groups'] = $planninggroups;

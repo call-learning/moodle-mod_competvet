@@ -34,7 +34,7 @@
 <div class="row" data-region="planitem" data-id="{{id}}">
     <div class="col-3 tcell {{#edit}}editable{{/edit}}">
         {{#edit}}
-            <input type="date" name="startdate" value="{{startdate}}" data-field="startdate" class="form-control {{#errorstartdate}}error{{/errorstartdate}}">
+            <input type="datetime-local" name="startdate" value="{{startdate}}" data-field="startdate" class="form-control {{#errorstartdate}}error{{/errorstartdate}}">
         {{/edit}}
         {{^edit}}
             {{#startdatets}}
@@ -44,7 +44,7 @@
     </div>
     <div class="col-3 tcell {{#edit}}editable{{/edit}}">
         {{#edit}}
-            <input type="date" name="enddate" value="{{enddate}}" data-field="enddate" class="form-control {{#errorenddate}}error{{/errorenddate}}">
+            <input type="datetime-local" name="enddate" value="{{enddate}}" data-field="enddate" class="form-control {{#errorenddate}}error{{/errorenddate}}">
         {{/edit}}
         {{^edit}}
             {{#enddatets}}

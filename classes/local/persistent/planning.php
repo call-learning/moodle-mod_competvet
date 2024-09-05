@@ -130,31 +130,6 @@ class planning extends persistent {
     }
 
     /**
-     * Make sure that the timestamp is set to 00:00 for start date and 23:59 for end date.
-     *
-     * @return void
-     */
-    protected function before_update() {
-        $this->before_create();
-    }
-
-    /**
-     * Make sure that the timestamp is set to 00:00 for start date and 23:59 for end date.
-     *
-     * @return void
-     */
-    protected function before_create() {
-        if ($this->raw_get('startdate') === null) {
-            $this->raw_set('startdate', time());
-        }
-        if ($this->raw_get('enddate') === null) {
-            $this->raw_set('enddate', time());
-        }
-        $this->raw_set('startdate', self::round_start_date($this->raw_get('startdate')));
-        $this->raw_set('enddate', self::round_end_date($this->raw_get('enddate')));
-    }
-
-    /**
      * Round start date to midnight
      *
      * @param int $timestamp
