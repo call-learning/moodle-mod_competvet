@@ -253,6 +253,9 @@ class Competvet {
                     return;
                 }
             }
+            if (formname === 'certification-grading') {
+                context.grading.certifpnum = this.gradingApp.dataset.certifpnum;
+            }
 
             CompetState.setValue(formname, context);
         }));

@@ -270,6 +270,7 @@ $string['noevaluations'] = 'Aucune évaluation';
 $string['certifevaluation'] = 'Certification des incontournables';
 $string['numcertifvalidated'] = 'Nombre d\'incontournables certifiés';
 $string['statusproposed'] = 'Statut proposé par CompetVet';
+$string['minpercentcertif'] = 'Le seuil minimal pour valider est de {$a}% d\'incontournables certifiés';
 $string['evaluatordecision'] = 'Décision de l\'évaluateur';
 $string['evaluatordecision_help'] = 'L\'absence de validation des incontournables étant rédhibitoire, vous pouvez changer manuellement cette note. Si vous forcez la validation, veuillez commenter.';
 $string['evalcomment'] = 'Commentaire libre sur la certification des incontournables';

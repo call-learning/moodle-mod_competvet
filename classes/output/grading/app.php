@@ -82,6 +82,7 @@ class app implements named_templatable, renderable {
         $export->returnurl = $returnurl->out();
         $export->debugging = $CFG->debugdisplay;
         $export->cangrade = has_capability('mod/competvet:cangrade', $this->competvet->get_context());
+        $export->certifpnum = $situation->get('certifpnum');
         return $export;
     }
 

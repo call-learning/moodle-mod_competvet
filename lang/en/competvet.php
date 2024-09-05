@@ -284,6 +284,7 @@ $string['noevaluations'] = 'No evaluations';
 $string['certifevaluation'] = 'Certif evaluation';
 $string['numcertifvalidated'] = 'Number of certified essentials';
 $string['statusproposed'] = 'Status proposed by CompetVet';
+$string['minpercentcertif'] = 'The minimum threshold to validate is {$a}% of certified essentials';
 $string['evaluatordecision'] = 'Evaluator decision';
 $string['evaluatordecision_help'] = 'Non-validation being a deal breaker, you can manually change this grade. If you force the validation, please comment.';
 $string['evalcomment'] = 'Free commentary on the essential clinical aspects';
