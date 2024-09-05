@@ -1,6 +1,7 @@
 {
     "numcertifvalidated": 0,
     "maxcertifvalidated": 0,
+    "certifpnum": 0,
     "statusproposed": "not validated",
     "evaloptions": [
         {
