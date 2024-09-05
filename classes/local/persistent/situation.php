@@ -60,19 +60,22 @@ class situation extends persistent {
             return $situationcache->get($userid);
         }
         $rs = $DB->get_recordset('competvet');
-        $situationsid = [];
-        foreach ($rs as $competvetmodule) {
-            $competvet = competvet::get_from_instance_id($competvetmodule->id);
-            $situation = $competvet->get_situation();
-            if ($competvet->has_view_access($userid) && $situation->get_top_role($userid) !== self::UNKNOWN_ROLE_TYPE) {
-                $userrole = user_role::get_top($userid, $competvet->get_situation()->get('id'));
-                // We only list situation of the user if he/she has not an unknown role.
-                if ($userrole !== self::UNKNOWN_ROLE_TYPE) {
-                    $situationsid[] = $competvet->get_situation()->get('id');
+        try {
+            $situationsid = [];
+            foreach ($rs as $competvetmodule) {
+                $competvet = competvet::get_from_instance_id($competvetmodule->id);
+                $situation = $competvet->get_situation();
+                if ($competvet->has_view_access($userid) && $situation->get_top_role($userid) !== self::UNKNOWN_ROLE_TYPE) {
+                    $userrole = user_role::get_top($userid, $competvet->get_situation()->get('id'));
+                    // We only list situation of the user if he/she has not an unknown role.
+                    if ($userrole !== self::UNKNOWN_ROLE_TYPE) {
+                        $situationsid[] = $competvet->get_situation()->get('id');
+                    }
                 }
             }
+        } finally {
+            $rs->close();
         }
-        $rs->close();
         $situationcache->set($userid, $situationsid);
         return $situationsid;
     }
