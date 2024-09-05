@@ -64,7 +64,6 @@
         ]
     }
 }}
-<link rel="stylesheet" href="{{wwwroot}}/mod/competvet/scss/styles.css?v={{version}}" />
 <form class="form mb-5 simplesearchform">
     <div class="d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center w-100 flex-column flex-lg-row">
@@ -129,7 +128,7 @@
         <th class="label first"></th>
         <th class="label">{{#str}}stats, mod_competvet{{/str}}</th>
         <th class="label">{{#str}}grade, mod_competvet{{/str}} / 100</th>
-        <th class="label last">{{#str}}comments, mod_competvet{{/str}}</th>
+        <th class="label last">{{#str}}evaluator:role, mod_competvet{{/str}}</th>
     </tr>
     {{#categories}}
         {{#plannings}}
@@ -204,12 +203,16 @@
                     </td>
                     <td class="t-grade globalgrade">
                         {{#grade}}
-                            <a class="circle {{#failure}}fail{{/failure}}" data-region="usergrade" href="{{{gradeurl}}}">{{grade}}</a>
+                            <div class="d-flex align-items-center">
+                                <a class="btn btn-secondary btn-nowrap mr-2 btn-sm" href="{{{gradeurl}}}">{{#str}}changegrade, mod_competvet{{/str}}</a>
+                                <span class="circle" data-region="usergrade">{{grade}}  / 100</span>
+                            </div>
                         {{/grade}}
                         {{^grade}}
-                            <a class="btn btn-secondary" href="{{{gradeurl}}}">
-                                {{#str}}grade, mod_competvet{{/str}}
-                            </a>
+                            <div class="d-flex align-items-center">
+                                <a class="btn btn-primary btn-nowrap mr-2 btn-sm" href="{{{gradeurl}}}">{{#str}}gradestudent, mod_competvet{{/str}}</a>
+                                <span class="circle bg-white border-0" data-region="usergrade">&nbsp;</span>
+                            </div>
                         {{/grade}}
                     </td>
                     <td class="t-grade comments">

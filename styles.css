@@ -735,10 +735,10 @@
 }
 
 .competvet-grade-table .globalgrade .circle {
-    border-radius: 100%;
+    border-radius: 5%;
     background-color: #f8f9fa;
     padding: 1rem;
-    width: 2rem;
+    width: 7rem;
     height: 2rem;
     border: 1px solid #dee2e6;
     text-align: center;
@@ -761,9 +761,19 @@
     stroke: #fff;
 }
 
+.competvet-grade-table .btn-nowrap {
+    white-space: nowrap;
+}
+
 .competvet-grade-table .studentname-d-none,
 .competvet-grade-table .groupname-d-none,
 .competvet-grade-table .ungraded-d-none,
 .competvet-grade-table .startdate-d-none {
     display: none;
+}
+
+.competvet-grade-table .userpicturesmall {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 100%;
 }

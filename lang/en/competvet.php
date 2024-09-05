@@ -73,6 +73,8 @@ $string['layout:default'] = 'Click to expand review panel';
 $string['layout:collapsegradepanel'] = 'Collapse grade panel';
 $string['layout:collapsereviewpanel'] = 'Collapse review panel';
 $string['grade'] = 'Grade';
+$string['gradestudent'] = 'Grade student';
+$string['changegrade'] = 'Change grade';
 $string['grader'] = 'Graded by';
 $string['gradefor'] = 'Grade for {$a}';
 $string['gradeedit'] = 'Edit grades';
@@ -258,7 +260,7 @@ $string['eval_criteria'] = 'Evaluation criteria';
 
 // Planning interface
 $string['stats'] = 'Stats';
-$string['studentprogress'] = 'Student progress';
+$string['studentprogress'] = 'access to the emulator to perform actions identical to those of the mobile application';
 
 // Eval
 $string['evalevaluation'] = 'Eval evaluation';
