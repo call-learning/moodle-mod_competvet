@@ -15,9 +15,9 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_competvet/comment
+    @template mod_competvet/comments
 
-    Renders a single comment or a list of comments.
+    This template is used to render the comments of a user.
 
     Example context (json):
     {
@@ -37,14 +37,18 @@
 }}
 <div class="commentsection">
     {{> mod_competvet/comment_obs_info }}
-    <div class="comment position-relative {{$classes}}{{/classes}} single" data-region="commenttext">
-        {{$info}}{{info}}{{/info}}
-        <span class="shortened" data-region="shorttext">{{#shortentext}}200, {{{comment}}} {{{commenttext}}} {{/shortentext}}</span>
-        <span class="fulltext d-none" data-region="fulltext">{{{comment}}} {{{commenttext}}}</span>
-        <div class="showmoreless">
-            &nbsp;
-            <a href="#" class="showmore d-none" data-action="showmore">{{#str}}more, mod_competvet{{/str}}</a>
-            <a href="#" class="showless d-none" data-action="showless">{{#str}}less, mod_competvet{{/str}}</a>
+    {{#comments}}
+        <div class="comment position-relative {{$classes}}{{/classes}}" data-region="commenttext">
+            {{#commenttitle}}
+                <div><strong>{{{commenttitle}}}</strong></div>{{/commenttitle}}
+            {{$info}}{{info}}{{/info}}
+            <span class="shortened" data-region="shorttext">{{#shortentext}}200, {{{comment}}} {{{commenttext}}}{{/shortentext}}</span>
+            <span class="fulltext d-none" data-region="fulltext">{{{comment}}} {{{commenttext}}}</span>
+            <div class="showmoreless">
+                &nbsp;
+                <a href="#" class="showmore d-none" data-action="showmore">{{#str}}more, mod_competvet{{/str}}</a>
+                <a href="#" class="showless d-none" data-action="showless">{{#str}}less, mod_competvet{{/str}}</a>
+            </div>
         </div>
-    </div>
+    {{/comments}}
 </div>

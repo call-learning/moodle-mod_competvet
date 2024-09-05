@@ -144,7 +144,7 @@
         <div class="span6 col-md-6">
             {{#evalcomments}}
                 {{^isautoeval}}
-                    {{< mod_competvet/comment}}
+                    {{< mod_competvet/comments}}
                         {{$classes}}{{#private}}text-muted{{/private}}{{/classes}}
                         {{$info}}
                             <div class="d-flex justify-content-between">
@@ -152,21 +152,21 @@
                                     {{categorytext}}
                                 </div>
                                 {{#timecreated}}
-                                    <div class="small timecreated d-flex justify-content-end">
+                                    <div class="small timecreated d-flex justify-content-end align-items-center">
                                         {{#private}}{{#pix}}t/show, core, {{#str}} observation:comment:privatecomment, mod_competvet{{/str}}{{/pix}}{{/private}}
                                         {{#userdate}} {{timecreated}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}} {{/userdate}}
                                     </div>
                                 {{/timecreated}}
                             </div>
                         {{/info}}
-                    {{/ mod_competvet/comment}}
+                    {{/ mod_competvet/comments}}
                 {{/isautoeval}}
             {{/evalcomments}}
         </div>
         <div class="span6 col-md-6">
             {{#evalcomments}}
                 {{#isautoeval}}
-                    {{< mod_competvet/comment}}
+                    {{< mod_competvet/comments}}
                         {{$info}}
                             <div class="d-flex justify-content-between">
                                 <div class="small d-flex font-weight-bold">
@@ -179,7 +179,7 @@
                                 {{/timecreated}}
                             </div>
                         {{/info}}
-                    {{/ mod_competvet/comment}}
+                    {{/ mod_competvet/comments}}
                 {{/isautoeval}}
             {{/evalcomments}}
         </div>
