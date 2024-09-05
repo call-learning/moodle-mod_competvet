@@ -380,7 +380,7 @@ class certifications {
         $certrecord['status'] = $cert->get('status');
         $certrecord['seendone'] = ($cert->get('status') == cert_decl::STATUS_DECL_SEENDONE);
         $certrecord['notseen'] = ($cert->get('status') == cert_decl::STATUS_STUDENT_NOTSEEN);
-        $certrecord['total'] = 5; // TODO: get the total from the criterion? maybe change to grade.
+        $certrecord['total'] = 100; // TODO: get the total from the criterion? maybe change to grade.
         $certrecord['timecreated'] = $cert->get('timecreated');
         $certrecord['timemodified'] = $cert->get('timemodified');
         $certrecord['isdeclared'] = true; // This is the flag to determine if the certification is declared or not.

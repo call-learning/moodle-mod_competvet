@@ -174,7 +174,7 @@ class cert_decl extends dynamic_form {
     protected function get_range_html($disabled = false) {
         global $OUTPUT;
         $min = 0;
-        $max = 5;
+        $max = 100;
         $value = $this->optional_param('level', 1, PARAM_INT);
         $context = [
             'min' => $min,
