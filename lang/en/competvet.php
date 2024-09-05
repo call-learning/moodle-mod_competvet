@@ -282,7 +282,7 @@ $string['noevaluations'] = 'No evaluations';
 
 // Certif
 $string['certifevaluation'] = 'Certif evaluation';
-$string['numcertifvalidated'] = 'Number of essentials validated';
+$string['numcertifvalidated'] = 'Number of certified essentials';
 $string['statusproposed'] = 'Status proposed by CompetVet';
 $string['evaluatordecision'] = 'Evaluator decision';
 $string['evaluatordecision_help'] = 'Non-validation being a deal breaker, you can manually change this grade. If you force the validation, please comment.';
