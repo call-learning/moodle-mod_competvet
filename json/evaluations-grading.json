@@ -1,9 +1,9 @@
 {
-    "evalscore": 70,
+    "evalscore": 0,
     "maxevalscore": 100,
     "numberofobservations": 1,
     "maxobservations": 4,
-    "finalscore": 60,
+    "finalscore": 0,
     "maxfinalscore": 100,
     "deactivatepenalty": false,
     "penalty": -20,
