@@ -88,6 +88,8 @@ class get_certifications extends external_api {
             'numcertifications' => new external_value(PARAM_INT, 'The number of certifications'),
             'numvalidated' => new external_value(PARAM_INT, 'The number of validated certifications'),
             'isdeclared' => new external_value(PARAM_BOOL, 'Is declared'),
+            'statusproposed' => new external_value(PARAM_BOOL, 'Status proposed'),
+            'certifpnum' => new external_value(PARAM_INT, 'The certification percentage number'),
         ]);
     }
 
@@ -110,6 +112,8 @@ class get_certifications extends external_api {
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
 
+
+
         $certifications = certifications::get_certifications($planningid, $studentid);
         // Get an array of all validations.
         $numvalidated = 0;
@@ -123,11 +127,18 @@ class get_certifications extends external_api {
             }
         }
 
+        $situation = $competvet->get_situation();
+        $certifpnum = $situation->get('certifpnum');
+        $actualcertifpnum = ($numvalidated / count($certifications)) * 100;
+        $statusproposed = ($actualcertifpnum >= $certifpnum) ? 1 : 0;
+
         return [
             'certifications' => $certifications,
             'numcertifications' => count($certifications),
             'numvalidated' => $numvalidated,
             'isdeclared' => $declared > 0 ? true : false,
+            'statusproposed' => $statusproposed,
+            'certifpnum' => $certifpnum,
         ];
     }
 

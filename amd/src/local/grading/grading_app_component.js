@@ -99,16 +99,17 @@ class Competvet {
         CompetState.setValue('user', user);
         this.currentUser = user;
 
-        this.setEvalResults();
-        this.setCertifResults();
-        this.setListResults();
+        await this.setEvalResults();
+        await this.setCertifResults();
+        await this.setListResults();
 
         await this.setListGrading();
         await this.setSubGrades();
         await this.setGlobalGrade();
         await this.setForms();
-        this.setSuggestedGrade();
-        this.setStateFormValues();
+        setTimeout(() => {
+            this.setSuggestedGrade();
+        }, 500);
     }
 
     async setEvalResults() {
@@ -254,32 +255,31 @@ class Competvet {
                 }
             }
             if (formname === 'certification-grading') {
-                context.grading.certifpnum = this.gradingApp.dataset.certifpnum;
+                this.setCertifFormValues(context);
             }
-
+            if (formname === 'evaluations-grading') {
+                this.setEvalFormValues(context);
+            }
             CompetState.setValue(formname, context);
         }));
     }
 
-    /**
-     * Specific form values fetched from other state values.
-     */
-    setStateFormValues() {
-        const certifGrading = CompetState.getValue('certification-grading');
+    setCertifFormValues(context) {
         const certifResults = CompetState.getValue('certification-results');
-        // Update the values numcertifvalidated and maxcertifvalidated based on the certification-results
-        certifGrading.grading.maxcertifvalidated = certifResults.certifications.length;
-        certifGrading.grading.numcertifvalidated = certifResults.certifications.filter(cert => cert.confirmed === true).length;
-        certifGrading.grading.statusproposed = false;
-        if (certifGrading.grading.maxcertifvalidated === certifGrading.grading.numcertifvalidated
-            && certifGrading.grading.maxcertifvalidated > 0) {
-                certifGrading.grading.statusproposed = true;
-        }
+        context.grading.numcertifvalidated = certifResults.numvalidated;
+        context.grading.maxcertifvalidated = certifResults.numcertifications;
+        context.grading.statusproposed = certifResults.statusproposed;
+        context.grading.certifpnum = certifResults.certifpnum;
+    }
 
-        const evalGrading = CompetState.getValue('evaluations-grading');
+    /**
+     * Set the Evaluation form values.
+     * @param {Object} context The context to set the values in
+     */
+    setEvalFormValues(context) {
         const evalResults = CompetState.getValue('evaluation-results');
         // Update the values numberofobservations and maxobservations based on the evaluation-results
-        evalGrading.grading.evalnum = this.gradingApp.dataset.evalnum;
+        context.grading.evalnum = this.gradingApp.dataset.evalnum;
 
         let numberofobservations = 0;
         let numberofselfevaluations = 0;
@@ -294,21 +294,20 @@ class Competvet {
         }
         let noSelfEvalPenalty = -30;
         if (numberofselfevaluations > 0) {
-            evalGrading.grading.selfevalselectoptions[1].selected = true;
+            context.grading.selfevalselectoptions[1].selected = true;
             noSelfEvalPenalty = 0;
         }
-        evalGrading.grading.numberofobservations = numberofobservations;
-        evalGrading.grading.haspenalty = evalGrading.grading.evalnum > numberofobservations;
+        context.grading.numberofobservations = numberofobservations;
+        context.grading.haspenalty = context.grading.evalnum > numberofobservations;
 
-        evalGrading.grading.evalscore = evalResults.totalaverage;
-        let penalty = evalGrading.grading.deactivatepenalty ? 0 : 1;
-        penalty = evalGrading.grading.haspenalty * penalty;
-        evalGrading.grading.finalscore = evalGrading.grading.evalscore +
-            (evalGrading.grading.penalty * penalty) + noSelfEvalPenalty;
-        if (evalGrading.grading.finalscore < 0) {
-            evalGrading.grading.finalscore = 0;
+        context.grading.evalscore = evalResults.totalaverage;
+        let penalty = context.grading.deactivatepenalty ? 0 : 1;
+        penalty = context.grading.haspenalty * penalty;
+        context.grading.finalscore = context.grading.evalscore +
+            (context.grading.penalty * penalty) + noSelfEvalPenalty;
+        if (context.grading.finalscore < 0) {
+            context.grading.finalscore = 0;
         }
-        // Set the average evalscore based on the evaluation-results
     }
 
     /**
