@@ -52,7 +52,7 @@ class student_eval_subcriteria extends base {
         foreach ($this->subcriteria as $criterion) {
             $data['subcriteria'][] = [
                 'label' => $criterion['criterioninfo']['label'],
-                'comment' => format_text($criterion['comment']),
+                'comment' => content_to_text($criterion['comment'], FORMAT_PLAIN),
             ];
         }
         return $data;

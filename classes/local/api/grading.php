@@ -96,7 +96,7 @@ class grading {
             // We need the stats per type (so we can display them in the UI).
             $groupmember->planninginfo = plannings::get_planning_stats_for_student($planningid, $student->id, true);
             $groupmember->grade = $studentgrade;
-            $groupmember->feedback = format_text($grade->feedback, FORMAT_HTML);
+            $groupmember->feedback = content_to_text($grade->feedback, FORMAT_HTML);
             if ($grade->usermodified) {
                 $groupmember->grader = utils::get_user_info($grade->usermodified);
             }
