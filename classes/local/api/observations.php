@@ -99,7 +99,7 @@ class observations {
             if (!empty($context)) {
                 $contextrecord = $context->to_record();
                 $contextrecord->userinfo = utils::get_user_info($context->get('usercreated'));
-                $contextrecord->comment = format_text($contextrecord->comment, $contextrecord->commentformat);
+                $contextrecord->comment = content_to_text($contextrecord->comment, $contextrecord->commentformat);
                 unset($contextrecord->commentformat);
                 $contextrecord = (array) $contextrecord;
                 $result['context'] = $contextrecord;
@@ -119,7 +119,7 @@ class observations {
                         $return['private'] = $return['type'] == observation_comment::OBSERVATION_PRIVATE_COMMENT;
                         $return['label'] = observation_comment::from_type_to_string($obscomment->get('type'));
                         unset($return['usercreated']);
-                        $return['comment'] = format_text($return['comment'], $return['commentformat']);
+                        $return['comment'] = content_to_text($return['comment'], $return['commentformat']);
                         unset($return['commentformat']);
                         return $return;
                     }, $othercomments)

@@ -69,7 +69,7 @@ class situations {
                     'haseval' => $situation->get('haseval'),
                     'hascertif' => $situation->get('hascertif'),
                     'hascase' => $situation->get('hascase'),
-                    'intro' => format_text($competvetinstance->intro, $competvetinstance->introformat),
+                    'intro' => content_to_text($competvetinstance->intro, $competvetinstance->introformat),
                     'id' => $situationid,
                 ];
             $newsituation['plannings'] = $allplannings;
