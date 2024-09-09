@@ -99,6 +99,7 @@ class grading {
             $groupmember->feedback = content_to_text($grade->feedback, FORMAT_HTML);
             if ($grade->usermodified) {
                 $groupmember->grader = utils::get_user_info($grade->usermodified);
+                $groupmember->timegraded = userdate($grade->timemodified);
             }
             $groupmember->studenturl = $competvet->get_user_planning_url($student->id, $planningid);
             $groupmember->gradeurl = $competvet->get_user_grading_url($groupmember->id, $planningid);

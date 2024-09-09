@@ -116,7 +116,8 @@
                 </div>
             </div>
             <div class="ml-lg-auto mb-2 mb-lg-0 ">
-                <button data-action="exportcsv" class="btn btn-primary text-nowrap">
+                <!-- Export CSV button: displayed when the onclick event is enabled -->
+                <button data-action="exportcsv" class="btn btn-primary text-nowrap d-none">
                     {{#str}}exportxls, mod_competvet{{/str}}
                 </button>
             </div>
@@ -132,7 +133,7 @@
     </tr>
     {{#categories}}
         {{#plannings}}
-            <tr class="planning" data-planningid="{{id}}" data-starttimestamp="{{starttimestamp}}" data-endtimestamp="{{endtimestamp}}" data-startdate="{{startdate}}">
+            <tr class="planning" data-planningid="{{id}}" data-starttimestamp="{{starttimestamp}}" data-endtimestamp="{{endtimestamp}}" data-startdate="{{startdate}}" data-enddate="{{enddate}}">
                 <th class="planning-name" colspan="7">
                     <div class="position-relative d-flex align-items-center">
                         {{< mod_competvet/expandcollapse}}
@@ -151,7 +152,7 @@
                     <th class="user student-name">
                         <div class="d-flex align-items-center position-relative">
                             <img src="{{userinfo.userpictureurl}}" alt="{{userinfo.fullname}}" class="userpicture">
-                            <a class="stretched-link" href="{{{profileurl}}}" data-region="studentname" data-email="{{userinfo.email}}">{{userinfo.fullname}}</a>
+                            <a class="stretched-link" href="{{{profileurl}}}" data-region="studentname" data-firstname="{{userinfo.firstname}}" data-lastname="{{userinfo.lastname}}" data-email="{{userinfo.email}}">{{userinfo.fullname}}</a>
                         </div>
                     </th>
                     <td class="t-grade stats">
@@ -205,7 +206,7 @@
                         {{#grade}}
                             <div class="d-flex align-items-center">
                                 <a class="btn btn-secondary btn-nowrap mr-2 btn-sm" href="{{{gradeurl}}}">{{#str}}changegrade, mod_competvet{{/str}}</a>
-                                <span class="circle" data-region="usergrade">{{grade}}  / 100</span>
+                                <span class="circle" data-region="usergrade" data-rawgrade="{{grade}}">{{grade}}  / 100</span>
                             </div>
                         {{/grade}}
                         {{^grade}}
@@ -222,6 +223,11 @@
                                 <div class="media-body" data-region="grader">
                                     {{fullname}}
                                 </div>
+                                {{#timegraded}}
+                                    <div class="d-none" data-region="timegraded">
+                                        {{timegraded}}
+                                    </div>
+                                {{/timegraded}}
                             </div>
                         {{/grader}}
                         <div data-region="comments">

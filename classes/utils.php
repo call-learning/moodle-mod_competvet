@@ -155,6 +155,8 @@ class utils {
                 'id' => $userid,
                 'fullname' => get_string('usernotfound', 'competvet'),
                 'userpictureurl' => $renderer->image_url('u/f1'), // Default image.
+                'firstname' => 'firstname',
+                'lastname' => 'lastname',
             ];
         }
         $userpicture = new user_picture($user);
@@ -165,6 +167,8 @@ class utils {
             'fullname' => fullname($user),
             'email' => $user->email,
             'userpictureurl' => $userpicture->get_url($PAGE)->out(false),
+            'firstname' => $user->firstname,
+            'lastname' => $user->lastname,
         ];
     }
 

@@ -65,6 +65,8 @@ class planning extends base {
                 }
                 $userinfo->userpictureurl = $user['userinfo']['userpictureurl'];
                 $userinfo->fullname = $user['userinfo']['fullname'];
+                $userinfo->lastname = $user['userinfo']['firstname'];
+                $userinfo->firstname = $user['userinfo']['firstname'];
                 $userinfo->id = $user['userinfo']['id'];
                 if (!empty($user['userinfo']['role'])) {
                     global $DB;
