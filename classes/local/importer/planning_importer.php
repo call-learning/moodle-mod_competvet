@@ -81,7 +81,10 @@ class planning_importer extends base_persistent_importer {
         if (empty($data->groupid)) {
             $groupid = groups_get_group_by_name($this->courseid, $groupname);
             if (empty($groupid)) {
-                groups_get_group_by_idnumber($this->courseid, $groupname);
+                $group = groups_get_group_by_idnumber($this->courseid, $groupname);
+                if (!empty($group)) {
+                    $groupid = $group->id;
+                }
                 if (empty($groupid)) {
                     throw new \moodle_exception('groupnotfound', 'mod_competvet', null, $groupname);
                 }
@@ -89,26 +92,67 @@ class planning_importer extends base_persistent_importer {
             $groupnametoid->set($groupname, $groupid);
             $data->groupid = $groupid;
         }
-        $format = 'd/m/Y'; // Adjust this to match the format of your input date.
-        $dt = DateTime::createFromFormat($format, $data->startdate);
-        if ($dt === false || array_sum($dt::getLastErrors()) > 0) {
-            throw new \moodle_exception('invaliddate', 'mod_competvet', null, $data->enddate);
-        }
-        $year = (int)$dt->format('Y');
-        if ($year < 1900 || $year > 2099) {
-            throw new \moodle_exception('invaliddate', 'mod_competvet', null, $data->enddate);
-        }
-        $data->startdate = planning::round_start_date($dt->getTimestamp());
-        $dt = DateTime::createFromFormat($format, $data->enddate);
-        if (!$dt) {
-            throw new \moodle_exception('invaliddate', 'mod_competvet', null, $data->enddate);
-        }
-        $data->enddate = planning::round_end_date($dt->getTimestamp());
+        $data->startdate = $this->process_start_date($data->startdate);
+        $data->enddate = $this->process_end_date($data->enddate);
         $data->situationid = $this->situationid;
 
         return $data;
     }
 
+    /**
+     * Process date
+     *
+     * @param string $datestring
+     * @return int
+     * @throws \moodle_exception
+     */
+    private function process_date(string $datestring) {
+        // Check if time is included in the date string.
+        if (strpos($datestring, ':') !== false) {
+            $format = 'd/m/Y H:i';
+        } else {
+            $format = 'd/m/Y';
+        }
+        $dt = DateTime::createFromFormat($format, $datestring);
+        if ($dt === false || array_sum($dt::getLastErrors()) > 0) {
+            throw new \moodle_exception('invaliddate', 'mod_competvet', null, $datestring);
+        }
+        $year = (int) $dt->format('Y');
+        if ($year < 1900 || $year > 2099) {
+            throw new \moodle_exception('invaliddate', 'mod_competvet', null, $datestring);
+        }
+        return  $dt->getTimestamp();
+    }
+
+    /**
+     * Process start date and round it eventually
+     *
+     * @param string $datestring
+     * @return int
+     * @throws \moodle_exception
+     */
+    private function process_start_date(string $datestring) {
+        $date = $this->process_date($datestring);
+        if (!strpos($datestring, ':') !== false) {
+            $date = planning::round_start_date($date);
+        }
+        return $date;
+    }
+
+    /**
+     * Process end date and round it eventually
+     *
+     * @param string $datestring
+     * @return int
+     * @throws \moodle_exception
+     */
+    private function process_end_date(string $datestring) {
+        $date = $this->process_date($datestring);
+        if (!strpos($datestring, ':') !== false) {
+            $date = planning::round_end_date($date);
+        }
+        return $date;
+    }
     /**
      * Get persistent column names from the CSV column names
      *
