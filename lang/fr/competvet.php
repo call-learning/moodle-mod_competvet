@@ -71,6 +71,7 @@ $string['layout:default'] = 'Cliquez pour agrandir le panneau de révision';
 $string['layout:collapsegradepanel'] = 'Réduire le panneau de note';
 $string['layout:collapsereviewpanel'] = 'Réduire le panneau de révision';
 $string['grade'] = 'Note';
+$string['gradepercent'] = 'Note / 100';
 $string['gradestudent'] = 'Noter l\'étudiant';
 $string['changegrade'] = 'Modifier la note';
 $string['grader'] = 'Noté par';

@@ -216,23 +216,27 @@ const hideStudentsInPlanning = (planningid, hideclass) => {
  * @param {string} situationname The name of the situation.
  * @return {void}
  */
-const exportToCsv = async(situationname) => {
+const exportToCsv = async (situationname) => {
     // If the row is hidden it has a class like studentname-d-none or groupname-d-none. Use a wildcard to select all hidden rows.
     const rows = document.querySelectorAll('tr.student:not([class*="-d-none"])');
     const csv = [];
-    const [name, email, group, grade, grader, comment, date] = await getStrings([
-        {key: 'name', component: 'moodle'},
+    const [firstname, lastname, email, group, grade, grader, comment, startdate, enddate] = await getStrings([
+        {key: 'firstname', component: 'moodle'},
+        {key: 'lastname', component: 'moodle'},
         {key: 'email', component: 'moodle'},
         {key: 'group', component: 'mod_competvet'},
-        {key: 'grade', component: 'mod_competvet'},
+        {key: 'gradepercent', component: 'mod_competvet'},
         {key: 'grader', component: 'mod_competvet'},
         {key: 'comment', component: 'mod_competvet'},
-        {key: 'date', component: 'moodle'},
+        {key: 'startdate', component: 'mod_competvet'},
+        {key: 'enddate', component: 'mod_competvet'},
     ]);
-    csv.push([name, email, group, grade, grader, comment, date]);
+    csv.push([firstname, lastname, email, group, grade, grader, comment, startdate, enddate]);
     rows.forEach((row) => {
-        // Student name.
-        const student = row.querySelector('[data-region="studentname"]').textContent;
+        // Student firstname.
+        const sfirstname = row.querySelector('[data-region="studentname"]').dataset.firstname;
+        // Student lastname.
+        const slastname = row.querySelector('[data-region="studentname"]').dataset.lastname;
 
         // Student email.
         const email = row.querySelector('[data-region="studentname"]').dataset.email;
@@ -243,8 +247,8 @@ const exportToCsv = async(situationname) => {
         const group = planningrow.querySelector('[data-region="groupname"]').textContent;
 
         // Grade.
-        const usergrade = row.querySelector('[data-region="usergrade"]');
-        const grade = usergrade ? usergrade.textContent : '';
+        const usergrade = row.querySelector('[data-region="usergrade"]')?.dataset.rawgrade;
+        const grade = usergrade ?? '';
 
         // Grader.
         const gradercontainer = row.querySelector('[data-region="grader"]');
@@ -254,9 +258,10 @@ const exportToCsv = async(situationname) => {
         const comment = row.querySelector('[data-region="comments"]').textContent.trim();
 
         // Date.
-        const date = planningrow.dataset.startdate;
+        const startdate = planningrow.dataset.startdate;
+        const enddate = planningrow.dataset.enddate;
 
-        csv.push([student, email, group, grade, grader, `"${comment}"`, date]);
+        csv.push([sfirstname, slastname, email, group, grade, grader, `"${comment}"`, startdate, enddate]);
     });
 
     // Export to XLSX
@@ -266,4 +271,5 @@ const exportToCsv = async(situationname) => {
     XLSX.utils.book_append_sheet(wb, ws, 'Plannings');
     XLSX.writeFile(wb, filename);
 };
+
 

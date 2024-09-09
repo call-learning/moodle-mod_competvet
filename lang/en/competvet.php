@@ -73,6 +73,7 @@ $string['layout:default'] = 'Click to expand review panel';
 $string['layout:collapsegradepanel'] = 'Collapse grade panel';
 $string['layout:collapsereviewpanel'] = 'Collapse review panel';
 $string['grade'] = 'Grade';
+$string['gradepercent'] = 'Grade / 100';
 $string['gradestudent'] = 'Grade student';
 $string['changegrade'] = 'Change grade';
 $string['grader'] = 'Graded by';
