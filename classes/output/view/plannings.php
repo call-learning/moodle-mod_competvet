@@ -51,6 +51,11 @@ class plannings extends base {
     protected string $situationname;
 
     /**
+     * @var bool $isgrader True if the current user is a student.
+     */
+    protected bool $isgrader;
+
+    /**
      * Export this data so it can be used in a mustache template.
      *
      * @param renderer_base $output
@@ -95,6 +100,7 @@ class plannings extends base {
             $data['categories'][] = $category;
         }
         $data['situationname'] = $this->situationname;
+        $data['isgrader'] = $this->isgrader;
         return $data;
     }
 
@@ -124,8 +130,9 @@ class plannings extends base {
             $planningstats = grading_api::get_planning_infos_for_grading($planningids, $USER->id);
             $viewplanning =
                 new moodle_url($this->baseurl, ['pagetype' => 'planning', 'id' => $competvet->get_course_module_id()]);
-            $data = [$currentplannings, $planningstats, $viewplanning, $situationname];
+            $isgrader = has_capability('mod/competvet:cangrade', $context);
+            $data = [$currentplannings, $planningstats, $viewplanning, $situationname, $isgrader];
         }
-        [$this->plannings, $this->planningstats, $this->viewplanning, $this->situationname] = $data;
+        [$this->plannings, $this->planningstats, $this->viewplanning, $this->situationname, $this->isgrader] = $data;
     }
 }
