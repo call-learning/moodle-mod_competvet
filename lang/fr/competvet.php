@@ -367,3 +367,5 @@ $string['noaccess'] = 'Vous n\'avez pas accès à cette ressource';
 $string['cachedef_usersituations'] = 'Cache des situations des utilisateurs';
 $string['cachedef_casestructures'] = 'Cache des structures de cas';
 $string['studentprogress'] = 'accès à l\'émulateur pour effectuer des actions identiques à celles de l\'application mobile';
+$string['tabletitle:autoevalstudent'] = 'Auto-évaluations de l\'étudiant';
+$string['tabletitle:evals'] = 'Observations de l\'étudiant';

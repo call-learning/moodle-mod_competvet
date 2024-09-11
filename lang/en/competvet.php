@@ -257,7 +257,8 @@ $string['managecriteria'] = 'Manage criteria';
 $string['list_criteria'] = 'List criteria';
 $string['certif_criteria'] = 'Certification criteria';
 $string['eval_criteria'] = 'Evaluation criteria';
-
+$string['tabletitle:autoevalstudent'] = 'Student\' autoevaluations';
+$string['tabletitle:evals'] = 'Observations';
 // Planning interface
 $string['stats'] = 'Stats';
 $string['studentprogress'] = 'access to the emulator to perform actions identical to those of the mobile application';

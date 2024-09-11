@@ -68,7 +68,7 @@ class get_evaluations extends external_api {
                             'grades' => new external_multiple_structure(
                                 new external_single_structure(
                                     [
-                                        'obsid' => new external_value(PARAM_INT, 'Observation id'),
+                                        'obsid' => new external_value(PARAM_INT, 'Observation id', VALUE_OPTIONAL),
                                         'level' => new external_value(PARAM_INT, 'Grade', VALUE_OPTIONAL),
                                         'autoeval' => new external_value(PARAM_BOOL, 'Is autoeval', VALUE_OPTIONAL),
                                         'graderinfo' => new external_single_structure(
@@ -80,6 +80,7 @@ class get_evaluations extends external_api {
                                             , 'grader info', VALUE_OPTIONAL),
                                         'timemodified' => new external_value(PARAM_TEXT, 'Date', VALUE_OPTIONAL),
                                         'date' => new external_value(PARAM_TEXT, 'Date', VALUE_OPTIONAL),
+                                        'nograde' => new external_value(PARAM_BOOL, 'No grade', VALUE_OPTIONAL),
                                     ]
                                 )
                             ),
@@ -149,8 +150,9 @@ class get_evaluations extends external_api {
         $comments = [];
         $hasautoevaluations = false;
         $hasobserverevaluations = false;
+        $criteria = $competvet->get_situation()->get_eval_criteria();
         foreach ($userobservations as $userobservation) {
-            self::collect_grades($userobservation, $gradedcriteria);
+            self::collect_grades($userobservation, $criteria, $gradedcriteria);
             self::collect_comments($userobservation, $comments);
             self::collect_subcriteria_comments($userobservation, $comments);
             if ($userobservation['category'] == observation::CATEGORY_EVAL_OBSERVATION) {
@@ -159,8 +161,13 @@ class get_evaluations extends external_api {
                 $hasautoevaluations = true;
             }
         }
+        // Remove totally empty criteria.
         $gradedcriteria = array_filter($gradedcriteria, function ($criterion) {
-            return !empty($criterion['grades']);
+            return !array_reduce(
+                $criterion['grades'],
+                fn($acc, $grade) => $acc && ($grade['nograde'] || $grade['autoeval'] && $grade['level'] === 0),
+                true
+            );
         });
         // Now process the average and mean for grades.
         $totalaverage = 0;
@@ -204,23 +211,37 @@ class get_evaluations extends external_api {
      * Collect grades from an observation
      *
      * @param array $userobservation
+     * @param array $criteria
      * @param array $gradedcriteria
      * @return void
      */
-    private static function collect_grades(array $userobservation, array &$gradedcriteria): void {
-        foreach ($userobservation['criteria'] as $gradedcriterion) {
-            $criterionid = $gradedcriterion['criterioninfo']['id'];
-            $grade = [
-                'obsid' => $userobservation['id'],
-                'level' => $gradedcriterion['level'],
-                'autoeval' => $userobservation['category'] == observation::CATEGORY_EVAL_AUTOEVAL,
-                'timemodified' => $userobservation['timemodified'],
-                'date' => userdate($userobservation['timemodified'], get_string('strftimedatefullshort')),
-                'graderinfo' => $userobservation['observerinfo'],
-            ];
+    private static function collect_grades(array $userobservation, array $criteria, array &$gradedcriteria): void {
+        $observedcriteriaid = array_map(
+            function($observedcriterion) {
+                return $observedcriterion['criterioninfo']['id'];
+            },
+            $userobservation['criteria']
+        );
+        $observationbycriteria = array_combine($observedcriteriaid, $userobservation['criteria']);
+        foreach ($criteria as $criterion) {
+            $criterionid = $criterion->get('id');
+            $gradedcriterion = $observationbycriteria[$criterionid] ?? null;
+            if (!$gradedcriterion) {
+                $grade = ['nograde' => true];
+            } else {
+                $grade = [
+                    'obsid' => $userobservation['id'],
+                    'level' => $gradedcriterion['level'],
+                    'autoeval' => $userobservation['category'] == observation::CATEGORY_EVAL_AUTOEVAL,
+                    'timemodified' => $userobservation['timemodified'],
+                    'date' => userdate($userobservation['timemodified'], get_string('strftimedatefullshort')),
+                    'graderinfo' => $userobservation['observerinfo'],
+                    'nograde' => false,
+                ];
+            }
             if (!isset($gradedcriteria[$criterionid])) {
                 $gradedcriteria[$criterionid] = [
-                    'criterion' => $gradedcriterion['criterioninfo'],
+                    'criterion' => (array) $criterion->to_record(),
                     'grades' => [],
                 ];
             }

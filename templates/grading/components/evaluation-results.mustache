@@ -44,8 +44,15 @@
         {{#hasobserverevaluations}}
             <div class="evaltable mb-3">
                 <div class="row no-gutters flex-nowrap">
-                    <div class="p-2 col-6 criterionlabel cellborder"></div>
+                    <div class="p-2 col-6 criterionlabel cellborder font-weight-bold text-center d-flex align-items-center">{{#str}}tabletitle:evals, mod_competvet{{/str}}</div>
                     {{#evaluations.0}}
+                        {{#hasaverage}}
+                            <div class="p-2 cellborder col-2 evaluator font-weight-bold text-center d-flex align-items-center">
+                                <div class="averagecolumn">
+                                    {{#str}}average, mod_competvet{{/str}}
+                                </div>
+                            </div>
+                        {{/hasaverage}}
                         {{#grades}}
                             {{^autoeval}}
                                 <div class="p-2 cellborder col-2 evaluator font-weight-bold text-center d-flex align-items-center">
@@ -55,13 +62,6 @@
                                 </div>
                             {{/autoeval}}
                         {{/grades}}
-                        {{#hasaverage}}
-                        <div class="p-2 cellborder col-2 evaluator font-weight-bold text-center d-flex align-items-center">
-                            <div class="averagecolumn">
-                                {{#str}}average, mod_competvet{{/str}}
-                            </div>
-                        </div>
-                        {{/hasaverage}}
                     {{/evaluations.0}}
                 </div>
                 {{#evaluations}}
@@ -69,21 +69,33 @@
                         <div class="p-2 cellborder col-6 criterionlabel font-weight-bold">
                             {{criterion.label}}
                         </div>
+                        {{#hasaverage}}
+                            <div class="p-2 cellborder col-2 grade text-center" data-region="averagerow">
+                                {{average}}
+                            </div>
+                        {{/hasaverage}}
+                        {{^hasaverage}}
+                            <div class="p-2 cellborder col-2 grade text-center">
+                                -
+                            </div>
+                        {{/hasaverage}}
                         {{#grades}}
                             {{^autoeval}}
-                            <div class="p-2 cellborder col-2 grade text-center">
-                                {{level}}
-                                <div class="sr-only">
-                                    {{graderinfo.fullname}}
-                                </div>
-                            </div>
+                                {{^nograde}}
+                                    <div class="p-2 cellborder col-2 grade text-center">
+                                        {{level}}
+                                        <div class="sr-only">
+                                            {{graderinfo.fullname}}
+                                        </div>
+                                    </div>
+                                {{/nograde}}
+                                {{#nograde}}
+                                    <div class="p-2 cellborder col-2 grade text-center">
+                                        -
+                                    </div>
+                                {{/nograde}}
                             {{/autoeval}}
                         {{/grades}}
-                        {{#hasaverage}}
-                        <div class="p-2 cellborder col-2 grade text-center" data-region="averagerow">
-                            {{average}}
-                        </div>
-                        {{/hasaverage}}
                     </div>
                 {{/evaluations}}
                 <div class="row no-gutters flex-nowrap">
@@ -91,15 +103,15 @@
                         {{#str}}average, mod_competvet{{/str}}
                     </div>
                     {{#evaluations.0}}
+                        <div class="p-2 cellborder col-2 grade text-center averages" data-region="averagerow">
+                            {{totalaverage}}
+                        </div>
                         {{#grades}}
                             {{^autoeval}}
                             <div class="p-2 cellborder col-2 grade text-center averages">
                             </div>
                             {{/autoeval}}
                         {{/grades}}
-                        <div class="p-2 cellborder col-2 grade text-center averages" data-region="averagerow">
-                            {{totalaverage}}
-                        </div>
                     {{/evaluations.0}}
                 </div>
             </div>
@@ -107,7 +119,7 @@
         {{#hasautoevaluations}}
             <div class="evaltable mb-3">
                 <div class="row no-gutters flex-nowrap">
-                    <div class="p-2 col-6 criterionlabel cellborder"></div>
+                    <div class="p-2 col-6 criterionlabel cellborder font-weight-bold text-center d-flex align-items-center">{{#str}}tabletitle:autoevalstudent, mod_competvet{{/str}}</div>
                     {{#evaluations.0}}
                         {{#grades}}
                             {{#autoeval}}
