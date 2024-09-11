@@ -158,12 +158,16 @@ $string['situation:certifpnum'] = 'Pourcentage de certification conseillé';
 $string['situation:certifpnum_help'] = 'Pourcentage de certification conseillé';
 $string['situation:casenum'] = 'Nombre de cas requis';
 $string['situation:casenum_help'] = 'Nombre de cas requis';
-$string['situation:haseval'] = 'Le module Eval est-il activé ?';
-$string['situation:haseval_help'] = 'Le module Eval est-il activé ?';
-$string['situation:hascertif'] = 'Le module de Cert est-il activé ?';
-$string['situation:hascertif_help'] = 'Le module Cert est-il activé ?';
-$string['situation:hascase'] = 'Le module List est-il activé ?';
-$string['situation:hascase_help'] = 'Le module List est-il activé ?';
+$string['situation:haseval'] = 'Activer le module "Eval" pour l\'évaluation des compétences générales';
+$string['situation:haseval_help'] = 'En sélectionnant cette case vous activez le module "Eval" dans cette activité';
+$string['situation:hascertif'] = 'Activer le module "Certif" pour la certification des incontournables cliniques
+ (compétences spécifiques)';
+$string['situation:hascertif_help'] = 'En sélectionnant cette case vous activez le module "Certif"
+(incontournables cliniques (compétences spécifiques)) dans cette activité.
+Il faudra vérifier que la liste des incontournables cliniques est bien remplie dans l\'onglet critères et sélectionnée ci-dessous';
+$string['situation:hascase'] = 'Activer le module "List" pour générer un carnet de cas';
+$string['situation:hascase_help'] = 'En sélectionnant cette case vous activez le module "List" dans cette activité.
+Ce module peut être sélectionné seul pour servir de carnet de cas en stage';
 $string['situation:selector'] = 'Sélecteur de situation';
 $string['situation:intro'] = 'Introduction de la situation';
 $string['situation:name'] = 'Nom de la situation (complet)';
