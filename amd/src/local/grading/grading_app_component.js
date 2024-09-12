@@ -270,6 +270,8 @@ class Competvet {
         context.grading.maxcertifvalidated = certifResults.numcertifications;
         context.grading.statusproposed = certifResults.statusproposed;
         context.grading.certifpnum = certifResults.certifpnum;
+        context.grading.validated = context.grading.evaloptions[1].selected;
+        context.grading.notvalidated = context.grading.evaloptions[0].selected;
     }
 
     /**

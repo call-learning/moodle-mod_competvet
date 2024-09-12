@@ -69,9 +69,8 @@
                     data-field="evaluatordecision"
                     {{^cangrade}}disabled{{/cangrade}}
                 >
-                    {{#evaloptions}}
-                        <option value="{{key}}" {{#selected}}selected{{/selected}}>{{value}}</option>
-                    {{/evaloptions}}
+                    <option value="1" {{#notvalidated}}selected{{/notvalidated}}>{{#str}}notvalidated, mod_competvet{{/str}}</option>
+                    <option value="2" {{#validated}}selected{{/validated}}>{{#str}}validated, mod_competvet{{/str}}</option>
                 </select>
             </div>
         </div>
