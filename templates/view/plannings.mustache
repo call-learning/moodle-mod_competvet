@@ -213,10 +213,14 @@
                         {{/grade}}
                         {{^grade}}
                             <div class="d-flex align-items-center">
-                                <a class="btn btn-primary btn-nowrap mr-2 btn-sm" href="{{{gradeurl}}}">
-                                    {{#isgrader}}{{#str}}gradestudent, mod_competvet{{/str}}{{/isgrader}}
-                                    {{^isgrader}}{{#str}}viewgrade, mod_competvet{{/str}}{{/isgrader}}
-                                </a>
+                                {{#isgrader}}
+                                    <a class="btn btn-primary btn-nowrap mr-2 btn-sm" href="{{{gradeurl}}}">
+                                        {{#isgrader}}{{#str}}gradestudent, mod_competvet{{/str}}{{/isgrader}}
+                                    </a>
+                                {{/isgrader}}
+                                {{^isgrader}}
+                                    <span class="text-dark">{{#str}}notgradedyet, mod_competvet{{/str}}</span>
+                                {{/isgrader}}
                                 <span class="circle bg-white border-0" data-region="usergrade">&nbsp;</span>
                             </div>
                         {{/grade}}
