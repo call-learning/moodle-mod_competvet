@@ -127,7 +127,6 @@ class get_evaluations extends external_api {
      * @throws \invalid_parameter_exception
      */
     public static function execute(int $planningid, int $studentid): array {
-        global $PAGE;
 
         ['planningid' => $planningid, 'studentid' => $studentid] =
             self::validate_parameters(self::execute_parameters(), ['planningid' => $planningid, 'studentid' => $studentid]);
@@ -138,10 +137,6 @@ class get_evaluations extends external_api {
         }
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
-
-        // Set the page context to be able to call get_user_observations. It is required for fetching the
-        // user images.
-        $PAGE->set_context(\context_system::instance());
 
         // This will get the observations for the current user and planning.
         $userobservations = observations::get_user_observations($planningid, $studentid, true);
