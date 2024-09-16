@@ -54,7 +54,7 @@ function competvet_supports($feature) {
         FEATURE_GROUPS => true,
         FEATURE_MOD_INTRO => true,
         FEATURE_BACKUP_MOODLE2 => true,
-        FEATURE_GRADE_HAS_GRADE => false,
+        FEATURE_GRADE_HAS_GRADE => true,
         FEATURE_GRADE_OUTCOMES => false,
         FEATURE_SHOW_DESCRIPTION => true,
         FEATURE_MOD_PURPOSE => MOD_PURPOSE_ASSESSMENT,
