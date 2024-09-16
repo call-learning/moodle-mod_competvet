@@ -32,6 +32,7 @@ import './components/list_results';
 import './components/evaluation_results';
 import './components/evaluation_chart';
 import './components/subgrades';
+import {getString} from 'core/str';
 
 /**
  * Constants for eval certif and list.
@@ -264,14 +265,17 @@ class Competvet {
         }));
     }
 
-    setCertifFormValues(context) {
+    async setCertifFormValues(context) {
         const certifResults = CompetState.getValue('certification-results');
         context.grading.numcertifvalidated = certifResults.numvalidated;
         context.grading.maxcertifvalidated = certifResults.numcertifications;
         context.grading.statusproposed = certifResults.statusproposed;
         context.grading.certifpnum = certifResults.certifpnum;
-        context.grading.validated = context.grading.evaloptions[1].selected;
-        context.grading.notvalidated = context.grading.evaloptions[0].selected;
+        context.grading.certifnum = certifResults.certifnum;
+        // We need to give the template the litteral string as {{#str}} {{value}} {{/str}} does not work.
+        for (const option of context.grading.evaloptions) {
+            option.valuestring = await getString(option.value === 'validated' ? 'validated' : 'notvalidated', 'mod_competvet');
+        }
     }
 
     /**
