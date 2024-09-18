@@ -279,4 +279,15 @@ function competvet_extend_settings_navigation($settingsnav, $competvetnode = nul
         );
         $competvetnode->add_node($node, $beforekey);
     }
+    if (has_capability('mod/competvet:candoeverything', $PAGE->cm->context)) {
+        $url = new moodle_url('/mod/competvet/view.php', ['pagetype' => 'viewnotifications', 'id' => $PAGE->cm->id]);
+        $node = navigation_node::create(
+            get_string('entity:notifications', 'mod_competvet'),
+            $url,
+            navigation_node::TYPE_SETTING,
+            '',
+            'managenotifications'
+        );
+        $competvetnode->add_node($node, $beforekey);
+    }
 }

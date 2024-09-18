@@ -119,5 +119,33 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2024082400, 'competvet');
     }
 
+    if ($oldversion < 2024091702) {
+
+        // Define table competvet_notification to be created.
+        $table = new xmldb_table('competvet_notification');
+
+        // Adding fields to table competvet_notification.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('notifid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('competvetid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('notification', XMLDB_TYPE_CHAR, '254', null, null, null, null);
+        $table->add_field('body', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table competvet_notification.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+
+        // Conditionally launch create table for competvet_notification.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024091702, 'competvet');
+    }
+
     return true;
 }

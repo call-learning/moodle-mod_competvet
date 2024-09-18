@@ -66,6 +66,7 @@ class manage_grade extends external_api {
      * @return array
      */
     public static function update($userid, $cmid, $grade, $feedback): array {
+        global $DB;
         $params = self::validate_parameters(self::update_parameters(), [
             'userid' => $userid,
             'cmid' => $cmid,
@@ -98,6 +99,21 @@ class manage_grade extends external_api {
             'courseid' => $competvet->get_course_id(),
         ]);
         $result = $item->update_final_grade($userid, $grade, null, $feedback, FORMAT_HTML);
+
+        $customdata = json_encode((object)['studentid' => $userid, 'cmid' => $competvet->get_course_module_id()]);
+        $existing = $DB->record_exists_select('task_adhoc',
+            "classname = :classname AND " . $DB->sql_compare_text('customdata') . " = " . $DB->sql_compare_text(':customdata'),
+            [
+                'classname' => '\mod_competvet\task\student_graded',
+                'customdata' => $customdata,
+            ]
+        );
+
+        if (!$existing) {
+            $task = new \mod_competvet\task\student_graded();
+            $task->set_custom_data((object)['studentid' => $userid, 'cmid' => $competvet->get_course_module_id()]);
+            \core\task\manager::queue_adhoc_task($task);
+        }
 
         if ($result) {
             return [

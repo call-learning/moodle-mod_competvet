@@ -401,3 +401,14 @@ $string['confirmplanningdelete'] = 'Are you sure you want to delete this plannin
 $string['noaccess'] = 'You don\'t have access to this page';
 $string['cachedef_usersituations'] = 'Cache des situations des utilisateurs';
 $string['cachedef_casestructures'] = 'Cache des structures de cas';
+
+// Notifications
+$string['notification_subject'] = 'Notification from CompetVet: {$a}';
+$string['notification:end_of_planning'] = 'End of planning';
+$string['notification:end_of_planning:subject'] = '[CompetVet] Vous avez des étudiants à noter dans la rotation {$a}';
+$string['notification:student_graded'] = 'Student graded';
+$string['notification:student_graded:subject'] = 'Your grade for {$a} has been updated';
+$string['entity:notifications'] = 'Notifications';
+$string['notification:notification'] = 'Notification';
+$string['notification:timecreated'] = 'Time created';
+$string['notification:message'] = 'Message';

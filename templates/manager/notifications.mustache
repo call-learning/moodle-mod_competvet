@@ -1,0 +1,64 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_competvet/manager/notifications
+
+    TODO describe template notifications
+
+    Example context (json):
+    {
+    }
+}}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>{{#str}}notification:notification, mod_competvet{{/str}}</th>
+            <th>{{#str}}notification:timecreated, mod_competvet{{/str}}</th>
+            <th>{{#str}}notification:message, mod_competvet{{/str}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#notifications}}
+        <tr>
+            <td>{{notification}}</td>
+            <td>{{#userdate}}{{timecreated}}, {{#str}}strftimedatetime, langconfig{{/str}}{{/userdate}}</td>
+            <td>
+                <a href="#" data-toggle="modal" data-target="#messageModal-{{id}}" class="text-decoration-none">
+                    {{{shortmessage}}}
+                </a>
+                <!-- Modal -->
+                <div class="modal fade" id="messageModal-{{id}}" tabindex="-1" aria-labelledby="messageModalLabel-{{id}}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="messageModalLabel-{{id}}">{{notification}}</h5>
+                                <button type="button" class="btn-close" data-dismiss="modal" aria-label="{{#str}}close, form{{/str}}"></button>
+                            </div>
+                            <div class="modal-body">
+                                {{{body}}}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">{{#str}}close, form{{/str}}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        {{/notifications}}
+    </tbody>
+</table>
