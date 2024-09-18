@@ -17,6 +17,7 @@
 namespace mod_competvet\local\api;
 
 use core\invalid_persistent_exception;
+use mod_competvet\event\cert_validation_completed;
 use mod_competvet\event\cert_validation_requested;
 use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\cert_decl_asso;
@@ -216,6 +217,10 @@ class certifications {
             $valid->set('comment', $comment);
             $valid->set('commentformat', $commentformat);
             $valid->create();
+            $event = cert_validation_completed::create_from_cert_valid(
+                $valid
+            );
+            $event->trigger();
         } catch (invalid_persistent_exception $e) {
             debugging($e->getMessage());
             return null;

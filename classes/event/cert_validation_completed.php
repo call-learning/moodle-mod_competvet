@@ -19,18 +19,19 @@ namespace mod_competvet\event;
 use core\event\base;
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\cert_decl;
+use mod_competvet\local\persistent\cert_valid;
 use mod_competvet\local\persistent\planning;
 
 /**
- * An event that is triggered when an certification is requested
+ * An event that is triggered when an certification is completed
  *
  * @package     mod_competvet
  * @copyright   2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class cert_validation_requested extends \core\event\base {
+class cert_validation_completed extends \core\event\base {
     public static function get_name() {
-        return get_string('event_certvalidationrequested', 'mod_competvet');
+        return get_string('event_certvalidationvalidated', 'mod_competvet');
     }
 
     public static function get_objectid_mapping() {
@@ -44,37 +45,35 @@ class cert_validation_requested extends \core\event\base {
         $othermapped['planningid'] = ['db' => 'context', 'restore' => 'planning'];
         return $othermapped;
     }
-
     /**
-     * Create an observation requested event from a planning
+     * Create cert validation completed requested event fromc ert_valid
      *
      * @param int $declid
      * @param int $studentid
      * @param int $supervisorid
      * @return base
      */
-    public static function create_from_decl_and_supervisor(
-       int $declid,
-       int $supervisorid,
-        int $studentid
+    public static function create_from_cert_valid(
+        cert_valid $certvalid,
     ): \core\event\base {
-        $declaration = cert_decl::get_record(['id' => $declid]);
+        $declaration = cert_decl::get_record(['id' => $certvalid->get('declid')]);
         $planning = planning::get_record(['id' => $declaration->get('planningid')]);
         $competvet = competvet::get_from_situation($planning->get_situation());
         return self::create([
             'context' => $competvet->get_context(),
-            'relateduserid' => $studentid,
+            'relateduserid' => $declaration->get('studentid'),
             'other' => [
-                'supervisorid' => $supervisorid,
-                'studentid' => $studentid,
+                'supervisorid' => $certvalid->get('supervisorid'),
+                'studentid' => $declaration->get('studentid'),
                 'planningid' => $planning->get('id'),
-                'declid' => $declid,
+                'declid' => $certvalid->get('declid'),
+                'status' => $certvalid->get('status'),
             ],
         ]);
     }
 
     public function get_description() {
-        return "The user with id {$this->userid} asked a validation with id with id {$this->objectid}.";
+        return "The user with id {$this->userid} created an validation with id {$this->objectid}.";
     }
 
     protected function init() {

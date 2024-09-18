@@ -140,6 +140,36 @@ class todos {
     }
 
     /**
+     * Ask for certification validation : add a todo list item for the observer
+     *
+     * Note: called from observers only (or from tests) !!!
+     *
+     * @param int $declid
+     * @return void
+     */
+    public static function cancel_certification_validation(int $declid): void {
+        // First get the declaration.
+        $declaration = cert_decl::get_record(['id' => $declid]);
+        // First check that the same user has not yet asked for a certification validation.
+        $existingtodos = todo::get_records([
+            'targetuserid' => $declaration->get('studentid'),
+            'planningid' => $declaration->get('planningid'),
+            'action' => todo::ACTION_EVAL_CERTIFICATION_VALIDATION_ASKED,
+        ]);
+        $todo = null;
+        if ($existingtodos) {
+            // Find the one with the same declid.
+            foreach ($existingtodos as $todo) {
+                $data = json_decode($todo->get('data'));
+                if ($data->declid == $declid) {
+                    $todo->set('status', todo::STATUS_DONE);
+                    $todo->update();
+                }
+            }
+        }
+    }
+
+    /**
      * Get todos for a given user
      *
      * @param int $userid
