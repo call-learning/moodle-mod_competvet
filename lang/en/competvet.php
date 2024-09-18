@@ -412,3 +412,5 @@ $string['entity:notifications'] = 'Notifications';
 $string['notification:notification'] = 'Notification';
 $string['notification:timecreated'] = 'Time created';
 $string['notification:message'] = 'Message';
+$string['notification:items_todo'] = 'Items to do';
+$string['notification:items_todo:subject'] = '[CompetVet] Vous avez des actions en attente dans votre liste de tâches CompetVet';

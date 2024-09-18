@@ -38,7 +38,7 @@ class notifications {
      * @param array $recipients List of users to send the email to.
      * @param array $context The email template context (planning, students, etc.).
      */
-    public static function send_email($notification, $id, $competvetid, $recipients, $context) {
+    public static function send_email($notification, $id, $competvetid, $recipients, $context = []) {
         $subject = $context['subject'];
         $competvet = competvet::get_from_instance_id($competvetid);
         // Add some global context variables

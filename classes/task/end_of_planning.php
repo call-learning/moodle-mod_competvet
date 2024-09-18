@@ -75,12 +75,8 @@ class end_of_planning extends \core\task\scheduled_task {
             // TODO, check if observers are okay or not.
             $competvet = competvet::get_from_situation_id($planning->situationid);
             // Get the list of users in this context with the capability 'mod/competvet:cangrade'.
-            $context = $competvet->get_context();
-            $recipients = get_users_by_capability($context, 'mod/competvet:cangrade');
-            // Only keep enrolled users.
-            $recipients = array_filter($recipients, function($user) use ($context) {
-                return is_enrolled($context, $user);
-            });
+            $modulecontext = $competvet->get_context();
+            $recipients = get_users_by_capability($modulecontext, 'mod/competvet:cangrade');
 
             // Fetch context for the template (students for the planning)
             $context = $this->get_email_context($competvet, $planning);

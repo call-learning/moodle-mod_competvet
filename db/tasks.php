@@ -31,10 +31,20 @@ $tasks = [
     [
         'classname' => 'mod_competvet\task\end_of_planning',
         'blocking' => 0,
-        'minute' => '0',
+        'minute' => '16',
         'hour' => '0',
         'day' => '*',
         'dayofweek' => '*',
+        'month' => '*',
+    ],
+    [
+        'classname' => 'mod_competvet\task\items_todo',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '16',
+        'day' => '*',
+        // Run on Monday, Wednesday, and Friday
+        'dayofweek' => '1,3,5',
         'month' => '*',
     ],
 ];
