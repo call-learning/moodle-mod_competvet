@@ -18,11 +18,8 @@ namespace mod_competvet\task;
 
 use mod_competvet\notifications;
 use mod_competvet\competvet;
-use mod_competvet\local\api\plannings;
 use mod_competvet\local\api\grading as grading_api;
-use mod_competvet\utils;
 use core_user;
-use moodle_url;
 
 /**
  * Class end_of_planning
@@ -65,64 +62,50 @@ class end_of_planning extends \core\task\scheduled_task {
             WHERE p.enddate > :oneday AND p.enddate < :now
             AND n.id IS NULL
         ", [
-            'oneday' => strtotime('-1 days'),  // Plannings ending within the next 7 days
+            'oneday' => strtotime('-1 days'),  // Plannings ending in the next 24 hours.
             'now' => time(),
-            'notification' => 'end_of_planning'
+            'notification' => $this->taskname,
         ]);
 
         // Send a reminder email for each planning that does not have a notification.
         foreach ($plannings as $planning) {
-            // TODO, check if observers are okay or not.
+            $ungradedstudents = $this->get_ungraded_students($planning->id);
+            if (empty($ungradedstudents)) {
+                continue;
+            }
             $competvet = competvet::get_from_situation_id($planning->situationid);
-            // Get the list of users in this context with the capability 'mod/competvet:cangrade'.
             $modulecontext = $competvet->get_context();
             $recipients = get_users_by_capability($modulecontext, 'mod/competvet:cangrade');
 
-            // Fetch context for the template (students for the planning)
-            $context = $this->get_email_context($competvet, $planning);
-            // if context is an empty array, no need to send the email
-            if (empty($context)) {
-                continue;
-            }
-            // Call notifications to handle the email
-            notifications::send_email('end_of_planning', $planning->id, $competvet->get_instance_id(), $recipients, $context);
+            $context = [];
+            $context['enddate'] = userdate($planning->enddate);
+            $context['students'] = implode('', array_map(function($student) {
+                return '<li>' . fullname($student) . '</li>';
+            }, $ungradedstudents));
+
+            notifications::send_email($this->taskname, $planning->id, $competvet->get_instance_id(), $recipients, $context);
         }
     }
 
     /**
-     * Get the context data for the email template.
+     * Get ungraded students for the planning.
      *
-     * @param object $competvet Competvet instance.
-     * @param object $planning Planning data.
-     * @return array Template context data.
+     * @param int $planningid
+     * @return array List of students that have not been graded.
      */
-    private function get_email_context($competvet, $planning) {
+    private function get_ungraded_students(int $planningid): array {
         global $USER;
-        $planninginfo = grading_api::get_planning_infos_for_grading([$planning->id], $USER->id);
+        $planninginfo = grading_api::get_planning_infos_for_grading([$planningid], $USER->id);
         if (empty($planninginfo)) {
             return [];
         }
+        $studenstwithinfo = [];
         $students = $planninginfo[0]['stats']['students'];
         foreach ($students as $student) {
             if (empty($student->grade)) {
                 $studenstwithinfo[] = core_user::get_user($student->id);
             }
         }
-        if (empty($studenstwithinfo)) {
-            return [];
-        }
-        $competvetname = $competvet->get_instance()->name;
-
-        $studenthtml = array_map(function($student) {
-            return '<li>' . fullname($student) . '</li>';
-        }, $studenstwithinfo);
-
-        $studenthtml = implode('', $studenthtml);
-
-        return [
-            'situation' => $competvetname,
-            'enddate' => userdate($planning->enddate),
-            'students' => $studenthtml
-        ];
+        return $studenstwithinfo;
     }
 }

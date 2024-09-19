@@ -47,4 +47,13 @@ $tasks = [
         'dayofweek' => '1,3,5',
         'month' => '*',
     ],
+    [
+        'classname' => 'mod_competvet\task\student_target',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '16',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*',
+    ],
 ];

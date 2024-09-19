@@ -40,12 +40,19 @@ class notifications {
      */
     public static function send_email($notification, $id, $competvetid, $recipients, $context = []) {
         $context = self::add_global_context($context, $competvetid);
-        $body = self::get_email_body($notification, $context);
         $subject = get_string('email:' . $notification . ':subject', 'mod_competvet', $context);
+        $body = self::get_email_body($notification, $context);
         self::log_notification($notification, $id, $competvetid, $body);
 
         foreach ($recipients as $recipient) {
-            email_to_user($recipient, core_user::get_noreply_user(), $subject, $body);
+            try {
+                $success = email_to_user($recipient, core_user::get_noreply_user(), $subject, $body);
+                if (!$success) {
+                    debugging("Failed to send email to user ID {$recipient->id}", DEBUG_DEVELOPER);
+                }
+            } catch (\exception $e) {
+                debugging("Exception when sending email to user ID {$recipient->id}: " . $e->getMessage(), DEBUG_DEVELOPER);
+            }
         }
     }
 
@@ -55,7 +62,7 @@ class notifications {
      * @param object $context
      * @return string
      */
-    public static function get_email_body($notification, $context) {
+    public static function get_email_body($notification, $context): string {
         global $OUTPUT;
         $content = get_string('email:' . $notification, 'mod_competvet', $context);
         $footer = $OUTPUT->render_from_template('mod_competvet/emails/footer', $context);
@@ -68,7 +75,7 @@ class notifications {
      * @param int $competvetid
      * @return array
      */
-    public static function add_global_context($context, $competvetid) {
+    public static function add_global_context($context, $competvetid): array {
         $competvet = competvet::get_from_instance_id($competvetid);
         $competvetlink = new moodle_url('/mod/competvet/view.php', ['id' => $competvet->get_course_module_id()]);
         $context['competvetlink'] = $competvetlink->out();
@@ -92,6 +99,6 @@ class notifications {
             'notification' => $notification,
             'body' => $body,
         ]);
-        //$log->save();
+        $log->save();
     }
 }

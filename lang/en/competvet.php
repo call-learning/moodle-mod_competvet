@@ -402,6 +402,10 @@ $string['noaccess'] = 'You don\'t have access to this page';
 $string['cachedef_usersituations'] = 'Cache des situations des utilisateurs';
 $string['cachedef_casestructures'] = 'Cache des structures de cas';
 
+
+// Task
+$string['task:cleanup'] = 'Clean up CompetVet data';
+
 // Notifications
 $string['notification_subject'] = 'Notification from CompetVet: {$a}';
 $string['notification:end_of_planning'] = 'End of planning';
@@ -411,6 +415,11 @@ $string['notification:notification'] = 'Notification';
 $string['notification:timecreated'] = 'Time created';
 $string['notification:message'] = 'Message';
 $string['notification:items_todo'] = 'Items to do';
+$string['notification:student_target'] = 'Student targets';
+$string['notification:student_target:eval'] = 'Evaluations Student targets';
+$string['notification:student_target:autoeval'] = 'Autoevaluations Student targets';
+$string['notification:student_target:cert'] = 'Certifications Student targets';
+$string['notification:student_target:list'] = 'List Student targets';
 
 // Emails
 $string['email:end_of_planning:subject'] = '[CompetVet] Vous avez des étudiants à noter dans la rotation {$a->competvetname}';
@@ -433,8 +442,8 @@ $string['email:end_of_planning'] = <<<'EOF'
 </ul>
 EOF;
 
-$string['email:item_todo:subject'] = '[CompetVet] Vous avez des actions en attente dans votre liste de tâches CompetVet';
-$string['email:item_todo'] = <<<'EOF'
+$string['email:items_todo:subject'] = '[CompetVet] Vous avez des actions en attente dans votre liste de tâches CompetVet {$a->competvetname}';
+$string['email:items_todo'] = <<<'EOF'
 
 <p>Bonjour,</p>
 
@@ -449,18 +458,69 @@ $string['email:item_todo'] = <<<'EOF'
 <p>Vous ne recevrez plus ce message dès que cette liste de tâches sera vide.</p>
 
 <p>Merci pour votre implication !</p>
+
+<p>Bien cordialement</p>
 EOF;
 
-$string['email:student_graded:subject'] = '[CompetVet] Votre note pour {$a->situationname} a été mise à jour';
+$string['email:student_graded:subject'] = '[CompetVet] Votre note pour {$a->competvetname} a été mise à jour';
 $string['email:student_graded'] = <<<'EOF'
 
 <p>Bonjour {$a->fullname},</p>
 
-<p>Votre note finale pour la situation <strong>{$a->situationname}</strong> a été attribuée par votre évaluateur.</p>
+<p>Votre note finale pour la situation <strong>{$a->competvetname}</strong> a été attribuée par votre évaluateur.</p>
 
 <p>Vous pouvez maintenant consulter votre note et les commentaires associés en suivant le lien ci-dessous :</p>
 
 <p><a href="{$a->competvetlink}" style="color: #1a73e8; text-decoration: none;">Accéder à votre note et aux commentaires</a></p>
 
 <p>Veuillez noter que cette situation est désormais clôturée et qu'aucune modification supplémentaire n'est possible.</p>
+
+<p>Bien cordialement</p>
+EOF;
+
+$string['email:student_target:eval:subject'] = '[CompetVet] Vous avez des étudiants à noter dans la rotation {$a->competvetname}';
+$string['email:student_target:eval'] = <<<'EOF'
+
+<p>Bonjour,</p>
+
+<p>Nous constatons qu'il vous manque encore des observations par des encadrants pour la rotation {$a->competvetname}.
+Si vous avez déjà sollicité des encadrants pour le faire, il faut le leur rappeler afin que vous remplissiez bien l'objectif visé. </p>
+
+<p>Bien cordialement</p>
+EOF;
+
+$string['email:student_target:autoeval:subject'] = '[CompetVet] Vous n\'avez pas encore réalisé votre auto-évaluation dans la rotation {$a->competvetname}';
+$string['email:student_target:autoeval'] = <<<'EOF'
+
+<p>Bonjour,</p>
+
+<p>Nous constatons que vous n'avez pas encore réalisé votre auto-évaluation pour la rotation {$a->competvetname}.</p>
+
+<p>Il vous reste encore un peu de temps pour le faire mais il faut y penser !</p>
+
+<p>Bien cordialement</p>
+EOF;
+
+$string['email:student_target:cert:subject'] = '[CompetVet] Vous n\'avez pas encore fait certifier tous vos incontournables dans la rotation {$a->competvetname}';
+$string['email:student_target:cert'] = <<<'EOF'
+
+<p>Bonjour,</p>
+
+<p>Nous constatons que vous n'avez pas encore reçu une certification de tous vos incontournables pour la rotation {$a->competvetname}.</p>
+
+<p>Si vous avez déjà déclaré ces incontournables mais que vos encadrants ne les ont pas encore certifiés, il faut le leur rappeler afin que vous remplissiez bien l'objectif visé.</p>
+
+<p>Bien cordialement</p>
+EOF;
+
+$string['email:student_target:list:subject'] = '[CompetVet] Vous n\'avez pas encore finalisé votre carnet de cas pour la rotation {$a->competvetname}';
+$string['email:student_target:list'] = <<<'EOF'
+
+<p>Bonjour,
+
+<p>Nous constatons que vous n'avez pas encore saisi le nombre de cas cliniques conseillé dans votre carnet de cas pour la rotation {$a->competvetname}.</p>
+
+<p>Il vous reste encore un peu de temps pour le faire mais il faut y penser !</p>
+
+<p>Bien cordialement</p>
 EOF;

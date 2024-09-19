@@ -64,4 +64,23 @@ class notification extends persistent {
         ];
     }
 
+    /**
+     * Hook to execute before a create operation.
+     *
+     * Throws an exception if the grid already exists (by idnumber).
+     *
+     * @return void
+     */
+    protected function before_create() {
+        // Delete notifications older than 30 days.
+        $this->delete_old_notifications();
+    }
+
+    /**
+     * Delete notifications older than 30 days.
+     */
+    private function delete_old_notifications() {
+        global $DB;
+        $DB->delete_records_select(self::TABLE, 'timecreated < :time', ['time' => strtotime('-30 days')]);
+    }
 }

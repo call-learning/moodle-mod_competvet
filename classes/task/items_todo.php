@@ -42,6 +42,9 @@ class items_todo extends \core\task\scheduled_task {
         return get_string('notification:' . $this->taskname, 'mod_competvet');
     }
 
+    /**
+     * Execute the task sending reminders to students who have items to do.
+     */
     public function execute() {
         global $DB;
         // Get all situations
@@ -57,10 +60,8 @@ class items_todo extends \core\task\scheduled_task {
                 }
                 $recipients[] = $observer;
             }
-            $context = [];
-            $context['subject'] = get_string('notification:items_todo:subject', 'mod_competvet');
 
-            notifications::send_email($this->taskname, 0, $competvet->get_instance_id(), $recipients, $context);
+            notifications::send_email($this->taskname, 0, $competvet->get_instance_id(), $recipients, []);
         }
     }
 }
