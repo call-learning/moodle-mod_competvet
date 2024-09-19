@@ -105,7 +105,7 @@ class end_of_planning extends \core\task\scheduled_task {
         $students = $planninginfo[0]['stats']['students'];
         foreach ($students as $student) {
             if (empty($student->grade)) {
-                $studenstwithinfo[] = utils::get_user_info($student->id);
+                $studenstwithinfo[] = core_user::get_user($student->id);
             }
         }
         if (empty($studenstwithinfo)) {
@@ -113,11 +113,16 @@ class end_of_planning extends \core\task\scheduled_task {
         }
         $competvetname = $competvet->get_instance()->name;
 
+        $studenthtml = array_map(function($student) {
+            return '<li>' . fullname($student) . '</li>';
+        }, $studenstwithinfo);
+
+        $studenthtml = implode('', $studenthtml);
+
         return [
-            'subject' => get_string('notification:end_of_planning:subject', 'mod_competvet', $competvetname),
             'situation' => $competvetname,
             'enddate' => userdate($planning->enddate),
-            'students' => $studenstwithinfo
+            'students' => $studenthtml
         ];
     }
 }

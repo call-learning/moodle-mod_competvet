@@ -405,12 +405,62 @@ $string['cachedef_casestructures'] = 'Cache des structures de cas';
 // Notifications
 $string['notification_subject'] = 'Notification from CompetVet: {$a}';
 $string['notification:end_of_planning'] = 'End of planning';
-$string['notification:end_of_planning:subject'] = '[CompetVet] Vous avez des étudiants à noter dans la rotation {$a}';
 $string['notification:student_graded'] = 'Student graded';
-$string['notification:student_graded:subject'] = 'Your grade for {$a} has been updated';
 $string['entity:notifications'] = 'Notifications';
 $string['notification:notification'] = 'Notification';
 $string['notification:timecreated'] = 'Time created';
 $string['notification:message'] = 'Message';
 $string['notification:items_todo'] = 'Items to do';
-$string['notification:items_todo:subject'] = '[CompetVet] Vous avez des actions en attente dans votre liste de tâches CompetVet';
+
+// Emails
+$string['email:end_of_planning:subject'] = '[CompetVet] Vous avez des étudiants à noter dans la rotation {$a->competvetname}';
+$string['email:end_of_planning'] = <<<'EOF'
+
+<p>Bonjour,</p>
+
+<p>Des étudiants attendent leur note pour la rotation {$a->situation}. Cette rotation s'est terminée le {$a->enddate}</p>
+
+<p>Plus le feedback est proche de la fin de l'activité, plus il est efficace. Aussi nous vous remercions de bien vouloir noter ces étudiants dès que possible.</p>
+
+<p>Vous pouvez accéder à l'interface de notation en cliquant ici : <a href="{$a->competvetlink}" style="color: #1a73e8; text-decoration: none;">LIEN</a></p>
+
+<p>Merci pour votre implication dans ce processus essentiel.</p>
+
+<p>Pour information, la liste des étudiants concernés est ci-dessous :
+
+<ul>
+    {$a->students}
+</ul>
+EOF;
+
+$string['email:item_todo:subject'] = '[CompetVet] Vous avez des actions en attente dans votre liste de tâches CompetVet';
+$string['email:item_todo'] = <<<'EOF'
+
+<p>Bonjour,</p>
+
+<p>Nous constatons que vous avez des actions en attente sur l'appli CompetVet. Ceci signifie que des étudiants vous ont sollicité pour réaliser une observation (Eval) ou pour certifier la réalisation d'un incontournable clinique (Certif).</p>
+
+<p>Ils ont besoin de vous ! Votre action est fondamentale pour que les étudiants puissent valider leur rotation.</p>
+
+<p>Pour cela, quelques clics suffisent : <strong>ouvrez l'application CompetVet</strong> sur votre téléphone et <strong>rendez vous dans l'onglet : "Liste des tâches".</strong></p>
+
+<p>Tout ce que vous avez à faire est détaillé dans cette liste.</p>
+
+<p>Vous ne recevrez plus ce message dès que cette liste de tâches sera vide.</p>
+
+<p>Merci pour votre implication !</p>
+EOF;
+
+$string['email:student_graded:subject'] = '[CompetVet] Votre note pour {$a->situationname} a été mise à jour';
+$string['email:student_graded'] = <<<'EOF'
+
+<p>Bonjour {$a->fullname},</p>
+
+<p>Votre note finale pour la situation <strong>{$a->situationname}</strong> a été attribuée par votre évaluateur.</p>
+
+<p>Vous pouvez maintenant consulter votre note et les commentaires associés en suivant le lien ci-dessous :</p>
+
+<p><a href="{$a->competvetlink}" style="color: #1a73e8; text-decoration: none;">Accéder à votre note et aux commentaires</a></p>
+
+<p>Veuillez noter que cette situation est désormais clôturée et qu'aucune modification supplémentaire n'est possible.</p>
+EOF;

@@ -39,16 +39,10 @@ class notifications {
      * @param array $context The email template context (planning, students, etc.).
      */
     public static function send_email($notification, $id, $competvetid, $recipients, $context = []) {
-        $subject = $context['subject'];
-        $competvet = competvet::get_from_instance_id($competvetid);
-        // Add some global context variables
-        $context['competvetlink'] = new moodle_url('/mod/competvet/view.php', ['id' => $competvet->get_course_module_id()]);
-        $context['competvetname'] = $competvet->get_instance()->name;
-
-        $body = self::render_template($notification, $context);
+        $context = self::add_global_context($context, $competvetid);
+        $body = self::get_email_body($notification, $context);
+        $subject = get_string('email:' . $notification . ':subject', 'mod_competvet', $context);
         self::log_notification($notification, $id, $competvetid, $body);
-
-
 
         foreach ($recipients as $recipient) {
             email_to_user($recipient, core_user::get_noreply_user(), $subject, $body);
@@ -56,17 +50,30 @@ class notifications {
     }
 
     /**
-     * Renders the email body using a Mustache template.
-     *
-     * @param string $notification The type of notification to render.
-     * @param array $context Data to populate the email template.
-     * @return string Rendered email body.
+     * Get the body of the email notification.
+     * @param string $notification
+     * @param object $context
+     * @return string
      */
-    public static function render_template($notification, $context) {
+    public static function get_email_body($notification, $context) {
         global $OUTPUT;
+        $content = get_string('email:' . $notification, 'mod_competvet', $context);
+        $footer = $OUTPUT->render_from_template('mod_competvet/emails/footer', $context);
+        return $content . $footer;
+    }
 
-        // Render the Mustache template
-        return $OUTPUT->render_from_template('mod_competvet/emails/' . $notification, $context);
+    /**
+     * add global context variables
+     * @param array $context
+     * @param int $competvetid
+     * @return array
+     */
+    public static function add_global_context($context, $competvetid) {
+        $competvet = competvet::get_from_instance_id($competvetid);
+        $competvetlink = new moodle_url('/mod/competvet/view.php', ['id' => $competvet->get_course_module_id()]);
+        $context['competvetlink'] = $competvetlink->out();
+        $context['competvetname'] = $competvet->get_instance()->name;
+        return $context;
     }
 
     /**
@@ -85,6 +92,6 @@ class notifications {
             'notification' => $notification,
             'body' => $body,
         ]);
-        $log->save();
+        //$log->save();
     }
 }
