@@ -407,7 +407,7 @@ $string['cachedef_casestructures'] = 'Cache des structures de cas';
 $string['task:cleanup'] = 'Clean up CompetVet data';
 
 // Notifications
-$string['defaultlang_help'] = 'Default language for the emails';
+$string['defaultlang_help'] = 'Default language for the emails, Current setting <strong>{$a}</strong>';
 $string['controltask'] = 'Control this task';
 $string['notification_subject'] = 'Notification from CompetVet: {$a}';
 $string['notification:end_of_planning'] = 'End of planning';
@@ -525,4 +525,32 @@ $string['email:student_target:list'] = <<<'EOF'
 <p>You still have some time to do it, but don't forget!</p>
 
 <p>Best regards,</p>
+EOF;
+
+$string['footer'] = 'Footer';
+$string['footer_help'] = 'Default email footer';
+
+$string['email:footer'] = <<<'EOF'
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" style="font-family: Arial, sans-serif; font-size: 13px; line-height: 20px; color: #555555;">
+    <tr>
+        <td style="width: 100px;">
+            <img src="{$a}" alt="Competvet Logo" width="100" height="auto">
+        </td>
+        <td style="padding: 20px;">
+            <p style="margin: 0; padding: 0; color: #333333; font-size: 16px; font-weight: bold;">
+                École nationale vétérinaire d'Alfort (EnvA)
+            </p>
+            <p style="margin: 5px 0; padding: 0;">
+                Teaching, research, and veterinary care since 1766
+            </p>
+            <p style="margin: 5px 0; padding: 0;">
+                Address: 7 Avenue du Général de Gaulle, 94700 Maisons-Alfort, France
+            </p>
+            <p style="margin: 5px 0; padding: 0;">
+                Website: <a href="http://www.vet-alfort.fr" style="color: #1a73e8; text-decoration: none;">www.vet-alfort.fr</a>
+            </p>
+        </td>
+    </tr>
+</table>
 EOF;

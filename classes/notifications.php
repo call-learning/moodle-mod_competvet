@@ -66,7 +66,9 @@ class notifications {
     public static function get_email_body($notification, $context): string {
         global $OUTPUT;
         $content = self::local_get_string('email:' . $notification, $context);
-        $footer = $OUTPUT->render_from_template('mod_competvet/emails/footer', $context);
+        // The logo is a base64 encoded image.
+        $logo = $OUTPUT->render_from_template('mod_competvet/emails/logo', []);
+        $footer = self::local_get_string('email:footer', $logo);
         return $content . $footer;
     }
 

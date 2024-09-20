@@ -101,11 +101,15 @@ if ($hassiteconfig) {
                 $defaultlang = 'fr';
             }
         }
+        $configuredlang = get_config('mod_competvet', 'defaultlang');
+        if (empty($configuredlang)) {
+            $configuredlang = 'fr';
+        }
         $settings->add(
             new admin_setting_configselect(
                 'mod_competvet/defaultlang',
                 get_string('lang', 'admin'),
-                get_string('defaultlang_help', 'mod_competvet'),
+                get_string('defaultlang_help', 'mod_competvet', $configuredlang),
                 $defaultlang,
                 $langs,
             )
@@ -183,5 +187,36 @@ if ($hassiteconfig) {
                 )
             );
         }
+
+        // Footer content
+        $settings->add(
+            new admin_setting_heading(
+                'mod_competvet/footerheader',
+                get_string('footer', 'mod_competvet'),
+                get_string('footer', 'mod_competvet'),
+            )
+        );
+        $footer = get_string('email:footer', 'mod_competvet');
+        $currentfooter = get_config('mod_competvet', 'email_footer_' . $currentlang);
+        if (empty($currentfooter)) {
+            $currentfooter = $footer;
+        }
+        $settings->add(
+            new admin_setting_description(
+                'mod_competvet/footerpreview',
+                get_string('footer', 'mod_competvet'),
+                $currentfooter,
+            )
+        );
+
+        $settings->add(
+            new admin_setting_configtextarea(
+                'mod_competvet/email_footer_' . $currentlang,
+                get_string('footer', 'mod_competvet'),
+                html_writer::tag('code', html_writer::tag('pre', s($footer))),
+                '',
+                PARAM_RAW,
+            )
+        );
     }
 }
