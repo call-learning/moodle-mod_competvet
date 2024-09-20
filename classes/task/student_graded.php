@@ -45,6 +45,10 @@ class student_graded extends \core\task\adhoc_task {
      * Execute the task.
      */
     public function execute() {
+        // Check if this task is enabled.
+        if (!get_config('mod_competvet', 'student_graded_enabled')) {
+            return;
+        }
         $data = $this->get_custom_data();
         $studentid = $data->studentid;
         $student = core_user::get_user($studentid);

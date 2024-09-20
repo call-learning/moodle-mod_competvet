@@ -40,7 +40,8 @@ class notifications {
      */
     public static function send_email($notification, $id, $competvetid, $recipients, $context = []) {
         $context = self::add_global_context($context, $competvetid);
-        $subject = get_string('email:' . $notification . ':subject', 'mod_competvet', $context);
+        // Get the default language for the emails from the competvet settings.
+        $subject = self::local_get_string('email:' . $notification . ':subject', $context);
         $body = self::get_email_body($notification, $context);
         self::log_notification($notification, $id, $competvetid, $body);
 
@@ -64,9 +65,55 @@ class notifications {
      */
     public static function get_email_body($notification, $context): string {
         global $OUTPUT;
-        $content = get_string('email:' . $notification, 'mod_competvet', $context);
+        $content = self::local_get_string('email:' . $notification, $context);
         $footer = $OUTPUT->render_from_template('mod_competvet/emails/footer', $context);
         return $content . $footer;
+    }
+
+    /**
+     * Local get string function
+     * Gets the string from the local language file or the custom setting.
+     * @param string $string
+     * @param array $context
+     * @return string
+     */
+    public static function local_get_string($string, $context = []): string {
+        $lang = get_config('mod_competvet', 'defaultlang');
+        if (empty($lang)) {
+            $lang = 'fr';
+        }
+        $settingname = str_replace(':', '_', $string);
+        $setting = get_config('mod_competvet', $settingname . '_' . $lang);
+        if (!empty($setting)) {
+            return self::process_placeholders($setting, $context);
+        }
+        $stringmanager = get_string_manager();
+        return $stringmanager->get_string($string, 'mod_competvet', $context, $lang);
+    }
+
+    /**
+     * Processes a custom string by replacing placeholders with actual values.
+     *
+     * @param string $string The custom string containing placeholders.
+     * @param mixed $a An object or array containing values for placeholders.
+     * @return string The processed string with placeholders replaced.
+     */
+    public static function process_placeholders($string, $a): string {
+        if (is_array($a) || is_object($a)) {
+            // Handle {$a->varname} placeholders
+            foreach ($a as $key => $value) {
+                if (is_array($value) || is_object($value)) {
+                    // Skip nested arrays or objects
+                    continue;
+                }
+                $placeholder = '{$a->' . $key . '}';
+                $string = str_replace($placeholder, $value, $string);
+            }
+        } else {
+            // Handle {$a} placeholder
+            $string = str_replace('{$a}', $a, $string);
+        }
+        return $string;
     }
 
     /**

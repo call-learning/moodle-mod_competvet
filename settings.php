@@ -73,17 +73,115 @@ if ($hassiteconfig) {
             )
         );
         // Add a link to the manage criteria page.
-        $renderer = $PAGE->get_renderer('mod_competvet');
-        $widget = base::factory($USER->id, 'managecriteria');
-        $widget->set_data();
-        $url = new moodle_url('/mod/competvet/criteria.php');
+        $url = new moodle_url('/mod/competvet/manageglobalcriteria.php');
         $settings->add(
-            new admin_setting_heading(
+            new admin_setting_description(
                 'mod_competvet/managecriteria',
                 get_string('managecriteria', 'mod_competvet'),
-                $renderer->render($widget)
+                html_writer::link($url, get_string('managecriteria', 'mod_competvet'), ['class' => 'btn btn-primary mb-3']),
             )
         );
-        // TODO: Define actual plugin settings page and add it to the tree - {@link https://docs.moodle.org/dev/Admin_settings}.
+
+        $settings->add(
+            new admin_setting_heading(
+                'mod_competvet/notifications_heading',
+                get_string('notifications', 'core'),
+                get_string('notifications', 'core'),
+            )
+        );
+
+        // Select the default language for the emails.
+        $stringmanager = get_string_manager();
+        $languages = $stringmanager->get_list_of_translations();
+        $langs = [];
+        $defaultlang = 'en';
+        foreach ($languages as $key => $lang) {
+            $langs[$key] = $lang;
+            if ($key = 'fr') {
+                $defaultlang = 'fr';
+            }
+        }
+        $settings->add(
+            new admin_setting_configselect(
+                'mod_competvet/defaultlang',
+                get_string('lang', 'admin'),
+                get_string('defaultlang_help', 'mod_competvet'),
+                $defaultlang,
+                $langs,
+            )
+        );
+
+        // Set custom language strings for emails
+        $emails = [
+            'end_of_planning',
+            'items_todo',
+            'student_graded',
+            'student_target:eval',
+            'student_target:autoeval',
+            'student_target:cert',
+            'student_target:list',
+        ];
+
+        // Get the current language.
+        $currentlang = current_language();
+        // Adds a setting for each email.
+        foreach ($emails as $email) {
+            $settingname = str_replace(':', '_', $email);
+            // Heading for the email settings.
+            $settings->add(
+                new admin_setting_heading(
+                    'mod_competvet/' . $settingname . '_heading',
+                    get_string('notification:' . $email, 'mod_competvet'),
+                    '',
+                )
+            );
+
+            if ($email == 'student_graded') {
+                // add a checkbox to enable/disable the task
+                $settings->add(
+                    new admin_setting_configcheckbox(
+                        'mod_competvet/' . $settingname . '_enabled',
+                        get_string('enable', 'core'),
+                        get_string('notification:student_graded:enabled', 'mod_competvet'),
+                        1,
+                    )
+                );
+            } else {
+                // Link to the task edit page
+                $url = new moodle_url('/admin/tool/task/scheduledtasks.php',
+                    ['action' => 'edit', 'task' => 'mod_competvet\task\\' . $email]);
+                $link = html_writer::link($url, get_string('controltask', 'mod_competvet'), ['class' => 'd-block mb-3']);
+                $settings->add(
+                    new admin_setting_description(
+                        'mod_competvet/' . $settingname . '_edit',
+                        get_string('schedule', 'core'),
+                        $link
+                    )
+                );
+            }
+
+            // Subject
+            $subject = get_string('email:' . $email . ':subject', 'mod_competvet');
+            $settings->add(
+                new admin_setting_configtext(
+                    'mod_competvet/email_' . $settingname . '_subject_' . $currentlang,
+                    get_string('subject', 'core'),
+                    html_writer::tag('code', s($subject)),
+                    '',
+                    PARAM_RAW,
+                )
+            );
+            // Body
+            $body = get_string('email:' . $email, 'mod_competvet');
+            $settings->add(
+                new admin_setting_configtextarea(
+                    'mod_competvet/email_' . $settingname . '_' . $currentlang,
+                    get_string('message', 'core'),
+                    html_writer::tag('code', s($body)),
+                    '',
+                    PARAM_RAW,
+                )
+            );
+        }
     }
 }
