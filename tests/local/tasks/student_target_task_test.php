@@ -13,28 +13,27 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\tasks;
+
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
 
-use advanced_testcase;
-use core_user;
-use DateTime;
-use mod_competvet\event\observation_requested;
-use mod_competvet\local\persistent\planning;
-use mod_competvet\local\persistent\situation;
-use mod_competvet\task\end_of_planning;
+use mod_competvet\task\student_target;
 use test_data_definition;
+use advanced_testcase;
+use DateTime;
 
 /**
- * User role test
+ * Tests for CompetVet
  *
- * @package     mod_competvet
- * @copyright   2023 CALL Learning <contact@call-learning.fr>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mod_competvet
+ * @category   test
+ * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class end_of_planning_task_test extends advanced_testcase {
+final class student_target_task_test extends advanced_testcase {
     use test_data_definition;
 
     /**
@@ -45,10 +44,10 @@ class end_of_planning_task_test extends advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
-        $this->setAdminUser(); // Needed for report builder to work.
+        $this->setAdminUser();
         $generator = $this->getDataGenerator();
         $competvetgenerator = $generator->get_plugin_generator('mod_competvet');
-        $startdate = new DateTime('15 days ago');
+        $startdate = new DateTime('12 days ago');
         $this->generates_definition(
             $this->{'get_data_definition_set_2'}($startdate->getTimestamp()),
             $generator,
@@ -57,17 +56,21 @@ class end_of_planning_task_test extends advanced_testcase {
     }
 
     /**
-     * Test that the end of planning tasks sends an email when there are students to grade.
+     * Test that the student target task sends an email to students who have not met the target.
+     * @covers \mod_competvet\task\student_target::execute
      *
      * @return void
-     * @covers       \mod_competvet\task\end_of_planning::execute
      */
-    public function test_end_of_planning_without_grade() {
+    public function test_student_target_task(): void {
         $emailsink = $this->redirectEmails();
-        $endofplanningtasks = new end_of_planning();
-        $endofplanningtasks->execute();
+        $task = new student_target();
+        $task->execute();
         $emails = $emailsink->get_messages();
-        $this->assertCount(1, $emails);
-        $this->assertEquals('[CompetVet] You have students to grade in the rotation SIT1', $emails[0]->subject);
+        $this->assertCount(4, $emails);
+        // Run the task again to check if the emails are not sent twice.
+        $emailsink = $this->redirectEmails();
+        $task->execute();
+        $emails = $emailsink->get_messages();
+        $this->assertCount(0, $emails);
     }
 }
