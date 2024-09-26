@@ -301,6 +301,9 @@ $string['notreached'] = 'Level not reached';
 $string['validated'] = 'Validated';
 $string['notvalidated'] = 'Not validated';
 $string['nocertifications'] = 'No certifications';
+$string['observationrequest'] = 'Observation request';
+$string['observationwaiting'] = '{$a->targetfullname} Requested observation on {$a->timecreated}';
+$string['observationrequested'] = '{$a->targetfullname} Requested observation on {$a->timecreated} <br> {$a->userfullname} Completed observation on {$a->timemodified}';
 
 $string['evaluation'] = 'Global Evaluation';
 $string['suggestedgrade'] = 'Suggested grade';

@@ -29,7 +29,9 @@ use external_single_structure;
 use external_multiple_structure;
 use mod_competvet\competvet;
 use mod_competvet\local\api\observations;
+use mod_competvet\local\api\todos;
 use mod_competvet\local\persistent\observation;
+use mod_competvet\local\persistent\todo;
 use mod_competvet\local\persistent\observation_comment;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\api\criteria;
@@ -141,11 +143,16 @@ class get_evaluations extends external_api {
         // This will get the observations for the current user and planning.
         $userobservations = observations::get_user_observations($planningid, $studentid, true);
 
+
         $gradedcriteria = [];
         $comments = [];
         $hasautoevaluations = false;
         $hasobserverevaluations = false;
         $criteria = $competvet->get_situation()->get_eval_criteria();
+        // This will get the todos targetted to the current user.
+        $todos = todos::get_todos_for_target_user_on_planning($planningid, $studentid, todo::ACTION_EVAL_OBSERVATION_ASKED);
+        self::collect_todos($todos, $comments);
+
         foreach ($userobservations as $userobservation) {
             self::collect_grades($userobservation, $criteria, $gradedcriteria);
             self::collect_comments($userobservation, $comments);
@@ -271,6 +278,52 @@ class get_evaluations extends external_api {
                 'commenttitle' => $comment['label'],
                 'private' => $comment['private'],
             ];
+        }
+    }
+
+    /**
+     * Collect todos from an observation
+     *
+     * @param array $todos
+     * @param array $comments
+     * @return void
+     */
+    private static function collect_todos(array $todos, array &$comments): void {
+        foreach ($todos as $todo) {
+            $observerid = $todo['user']['id'];
+            if (!isset($comments[$observerid])) {
+                $comments[$observerid] = [
+                    'observerinfo' => $todo['user'],
+                    'isautoeval' => false,
+                    'comments' => [],
+                ];
+            }
+
+            $strings = [
+                'timecreated' => userdate($todo['timecreated'], get_string('strftimedatefullshort')),
+                'timemodified' => userdate($todo['timemodified'], get_string('strftimedatefullshort')),
+                'userfullname' => $todo['user']['fullname'],
+                'targetfullname' => $todo['targetuser']['fullname'],
+            ];
+            if ($todo['status'] == todo::STATUS_PENDING) {
+                $comments[$observerid]['comments'][] = [
+                    'id' => $todo['id'],
+                    'comment' => get_string('observationwaiting', 'mod_competvet', $strings),
+                    'timecreated' => 0,
+                    'commenttitle' => get_string('observationrequest', 'mod_competvet'),
+                    'private' => false,
+                ];
+            } else {
+
+
+                $comments[$observerid]['comments'][] = [
+                    'id' => $todo['id'],
+                    'comment' => get_string('observationrequested', 'mod_competvet', $strings),
+                    'timecreated' => 0,
+                    'commenttitle' => get_string('observationrequest', 'mod_competvet'),
+                    'private' => false,
+                ];
+            }
         }
     }
 

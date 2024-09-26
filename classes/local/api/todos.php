@@ -203,6 +203,43 @@ class todos {
     }
 
     /**
+     * Get todos for a target user on a given planning
+     *
+     * @param int $planningid
+     * @param int $targetuserid
+     * @param int $action
+     * @return array
+     */
+    public static function get_todos_for_target_user_on_planning(int $planningid, int $targetuserid, int $action): array {
+        $todos = todo::get_records([
+            'targetuserid' => $targetuserid,
+            'planningid' => $planningid,
+            'action' => $action,
+        ],  'timecreated');
+        $todoarray = [];
+        foreach ($todos as $todo) {
+            if (
+                planning::record_exists($todo->get('planningid')) === false ||
+                utils::user_exists($todo->get('targetuserid')) === false ||
+                utils::user_exists($todo->get('userid')) === false
+            ) {
+                continue;
+            }
+            $todorecord = [];
+            $todorecord['id'] = $todo->get('id');
+            $todorecord['user'] = utils::get_user_info($todo->get('userid'));
+            $todorecord['targetuser'] = utils::get_user_info($todo->get('targetuserid'));
+            $todorecord['status'] = $todo->get('status');
+            $todorecord['action'] = $todo->get('action');
+            $todorecord['data'] = $todo->get('data');
+            $todorecord['timecreated'] = $todo->get('timecreated');
+            $todorecord['timemodified'] = $todo->get('timemodified');
+            $todoarray[] = $todorecord;
+        }
+        return $todoarray;
+    }
+
+    /**
      * Update TODO status
      *
      * @param int $todoid
