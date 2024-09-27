@@ -72,7 +72,76 @@
                 </div>
             </section>
         {{/criteria}}
-        <button type="submit" class="btn btn-primary {{^cangrade}}d-none{{/cangrade}}">{{#str}}savechanges{{/str}}</button>
-
+        <hr>
+        <div class="mb-5 mt-3">
+            <div class="d-flex justify-content-between mb-2">
+                {{#str}}finalscore, mod_competvet{{/str}}
+                <div class="ml-auto">
+                    <span id="finalscore" class="calculatedgrade" data-field="finalscore">{{finalscore}}</span> /
+                    <span class="maxgrade" data-field="maxfinalscore">{{maxfinalscore}}</span>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end mb-1">
+                <button
+                    type="button"
+                    class="btn btn-sm btn-link {{#hideaccept}}d-none{{/hideaccept}} {{^cangrade}}d-none{{/cangrade}}"
+                    data-action="acceptgrade"
+                    data-source="#finalscore"
+                    data-target="#scoreevaluator"
+                >
+                    {{#str}}acceptgrade, mod_competvet{{/str}}
+                </button>
+            </div>
+            <div class="form-group d-flex">
+                <div class="d-flex flex-column">
+                    <label for="scoreevaluator">
+                        {{#str}}scoreevaluator, mod_competvet{{/str}}
+                    </label>
+                    <div class="text-muted">
+                        {{#str}}scoreevaluator_help, mod_competvet{{/str}}
+                    </div>
+                </div>
+                <div class="span3 col-3 pr-0">
+                    <input
+                        type="number"
+                        data-field="scoreevaluator"
+                        class="form-control{{!
+                            }}{{#isvalid}} is-valid{{/isvalid}}{{!
+                            }}{{#isinvalid}} is-invalid{{/isinvalid}}"
+                        id="scoreevaluator"
+                        name="scoreevaluator"
+                        value="{{scoreevaluator}}"
+                        min="0"
+                        max="{{maxfinalscore}}"
+                        step="1"
+                        {{^cangrade}}disabled{{/cangrade}}
+                        {{^cangrade}}disabled{{/cangrade}}
+                    />
+                </div>
+            </div>
+        </div>
+        <div class="mb-5">
+            <div class="form-group">
+                <label for="freecommentlist">
+                    {{#str}}freecommentlist, mod_competvet{{/str}}
+                </label>
+                <textarea
+                    data-field="comment"
+                    class="form-control{{!
+                        }}{{#comment}}{{!
+                            }}{{#isvalid}} is-valid{{/isvalid}}{{!
+                            }}{{#isinvalid}} is-invalid{{/isinvalid}}{{!
+                        }}{{/comment}}"
+                    id="comment"
+                    name="comment"
+                    {{^cangrade}}disabled{{/cangrade}}
+                    rows="3">{{comment}}</textarea>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center">
+            <button type="submit" class="btn btn-primary {{^cangrade}}d-none{{/cangrade}}">
+                {{#str}}savechanges{{/str}}
+            </button>
+        </div>
     {{/grading}}
 {{/list-grading}}

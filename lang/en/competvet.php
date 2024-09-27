@@ -305,6 +305,8 @@ $string['observationrequest'] = 'Observation request';
 $string['observationwaiting'] = '{$a->targetfullname} Requested observation on {$a->timecreated}';
 $string['observationrequested'] = '{$a->targetfullname} Requested observation on {$a->timecreated} <br> {$a->userfullname} Completed observation on {$a->timemodified}';
 
+$string['freecommentlist'] = 'Free comment for the List part';
+
 $string['evaluation'] = 'Global Evaluation';
 $string['suggestedgrade'] = 'Suggested grade';
 $string['suggestedgrade_help'] = 'Suggested grade';

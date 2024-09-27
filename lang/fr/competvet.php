@@ -293,6 +293,7 @@ $string['nocertifications'] = 'Non certifié';
 $string['observationrequest'] = 'Demande d\'observation';
 $string['observationwaiting'] = '{$a->targetfullname} a demandé une observation le {$a->timecreated}';
 $string['observationrequested'] = '{$a->targetfullname} a demandé une observation le {$a->timecreated} <br> {$a->userfullname} a complété l\'observation le {$a->timemodified}';
+$string['freecommentlist'] = 'Commentaire libre pour la partie journal de cas';
 $string['evaluation'] = 'Évaluation globale';
 $string['suggestedgrade'] = 'Note suggérée';
 $string['suggestedgrade_help'] = 'Note suggérée';

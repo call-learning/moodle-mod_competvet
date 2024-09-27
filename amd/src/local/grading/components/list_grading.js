@@ -75,6 +75,13 @@ const formCalculation = () => {
             }
         });
     });
+    grading.finalscore = Math.round(grading.subgrade);
+    grading.maxfinalscore = 100;
+    grading.scoreevaluator = formObject.scoreevaluator;
+    if (grading.scoreevaluator) {
+        grading.subgrade = grading.scoreevaluator;
+    }
+    grading.comment = formObject.comment;
     const context = {
         grading: grading
     };
@@ -83,9 +90,19 @@ const formCalculation = () => {
 
 const formEvents = () => {
     const form = document.querySelector('[data-region="list-grading"]');
+    const acceptGradeButton = form.querySelector('[data-action="acceptgrade"]');
+    if (acceptGradeButton) {
+        acceptGradeButton.addEventListener('click', async(e) => {
+            e.preventDefault();
+            form.querySelector(acceptGradeButton.dataset.target).value =
+                form.querySelector(acceptGradeButton.dataset.source).innerHTML;
+        });
+    }
     if (form.dataset.events) {
         return;
     }
+    const context = formCalculation();
+    CompetState.setValue('list-grading', context);
     form.addEventListener('submit', async(e) => {
         e.preventDefault();
         const context = formCalculation();
@@ -115,6 +132,22 @@ const formEvents = () => {
 
         const customEvent = new CustomEvent('setSuggestedGrade', {});
         gradingApp.dispatchEvent(customEvent);
+
+    });
+    form.addEventListener('change', (e) => {
+        if (e.target.type === 'radio') {
+            let sumvalues = 0;
+            // Get all the selected options for each criterion.
+            const selectedOptions = form.querySelectorAll('input[type="radio"]:checked');
+            sumvalues = Array.from(selectedOptions).reduce((acc, option) => {
+                return acc + parseFloat(option.value);
+            }, 0);
+            // Finalscore input
+            const finalscore = form.querySelector('[id="finalscore"]');
+            if (finalscore) {
+                finalscore.innerHTML = Math.ceil(sumvalues);
+            }
+        }
 
     });
     form.dataset.events = true;
