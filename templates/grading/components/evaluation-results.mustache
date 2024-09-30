@@ -46,13 +46,11 @@
                 <div class="row no-gutters flex-nowrap">
                     <div class="p-2 col-6 criterionlabel cellborder font-weight-bold text-center d-flex align-items-center">{{#str}}tabletitle:evals, mod_competvet{{/str}}</div>
                     {{#evaluations.0}}
-                        {{#hasaverage}}
-                            <div class="p-2 cellborder col-2 evaluator font-weight-bold text-center d-flex align-items-center">
-                                <div class="averagecolumn">
-                                    {{#str}}average, mod_competvet{{/str}}
-                                </div>
+                        <div class="p-2 cellborder col-2 evaluator font-weight-bold text-center d-flex align-items-center">
+                            <div class="averagecolumn">
+                                {{#str}}average, mod_competvet{{/str}}
                             </div>
-                        {{/hasaverage}}
+                        </div>
                         {{#grades}}
                             {{^autoeval}}
                                 <div class="p-2 cellborder col-2 evaluator font-weight-bold text-center d-flex align-items-center">
@@ -69,16 +67,10 @@
                         <div class="p-2 cellborder col-6 criterionlabel font-weight-bold">
                             {{criterion.label}}
                         </div>
-                        {{#hasaverage}}
-                            <div class="p-2 cellborder col-2 grade text-center" data-region="averagerow">
-                                {{average}}
-                            </div>
-                        {{/hasaverage}}
-                        {{^hasaverage}}
-                            <div class="p-2 cellborder col-2 grade text-center">
-                                -
-                            </div>
-                        {{/hasaverage}}
+                        <div class="p-2 cellborder col-2 grade text-center" data-region="averagerow">
+                            {{average}}
+                        </div>
+
                         {{#grades}}
                             {{^autoeval}}
                                 {{^nograde}}

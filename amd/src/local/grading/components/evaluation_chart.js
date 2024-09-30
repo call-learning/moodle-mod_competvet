@@ -81,7 +81,9 @@ const stateTemplate = () => {
 const transformContext = async(context, autoeval) => {
     const currentUser = CompetState.getValue('user');
     const self = currentUser.id;
-    const data = context['evaluation-results'];
+    let data = context['evaluation-results'];
+    // Filter out the criteria that do not have an average.
+    data.evaluations = data.evaluations.filter(criterion => criterion.hasaverage);
     const labels = data.evaluations.map(criterion => criterion.criterion.label);
     const graders = [];
     const colors = [

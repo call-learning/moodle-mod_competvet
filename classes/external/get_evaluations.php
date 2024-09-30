@@ -194,7 +194,11 @@ class get_evaluations extends external_api {
                 $totalaveragecount++;
             }
             $gradedcriteria[$index]['hasaverage'] = $hasaverage;
-            $gradedcriteria[$index]['average'] = round($average);
+            if ($hasaverage) {
+                $gradedcriteria[$index]['average'] = round($average);
+            } else {
+                $gradedcriteria[$index]['average'] = null;
+            }
         }
         usort($gradedcriteria, function ($a, $b) {
             return $a['criterion']['sort'] <=> $b['criterion']['sort'];
