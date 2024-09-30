@@ -131,6 +131,7 @@ $string['entity:planning'] = 'Planification';
 $string['entity:situation'] = 'Situation';
 $string['entity:criterion'] = 'Critère';
 $string['entity:criteria'] = 'Critères';
+$string['entity:roles'] = 'Utilisateurs';
 $string['entity:grid'] = 'Grille d\'évaluation';
 $string['entity:observation_comment'] = 'Commentaire d\'observation';
 $string['observation:status'] = 'Statut';

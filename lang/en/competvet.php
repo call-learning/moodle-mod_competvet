@@ -133,6 +133,7 @@ $string['entity:planning'] = 'Planning';
 $string['entity:situation'] = 'Situation';
 $string['entity:criterion'] = 'Criterion';
 $string['entity:criteria'] = 'Criteria';
+$string['entity:roles'] = 'Assign roles';
 $string['entity:grid'] = 'Evaluation Grid';
 $string['entity:observation_comment'] = 'Observation comment';
 $string['observation:status'] = 'Status';
