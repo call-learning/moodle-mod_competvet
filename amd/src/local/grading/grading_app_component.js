@@ -275,6 +275,13 @@ class Competvet {
         // We need to give the template the litteral string as {{#str}} {{value}} {{/str}} does not work.
         for (const option of context.grading.evaloptions) {
             option.valuestring = await getString(option.value === 'validated' ? 'validated' : 'notvalidated', 'mod_competvet');
+            option.selected = false;
+            if (option.value === 'validated' && context.grading.statusproposed === true) {
+                option.selected = true;
+            }
+            if (option.value === 'notvalidated' && context.grading.statusproposed !== true) {
+                option.selected = true;
+            }
         }
     }
 
