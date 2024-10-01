@@ -175,7 +175,7 @@ class get_evaluations extends external_api {
         $totalaverage = 0;
         $totalaveragecount = 0;
         foreach($gradedcriteria as $index => $gradedcriterion) {
-            $gradesum = 0;
+            $gradesum = null;
             $gradescount = 0;
             $average = 0;
             $hasaverage = false;
@@ -185,7 +185,7 @@ class get_evaluations extends external_api {
                     $gradescount++;
                 }
             }
-            if ($gradesum > 0) {
+            if ($gradesum !== null && $gradesum >= 0) {
                 $hasaverage = true;
                 $average = $gradesum / $gradescount;
             }
