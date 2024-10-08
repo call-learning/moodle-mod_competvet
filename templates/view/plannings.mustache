@@ -161,7 +161,7 @@
                                 {{#stats.eval}}
                                     <span class="evalutations">
                                 <span class="badge {{#pass}}badge-success{{/pass}}{{^pass}}badge-secondary{{/pass}} badge-pill" data-toggle="tooltip"
-                                      title="{{#str}}planning:page:info:eval, mod_competvet{{/str}}">
+                                      title="{{#str}}planning:page:badge:eval, mod_competvet{{/str}}">
                                     {{nbdone}}/{{nbrequired}}
                                     {{> mod_competvet/grading/svg/chat}}
                                 </span>
@@ -170,7 +170,7 @@
                                 {{#stats.autoeval}}
                                     <span class="autoevaluations">
                                 <span class="badge {{#pass}}badge-success{{/pass}}{{^pass}}badge-secondary{{/pass}} badge-pill" data-toggle="tooltip"
-                                      title="{{#str}}planning:page:info:autoeval, mod_competvet{{/str}}">
+                                      title="{{#str}}planning:page:badge:autoeval, mod_competvet{{/str}}">
                                     {{nbdone}}/{{nbrequired}}
                                     {{> mod_competvet/grading/svg/chat}}
                                 </span>
@@ -179,7 +179,7 @@
                                 {{#stats.cert}}
                                     <span class="certications">
                                 <span class="badge {{#pass}}badge-success{{/pass}}{{^pass}}badge-secondary{{/pass}} badge-pill" data-toggle="tooltip"
-                                      title="{{#str}}planning:page:info:cert, mod_competvet{{/str}}">
+                                      title="{{#str}}planning:page:badge:cert, mod_competvet{{/str}}">
                                     {{nbdone}}/{{nbrequired}}
                                     {{> mod_competvet/grading/svg/certif}}
                                 </span>
@@ -188,7 +188,7 @@
                                 {{#stats.list}}
                                     <span class="cases">
                                 <span class="badge {{#pass}}badge-success{{/pass}}{{^pass}}badge-secondary{{/pass}} badge-pill" data-toggle="tooltip"
-                                      title="{{#str}}planning:page:info:list, mod_competvet{{/str}}">
+                                      title="{{#str}}planning:page:badge:list, mod_competvet{{/str}}">
                                     {{nbdone}}/{{nbrequired}}
                                     {{> mod_competvet/grading/svg/list}}
                                 </span>
@@ -196,7 +196,7 @@
                                 {{/stats.list}}
                             {{/planninginfo}}
                             <span class="badge badge-info icon-no-margin ml-4 badge-pill" data-toggle="tooltip" title="{{#str}}studentprogress, mod_competvet{{/str}}">
-                            <a class="text-white stretched-link" href="{{{studenturl}}}">
+                            <a class="text-white" href="{{{studenturl}}}">
                                 {{#pix}}i/info, core{{/pix}}
                             </a>
                         </span>
