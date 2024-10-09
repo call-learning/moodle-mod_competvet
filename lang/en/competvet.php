@@ -434,6 +434,11 @@ $string['notification:student_target:autoeval'] = 'Student objectives: Self-eval
 $string['notification:student_target:cert'] = 'Student objectives: Certifications';
 $string['notification:student_target:list'] = 'Student objectives: Case log';
 
+$string['catchall_email'] = 'Catchall Email Address';
+$string['catchall_email_desc'] = 'Enter the email address to which all notifications should be redirected when enabled.';
+$string['redirect_to_catchall'] = 'Redirect to Catchall Email';
+$string['redirect_to_catchall_desc'] = 'Enable this option to redirect all notifications to the catchall email address.';
+
 // Emails
 $string['email:end_of_planning:subject'] = '[CompetVet] You have students to grade in the rotation {$a->competvetname}';
 $string['email:end_of_planning'] = <<<'EOF'

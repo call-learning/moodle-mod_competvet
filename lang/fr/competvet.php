@@ -404,6 +404,11 @@ $string['notification:student_target:autoeval'] = 'Objectifs étudiants : Auto-�
 $string['notification:student_target:cert'] = 'Objectifs étudiants : Certifications';
 $string['notification:student_target:list'] = 'Objectifs étudiants : Carnet de cas';
 
+$string['catchall_email'] = 'Adresse e-mail de récupération';
+$string['catchall_email_desc'] = 'Entrez l\'adresse e-mail à laquelle toutes les notifications doivent être redirigées lorsqu\'elle est activée.';
+$string['redirect_to_catchall'] = 'Rediriger vers l\'e-mail de récupération';
+$string['redirect_to_catchall_desc'] = 'Activez cette option pour rediriger toutes les notifications vers l\'adresse e-mail de récupération.';
+
 // Emails
 $string['email:end_of_planning:subject'] = '[CompetVet] Vous avez des étudiants à noter dans la rotation {$a->competvetname}';
 $string['email:end_of_planning'] = <<<'EOF'

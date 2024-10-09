@@ -45,7 +45,15 @@ class notifications {
         $body = self::get_email_body($notification, $context);
         self::log_notification($notification, $id, $competvetid, $body);
 
+        // Check if redirection to catchall email is enabled.
+        $redirect_to_catchall = get_config('mod_competvet', 'redirect_to_catchall');
+        $catchall_email = get_config('mod_competvet', 'catchall_email');
+
+
         foreach ($recipients as $recipient) {
+            if ($redirect_to_catchall && !empty($catchall_email)) {
+                $recipient->email = $catchall_email;
+            }
             try {
                 $success = email_to_user($recipient, core_user::get_noreply_user(), $subject, $body);
                 if (!$success) {

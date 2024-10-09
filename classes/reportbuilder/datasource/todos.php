@@ -19,8 +19,8 @@ declare(strict_types=1);
 namespace mod_competvet\reportbuilder\datasource;
 
 use core_reportbuilder\datasource;
-use mod_competvet\reportbuilder\local\entities\situation;
 use mod_competvet\reportbuilder\local\entities\todo;
+use mod_competvet\reportbuilder\local\helpers\todos_helper;
 
 /**
  * TODO datasource
@@ -30,6 +30,7 @@ use mod_competvet\reportbuilder\local\entities\todo;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class todos extends datasource {
+    use todos_helper;
     /**
      * Return user friendly name of the report source
      *
@@ -47,6 +48,8 @@ class todos extends datasource {
     public function get_default_columns(): array {
         return [
             'todo:status',
+            'student:fullname',
+            'observer:fullname',
             'todo:action',
             'todo:data',
             'todo:created',
@@ -81,13 +84,7 @@ class todos extends datasource {
      * Initialise report
      */
     protected function initialise(): void {
-        $todoentity = new todo();
-
-        $todoalias = $todoentity->get_table_alias('competvet_todo');
-        $this->set_main_table('competvet_todo', $todoalias);
-
-        $this->add_entity($todoentity);
-
+        $this->add_todos_entities();
         $this->add_all_from_entities();
     }
 }
