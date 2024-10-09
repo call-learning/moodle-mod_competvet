@@ -168,16 +168,9 @@ class todos {
             }
         }
     }
-
-    /**
-     * Get todos for a given user
-     *
-     * @param int $userid
-     * @return array
-     */
-    public static function get_todos_for_user(int $userid): array {
+    private static function get_todos_for(int $userid, string $key): array {
         $todos = todo::get_records([
-            'userid' => $userid,
+            $key => $userid,
             'status' => todo::STATUS_PENDING,
         ],  'timecreated');
         $todoarray = [];
@@ -193,7 +186,6 @@ class todos {
             $todorecord['id'] = $todo->get('id');
             $todorecord['user'] = utils::get_user_info($todo->get('userid'));
             $todorecord['targetuser'] = utils::get_user_info($todo->get('targetuserid'));
-            $todorecord['planning'] = plannings::get_planning_info($todo->get('planningid'));
             $todorecord['status'] = $todo->get('status');
             $todorecord['action'] = $todo->get('action');
             $todorecord['data'] = $todo->get('data');
@@ -201,7 +193,24 @@ class todos {
         }
         return $todoarray;
     }
-
+    /**
+     * Get todos for a given user
+     *
+     * @param int $userid
+     * @return array
+     */
+    public static function get_todos_for_user(int $userid): array {
+        return self::get_todos_for($userid, 'userid');
+    }
+    /**
+     * Get todos targetting a given user
+     *
+     * @param int $userid
+     * @return array
+     */
+    public static function get_todos_for_target_user(int $userid): array {
+        return self::get_todos_for($userid, 'targetuserid');
+    }
     /**
      * Get todos for a target user on a given planning
      *
