@@ -48,20 +48,28 @@ class items_todo extends \core\task\scheduled_task {
     public function execute() {
         global $DB;
         // Get all situations
-        $situtations = $DB->get_records('competvet_situation');
-        foreach ($situtations as $situation) {
+        $situations = $DB->get_records('competvet_situation');
+        $recipients = [];
+
+        foreach ($situations as $situation) {
             $competvet = competvet::get_from_instance_id($situation->competvetid);
             $modulecontext = $competvet->get_context();
             $observers = get_users_by_capability($modulecontext, 'mod/competvet:canobserve');
+
             foreach ($observers as $observer) {
+                if (array_key_exists($observer->id, $recipients)) {
+                    continue;
+                }
                 $todos = todos::get_todos_for_user($observer->id);
                 if (empty($todos)) {
                     continue;
                 }
-                $recipients[] = $observer;
+                if (!isset($recipients[$observer->id])) {
+                    $recipients[$observer->id] = $observer;
+                }
             }
-
-            notifications::send_email($this->taskname, 0, $competvet->get_instance_id(), $recipients, []);
         }
+
+        notifications::send_email($this->taskname, 0, $competvet->get_instance_id(), $recipients, []);
     }
 }
