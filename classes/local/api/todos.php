@@ -189,6 +189,8 @@ class todos {
             $todorecord['status'] = $todo->get('status');
             $todorecord['action'] = $todo->get('action');
             $todorecord['data'] = $todo->get('data');
+            $todorecord['timecreated'] = $todo->get('timecreated');
+            $todorecord['timemodified'] = $todo->get('timemodified');
             $todoarray[] = $todorecord;
         }
         return $todoarray;
