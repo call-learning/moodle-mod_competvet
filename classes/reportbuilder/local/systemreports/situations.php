@@ -96,7 +96,6 @@ class situations extends system_report {
             'situation:shortname',
             'situation:name',
             'situation:evalnum',
-            'situation:autoevalnum',
             'situation:certifpnum',
             'situation:casenum',
             'situation:haseval',

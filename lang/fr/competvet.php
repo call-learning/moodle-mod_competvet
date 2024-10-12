@@ -230,8 +230,13 @@ $string['entity:competvet_todo'] = 'À faire';
 $string['todo:action:certif:valid:asked'] = 'Validation demandée';
 $string['todo:status:pending'] = 'En attente';
 $string['todo:status:done'] = 'Done';
+$string['todo:status:deleted'] = 'Effacé';
 $string['todo:status'] = 'Statut';
 $string['todo:user'] = 'Utilisateur';
+$string['todo:action:format:observationasked'] = 'Observation demandée par {$a->student} pour la situation {$a->situationlabel}
+ à l\'observateur {$a->observer}';
+$string['todo:action:format:certificationasked'] = 'Certification demandée par {$a->student} pour la situation {$a->situationlabel}
+ à l\'observateur {$a->observer}';
 $string['todo:targetuser'] = 'Utilisateur cible';
 $string['todo:type'] = 'Type';
 $string['todo:planning'] = 'Planification';

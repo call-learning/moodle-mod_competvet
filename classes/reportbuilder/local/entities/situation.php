@@ -113,16 +113,6 @@ class situation extends base {
             ->set_is_sortable(true);
 
         $columns[] = (new column(
-            'autoevalnum',
-            new lang_string('situation:autoevalnum', 'mod_competvet'),
-            $this->get_entity_name()
-        ))
-            ->add_joins($this->get_joins())
-            ->set_type(column::TYPE_INTEGER)
-            ->add_fields("{$situationalias}.autoevalnum")
-            ->set_is_sortable(true);
-
-        $columns[] = (new column(
             'certifpnum',
             new lang_string('situation:certifpnum', 'mod_competvet'),
             $this->get_entity_name()
@@ -286,14 +276,6 @@ class situation extends base {
             new lang_string('situation:evalnum', 'mod_competvet'),
             $this->get_entity_name(),
             "{$situationalias}.evalnum"
-        ))->add_joins($this->get_joins());
-
-        $filters[] = (new filter(
-            number::class,
-            'autoevalnum',
-            new lang_string('situation:autoevalnum', 'mod_competvet'),
-            $this->get_entity_name(),
-            "{$situationalias}.autoevalnum"
         ))->add_joins($this->get_joins());
 
         $filters[] = (new filter(

@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace mod_competvet\reportbuilder\local\helpers;
 
-use html_writer;
 use mod_competvet\local\persistent\todo;
 use stdClass;
 
@@ -34,15 +33,29 @@ class format {
         if ($value === null) {
             return '';
         }
-        $data = json_decode($value);
+        $planning = \mod_competvet\local\persistent\planning::get_record(['id' => $row->planningid]);
+        if (!$planning) {
+            return '';
+        }
+        $situation = $planning->get_situation();
+        $competvet = \mod_competvet\competvet::get_from_situation($situation);
+        $student = \core_user::get_user($row->targetuserid);
+        $observer = \core_user::get_user($row->userid);
+        $label = $competvet->get_course_module()->name;
         switch ($row->action) {
             case todo::ACTION_EVAL_OBSERVATION_ASKED:
-                $planning = \mod_competvet\local\persistent\planning::get_record(['id' => $row->planningid]);
-                $student = \core_user::get_user($row->targetuserid);
-                $situation = $planning->get_situation();
-                $competvet = \mod_competvet\competvet::get_from_situation($situation);
-                $label = $competvet->get_course_module()->name;
-                return "Observation demandée par " . fullname($student) . " pour la situation '{$label}'";
+                return get_string(
+                    'todo:action:format:observationasked',
+                    'mod_competvet',
+                    ['student' => fullname($student), 'situationlabel' => $label, 'observer' => fullname($observer)]
+                );
+
+            case todo::ACTION_EVAL_CERTIFICATION_VALIDATION_ASKED:
+                return get_string(
+                    'todo:action:format:certificationasked',
+                    'mod_competvet',
+                    ['student' => fullname($student), 'situationlabel' => $label, 'observer' => fullname($observer)]
+                );
             default:
                 return '';
         }

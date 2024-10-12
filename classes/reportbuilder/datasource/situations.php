@@ -47,7 +47,6 @@ class situations extends datasource {
         return [
             'situation:shortname',
             'situation:evalnum',
-            'situation:autoevalnum',
             'situation:certifpnum',
             'situation:casenum',
             'situation:haseval',

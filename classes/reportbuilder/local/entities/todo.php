@@ -19,7 +19,7 @@ declare(strict_types=1);
 namespace mod_competvet\reportbuilder\local\entities;
 
 use core_reportbuilder\local\entities\base;
-use core_reportbuilder\local\filters\{autocomplete, number};
+use core_reportbuilder\local\filters\{autocomplete};
 use core_reportbuilder\local\report\{column, filter};
 use lang_string;
 use mod_competvet\local\persistent\todo as todo_entity;
@@ -100,7 +100,8 @@ class todo extends base {
         ))
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_LONGTEXT)
-            ->add_fields("{$todoalias}.data, {$todoalias}.action, {$todoalias}.status, {$todoalias}.planningid, {$todoalias}.targetuserid")
+            ->add_fields("{$todoalias}.data, {$todoalias}.action, {$todoalias}.status, 
+            {$todoalias}.planningid, {$todoalias}.targetuserid, {$todoalias}.userid")
             ->set_is_sortable(false)
             ->set_callback([format::class, 'format_todo_data']);
 
@@ -113,8 +114,10 @@ class todo extends base {
             ->set_type(column::TYPE_TIMESTAMP)
             ->add_fields("{$todoalias}.timecreated")
             ->set_is_sortable(true)
-            ->add_callback([\core_reportbuilder\local\helpers\format::class, 'userdate'], get_string('strftimedatetimeshortaccurate', 'core_langconfig'));
-        ;
+            ->add_callback(
+                [\core_reportbuilder\local\helpers\format::class, 'userdate'],
+                get_string('strftimedatetimeshortaccurate', 'core_langconfig')
+            );
 
         $columns[] = (new column(
             'timemodified',
@@ -125,7 +128,10 @@ class todo extends base {
             ->set_type(column::TYPE_TIMESTAMP)
             ->add_fields("{$todoalias}.timemodified")
             ->set_is_sortable(true)
-            ->add_callback([\core_reportbuilder\local\helpers\format::class, 'userdate'], get_string('strftimedatetimeshortaccurate', 'core_langconfig'));
+            ->add_callback(
+                [\core_reportbuilder\local\helpers\format::class, 'userdate'],
+                get_string('strftimedatetimeshortaccurate', 'core_langconfig')
+            );
 
         return $columns;
     }
