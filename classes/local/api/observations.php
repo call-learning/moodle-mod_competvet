@@ -121,6 +121,7 @@ class observations {
                         unset($return['usercreated']);
                         $return['comment'] = content_to_text($return['comment'], $return['commentformat']);
                         unset($return['commentformat']);
+                        $return['commentlabel'] = observation_comment::from_type_to_string($obscomment->get('type'));
                         return $return;
                     }, $othercomments)
                 );

@@ -186,6 +186,7 @@ class todos {
             $todorecord['id'] = $todo->get('id');
             $todorecord['user'] = utils::get_user_info($todo->get('userid'));
             $todorecord['targetuser'] = utils::get_user_info($todo->get('targetuserid'));
+            $todorecord['planning'] = plannings::get_planning_info($todo->get('planningid'));
             $todorecord['status'] = $todo->get('status');
             $todorecord['action'] = $todo->get('action');
             $todorecord['data'] = $todo->get('data');
