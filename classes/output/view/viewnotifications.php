@@ -20,6 +20,7 @@ use mod_competvet\competvet;
 use mod_competvet\local\persistent\notification;
 use renderer_base;
 use stdClass;
+use moodle_url;
 
 /**
  * Generic renderable for the view.
@@ -32,7 +33,12 @@ class viewnotifications extends base {
     /**
      * @var $competvet The competvet object.
      */
-    protected $competvet;
+    protected $competvetid;
+
+    /**
+     * @var $cmid The course module id.
+     */
+    protected $cmid;
 
     /**
      * Export this data so it can be used in a mustache template.
@@ -43,7 +49,12 @@ class viewnotifications extends base {
     public function export_for_template(renderer_base $output) {
         global $CFG;
         $data = parent::export_for_template($output);
-        $competvetid = $this->competvet;
+        $competvetid = $this->competvetid;
+        $delete = optional_param('delete', null, PARAM_INT);
+        if ($delete) {
+            $todelete = notification::get_record(['id' => $delete]);
+            $todelete->delete();
+        }
         $notifications = notification::get_records(['competvetid' => $competvetid]);
         $data['notifications'] = [];
         foreach ($notifications as $notification) {
@@ -51,6 +62,12 @@ class viewnotifications extends base {
             // Get a short version of the body in plain text
             $shortmessage = strip_tags($body);
             $shortmessage = substr($shortmessage, 0, 100);
+            $delete = new moodle_url('/mod/competvet/view.php',
+                [
+                    'pagetype' => 'viewnotifications',
+                    'id' => $this->cmid,
+                    'delete' => $notification->get('id')
+                ]);
             $data['notifications'][] = [
                 'id' => $notification->get('id'),
                 'timecreated' => $notification->get('timecreated'),
@@ -58,6 +75,7 @@ class viewnotifications extends base {
                     'mod_competvet'),
                 'shortmessage' => $shortmessage,
                 'body' => $body,
+                'delete' => $delete->out()
             ];
         }
         $data['version'] = time();
@@ -84,12 +102,13 @@ class viewnotifications extends base {
                 $PAGE->set_secondary_active_tab('viewnotifications');
                 $competvet = competvet::get_from_context($context);
                 $competvetid = $competvet->get_instance_id();
-                $data = [$competvetid];
+                $cmid = $PAGE->cm->id;
+                $data = [$competvetid, $cmid];
             } else {
                 $data = [null];
             }
         }
-        [$this->competvet] = $data;
+        [$this->competvetid, $this->cmid] = $data;
     }
 
     /**
