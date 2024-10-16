@@ -25,7 +25,6 @@ function xmldb_competvet_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
     if ($oldversion < 2024060701) {
-
         // Define field category to be added to competvet_situation.
         $table = new xmldb_table('competvet_situation');
         $field = new xmldb_field('category', XMLDB_TYPE_CHAR, '254', null, null, null, null, 'listgrid');
@@ -39,7 +38,6 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2024060701, 'competvet');
     }
     if ($oldversion < 2024060703) {
-
         // Rename field idnumber on table competvet_case_cat to NEWNAMEGOESHERE.
         $table = new xmldb_table('competvet_case_cat');
         if ($dbman->field_exists($table, 'shortname')) {
@@ -60,7 +58,6 @@ function xmldb_competvet_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024060705) {
-
         // Define field value to be dropped from competvet_case_data.
         $table = new xmldb_table('competvet_case_data');
         $field = new xmldb_field('value');
@@ -81,7 +78,6 @@ function xmldb_competvet_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024082200) {
-
         // Define index planning_ux (unique) to be dropped form competvet_planning.
         $table = new xmldb_table('competvet_planning');
         $index = new xmldb_index('planning_ux', XMLDB_INDEX_UNIQUE, ['situationid', 'groupid', 'startdate', 'enddate']);
@@ -100,7 +96,6 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2024082200, 'competvet');
     }
     if ($oldversion < 2024082400) {
-
         // Define index competvetusergrade_ux (unique) to be dropped form competvet_grades.
         $table = new xmldb_table('competvet_grades');
         $index = new xmldb_index('competvetusergrade_ux', XMLDB_INDEX_UNIQUE, ['competvet', 'type']);
@@ -120,7 +115,6 @@ function xmldb_competvet_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024091702) {
-
         // Define table competvet_notification to be created.
         $table = new xmldb_table('competvet_notification');
 
@@ -146,6 +140,48 @@ function xmldb_competvet_upgrade($oldversion) {
         // Competvet savepoint reached.
         upgrade_mod_savepoint(true, 2024091702, 'competvet');
     }
+    if ($oldversion < 2024101602) {
+        // Change role config data.
+        $roleconfig = mod_competvet\local\persistent\case_field::get_record(['idnumber' => 'role_charge']);
+        $roledata = json_encode(
+            (object) ['options' => [
+                1 => 'Observateur',
+                2 => 'Principal acteur (responsable du cas)',
+                3 => 'En assistance d\'un autre étudiant responsable',
+                4 => 'En groupe sans responsable attitré',
+            ],
+            ],
+            JSON_UNESCAPED_UNICODE
+        );
+        $roleconfig->set('configdata', $roledata);
+        $roleconfig->save();
+        // Change sort order as it does not work.
+        $fields = ['nom_animal',
+            'espece',
+            'race',
+            'sexe',
+            'date_naissance',
+            'num_dossier',
+            'date_cas',
+            'motif_presentation',
+            'resultats_examens',
+            'diag_final',
+            'traitement',
+            'evolution',
+            'role_charge',
+            'taches_effectuees',
+            'reflexions_cas'
+        ];
+        foreach ($fields as $sortorder => $field) {
+            $fieldconfig = mod_competvet\local\persistent\case_field::get_record(['idnumber' => $field]);
+            $fieldconfig->set('sortorder', $sortorder + 1);
+            $fieldconfig->save();
+        }
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024101602, 'competvet');
+    }
+
 
     return true;
 }

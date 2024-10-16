@@ -59,15 +59,14 @@ class fields_importer extends base_persistent_importer {
             }
             $this->categoryCache[$categoryname] = $category->get('id');
         }
-        $fieldorder = 0;
         $fielddata = parent::to_persistent_data($row, $reader);
         $fielddata->categoryid = $this->categoryCache[$categoryname];
         $fielddata->idnumber = $row[1];
         $fielddata->name = $row[2];
-        $fielddata->type = $row[3];
-        $fielddata->description = $row[4];
-        $fielddata->configdata = $row[5];
-        $fielddata->sortorder = $fieldorder++;
+        $fielddata->sortorder = $row[3];
+        $fielddata->type = $row[4];
+        $fielddata->description = $row[5];
+        $fielddata->configdata = $row[6];
 
         return $fielddata;
     }

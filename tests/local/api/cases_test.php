@@ -120,7 +120,7 @@ class cases_test extends advanced_testcase {
                         $this->assertEquals('1 January 2023', $field->displayvalue);
                         break;
                     case 'role_charge':
-                        $this->assertEquals('Principal acteur', $field->displayvalue);
+                        $this->assertEquals('Principal acteur (responsable du cas)', $field->displayvalue);
                         break;
                 }
             }
