@@ -21,7 +21,7 @@
  * @return bool
  */
 function xmldb_competvet_upgrade($oldversion) {
-    global $CFG, $DB;
+    global $DB;
 
     $dbman = $DB->get_manager();
     if ($oldversion < 2024060701) {
@@ -170,7 +170,7 @@ function xmldb_competvet_upgrade($oldversion) {
             'evolution',
             'role_charge',
             'taches_effectuees',
-            'reflexions_cas'
+            'reflexions_cas',
         ];
         foreach ($fields as $sortorder => $field) {
             $fieldconfig = mod_competvet\local\persistent\case_field::get_record(['idnumber' => $field]);
@@ -181,7 +181,29 @@ function xmldb_competvet_upgrade($oldversion) {
         // Competvet savepoint reached.
         upgrade_mod_savepoint(true, 2024101602, 'competvet');
     }
-
-
+    if ($oldversion < 2024101603) {
+        // Change role config data.
+        $reflexioncas = mod_competvet\local\persistent\case_field::get_record(['idnumber' => 'reflexions_cas']);
+        $data = json_encode(
+            (object) [
+                "placeholder" => "Décrivez ici ce que vous" .
+                    " avez appris de ce cas," .
+                    " les principaux défis que vous avez" .
+                    " rencontrés, les domaines sur lesquels" .
+                    " vous devrez encore travailler, ainsi" .
+                    " que les aspects sur lesquels ce cas vous" .
+                    " a aidé à progresser. En résumé, identifiez" .
+                    " pour vous-même les éléments clés à" .
+                    " retenir, ceux qui vous aideront à vous" .
+                    " améliorer grâce à l'analyse que vous en faites ici",
+                "rows" => 12,
+            ],
+            JSON_UNESCAPED_UNICODE
+        );
+        $reflexioncas->set('configdata', $data);
+        $reflexioncas->save();
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024101603, 'competvet');
+    }
     return true;
 }
