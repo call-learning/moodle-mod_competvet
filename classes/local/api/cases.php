@@ -58,7 +58,7 @@ class cases {
             return $casestructure->get('casestructure');
         }
         $categories = case_cat::get_records();
-        $fields = case_field::get_records();
+        $fields = case_field::get_records([], 'sortorder');
         $data = [];
         foreach ($categories as $category) {
             $data[$category->get('id')] = (object) [
