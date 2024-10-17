@@ -239,5 +239,16 @@ if ($hassiteconfig) {
                 0
             )
         );
+
+        // Add a date setting for removing pending todos
+        $settings->add(
+            new admin_setting_configtext(
+                'mod_competvet/clear_pending_todos_days',
+                get_string('clear_pending_todos_days', 'mod_competvet'),
+                get_string('clear_pending_todos_days_desc', 'mod_competvet'),
+                '0',
+                PARAM_INT
+            )
+        );
     }
 }

@@ -392,6 +392,9 @@ $string['studentprogress'] = 'accès à l\'émulateur pour effectuer des actions
 $string['tabletitle:autoevalstudent'] = 'Auto-évaluations de l\'étudiant';
 $string['tabletitle:evals'] = 'Observations de l\'étudiant';
 
+$string['clear_pending_todos'] = 'Supprimer les tâches en attente';
+$string['clear_pending_todos_days'] = 'Supprimer les tâches en attente plus anciennes que les jours';
+$string['clear_pending_todos_days_desc'] = 'Spécifiez le nombre de jours avant lequel toutes les tâches en attente doivent être supprimées. 0 signifie que le tâche est désactivée.';
 $string['defaultlang_help'] = 'Langue par défaut de l\'activité';
 $string['controltask'] = 'Contrôler les tâches';
 $string['notification_subject'] = 'Notification de CompetVet : {$a}';

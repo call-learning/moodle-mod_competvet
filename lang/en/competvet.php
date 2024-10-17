@@ -420,7 +420,9 @@ $string['cachedef_casestructures'] = 'Cache des structures de cas';
 
 // Task
 $string['task:cleanup'] = 'Clean up CompetVet data';
-
+$string['clear_pending_todos'] = 'Remove pending todos';
+$string['clear_pending_todos_days'] = 'Remove pending todos older than days';
+$string['clear_pending_todos_days_desc'] = 'Specify the number of days ago before which all pending todos should be removed, 0 to disable';
 // Notifications
 $string['defaultlang_help'] = 'Default language for the emails, Current setting <strong>{$a}</strong>';
 $string['controltask'] = 'Control this task';

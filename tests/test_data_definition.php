@@ -17,6 +17,7 @@ use mod_competvet\competvet;
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\observation_comment;
+use mod_competvet\local\persistent\todo;
 
 /**
  * Competvet Trait for data test definition.
@@ -48,6 +49,7 @@ trait test_data_definition {
      * @return void
      */
     public function generates_definition(array $datadefinition, object $generator, object $competvetevalgenerator): void {
+        global $DB;
         $users = [];
         foreach ($datadefinition as $coursename => $data) {
             $course = $generator->create_course(['shortname' => $coursename]);
@@ -85,6 +87,18 @@ trait test_data_definition {
                         'situationid' => $situation->get('id'),
                         'session' => $planningdef['session'],
                     ]);
+                    if (!empty($planningdef['todos'])) {
+                        foreach ($planningdef['todos'] as $tododef) {
+                            $tododef['planningid'] = $planning->id;
+                            $tododef['studentid'] = $users[$tododef['observername']]->id;
+                            $tododef['targetuserid'] = $users[$tododef['targetusername']]->id;
+                            $todorecord = $competvetevalgenerator->create_todo($tododef);
+
+                            $dbrecord = $DB->get_record('competvet_todo', ['id' => $todorecord->id]);
+                            $dbrecord->timecreated = $tododef['timecreated'];
+                            $DB->update_record('competvet_todo', $dbrecord);
+                        }
+                    }
                     if (!empty($planningdef['observations'])) {
                         foreach ($planningdef['observations'] as $observationdef) {
                             $student = $users[$observationdef['student']];
@@ -602,4 +616,72 @@ trait test_data_definition {
             ],
         ];
     }
+    private function get_data_definition_set_4(int $startdate): array {
+        $oneweek = 60 * 60 * 24 * 7; // 1 week in seconds.
+        $onemonth = $oneweek * 4; // 1 month in seconds.
+        return [
+            'course 1' => [
+                'users' => [
+                    'student' => ['student1', 'student2'],
+                    'observer' => ['observer1', 'observer2'],
+                    'teacher' => ['teacher1'],
+                    'manager' => ['manager'],
+                ],
+                'groups' => [
+                    'group 8.1' => [
+                        'users' => ['student1'],
+                    ],
+                    'group 8.2' => [
+                        'users' => ['student2'],
+                    ],
+                    'group 8.3' => [
+                        'users' => [],
+                    ],
+                    'group 8.4' => [
+                        'users' => [],
+                    ],
+                ],
+                'activities' => [
+                    'SIT1' => [
+                        'category' => 'Y1',
+                        'plannings' => [
+                            [
+                                'startdate' => $startdate,
+                                'enddate' => $startdate + $oneweek,
+                                'groupname' => 'group 8.1',
+                                'session' => '2023',
+                                'todos' => [
+                                    [
+                                        'action' => todo::ACTION_EVAL_OBSERVATION_ASKED,
+                                        'data' => (object) ['context' => 'context1'],
+                                        'planningid' => 1,
+                                        'targetusername' => 'student1',
+                                        'observername' => 'observer1',
+                                        'timecreated' => strtotime('-40 days'),
+                                    ],
+                                    [
+                                        'action' => todo::ACTION_EVAL_OBSERVATION_ASKED,
+                                        'data' => (object) ['context' => 'context2'],
+                                        'planningid' => 1,
+                                        'targetusername' => 'student1',
+                                        'observername' => 'observer2',
+                                        'timecreated' => strtotime('-20 days'),
+                                    ],
+                                    [
+                                        'action' => todo::ACTION_EVAL_OBSERVATION_ASKED,
+                                        'data' => (object) ['context' => 'context3'],
+                                        'planningid' => 1,
+                                        'targetusername' => 'student2',
+                                        'observername' => 'observer2',
+                                        'timecreated' => strtotime('-10 days'),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
 }
+
