@@ -26,6 +26,7 @@ use core_grades\component_gradeitems;
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\grid;
 use mod_competvet\local\persistent\situation;
+use mod_competvet\local\api\plannings as plannings_api;
 use mod_competvet\reportbuilder\local\systemreports\planning_per_situation;
 use mod_competvet\utils;
 
@@ -78,6 +79,7 @@ class mod_competvet_mod_form extends moodleform_mod {
      * @return void
      */
     protected function add_situation_fields() {
+        global $USER;
         $mform = $this->_form;
         $mform->addElement('header', 'situationdef', get_string('situation:def', 'competvet'));
         $mform->setExpanded('situationdef');
@@ -104,6 +106,23 @@ class mod_competvet_mod_form extends moodleform_mod {
                 $mform->addHelpButton($situationfield, 'situation:' . $situationfield, 'competvet');
             }
             $mform->setType($situationfield, $situationfielddefinition['type']);
+
+            $mform->addElement('hidden', 'hasactivity', 0);
+
+            if (in_array($situationfield, ['haseval', 'hascase', 'hascertif'])) {
+                if ($competvetid = $this->get_current()->id) {
+                    $situation = situation::get_record(['competvetid' => $competvetid]);
+                    $plannings = plannings_api::get_plannings_for_situation_id($situation->get('id'), $USER->id, false);
+                    foreach ($plannings as $planning) {
+                        $data = plannings_api::has_user_data($planning['id']);
+                        if ($data) {
+                            $mform->addElement('hidden', 'hasactivity', 1);
+                            break;
+                        }
+                    }
+                }
+                $mform->disabledIf($situationfield, 'hasactivity', 'eq', 1);
+            }
 
             if (!empty($situationfielddefinition['default'])) {
                 $mform->setDefault($situationfield, $situationfielddefinition['default']);
