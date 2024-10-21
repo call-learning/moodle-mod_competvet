@@ -180,6 +180,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $data = (object) $data;
         $oldid = $data->id;
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
+        $data->usercreated = $this->get_mappingid('user', $data->usercreated);
         $data->observationid = $this->get_new_parentid('observation');
         // Insert the observation comment record.
         $DB->insert_record('competvet_obs_comment', $data);

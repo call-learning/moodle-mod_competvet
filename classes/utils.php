@@ -150,11 +150,11 @@ class utils {
         global $PAGE;
         $user = core_user::get_user($userid);
         if (!$user) {
-            $renderer = $PAGE->get_renderer('core', 'core');
+            $renderer = $PAGE->get_renderer('core');
             return [
                 'id' => $userid,
                 'fullname' => get_string('usernotfound', 'competvet'),
-                'userpictureurl' => $renderer->image_url('u/f1'), // Default image.
+                'userpictureurl' => $renderer->image_url('u/f1')->out(false), // Default image.
                 'firstname' => 'firstname',
                 'lastname' => 'lastname',
             ];
