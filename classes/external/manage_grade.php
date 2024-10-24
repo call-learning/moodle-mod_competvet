@@ -51,6 +51,7 @@ class manage_grade extends external_api {
         return new external_function_parameters([
             'userid' => new external_value(PARAM_INT, 'The user id', VALUE_REQUIRED),
             'cmid' => new external_value(PARAM_INT, 'The course module id', VALUE_REQUIRED),
+            'planningid' => new external_value(PARAM_INT, 'The planning id', VALUE_REQUIRED),
             'grade' => new external_value(PARAM_TEXT, 'The grade', VALUE_REQUIRED),
             'feedback' => new external_value(PARAM_TEXT, 'The feedback', VALUE_OPTIONAL),
         ]);
@@ -61,21 +62,25 @@ class manage_grade extends external_api {
      *
      * @param int $userid
      * @param int $cmid
+     * @param int $planningid
      * @param string $grade
      * @param string $feedback
+     * @param int $planningid
      * @return array
      */
-    public static function update($userid, $cmid, $grade, $feedback): array {
+    public static function update($userid, $cmid, $planningid, $grade, $feedback): array {
         global $DB;
         $params = self::validate_parameters(self::update_parameters(), [
             'userid' => $userid,
             'cmid' => $cmid,
+            'planningid' => $planningid,
             'grade' => $grade,
             'feedback' => $feedback,
         ]);
         // Set the grade for this user in the Moodle gradebook
         $grade = intval($params['grade']);
         $cmid = $params['cmid'];
+        $planningid = $params['planningid'];
         $userid = $params['userid'];
         $feedback = $params['feedback'];
         $competvet = competvet::get_from_cmid($cmid);
@@ -100,7 +105,11 @@ class manage_grade extends external_api {
         ]);
         $result = $item->update_final_grade($userid, $grade, null, $feedback, FORMAT_HTML);
 
-        $customdata = json_encode((object)['studentid' => $userid, 'cmid' => $competvet->get_course_module_id()]);
+        $customdata = json_encode((object)[
+            'studentid' => $userid,
+            'cmid' => $competvet->get_course_module_id(),
+            'planningid' => $planningid
+        ]);
         $existing = $DB->record_exists_select('task_adhoc',
             "classname = :classname AND " . $DB->sql_compare_text('customdata') . " = " . $DB->sql_compare_text(':customdata'),
             [
@@ -111,7 +120,11 @@ class manage_grade extends external_api {
 
         if (!$existing) {
             $task = new \mod_competvet\task\student_graded();
-            $task->set_custom_data((object)['studentid' => $userid, 'cmid' => $competvet->get_course_module_id()]);
+            $task->set_custom_data((object)[
+                'studentid' => $userid,
+                'cmid' => $competvet->get_course_module_id(),
+                'planningid' => $planningid
+            ]);
             \core\task\manager::queue_adhoc_task($task);
         }
 

@@ -84,8 +84,9 @@ const formEvents = () => {
         const args = {
             userid: user.id,
             cmid: planning.cmid,
+            planningid: planning.id,
             grade: globalgrade.finalgrade,
-            feedback: globalgrade.comment,
+            feedback: globalgrade.comment
         };
         const result = await Repository.saveGlobalGrade(args);
         globalgrade.gradesuccess = result.result;

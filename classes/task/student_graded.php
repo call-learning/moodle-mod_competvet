@@ -19,6 +19,7 @@ use mod_competvet\competvet;
 use mod_competvet\notifications;
 use core_user;
 use moodle_url;
+use mod_competvet\local\persistent\todo;
 
 /**
  * Class student_graded
@@ -50,13 +51,24 @@ class student_graded extends \core\task\adhoc_task {
             return;
         }
         $data = $this->get_custom_data();
+        $cmid = $data->cmid;
+        $competvet = competvet::get_from_cmid($cmid);
         $studentid = $data->studentid;
         $student = core_user::get_user($studentid);
         if (!$student) {
             return;
         }
-        $cmid = $data->cmid;
-        $competvet = competvet::get_from_cmid($cmid);
+
+        // First clear out all pending tasks for this user.
+        $todos = todo::get_records_select(
+            'status = :status AND targetuserid = :targetuserid AND planningid = :planningid',
+            ['status' => todo::STATUS_PENDING, 'targetuserid' => $studentid, 'planningid' => $data->planningid]
+        );
+        foreach ($todos as $todo) {
+            $todo->delete();
+        }
+
+        // Send the email.
         $recipients[]= $student;
         $context = $this->get_email_context($competvet, $student);
         notifications::send_email($this->taskname, $student->id, $competvet->get_instance_id(), $recipients, $context);
@@ -73,7 +85,7 @@ class student_graded extends \core\task\adhoc_task {
         $competvetname = $competvet->get_instance()->name;
 
         $context = [];
-        $context['subject'] = get_string('notification:student_graded:subject', 'mod_competvet', $competvetname);
+        $context['subject'] = get_string('email:student_graded:subject', 'mod_competvet', $competvetname);
         $context['situationname'] = $competvet->get_situation()->get('shortname');
         $context['fullname'] = fullname($student);
         return $context;
