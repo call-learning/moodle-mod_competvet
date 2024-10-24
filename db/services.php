@@ -72,14 +72,6 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/competvet:view',
     ],
-    'mod_competvet_get_evaluations' => [
-        'classname' => \mod_competvet\external\get_evaluations::class,
-        'methodname' => 'execute',
-        'description' => 'Get evaluations for the given user',
-        'type' => 'read',
-        'ajax' => true,
-        'capabilities' => 'mod/competvet:view',
-    ],
     'mod_competvet_get_plannings' => [
         'classname' => \mod_competvet\external\get_plannings::class,
         'methodname' => 'execute',
