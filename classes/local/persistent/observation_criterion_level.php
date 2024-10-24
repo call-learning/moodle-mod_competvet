@@ -64,5 +64,20 @@ class observation_criterion_level extends persistent {
             ],
         ];
     }
+
+    /**
+     * Considered as no grade (we did not touch the level / grade)
+     */
+    const NO_GRADE_LEVEL = 50;
+
+    /**
+     * Is this level / grade considered as empty.
+     *
+     * @param mixed $grade
+     * @return bool
+     */
+    public static function is_an_empty_level($grade) {
+        return empty($grade) || $grade == self::NO_GRADE_LEVEL;
+    }
 }
 

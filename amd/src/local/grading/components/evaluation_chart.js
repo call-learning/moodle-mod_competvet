@@ -83,8 +83,9 @@ const transformContext = async(context, autoeval) => {
     const self = currentUser.id;
     let data = context['evaluation-results'];
     // Filter out the criteria that do not have an average.
-    data.evaluations = data.evaluations.filter(criterion => criterion.hasaverage);
-    const labels = data.evaluations.map(criterion => criterion.criterion.label);
+    let evaluations = autoeval ? data.autoevals : data.observations;
+    evaluations = evaluations.filter(criterion => criterion.hasaverage);
+    const labels = evaluations.map(criterion => criterion.criterion.label);
     const graders = [];
     const colors = [
         'rgba(255, 99, 132, 0.6)',
@@ -104,7 +105,7 @@ const transformContext = async(context, autoeval) => {
 
     let numGraders = 0;
 
-    data.evaluations.forEach(criterion => {
+    evaluations.forEach(criterion => {
         criterion.grades.forEach(grade => {
             if (!grade.graderinfo || !grade.graderinfo.id) {
                 return;
@@ -144,7 +145,7 @@ const transformContext = async(context, autoeval) => {
         const averageString = await getString('average', 'mod_competvet');
         const average = {
             label: averageString,
-            data: data.evaluations.map(criterion => criterion.average),
+            data: evaluations.map(criterion => criterion.average),
             fill: true,
             backgroundColor: 'rgba(54, 162, 235, 0.2)',
             pointRadius: 8,

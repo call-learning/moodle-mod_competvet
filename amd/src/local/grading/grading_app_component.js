@@ -294,17 +294,8 @@ class Competvet {
         // Update the values numberofobservations and maxobservations based on the evaluation-results
         context.grading.evalnum = this.gradingApp.dataset.evalnum;
 
-        let numberofobservations = 0;
-        let numberofselfevaluations = 0;
-        if (evalResults.evaluations.length > 0) {
-            evalResults.evaluations[0].grades.forEach(grade => {
-                if (grade.graderinfo.id == this.currentUser.id) {
-                    numberofselfevaluations++;
-                    return;
-                }
-                numberofobservations++;
-            });
-        }
+        let numberofobservations = evalResults.observations.length;
+        let numberofselfevaluations = evalResults.autoevals.length;
         let noSelfEvalPenalty = -30;
         if (numberofselfevaluations > 0) {
             context.grading.selfevalselectoptions[1].selected = true;

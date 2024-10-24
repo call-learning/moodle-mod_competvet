@@ -24,20 +24,20 @@
     }
 }}
 {{#evaluation-results}}
-    {{^evaluations}}
+    {{^hasanyobservations}}
         <div class="p-3">
-        <div class="alert alert-info w-50 mx-auto ">
-            {{#str}} noevaluations, mod_competvet {{/str}}
+            <div class="alert alert-info w-50 mx-auto ">
+                {{#str}} noevaluations, mod_competvet {{/str}}
+            </div>
         </div>
-        </div>
-    {{/evaluations}}
+    {{/hasanyobservations}}
     <div class="row">
         <div class="col-12 d-flex justify-content-center">
-            {{#evaluations.0}}
+            {{#hasanyobservations}}
                 <a class="btn btn-link mb-3" data-toggle="collapse" href="#evaluations-table" role="button" aria-expanded="false" aria-controls="evaluations-table">
                     {{#str}} showastable, mod_competvet {{/str}}
                 </a>
-            {{/evaluations.0}}
+            {{/hasanyobservations}}
         </div>
     </div>
     <div class="collapse" id="evaluations-table">
@@ -45,25 +45,23 @@
             <div class="evaltable mb-3">
                 <div class="row no-gutters flex-nowrap">
                     <div class="p-2 col-6 criterionlabel cellborder font-weight-bold text-center d-flex align-items-center">{{#str}}tabletitle:evals, mod_competvet{{/str}}</div>
-                    {{#evaluations.0}}
+                    {{#observations.0}}
                         <div class="p-2 cellborder col-2 evaluator font-weight-bold text-center d-flex align-items-center">
                             <div class="averagecolumn">
                                 {{#str}}average, mod_competvet{{/str}}
                             </div>
                         </div>
                         {{#grades}}
-                            {{^autoeval}}
-                                <div class="p-2 cellborder col-2 evaluator font-weight-bold text-center d-flex align-items-center">
-                                    <div class="text-truncate" data-toggle="tooltip" title="{{graderinfo.fullname}}  {{#timemodified}}{{#userdate}}{{timemodified}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}}{{/userdate}}{{/timemodified}}">
-                                        {{graderinfo.fullname}}
-                                    </div>
+                            <div class="p-2 cellborder col-2 evaluator font-weight-bold text-center d-flex align-items-center">
+                                <div class="text-truncate" data-toggle="tooltip"
+                                     title="{{graderinfo.fullname}}  {{#timemodified}}{{#userdate}}{{timemodified}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}}{{/userdate}}{{/timemodified}}">
+                                    {{graderinfo.fullname}}
                                 </div>
-                            {{/autoeval}}
+                            </div>
                         {{/grades}}
-                    {{/evaluations.0}}
+                    {{/observations.0}}
                 </div>
-                {{#evaluations}}
-
+                {{#observations}}
                     <div class="row no-gutters flex-nowrap">
                         <div class="p-2 cellborder col-6 criterionlabel font-weight-bold">
                             {{criterion.label}}
@@ -73,75 +71,78 @@
                         </div>
 
                         {{#grades}}
-                            {{^autoeval}}
-                                {{^nograde}}
-                                    <div class="p-2 cellborder col-2 grade text-center">
-                                        {{level}}
-                                        <div class="sr-only">
-                                            {{graderinfo.fullname}}
-                                        </div>
+                            {{^nograde}}
+                                <div class="p-2 cellborder col-2 grade text-center">
+                                    {{level}}
+                                    <div class="sr-only">
+                                        {{graderinfo.fullname}}
                                     </div>
-                                {{/nograde}}
-                                {{#nograde}}
-                                    <div class="p-2 cellborder col-2 grade text-center">
-                                        -
-                                    </div>
-                                {{/nograde}}
-                            {{/autoeval}}
+                                </div>
+                            {{/nograde}}
+                            {{#nograde}}
+                                <div class="p-2 cellborder col-2 grade text-center">
+                                    -
+                                </div>
+                            {{/nograde}}
                         {{/grades}}
                     </div>
-                {{/evaluations}}
+                {{/observations}}
                 <div class="row no-gutters flex-nowrap">
                     <div class="p-2 cellborder col-6 averages">
                         {{#str}}average, mod_competvet{{/str}}
                     </div>
-                    {{#evaluations.0}}
+                    {{#observations.0}}
                         <div class="p-2 cellborder col-2 grade text-center averages" data-region="averagerow">
                             {{totalaverage}}
                         </div>
                         {{#grades}}
-                            {{^autoeval}}
                             <div class="p-2 cellborder col-2 grade text-center averages">
+                                -
                             </div>
-                            {{/autoeval}}
                         {{/grades}}
-                    {{/evaluations.0}}
+                    {{/observations.0}}
                 </div>
             </div>
         {{/hasobserverevaluations}}
         {{#hasautoevaluations}}
             <div class="evaltable mb-3">
                 <div class="row no-gutters flex-nowrap">
-                    <div class="p-2 col-6 criterionlabel cellborder font-weight-bold text-center d-flex align-items-center">{{#str}}tabletitle:autoevalstudent, mod_competvet{{/str}}</div>
-                    {{#evaluations.0}}
+                    <div class="p-2 col-6 criterionlabel cellborder font-weight-bold text-center d-flex align-items-center">{{#str}}
+                        tabletitle:autoevalstudent, mod_competvet{{/str}}</div>
+                    {{#autoevals.0}}
                         {{#grades}}
-                            {{#autoeval}}
                             <div class="p-2 cellborder col-2 evaluator font-weight-bold text-center d-flex align-items-center">
-                                <div class="text-truncate" data-toggle="tooltip" title="{{graderinfo.fullname}}  {{#timemodified}}{{#userdate}}{{timemodified}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}}{{/userdate}}{{/timemodified}}">
+                                <div class="text-truncate" data-toggle="tooltip"
+                                     title="{{graderinfo.fullname}}  {{#timemodified}}{{#userdate}}{{timemodified}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}}{{/userdate}}{{/timemodified}}">
                                     {{graderinfo.fullname}}
                                 </div>
                             </div>
-                            {{/autoeval}}
                         {{/grades}}
-                    {{/evaluations.0}}
+                    {{/autoevals.0}}
                 </div>
-                {{#evaluations}}
+                {{#autoevals}}
                     <div class="row no-gutters flex-nowrap">
                         <div class="p-2 cellborder col-6 criterionlabel font-weight-bold">
                             {{criterion.label}}
                         </div>
                         {{#grades}}
-                            {{#autoeval}}
-                            <div class="p-2 cellborder col-2 grade text-center">
-                                {{level}}
-                                <div class="sr-only">
-                                    {{graderinfo.fullname}}
+                            {{^nograde}}
+                                <div class="p-2 cellborder col-2 grade text-center">
+                                    {{level}}
+                                    <div class="sr-only">
+                                        {{graderinfo.fullname}}
+                                    </div>
                                 </div>
-                            </div>
-                            {{/autoeval}}
+                            {{/nograde}}
+                            {{#nograde}}
+                                <div class="p-2 cellborder col-2 grade text-center">
+                                    -
+                                </div>
+                            {{/nograde}}
+
                         {{/grades}}
                     </div>
-                {{/evaluations}}
+                {{/autoevals}}
             </div>
         {{/hasautoevaluations}}
     </div>
@@ -178,9 +179,9 @@
                                     {{categorytext}}
                                 </div>
                                 {{#timecreated}}
-                                <div class="small timecreated">
-                                    {{#userdate}} {{timecreated}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}} {{/userdate}}
-                                </div>
+                                    <div class="small timecreated">
+                                        {{#userdate}} {{timecreated}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}} {{/userdate}}
+                                    </div>
                                 {{/timecreated}}
                             </div>
                         {{/info}}
