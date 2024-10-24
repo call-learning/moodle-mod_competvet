@@ -20,6 +20,7 @@ use mod_competvet\local\api\criteria;
 use mod_competvet\local\api\observations;
 use mod_competvet\local\api\plannings;
 use mod_competvet\local\api\user_role;
+use mod_competvet\local\persistent\observation_criterion_level;
 use mod_competvet\utils;
 use moodle_url;
 use single_button;
@@ -80,7 +81,7 @@ class student_evaluations extends base {
                 foreach ($observation['criteria'] as $obscrit) {
                     if ($criterion['id'] == $obscrit['criterioninfo']['id']) {
                         $grades[$observation['id']] = [
-                            'level' => $obscrit['level'],
+                            'level' => observation_criterion_level::is_an_empty_level($obscrit['level']) ? '-' : $obscrit['level'],
                             'graderinfo' => $observation['observerinfo'],
                             'timemodified' => $observation['timemodified'],
                             'viewurl' => (new moodle_url(

@@ -18,6 +18,7 @@ namespace mod_competvet\output\view;
 use mod_competvet\competvet;
 use mod_competvet\local\api\observations;
 use mod_competvet\local\persistent\observation;
+use mod_competvet\local\persistent\observation_criterion_level;
 use moodle_url;
 use renderer_base;
 use stdClass;
@@ -35,7 +36,9 @@ class student_eval extends base {
      */
     const BADGELEVEL = [
         0 => 'danger',
-        50 => 'warning',
+        49 => 'danger',
+        50 => 'secondary',
+        51 => 'warning',
         100 => 'success',
     ];
     /**
@@ -64,7 +67,7 @@ class student_eval extends base {
         $data['evalcomments'] = $this->evaluation['comments'];
         foreach ($this->evaluation['criteria'] as $evalcriterion) {
             $info = ['label' => $evalcriterion['criterioninfo']['label']];
-            $level = $evalcriterion['level'];
+            $level = $evalcriterion['level'] ?? observation_criterion_level::NO_GRADE_LEVEL;
             // Find the key in BADGELEVEL that is the closest from the level.
             $roundedlevel = array_reduce(array_keys(self::BADGELEVEL), function ($carry, $item) use ($level) {
                 if (abs($item - $level) < abs($carry - $level)) {
@@ -75,7 +78,7 @@ class student_eval extends base {
             $info['badgetype'] = self::BADGELEVEL[$roundedlevel];
             $info['viewurl'] =
                 (new moodle_url($this->subcriteriaurl, ['criterionid' => $evalcriterion['criterioninfo']['id']]))->out(false);
-            $info['level'] = $level;
+            $info['level'] = observation_criterion_level::is_an_empty_level($level) ? '-' : $level;
             $data['criteria'][] = $info;
         }
         $data['canedit'] = $this->evaluation['canedit'];

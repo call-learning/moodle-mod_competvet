@@ -77,7 +77,7 @@ class observation_criterion_level extends persistent {
      * @return bool
      */
     public static function is_an_empty_level($grade) {
-        return empty($grade) || $grade == self::NO_GRADE_LEVEL;
+        return is_null($grade) || $grade == self::NO_GRADE_LEVEL;
     }
 }
 
