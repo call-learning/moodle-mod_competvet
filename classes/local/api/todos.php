@@ -348,4 +348,19 @@ class todos {
             ]),
         ];
     }
+
+    /**
+     * Delete todos
+     * @param array $ids
+     * @return void
+     */
+    public static function delete_todos(array $ids): void {
+        global $USER;
+        foreach ($ids as $id) {
+            $todo = todo::get_record(['id' => $id]);
+            if ($todo->get('userid') == $USER->id) {
+                $todo->delete();
+            }
+        }
+    }
 }

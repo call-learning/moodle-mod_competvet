@@ -208,4 +208,20 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/competvet:view',
     ],
+    'mod_competvet_get_todos' => [
+        'classname' => \mod_competvet\external\get_todos::class,
+        'methodname' => 'execute',
+        'description' => 'Get todos for the given user',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:view',
+    ],
+    'mod_competvet_delete_todos' => [
+        'classname' => \mod_competvet\external\delete_todos::class,
+        'methodname' => 'execute',
+        'description' => 'Delete selected todos',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:editplanning',
+    ],
 ];

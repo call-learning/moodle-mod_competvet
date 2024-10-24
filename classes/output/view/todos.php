@@ -16,12 +16,9 @@
 namespace mod_competvet\output\view;
 
 use mod_competvet\competvet;
-use mod_competvet\local\api\todos as todos_api;
-use mod_competvet\local\persistent\todo;
-use mod_competvet\local\persistent\planning;
-use moodle_url;
 use renderer_base;
 use stdClass;
+use moodle_url;
 
 /**
  * Render the todo list.
@@ -32,10 +29,14 @@ use stdClass;
  */
 class todos extends base {
     /**
-     * @var array $todos The todo to display.
+     * @var competvet $competvet The competvet object.
      */
-    protected array $todos;
-    private array $actionsurls;
+    protected competvet $competvet;
+
+    /**
+     * @var $userid The user id.
+     */
+    protected int $userid;
 
     /**
      * Export this data so it can be used in a mustache template.
@@ -44,38 +45,13 @@ class todos extends base {
      * @return array|array[]|stdClass
      */
     public function export_for_template(renderer_base $output) {
-        $data = parent::export_for_template($output);
-        $data['todos'] = [];
-        foreach ($this->todos as $todo) {
-            $currentaction = $todo['action'];
-            $planning = planning::get_record(['id' => $todo['planning']['id']]);
-            $competvet = competvet::get_from_situation_id($planning->get('situationid'));
 
-            if ($currentaction == todo::ACTION_EVAL_OBSERVATION_ASKED) {
-                $tododata = json_decode($todo['data']);
-                $todo['action'] = \html_writer::tag(
-                    'button',
-                    get_string('todo:action:cta:' . todo::ACTIONS[$currentaction], 'mod_competvet'),
-                    [
-                        'class' => 'btn btn-primary',
-                        'data-action' => 'eval-observation-addfromtodo',
-                        'data-planning-id' => $todo['planning']['id'],
-                        'data-student-id' => $todo['targetuser']['id'],
-                        'data-observer-id' => $todo['user']['id'],
-                        'data-todo-id' => $todo['id'],
-                        'data-cmid' => $competvet->get_course_module_id(),
-                        'data-context' => $tododata->context ?? '',
-                        'data-returnurl' => (new moodle_url($this->actionsurls[$currentaction]))->out_as_local_url(),
-                    ]
-                );
-            } else {
-                $todo['action'] = \html_writer::link(
-                    new moodle_url($this->actions[$todo->get_action()], ['todoid' => $todo['id']]),
-                    get_string('todo:action:' . todo::ACTIONS[$currentaction], 'mod_competvet')
-                );
-            }
-            $data['todos'][] = $todo;
-        }
+        $data = parent::export_for_template($output);
+        $data['version'] = time();
+        $data['cmid'] = $this->competvet->get_course_module_id();
+        $data['courseid'] = $this->competvet->get_course_id();
+        $data['situationid'] = $this->competvet->get_situation()->get('id');
+        $data['userid'] = $this->userid;
         return $data;
     }
 
@@ -87,21 +63,44 @@ class todos extends base {
      *
      * The idea behind it is to reuse the template in mod_competvet and local_competvet
      *
-     * @param mixed ...$data Array containing two elements: $plannings and $planningstats.
+     * @param mixed ...$data Array containing the competvet object.
      * @return void
      */
     public function set_data(...$data) {
         if (empty($data)) {
-            global $USER;
-            $todos = todos_api::get_todos_for_user($USER->id);
-            $data = [
-                $todos,
-                [
-                    todo::ACTION_EVAL_OBSERVATION_ASKED =>
-                        new moodle_url($this->baseurl, ['pagetype' => 'student_eval', 'id' => 'OBSERVATIONID']),
-                ],
-            ];
+            global $PAGE, $USER;
+            $context = $PAGE->context;
+            $PAGE->set_secondary_active_tab('todos');
+            $competvet = competvet::get_from_context($context);
+            $data = [$competvet, $USER->id];
+            $this->set_backurl(new moodle_url(
+                $this->baseurl,
+                ['id' => $competvet->get_course_module_id()]
+            ));
         }
-        [$this->todos, $this->actionsurls] = $data;
+        [$this->competvet, $this->userid] = $data;
+    }
+
+    /**
+     * Get the template name to use for this renderable.
+     *
+     * @param \renderer_base $renderer
+     * @return string
+     */
+    public function get_template_name(\renderer_base $renderer): string {
+        return 'mod_competvet/manager/todos';
+    }
+
+    /**
+     * Check if current user has access to this page and throw an exception if not.
+     *
+     * @return void
+     */
+    public function check_access(): void {
+        global $PAGE;
+        $context = $PAGE->context;
+        if (!has_capability('mod/competvet:view', $context)) {
+            throw new \moodle_exception('noaccess', 'mod_competvet');
+        }
     }
 }

@@ -21,6 +21,7 @@ use mod_competvet\local\persistent\planning;
 use moodle_url;
 use renderer_base;
 use stdClass;
+use single_button;
 
 /**
  * Generic renderable for the view.
@@ -134,5 +135,26 @@ class plannings extends base {
             $data = [$currentplannings, $planningstats, $viewplanning, $situationname, $isgrader];
         }
         [$this->plannings, $this->planningstats, $this->viewplanning, $this->situationname, $this->isgrader] = $data;
+    }
+
+    /**
+     * Adds the todos button to the page.
+     * @param object $context The context object.
+     * @return single_button|null
+     */
+    public function get_button($context): ?single_button {
+        if (!has_capability('mod/competvet:canobserve', $context)) {
+            return null;
+        }
+        $competvet = competvet::get_from_context($context);
+        $cmid = $competvet->get_course_module_id();
+
+        return new single_button(
+            new moodle_url(
+                '/mod/competvet/view.php',
+                ['id' => $cmid, 'currenttab' => 'todo', 'pagetype' => 'todos']
+            ),
+            get_string('mytodos', 'mod_competvet'),
+        );
     }
 }

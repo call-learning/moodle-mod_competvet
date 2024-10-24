@@ -224,6 +224,7 @@ $string['observation:comment:deleteno'] = 'Delete comment {no}';
 $string['observation_comment:type'] = 'Type de commentaire {$a}';
 $string['observation:comment:observercomment'] = 'Observer comment';
 $string['todos'] = 'ToDos';
+$string['mytodos'] = 'My ToDos';
 $string['entity:competvet_todo'] = 'ToDo';
 $string['todo:action:certif:valid:asked'] = 'Validation asked';
 $string['todo:status:pending'] = 'Pending';
@@ -245,6 +246,10 @@ $string['todo:action'] = 'Action';
 $string['todo:data'] = 'Data';
 $string['todo:timecreated'] = 'Time created';
 $string['todo:timemodified'] = 'Time modified';
+$string['todo:delete'] = 'Delete the ToDo';
+$string['todo:deleteselected'] = 'Delete selected ToDos';
+$string['todo:date'] = 'Date';
+$string['todo:notodos'] = 'No ToDos';
 
 // Grading interface
 $string['modulename_help'] = 'The Compet Eval Grading interface.';

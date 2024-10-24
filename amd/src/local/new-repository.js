@@ -200,6 +200,24 @@ class Repository {
     async getSubGrades(args) {
         return Ajax.call([{methodname: 'mod_competvet_get_subgrades', args}])[0];
     }
+
+    /**
+     * Get the todos for a user.
+     * @param {Object} args The arguments.
+     * @return {Promise} The promise.
+     */
+    async getTodos(args) {
+        return Ajax.call([{methodname: 'mod_competvet_get_todos', args: args}])[0];
+    }
+
+    /**
+     * Delete selected todos.
+     * @param {Object} args The arguments.
+     * @return {Promise} The promise.
+     */
+    async deleteTodos(args) {
+        return Ajax.call([{methodname: 'mod_competvet_delete_todos', args: args}])[0];
+    }
 }
 
 const RepositoryInstance = new Repository();

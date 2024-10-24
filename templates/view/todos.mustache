@@ -23,30 +23,26 @@
 
     }
 }}
-<div class="competvet-view-todos">
-    <table class="table">
-        <thead>
-        <tr>
-            <th scope="col">{{#str}}todo:targetuser, mod_competvet{{/str}}</th>
-            <th scope="col">{{#str}}todo:planning, mod_competvet{{/str}}</th>
-            <th scope="col">{{#str}}todo:type, mod_competvet{{/str}}</th>
-            <th scope="col">{{#str}}todo:action, mod_competvet{{/str}}</th>
-        </tr>
-        </thead>
-        <tbody>
-        {{#todos}}
-            <tr>
-                <td>{{targetuser.fullname}}</td>
-                <td>{{planning.situationname}}</td>
-                <td>{{type}}</td>
-                <td>{{{action}}}</td>
-            </tr>
-        {{/todos}}
-        </tbody>
-    </table>
-</div>
-{{#js}}
-require(['{{modulename}}/local/forms/eval_observation_add_from_todo'], function(Form) {
-    Form.init('{{modulename}}');
-});
-{{/js}}
+{{#todos}}
+    <tr data-timecreated="{{timecreated}}" class="{{#deleted}}d-none{{/deleted}}">
+        <td><input type="checkbox" class="todoCheckbox" data-id="{{id}}" data-radio-action="selectone"></td>
+        <td>
+            <div>{{planning.situationname}}<strong></div>
+            <div>{{planning.groupname}}<strong></div>
+            <div class="small muted">
+                {{#userdate}} {{planning.startdate}}, {{#str}}strftimedateshort, core_langconfig {{/str}} {{/userdate}} -
+                {{#userdate}} {{planning.enddate}}, {{#str}}strftimedateshort, core_langconfig {{/str}} {{/userdate}}
+            </div>
+        </td>
+        <td>
+            {{#userdate}} {{timecreated}}, {{#str}} strftimedateshort, core_langconfig {{/str}} {{/userdate}}
+        </td>
+        <td>
+            <img src="{{{targetuser.userpictureurl}}}" alt="{{targetuser.fullname}}" class="userpicture">
+            {{targetuser.fullname}}
+        </td>
+        <td>{{{action}}}</td>
+        <td>{{status}}</td>
+        <td><button class="btn btn-danger btn-sm delete-todo" data-type="todo" data-button-action="delete" data-id="{{id}}">Delete</button></td>
+    </tr>
+{{/todos}}
