@@ -353,7 +353,15 @@ class plannings {
                 $info[$type]['pass'] = $data['nbdone'] >= $data['nbrequired'] ? 1 : 0;
             }
         }
-
+        if (!$situation->get('haseval')) {
+            unset($info['eval']);
+        }
+        if (!$situation->get('hascertif')) {
+            unset($info['cert']);
+        }
+        if (!$situation->get('hascase')) {
+            unset($info['list']);
+        }
         return $info;
     }
 
