@@ -50,5 +50,14 @@ export const init = (modulename) => {
             await Repository.deleteEntry({'entryid': button.dataset.id});
             window.location.reload();
         }
+        if (event.target.closest('[data-action="edit-case"]')) {
+            const button = event.target.closest('[data-action="edit-case"]');
+            const gradingApp = document.querySelector('[data-region="grading-app"]');
+            const data = gradingApp.dataset;
+            data.entryid = button.dataset.id;
+            const modalForm = genericFormCreate(data, 'case:edit', modulename, 'case_form_edit', button.dataset.id);
+            modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, onSubmitHandler);
+            modalForm.show();
+        }
     });
 };

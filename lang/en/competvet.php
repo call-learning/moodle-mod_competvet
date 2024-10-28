@@ -366,6 +366,8 @@ $string['groupnotfound'] = 'The group with name {$a} was not found';
 // Case form
 $string['case:add'] = 'Add a clinical case';
 $string['case:add:save'] = 'Save';
+$string['case:edit'] = 'Edit a clinical case';
+$string['case:edit:save'] = 'Save';
 $string['error:accessdenied'] = 'Access denied';
 $string['nolistgrade'] = 'I do not want to grade the logbook';
 $string['nolistgrade_desc'] = 'If you decide not to grade the logbook, the coefficient for this block will be reduced to 0 in the calculation of the overall grade.';

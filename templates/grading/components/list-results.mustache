@@ -70,7 +70,10 @@
     {{#cases}}
         <div class="case mb-3">
             {{#isstudent}}
-                <div class="deletecase">
+                <div class="deletecase d-flex">
+                    <button class="btn btn-icon icon-no-margin" data-action="edit-case" data-id="{{id}}">
+                        {{#pix}}i/edit, core, {{#str}}edit{{/str}}{{/pix}}
+                    </button>
                     <button class="btn btn-icon icon-no-margin mx-2" data-action="delete-case" data-id="{{id}}">
                         {{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}
                     </button>
