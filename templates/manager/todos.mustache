@@ -37,14 +37,38 @@
                     <th scope="col">{{#str}}todo:planning, mod_competvet{{/str}}</th>
                     <th scope="col">
                         <div class="d-flex">
-                        {{#str}}todo:date, mod_competvet{{/str}}
-                            <div class="sort d-flex ml-2">
-                                <a href="#" class="sort-date d-none" data-sort="asc"><i class="fa fa-sort-asc"></i></a>
-                                <a href="#" class="sort-date" data-sort="desc"><i class="fa fa-sort-desc"></i></a>
+                            {{#str}}todo:date, mod_competvet{{/str}}
+                            <div class="sort icon-no-margin d-flex ml-2">
+                                <a href="#" class="btn-sort d-none" data-button-action="date-sort-asc"
+                                    title="{{#str}} sortbyx, core, {{#str}} date {{/str}} {{/str}}"
+                                >
+                                    {{#pix}}t/sort_asc, core{{/pix}}
+                                </a>
+                                <a href="#" class="btn-sort" data-button-action="date-sort-desc"
+                                    title="{{#str}} sortbyxreverse, core, {{#str}} date {{/str}} {{/str}}"
+                                >
+                                    {{#pix}}t/sort_desc, core{{/pix}}
+                                </a>
                             </div>
                         </div>
                     </th>
-                    <th scope="col">{{#str}}todo:targetuser, mod_competvet{{/str}}</th>
+                    <th scope="col">
+                        <div class="d-flex">
+                            {{#str}}todo:targetuser, mod_competvet{{/str}}
+                            <div class="sort icon-no-margin d-flex ml-2">
+                                <a href="#" class="btn-sort d-none" data-button-action="targetuser-sort-asc"
+                                    title="{{#str}} sortbyx, core, {{#str}} user {{/str}} {{/str}}"
+                                >
+                                    {{#pix}}t/sort_asc, core{{/pix}}
+                                </a>
+                                <a href="#" class="btn-sort" data-button-action="targetuser-sort-desc"
+                                    title="{{#str}} sortbyxreverse, core, {{#str}} user {{/str}} {{/str}}"
+                                >
+                                    {{#pix}}t/sort_desc, core{{/pix}}
+                                </a>
+                            </div>
+                        </div>
+                    </th>
                     <th scope="col">{{#str}}todo:action, mod_competvet{{/str}}</th>
                     <th scope="col">{{#str}}todo:status, mod_competvet{{/str}}</th>
                     <th scope="col">{{#str}}todo:delete, mod_competvet{{/str}}</th>

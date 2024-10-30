@@ -20,6 +20,8 @@ use context;
 use core_form\dynamic_form;
 use mod_competvet\competvet;
 use mod_competvet\local\api\observations;
+use mod_competvet\local\api\todos;
+use mod_competvet\local\persistent\todo as todo;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
@@ -38,17 +40,52 @@ class eval_observation_add extends dynamic_form {
             $data = $this->get_data();
             $planning = planning::get_record(['id' => $data->planningid]);
             $situation = $planning->get_situation();
+            $competvet = competvet::get_from_cmid($data->cmid);
+            $observationid = null;
+            // If this action is based on a todo, generate an observation and get the
+            // observation id. This works for the TODO UI, not from the emulator.
+            // Check if observation should be allowed without a todo!
+            if ($data->todoid) {
+                todos::act_on_todo($data->todoid);
+                $todo = todo::get_record(['id' => $data->todoid]);
+                $tododata = $todo->get('data');
+                $todojson = json_decode($tododata);
+                $observationid = $todojson->observationid;
+            }
             $comments = eval_observation_helper::process_form_data_comments($data);
             $criteria = eval_observation_helper::process_form_data_criteria($data, $situation);
-            observations::create_observation(
-                observation::CATEGORY_EVAL_OBSERVATION,
-                $data->planningid,
-                $data->studentid,
-                $USER->id,
-                $data->context,
-                $comments,
-                $criteria
-            );
+            if ($observationid) {
+                observations::edit_observation(
+                    $observationid,
+                    $data->context,
+                    $comments,
+                    $criteria
+                );
+            } else {
+                $observationid = observations::create_observation(
+                    observation::CATEGORY_EVAL_OBSERVATION,
+                    $data->planningid,
+                    $data->studentid,
+                    $USER->id,
+                    $data->context,
+                    $comments,
+                    $criteria
+                );
+            }
+            // The event could also have been added in create_observation, I am just not
+            // sure if it is the right place to do it and if it will not interfere with
+            // the mobile app.
+            $context = $competvet->get_context();
+            $event = \mod_competvet\event\observation_completed::create([
+                'context' => $context,
+                'relateduserid' => $data->studentid,
+                'objectid' => $observationid,
+                'other' => [
+                    'observerid' => $USER->id,
+                    'observationid' => $observationid,
+                ],
+            ]);
+            $event->trigger();
             return [
                 'result' => true,
                 'returnurl' => ($this->get_page_url_for_dynamic_submission())->out_as_local_url(),
@@ -73,7 +110,7 @@ class eval_observation_add extends dynamic_form {
     public function set_data_for_dynamic_submission(): void {
         $data = [
             'cmid' => $this->optional_param('cmid', null, PARAM_INT),
-
+            'todoid' => $this->optional_param('todoid', null, PARAM_INT),
             'planningid' => $this->optional_param('planningid', null, PARAM_INT),
             'studentid' => $this->optional_param('studentid', null, PARAM_INT),
         ];
@@ -96,6 +133,8 @@ class eval_observation_add extends dynamic_form {
         $planningid = $this->optional_param('planningid', null, PARAM_INT);
         $mform->addElement('hidden', 'planningid', $planningid);
         $mform->setType('planningid', PARAM_INT);
+        $mform->addElement('hidden', 'todoid', $this->optional_param('todoid', null, PARAM_INT));
+        $mform->setType('todoid', PARAM_INT);
         $mform->addElement('hidden', 'cmid', $this->optional_param('cmid', null, PARAM_INT));
         $mform->setType('cmid', PARAM_INT);
         $mform->addElement('hidden', 'studentid', $this->optional_param('studentid', null, PARAM_INT));

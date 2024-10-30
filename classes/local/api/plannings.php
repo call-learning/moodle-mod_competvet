@@ -220,6 +220,7 @@ class plannings {
         );
         $planningarray['groupname'] = groups_get_group_name($planning->get('groupid'));
         $planningarray['situationname'] = $competvet->get_course_module()->name;
+        $planningarray['cmid'] = $competvet->get_course_module()->id;
         return $planningarray;
     }
 

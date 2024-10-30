@@ -26,17 +26,24 @@
     }
 }}
 <div class="user-info container m-3 py-1">
-    <div data-user-id="{{id}}">
-        <img src="{{userpictureurl}}" alt="{{label}}" class="userpicture">
-        {{#viewurl}}
-            <a href="{{viewurl}}"><span>{{fullname}}</span></a>
-        {{/viewurl}}
-        {{^viewurl}}
-            <span>{{fullname}}</span>
-        {{/viewurl}}
-        {{#rolename}}
-            <span class="badge badge-secondary">{{.}}</span>
-        {{/rolename}}
+
+    <div data-user-id="{{id}}" role="button" class="d-flex align-items-center">
+        <div class="btn btn-link text-body">
+            <img src="{{userpictureurl}}" alt="{{label}}" class="userpicture">
+            {{#viewurl}}
+                <a href="{{viewurl}}"><span>{{fullname}}</span></a>
+            {{/viewurl}}
+            {{^viewurl}}
+                <span>{{fullname}}</span>
+            {{/viewurl}}
+            {{#rolename}}
+                <span class="badge badge-secondary">{{.}}</span>
+            {{/rolename}}
+        </div>
+        <div class="d-none asked icon-no-margin ml-3">
+            {{#pix}}i/grade_correct, core{{/pix}}
+            {{#str}}observation:asked, mod_competvet{{/str}}
+        </div>
     </div>
     <div>
         {{#stats}}

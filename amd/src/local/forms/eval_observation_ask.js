@@ -60,7 +60,6 @@ export const initUsersAction = (modulename, planningId, studentId, context) => {
     selectedElements.forEach((element) => {
         element.addEventListener('click', async (event) => {
             event.preventDefault();
-            const observationAskedTitle = await getString('observation:asked', modulename);
             const askEvalPayload = {
                 context: context,
                 planningid: planningId,
@@ -71,28 +70,8 @@ export const initUsersAction = (modulename, planningId, studentId, context) => {
                 const askObservationReturn = await Ajax.call(
                     [{methodname: `${modulename}_ask_eval_observation`, args: askEvalPayload}]
                 )[0];
-                if (askObservationReturn.asked) {
-                    try {
-                        const userInfo = await Ajax.call([
-                            {
-                                methodname: `${modulename}_get_user_profile`,
-                                args: {
-                                    userid: element.dataset.userId,
-                                },
-                            }
-                        ])[0];
-                        const modal = await ModalFactory.create({
-                            title: observationAskedTitle,
-                            body: getString('observation:asked:body', modulename, userInfo.fullname),
-                            type: ModalFactory.types.CANCEL,
-                            large: true
-                        });
-                        element.classList.add('text-success');
-                        modal.show();
-                        return modal;
-                    } catch (error) {
-                        await Notification.exception(error);
-                    }
+                if (askObservationReturn.success) {
+                    element.querySelector('.asked').classList.remove('d-none');
                 }
             } catch (error) {
                 const cannotAddString = await getString('todo:cannotadd', modulename);

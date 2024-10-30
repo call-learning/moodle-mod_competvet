@@ -4,4 +4,19 @@
         height: 3rem;
         border-radius: 100%;
     }
+    .btn-sort {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        background: var(--secondary);
+        color: var(--gray-dark);
+        width: 20px;
+        height: 20px;
+        border-radius: 10px;
+        justify-content: center;
+        &:hover, &:focus {
+            background: var(--light);
+            text-decoration: none;
+        }
+    }
 }

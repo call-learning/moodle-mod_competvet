@@ -344,7 +344,7 @@ class observations {
         }
         // We are now sure we have the full structure of criteria.
         foreach ($criteria as $criterion) {
-            if (isset($criterion['id'])) {
+            if (isset($criterion['id']) && $criterion['id'] > 0) {
                 $obscrit = observation_criterion_level::get_record(['id' => $criterion['id']]);
             } else {
                 $obscrit = new observation_criterion_level(0);

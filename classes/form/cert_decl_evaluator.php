@@ -70,6 +70,8 @@ class cert_decl_evaluator extends cert_decl_student {
         $mform->addElement('hidden', 'supervisorid');
         $mform->setType('supervisorid', PARAM_INT);
 
+        $mform->addElement('static', 'label', get_string('criterion:label', 'mod_competvet'), '');
+
         $mform->addElement('static', 'studentinfo', '');
         $range = $this->get_range_html(true);
         $mform->addElement('static', 'rangeheader', get_string('declaredlevel', 'mod_competvet'), $range);

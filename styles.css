@@ -783,3 +783,20 @@
     height: 3rem;
     border-radius: 100%;
 }
+
+.competvet-view-todos .btn-sort {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    background: var(--secondary);
+    color: var(--gray-dark);
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    justify-content: center;
+}
+
+.competvet-view-todos .btn-sort:hover, .competvet-view-todos .btn-sort:focus {
+    background: var(--light);
+    text-decoration: none;
+}

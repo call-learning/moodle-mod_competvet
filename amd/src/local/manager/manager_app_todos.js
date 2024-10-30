@@ -25,6 +25,7 @@
 
 import CompetState from 'mod_competvet/local/competstate';
 import Repository from 'mod_competvet/local/new-repository';
+import {genericFormCreate} from "../forms/generic_form_helper";
 import './todo';
 
 /*
@@ -111,6 +112,32 @@ class Manager {
         if (btn.dataset.buttonAction === 'deleteselected') {
             this.deleteselected();
         }
+        if (btn.dataset.buttonAction === 'observation-add') {
+            this.addObservation(btn);
+        }
+        if (btn.dataset.buttonAction === 'cert-decl-evaluator') {
+            this.addCertDeclEvaluator(btn);
+        }
+        if (btn.dataset.buttonAction === 'date-sort-asc') {
+            this.sort('timecreated', 'asc');
+            btn.classList.add('d-none');
+            this.app.querySelector('[data-button-action="date-sort-desc"]').classList.remove('d-none');
+        }
+        if (btn.dataset.buttonAction === 'date-sort-desc') {
+            this.sort('timecreated', 'desc');
+            btn.classList.add('d-none');
+            this.app.querySelector('[data-button-action="date-sort-asc"]').classList.remove('d-none');
+        }
+        if (btn.dataset.buttonAction === 'targetuser-sort-asc') {
+            this.sort('targetuser.fullname', 'asc');
+            btn.classList.add('d-none');
+            this.app.querySelector('[data-button-action="targetuser-sort-desc"]').classList.remove('d-none');
+        }
+        if (btn.dataset.buttonAction === 'targetuser-sort-desc') {
+            this.sort('targetuser.fullname', 'desc');
+            btn.classList.add('d-none');
+            this.app.querySelector('[data-button-action="targetuser-sort-asc"]').classList.remove('d-none');
+        }
     }
 
     /**
@@ -154,6 +181,76 @@ class Manager {
         }
         await Repository.deleteTodos({todoids: todoIds});
         this.toggleEmptyTodos();
+    }
+
+    /**
+     * Add an observation.
+     * @param {object} btn The button that was clicked.
+     */
+    addObservation(btn) {
+        const submitEventHandler = () => {
+            window.location.reload();
+        };
+        const modalForm = genericFormCreate(btn.dataset, 'observation:add', 'mod_competvet', 'eval_observation_add');
+        modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, submitEventHandler);
+        modalForm.show();
+    }
+
+    /**
+     * Add a cert decl evaluator.
+     * @param {object} btn The button that was clicked.
+     */
+    addCertDeclEvaluator(btn) {
+        const submitEventHandler = () => {
+            window.location.reload();
+        };
+        const modalForm = genericFormCreate(btn.dataset, 'certdecl', 'mod_competvet', 'cert_decl_evaluator');
+
+        // This sets the level field to the value of the range input.
+        modalForm.addEventListener(modalForm.events.LOADED, () => {
+            // Get the value of the range input and set it to the hidden level field.
+            modalForm.modal.getRoot().on('modal:bodyRendered', () => {
+                const rangeInput = modalForm.modal.getRoot().find('input[type="range"]');
+                const levelInput = modalForm.modal.getRoot().find('input[name="level"]');
+                const currentLevel = modalForm.modal.getRoot().find('[data-region="current-level"]');
+                rangeInput.val(levelInput.val());
+                currentLevel.text(levelInput.val());
+            });
+        });
+        modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, submitEventHandler);
+        modalForm.show();
+    }
+
+    /**
+     * Get the value of a nested property using dot notation.
+     * @param {object} obj The object to query.
+     * @param {string} path The path to the property (e.g., 'targetuser.fullname').
+     * @returns {*} The value of the nested property.
+     */
+    getNestedValue(obj, path) {
+        return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+    }
+
+    /**
+     * Sort the todos.
+     * @param {string} field The field to sort on.
+     * @param {string} direction The direction to sort.
+     */
+    sort(field, direction) {
+        let state = CompetState.getData();
+        state.todos = state.todos.sort((a, b) => {
+            const aValue = this.getNestedValue(a, field);
+            const bValue = this.getNestedValue(b, field);
+
+            if (aValue > bValue) {
+                return direction === 'asc' ? 1 : -1;
+            } else if (aValue < bValue) {
+                return direction === 'asc' ? -1 : 1;
+            } else {
+                return 0;
+            }
+        });
+        CompetState.setData(state);
     }
 }
 

@@ -48,10 +48,14 @@ class get_todos extends external_api {
             $statusoptions = todo::STATUS;
             $status = $statusoptions[$todo['status']];
             $todo['status'] = get_string('todo:status:' . $status, 'mod_competvet');
-
-            $actionoptions = todo::ACTIONS;
-            $action = $actionoptions[$todo['action']];
-            $todo['action'] = get_string('todo:action:' . $action, 'mod_competvet');
+            $todo['evalasked'] = $todo['action'] == todo::ACTION_EVAL_OBSERVATION_ASKED;
+            $todo['certifvalidasked'] = $todo['action'] == todo::ACTION_EVAL_CERTIFICATION_VALIDATION_ASKED;
+            $todo['declid'] = null;
+            $todo['observationid'] = null;
+            $data = json_decode($todo['data']);
+            if ($data && isset($data->declid)) {
+                $todo['declid'] = $data->declid;
+            }
         }
         return ['todos' => $todos];
     }
@@ -66,16 +70,22 @@ class get_todos extends external_api {
                     'groupname' => new external_value(PARAM_TEXT, 'Group name', VALUE_REQUIRED),
                     'startdate' => new external_value(PARAM_INT, 'Start date', VALUE_REQUIRED),
                     'enddate' => new external_value(PARAM_INT, 'End date', VALUE_REQUIRED),
+                    'cmid' => new external_value(PARAM_INT, 'Course module ID', VALUE_REQUIRED),
+                    'session' => new external_value(PARAM_TEXT, 'Session', VALUE_REQUIRED),
                 ]),
                 'timecreated' => new external_value(PARAM_INT, 'timecreated', VALUE_REQUIRED),
                 'timemodified' => new external_value(PARAM_INT, 'timemodified', VALUE_REQUIRED),
                 'targetuser' => new external_single_structure([
+                    'id' => new external_value(PARAM_INT, 'User ID', VALUE_REQUIRED),
                     'fullname' => new external_value(PARAM_TEXT, 'Fullname', VALUE_REQUIRED),
                     'userpictureurl' => new external_value(PARAM_TEXT, 'User picture URL', VALUE_REQUIRED),
                 ]),
                 'action' => new external_value(PARAM_TEXT, 'Action', VALUE_REQUIRED),
+                'evalasked' => new external_value(PARAM_BOOL, 'Eval asked', VALUE_REQUIRED),
+                'certifvalidasked' => new external_value(PARAM_BOOL, 'Certif valid asked', VALUE_REQUIRED),
                 'status' => new external_value(PARAM_TEXT, 'Status', VALUE_REQUIRED),
                 'data' => new external_value(PARAM_RAW, 'Data', VALUE_REQUIRED),
+                'declid' => new external_value(PARAM_INT, 'Declaration ID', VALUE_REQUIRED),
             ])),
         ]);
     }

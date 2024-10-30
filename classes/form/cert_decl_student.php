@@ -212,6 +212,7 @@ class cert_decl_student extends dynamic_form {
             $data['level'] = $certification['level'];
             $data['status'] = $certification['status'];
             $data['supervisors'] = $supervisors;
+            $data['label'] = $certification['label'];
             $validations = $certification['validations'];
             if ($supervisors) {
                 in_array($USER->id, $supervisors) ? $data['supervisorid'] = $USER->id : $data['supervisorid'] = 0;
