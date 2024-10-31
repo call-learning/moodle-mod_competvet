@@ -27,6 +27,7 @@
     <tr data-timecreated="{{timecreated}}" class="{{#deleted}}d-none{{/deleted}}">
         <td><input type="checkbox" class="todoCheckbox" data-id="{{id}}" data-radio-action="selectone"></td>
         <td>
+            <div><strong>{{planning.situationname}}</strong> ({{planning.session}})</div>
             <div><strong>{{planning.groupname}}</strong> ({{planning.session}})</div>
             <div class="small muted">
                 {{#userdate}} {{planning.startdate}}, {{#str}}strftimedateshort, core_langconfig {{/str}} {{/userdate}} -
