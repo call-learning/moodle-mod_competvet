@@ -108,6 +108,7 @@ class mod_competvet_mod_form extends moodleform_mod {
             $mform->setType($situationfield, $situationfielddefinition['type']);
 
             $mform->addElement('hidden', 'hasactivity', 0);
+            $mform->setType('hasactivity', PARAM_INT);
 
             if (in_array($situationfield, ['haseval', 'hascase', 'hascertif'])) {
                 if ($competvetid = $this->get_current()->id) {

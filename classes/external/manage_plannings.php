@@ -82,7 +82,7 @@ class manage_plannings extends external_api {
         // Loop through the plannings, if a planning has the haschanged flag set to true,
         // update or insert the planning by calling the correct API.
         foreach ($plannings as $planning) {
-            if ($planning['deleted']) {
+            if (isset($planning['deleted']) && $planning['deleted']) {
                 plannings::delete_planning($planning['id']);
                 continue;
             }

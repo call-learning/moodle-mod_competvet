@@ -148,11 +148,11 @@
                 </th>
             </tr>
             {{#students}}
-                <tr class="student collapse {{^contentcollapsed}}show{{/contentcollapsed}}" data-planningid="{{planninginfo.planningid}}" id="collapse{{planninginfo.planningid}}" data-hasgrade="{{#grade}}1{{/grade}}">
+                <tr class="student collapse {{^contentcollapsed}}show{{/contentcollapsed}}" data-studentid="{{userinfo.id}}" data-planningid="{{planninginfo.planningid}}" id="collapse{{planninginfo.planningid}}" data-hasgrade="{{#grade}}1{{/grade}}">
                     <th class="user student-name">
                         <div class="d-flex align-items-center position-relative">
                             <img src="{{userinfo.userpictureurl}}" alt="{{userinfo.fullname}}" class="userpicture">
-                            <a class="stretched-link" href="{{{profileurl}}}" data-region="studentname" data-firstname="{{userinfo.firstname}}" data-lastname="{{userinfo.lastname}}" data-email="{{userinfo.email}}">{{userinfo.fullname}}</a>
+                            <a class="stretched-link" href="{{{profileurl}}}" data-region="studentname" data-studentid="{{userinfo.id}}" data-firstname="{{userinfo.firstname}}" data-lastname="{{userinfo.lastname}}" data-email="{{userinfo.email}}">{{userinfo.fullname}}</a>
                         </div>
                     </th>
                     <td class="t-grade stats">
