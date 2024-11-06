@@ -13,11 +13,11 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-namespace local\api\observers;
+
+namespace mod_competvet\local\observers;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
-
 use advanced_testcase;
 use core_user;
 use mod_competvet\event\cert_validation_requested;
@@ -43,7 +43,7 @@ use test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class cert_requested_test extends advanced_testcase {
+final class cert_requested_test extends advanced_testcase {
     use test_data_definition;
 
     /**
@@ -85,7 +85,7 @@ class cert_requested_test extends advanced_testcase {
      * @return void
      * @covers       \mod_competvet\event\cert_validation_requested::create_from_decl_and_supervisor
      */
-    public function test_request_cert_validation_trigger_event() {
+    public function test_request_cert_validation_trigger_event(): void {
         $student = core_user::get_user_by_username('student1');
         $observer = core_user::get_user_by_username('observer1');
         $eventsink = $this->redirectEvents(); // Here call to trigger will never dispatch the event, just create it.
@@ -108,7 +108,7 @@ class cert_requested_test extends advanced_testcase {
      * @return void
      * @covers       \mod_competvet\local\observers\cert_observer::cert_validation_requested
      */
-    public function test_request_cert_validation_create_todo() {
+    public function test_request_cert_validation_create_todo(): void {
         $student = core_user::get_user_by_username('student1');
         $observer = core_user::get_user_by_username('observer1');
         $situation = situation::get_record(['shortname' => 'SIT1']);

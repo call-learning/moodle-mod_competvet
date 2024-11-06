@@ -22,11 +22,27 @@
     Example context (json):
     {
         "id": 1,
-        "startdate": "10 January 2024",
-        "enddate": "18 January 2024",
-        "groupname": "Group 1",
-        "nbstudents": 10,
-        "viewurl": "http://localhost/moodle/mod/competvet/view.php?id=1",
+        "canedit": true,
+        "edit": false,
+        "label": "Criterion 1",
+        "placeholder": "Criterion 1",
+        "gridid": 1,
+        "criterionid": 1,
+        "hasoptions": true,
+        "options": [
+            {
+                "id": 1,
+                "label": "Option 1",
+                "grade": 1,
+                "deleted": false
+            },
+            {
+                "id": 2,
+                "label": "Option 2",
+                "grade": 2,
+                "deleted": false
+            }
+        ]
     }
 }}
 <div data-region="criterion" data-id="{{criterionid}}">

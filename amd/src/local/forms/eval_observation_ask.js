@@ -29,7 +29,7 @@ import Template from "core/templates";
 import {genericForm} from './generic_form_helper';
 
 export const init = (modulename) => {
-    const handleAskSubmit = async (event) => {
+    const handleAskSubmit = async(event) => {
         const askObservationTitle = await getString('observation:ask', modulename);
         try {
             const modal = await ModalFactory.create({
@@ -48,6 +48,7 @@ export const init = (modulename) => {
         } catch (error) {
             await Notification.exception(error);
         }
+        return null;
     };
     genericForm('observation:ask', modulename, 'eval_observation_ask', handleAskSubmit);
 };
@@ -58,7 +59,7 @@ export const initUsersAction = (modulename, planningId, studentId, context) => {
         return;
     }
     selectedElements.forEach((element) => {
-        element.addEventListener('click', async (event) => {
+        element.addEventListener('click', async(event) => {
             event.preventDefault();
             const askEvalPayload = {
                 context: context,

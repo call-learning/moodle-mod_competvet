@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\persistent;
 
 use core\persistent;
@@ -93,6 +94,7 @@ class planning extends persistent {
     /**
      * Get printable version of start time
      *
+     * @param int $timestamp
      * @return string
      */
     public static function get_planning_date_string($timestamp) {
@@ -119,6 +121,8 @@ class planning extends persistent {
     /**
      * Return true if user is member of any planning group for this situation
      *
+     * @param int $userid
+     * @param situation $situation
      * @return bool
      */
     public static function is_user_in_planned_groups(int $userid, situation $situation): bool {

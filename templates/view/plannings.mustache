@@ -26,6 +26,7 @@
                 "categorytext": "Category 1",
                 "plannings": [
                     {
+                        "id": 1,
                         "startdate": "01/01/2019",
                         "enddate": "01/01/2019",
                         "groupname": "Group 1",
@@ -33,6 +34,7 @@
                         "planningurl": "http://localhost/moodle/mod/competvet/view.php?id=1&planningid=1"
                     },
                     {
+                        "id": 2,
                         "startdate": "01/01/2019",
                         "enddate": "01/01/2019",
                         "groupname": "Group 2",
@@ -46,6 +48,7 @@
                 "categorytext": "Category 2",
                 "plannings": [
                     {
+                        "id": 3,
                         "startdate": "01/01/2019",
                         "enddate": "01/01/2019",
                         "groupname": "Group 1",
@@ -53,6 +56,7 @@
                         "planningurl": "http://localhost/moodle/mod/competvet/view.php?id=1&planningid=1"
                     },
                     {
+                        "id": 4,
                         "startdate": "01/01/2019",
                         "enddate": "01/01/2019",
                         "groupname": "Group 2",
@@ -61,7 +65,8 @@
                     }
                 ]
             }
-        ]
+        ],
+        "lintolny": true
     }
 }}
 <form class="form mb-5 simplesearchform">
@@ -101,9 +106,9 @@
                 <label for="startdate">
                     <span class="sr-only">{{#str}}search:startdate, mod_competvet{{/str}}</span>
                 </label>
-                <input type="date" name="startdate" value="{{startdate}}" data-field="startdate" class="form-control {{#errorenddate}}error{{/errorenddate}}">
+                <input type="date" id="startdate" name="startdate" value="{{startdate}}" data-field="startdate" class="form-control {{#errorenddate}}error{{/errorenddate}}">
                 <div class="input-group-append">
-                    <button id="clearstartdate" type="clear" class="btn btn-outline-secondary">
+                    <button id="clearstartdate" class="btn btn-outline-secondary">
                        <i class="icon fa fa-times"></i>
                        <span class="sr-only">{{#str}}search:clearstartdate, mod_competvet{{/str}}</span>
                     </button>
@@ -134,14 +139,14 @@
     {{#categories}}
         {{#plannings}}
             <tr class="planning" data-planningid="{{id}}" data-starttimestamp="{{starttimestamp}}" data-endtimestamp="{{endtimestamp}}" data-startdate="{{startdate}}" data-enddate="{{enddate}}">
-                <th class="planning-name" colspan="7">
+                <th class="planning-name" colspan="4">
                     <div class="position-relative d-flex align-items-center">
                         {{< mod_competvet/expandcollapse}}
                             {{$id}}{{id}}{{/id}}
                         {{/ mod_competvet/expandcollapse}}
                         <div class="d-flex w-100 align-items-center">
                             <div class="h3 mb-0 ml-2" data-region="groupname">{{groupname}}</div>
-                            <div class="ml-1 mb-2"><span class="badge badge-info">{{categorytext}}<span></div>
+                            <div class="ml-1 mb-2"><span class="badge badge-info">{{categorytext}}</span></div>
                             <div class="ml-auto">{{startdate}} / {{enddate}}</div>
                         </div>
                     </div>

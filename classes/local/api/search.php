@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\api;
 
 use context;
@@ -32,9 +33,13 @@ use mod_competvet\utils;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class search {
+    /** Situation type */
     const TYPE_SITUATION = 'situation';
+    /** Observation type */
     const TYPE_OBSERVATION = 'observation';
+    /** Planning type */
     const TYPE_PLANNING = 'planning';
+    /** Case type */
     const TYPE_CASE = 'case';
 
     /**

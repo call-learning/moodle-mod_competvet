@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\api;
 
 use mod_competvet\local\persistent\todo;
@@ -39,7 +40,7 @@ abstract class todo_action_base {
      *
      * @param int|null $todoid
      */
-    public function __construct(int $todoid = null) {
+    public function __construct(?int $todoid = null) {
         if ($todoid) {
             $this->todo = todo::get_record(['id' => $todoid]);
         }
@@ -55,7 +56,7 @@ abstract class todo_action_base {
     /**
      * Create a new todo
      *
-     * @param array $params the todo
+     * @param mixed ...$params the todo
      * @return void
      */
     abstract public function create(...$params);

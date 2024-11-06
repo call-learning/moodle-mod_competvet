@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\observers;
 /**
  * User enrolment change observe
@@ -22,12 +23,27 @@ namespace mod_competvet\local\observers;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class user_enrolment_observer {
+    /**
+     * Invalidate user situation cache when a user enrolment is created.
+     *
+     * @param \core\event\user_enrolment_created $event
+     */
     public static function user_enrolment_created(\core\event\user_enrolment_created $event) {
         \cache_helper::invalidate_by_definition('mod_competvet', 'usersituations', [], [$event->relateduserid]);
     }
+    /**
+     * Invalidate user situation cache when a user enrolment is deleted.
+     *
+     * @param \core\event\user_enrolment_deleted $event
+     */
     public static function user_enrolment_deleted(\core\event\user_enrolment_deleted $event) {
         \cache_helper::invalidate_by_definition('mod_competvet', 'usersituations', [], [$event->relateduserid]);
     }
+    /**
+     * Invalidate user situation cache when a user enrolment is updated.
+     *
+     * @param \core\event\user_enrolment_updated $event
+     */
     public static function user_enrolment_updated(\core\event\user_enrolment_updated $event) {
         \cache_helper::invalidate_by_definition('mod_competvet', 'usersituations', [], [$event->relateduserid]);
     }

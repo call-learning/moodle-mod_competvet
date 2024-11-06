@@ -203,7 +203,12 @@ class get_evaluations extends external_api {
         ];
     }
 
-
+    /**
+     * Remove empty rows from the graded criteria
+     *
+     * @param array $gradedcriteria
+     * @return array
+     */
     private static function remove_empty_rows($gradedcriteria) {
         return array_filter($gradedcriteria, function ($criterion) {
             return !array_reduce(
@@ -213,6 +218,13 @@ class get_evaluations extends external_api {
             );
         });
     }
+
+    /**
+     * Compute average and stats
+     *
+     * @param array $gradedcriteria
+     * @return array
+     */
     private static function compute_average_and_stats(&$gradedcriteria) {
         $totalaverage = 0;
         $totalaveragecount = 0;
@@ -244,15 +256,18 @@ class get_evaluations extends external_api {
         }
         return [$totalaverage, $totalaveragecount];
     }
+
     /**
      * Collect grades from an observation
      *
      * @param array $userobservation
      * @param array $criteria
-     * @param array $gradedcriteria
+     * @param array $gradedobservations
+     * @param array $gradedautoevals
      * @return void
      */
-    private static function collect_grades(array $userobservation, array $criteria, array &$gradedobservations, &$gradedautoevals): void {
+    private static function collect_grades(array $userobservation, array $criteria,
+        array &$gradedobservations, &$gradedautoevals): void {
         $observedcriteriaid = array_map(
             function ($observedcriterion) {
                 return $observedcriterion['criterioninfo']['id'];
@@ -269,7 +284,7 @@ class get_evaluations extends external_api {
                     'graderinfo' => $userobservation['observerinfo'],
                     'timemodified' => $userobservation['timemodified'],
                     'date' => userdate($userobservation['timemodified'], get_string('strftimedatefullshort')),
-                    'nograde' => true
+                    'nograde' => true,
                 ];
             } else {
                 $grade = [

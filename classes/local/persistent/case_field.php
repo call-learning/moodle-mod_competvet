@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\persistent;
 
 use core\persistent;
@@ -28,10 +29,13 @@ use lang_string;
  */
 class case_field extends persistent {
     /**
-     * Current table
+     * @var string TABLE
      */
     const TABLE = 'competvet_case_field';
 
+    /**
+     * @var array FIELD_TYPES
+     */
     const FIELD_TYPES = [
         'text',
         'date',
@@ -90,7 +94,7 @@ class case_field extends persistent {
     /**
      * Validate type
      *
-     * @param $type
+     * @param string $type
      * @return bool
      */
     protected function validate_type($type) {
@@ -131,6 +135,11 @@ class case_field extends persistent {
         return '';
     }
 
+    /**
+     * Convert a raw value to a value that can be stored in the database.
+     * @param mixed $value
+     * @return mixed
+     */
     public function convert_to_raw_value(mixed $value) {
         switch ($this->get('type')) {
             case 'text':

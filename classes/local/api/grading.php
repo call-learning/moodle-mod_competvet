@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\api;
 
 use mod_competvet\competvet;
@@ -20,8 +21,12 @@ use mod_competvet\local\persistent\planning;
 use mod_competvet\utils;
 use moodle_url;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->libdir . '/gradelib.php');
+
+
 
 /**
  * Grading API

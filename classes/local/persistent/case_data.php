@@ -95,7 +95,6 @@ class case_data extends persistent {
     /**
      * Get the display value of the data.
      *
-     * @param object $field The field object
      * @return string
      */
     public function get_display_value() {

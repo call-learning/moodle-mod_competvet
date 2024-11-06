@@ -36,12 +36,22 @@ use mod_competvet\local\persistent\todo;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_todos extends external_api {
+
+    /**
+     * Returns description of method parameters
+     * @return external_function_parameters
+     */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'userid' => new external_value(PARAM_INT, 'User ID', VALUE_REQUIRED),
         ]);
     }
 
+    /**
+     * Get todos
+     * @param int $userid
+     * @return array
+     */
     public static function execute(int $userid): array {
         $todos = todos_api::get_todos_for_user($userid);
         foreach ($todos as &$todo) {
@@ -60,6 +70,10 @@ class get_todos extends external_api {
         return ['todos' => $todos];
     }
 
+    /**
+     * Returns description of method result value
+     * @return external_single_structure
+     */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'todos' => new external_multiple_structure(new external_single_structure([

@@ -13,6 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// phpcs:ignoreFile
+
 namespace mod_competvet\reportbuilder\local\helpers;
 
 use context;
@@ -56,10 +58,11 @@ class data_retriever_helper {
     /**
      * Get all data from a given
      *
-     * @param base $report
+     * @param string $reportclass
+     * @param context $context
      * @param array $parameters
      * @param array|null $filters
-     * @param int $pagesize
+     * @param int|null $pagesize
      * @return array
      */
     public static function get_data_from_system_report(

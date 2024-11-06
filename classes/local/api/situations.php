@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\api;
 
 use context_system;
@@ -134,7 +135,7 @@ class situations {
     /**
      * Unset unwanted fields from a record
      *
-     * @param $record
+     * @param object $record
      * @return void
      */
     private static function unset_persistent_records($record) {

@@ -23,6 +23,7 @@ use mod_competvet\local\persistent\observation_comment;
  * Observation create form
  *
  * @package    mod_competvet
+ * @copyright  2023 CALL Learning
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class eval_observation_helper {
@@ -106,7 +107,7 @@ class eval_observation_helper {
         $mform->setType('comments_id', PARAM_INT);
         $mform->setType('comments', PARAM_TEXT);
 
-        // Now do the same for private comments
+        // Now do the same for private comments.
         $mform->addElement('header', 'privatecomment_header', get_string('observation:comment:privatecomment', 'mod_competvet'));
         $mform->setExpanded('privatecomment_header');
         $form->repeat_elements(

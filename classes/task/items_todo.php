@@ -47,7 +47,7 @@ class items_todo extends \core\task\scheduled_task {
      */
     public function execute() {
         global $DB;
-        // Get all situations
+        // Get all situations.
         $situations = $DB->get_records('competvet_situation');
         $recipients = [];
 

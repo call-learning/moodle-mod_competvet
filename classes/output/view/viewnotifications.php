@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\output\view;
 
 use context_system;
@@ -59,14 +60,14 @@ class viewnotifications extends base {
         $data['notifications'] = [];
         foreach ($notifications as $notification) {
             $body = $notification->get('body');
-            // Get a short version of the body in plain text
+            // Get a short version of the body in plain text.
             $shortmessage = strip_tags($body);
             $shortmessage = substr($shortmessage, 0, 100);
             $delete = new moodle_url('/mod/competvet/view.php',
                 [
                     'pagetype' => 'viewnotifications',
                     'id' => $this->cmid,
-                    'delete' => $notification->get('id')
+                    'delete' => $notification->get('id'),
                 ]);
             $data['notifications'][] = [
                 'id' => $notification->get('id'),
@@ -75,7 +76,7 @@ class viewnotifications extends base {
                     'mod_competvet'),
                 'shortmessage' => $shortmessage,
                 'body' => $body,
-                'delete' => $delete->out()
+                'delete' => $delete->out(),
             ];
         }
         $data['version'] = time();

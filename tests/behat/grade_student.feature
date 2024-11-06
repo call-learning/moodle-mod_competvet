@@ -38,25 +38,25 @@ Feature: Grade a student
       | SIT1      | G1    | last Monday      | Monday next week      | SESSION1 |
       | SIT1      | G2    | last Sunday      | Monday next fortnight | SESSION2 |
 
-    @javascript
-    Scenario: Teacher can grade student
-      Given I am on the "S1" Activity page logged in as "teacher1"
-        And I open grading page for "Student One"
-        And I set "75" in the "finalgrade" field within the form with data-region "globalgrade"
-        And I set "Well done" in the "comment" field within the form with data-region "globalgrade"
-        And I submit the form with data-region "globalgrade"
-        And I click the link with text "Close evaluation"
+  @javascript
+  Scenario: Teacher can grade student
+    Given I am on the "S1" Activity page logged in as "teacher1"
+    And I open grading page for "Student One"
+    And I set "75" in the "finalgrade" field within the form with data-region "globalgrade"
+    And I set "Well done" in the "comment" field within the form with data-region "globalgrade"
+    And I submit the form with data-region "globalgrade"
+    And I click the link with text "Close evaluation"
 
-        And I am on the "S1" Activity page logged in as "teacher1"
-        And I open grading page for "Student Two"
-        And I set "30" in the "finalgrade" field within the form with data-region "globalgrade"
-        And I set "Better luck next time" in the "comment" field within the form with data-region "globalgrade"
-        And I submit the form with data-region "globalgrade"
-        And I click the link with text "Close evaluation"
+    And I am on the "S1" Activity page logged in as "teacher1"
+    And I open grading page for "Student Two"
+    And I set "30" in the "finalgrade" field within the form with data-region "globalgrade"
+    And I set "Better luck next time" in the "comment" field within the form with data-region "globalgrade"
+    And I submit the form with data-region "globalgrade"
+    And I click the link with text "Close evaluation"
 
-        And I am on the "CVET1" "grades > Grader report > View" page
-        And I should see "MEDCHIR" in the "user-grades" "table"
-        Then the following should exist in the "user-grades" table:
-          | -1-                | -2-                  | -3-       |
-          | Student One        | student1@example.com | 75        |
-          | Student Two        | student2@example.com | 30        |
+    And I am on the "CVET1" "grades > Grader report > View" page
+    And I should see "MEDCHIR" in the "user-grades" "table"
+    Then the following should exist in the "user-grades" table:
+      | -1-                | -2-                  | -3-       |
+      | Student One        | student1@example.com | 75        |
+      | Student Two        | student2@example.com | 30        |

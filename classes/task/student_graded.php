@@ -69,7 +69,7 @@ class student_graded extends \core\task\adhoc_task {
         }
 
         // Send the email.
-        $recipients[]= $student;
+        $recipients[] = $student;
         $context = $this->get_email_context($competvet, $student);
         notifications::send_email($this->taskname, $student->id, $competvet->get_instance_id(), $recipients, $context);
     }
@@ -78,7 +78,7 @@ class student_graded extends \core\task\adhoc_task {
      * Get the email context.
      *
      * @param competvet $competvet
-     * @param $student
+     * @param object $student
      * @return object
      */
     private function get_email_context(competvet $competvet, $student) {

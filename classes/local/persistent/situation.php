@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\persistent;
 
 use cache;
@@ -83,6 +84,7 @@ class situation extends persistent {
     /**
      * Get a unique user type for a given user and situation
      *
+     * @param int $userid
      * @return string
      */
     public function get_top_role(int $userid): string {
@@ -138,6 +140,7 @@ class situation extends persistent {
      * Here we do not use cache as we should have a small amount of situations
      *
      * @param int $userid
+     * @param int $courseid
      * @return array|int[]
      */
     public static function get_all_situations_in_course_id_for(int $userid, int $courseid): array {

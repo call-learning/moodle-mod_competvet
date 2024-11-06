@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet;
 
 use context_module;
@@ -30,6 +31,7 @@ class utils {
     /**
      * Get Groups
      *
+     * @param int $cmid
      * @return array|false
      */
     public static function get_groups_with_members(int $cmid) {
@@ -44,7 +46,7 @@ class utils {
     /**
      * Page requirements
      *
-     * @param $action
+     * @param string $action
      * @return array
      */
     public static function page_requirements($action) {
@@ -78,8 +80,8 @@ class utils {
      *
      * Note: this will remove the id which is supposed to be the id from another entity.
      *
-     * @param $persistentclass
-     * @param $record
+     * @param class $persistentclass
+     * @param object $record
      * @return object [persistent, otherproperties ]
      */
     public static function split_properties_from_persistent($persistentclass, $record): array {
@@ -98,8 +100,9 @@ class utils {
     /**
      * Get persistent field without some standard fields.
      *
-     * @param $persistentclass
-     * @return array
+     * @param mixed $persistentclass An instance of the persistent class.
+     * @param array|null $fieldstoremove The fields to remove from the persistent fields.
+     * @return array The persistent fields without the specified fields.
      */
     public static function get_persistent_fields_without_internals($persistentclass, ?array $fieldstoremove = []): array {
         $persistentfields = $persistentclass::properties_definition();
@@ -113,6 +116,8 @@ class utils {
     /**
      * Is the user student in this context
      *
+     * @param int $userid
+     * @param int $contextid
      * @return bool
      */
     public static function is_student(int $userid, int $contextid): bool {
@@ -172,6 +177,7 @@ class utils {
         ];
     }
 
+    /** Situation categories definition */
     const SITUATION_CATEGORIES_DEF = "Y1|fr:Première année|en:First year\nY2|fr:Deuxième année|en:Second year
 Y3|fr:Troisième année|en:Third year\nY4|fr:Quatrième année|en:Fourth year\nY5|fr:Cinquième année|en:Fifth year";
 

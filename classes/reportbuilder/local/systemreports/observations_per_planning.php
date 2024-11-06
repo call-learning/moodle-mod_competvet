@@ -124,6 +124,10 @@ class observations_per_planning extends system_report {
         $this->add_filters_from_entities($filters);
     }
 
+    /**
+     * Check if the user can view this report
+     * @return bool
+     */
     protected function can_view(): bool {
         return isloggedin();
     }

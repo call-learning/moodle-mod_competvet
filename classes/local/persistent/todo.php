@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\persistent;
 
 use core\persistent;
@@ -31,17 +32,16 @@ class todo extends persistent {
      * Current table
      */
     const TABLE = 'competvet_todo';
-    /**
-     * Action definition
-     */
+    /** Eval observation asked */
     const ACTION_EVAL_OBSERVATION_ASKED = 1;
+    /** Certif validation asked */
     const ACTION_EVAL_CERTIFICATION_VALIDATION_ASKED = 2;
 
-    /**
-     * Status definition
-     */
+    /** Status pending */
     const STATUS_PENDING = 1;
+    /** Status done */
     const STATUS_DONE = 2;
+    /** Status deleted */
     const STATUS_DELETED = 3;
     /**
      * Status definition
@@ -105,6 +105,11 @@ class todo extends persistent {
         ];
     }
 
+    /**
+     * Get all todos for a given user
+     * @param int $userid
+     * @return array
+     */
     public static function get_all_todos_for_user(int $userid): array {
         global $DB;
         $todos = $DB->get_records(self::TABLE, ['userid' => $userid],  'timecreated');

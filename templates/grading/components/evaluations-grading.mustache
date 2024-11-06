@@ -21,6 +21,36 @@
 
     Example context (json):
     {
+        "evaluations-grading": {
+            "grading": {
+                "evalscore": 0,
+                "maxevalscore": 0,
+                "numberofobservations": 0,
+                "evalnum": 0,
+                "haspenalty": false,
+                "penalty": 0,
+                "deactivatepenalty": false,
+                "selfevaluation": 0,
+                "selfevalselectoptions": [
+                    {
+                        "key": 0,
+                        "value": "No"
+                    },
+                    {
+                        "key": 1,
+                        "value": "Yes"
+                    }
+                ],
+                "finalscore": 0,
+                "maxfinalscore": 0,
+                "hideaccept": false,
+                "scoreevaluator": 0,
+                "comment": "",
+                "isvalid": false,
+                "isinvalid": false,
+                "cangrade": true
+            }
+        }
     }
 }}
 {{#evaluations-grading}}
@@ -64,8 +94,8 @@
                         {{^cangrade}}disabled{{/cangrade}}
                         {{#deactivatepenalty}}checked{{/deactivatepenalty}}
                         {{^cangrade}}disabled{{/cangrade}}
-                    />
-                    <label class="custom-control-label" for="deactivatepenalty">
+                    >
+                    <label class="custom-control-label">
                         {{#str}}deactivatepenalty, mod_competvet{{/str}}
                     </label>
                 </div>
@@ -134,13 +164,13 @@
                         step="1"
                         {{^cangrade}}disabled{{/cangrade}}
                         {{^cangrade}}disabled{{/cangrade}}
-                    />
+                    >
                 </div>
             </div>
         </div>
         <div class="mb-5">
             <div class="form-group">
-                <label for="freecommenteval">
+                <label for="comment">
                     {{#str}}freecommenteval, mod_competvet{{/str}}
                 </label>
                 <textarea

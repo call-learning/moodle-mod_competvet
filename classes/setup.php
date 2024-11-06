@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet;
 
 use context_system;
@@ -86,8 +87,8 @@ class setup {
         foreach ($roles as $currentrole) {
             $roledef = $roledefinitions[$currentrole->shortname] ?? [];
             foreach ($roledef['globalpermissions'] as $permissionname => $permissionvalue) {
-                // Assign the capability to the role at context level and then this will be replicated to the children. This is mainly
-                // for later assignments.
+                // Assign the capability to the role at context level and then this will be replicated to the children.
+                // This is mainly for later assignments.
                 assign_capability($permissionname, $permissionvalue, $currentrole->id, $contextsystemid, true);
             }
         }

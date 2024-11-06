@@ -13,7 +13,10 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\tests;
+
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->libdir . '/testing/classes/util.php');
@@ -28,11 +31,22 @@ use ReflectionMethod;
 use tool_generator\local\testscenario\parsedfeature;
 use tool_generator\local\testscenario\steprunner;
 
+
+/**
+ * Class test_scenario
+ *
+ * @package   mod_competvet
+ * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class test_scenario {
     /** @var array An array of original globals, restored after each test */
     protected static $globals = [];
+
     /** @var array of valid steps indexed by given expression tag. */
     private array $validsteps;
+
+    /** @var behat_data_generators $behatgenerator */
     private behat_data_generators $behatgenerator;
 
     /**

@@ -21,6 +21,8 @@
 
     Example context (json):
     {
+        "globalgrade": true,
+        "cangrade": true
     }
 }}
 {{#globalgrade}}
@@ -38,7 +40,7 @@
                     </button>
                 </div>
                 <a
-                    type="button"
+                    href="#"
                     class="small mt-2 {{#hideaccept}}d-none{{/hideaccept}}"
                     data-action="acceptgrade"
                     data-source="#suggestedgrade"
@@ -48,7 +50,7 @@
                 </a>
             </div>
             <div class="form-group">
-                <label class="h5" for="finalgrade">
+                <label class="h5" for="moodlegrade">
                     {{#str}}finalgrade, mod_competvet{{/str}} : / 100
                 </label>
                 <div>

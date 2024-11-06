@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet;
 
 defined('MOODLE_INTERNAL') || die();
@@ -30,7 +31,7 @@ use test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class lib_test extends advanced_testcase {
+final class lib_test extends advanced_testcase {
     use test_data_definition;
 
     /**
@@ -49,7 +50,7 @@ class lib_test extends advanced_testcase {
      * @return void
      * @covers ::competvet_delete_instance
      */
-    public function test_delete() {
+    public function test_delete(): void {
         global $DB;
         $this->prepare_scenario('set_2');
         // Test deletion.

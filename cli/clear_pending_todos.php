@@ -64,7 +64,7 @@ if ($timestamp === false) {
     cli_error('Invalid date.');
 }
 
-// Create the task and set the timestamp
+// Create the task and set the timestamp.
 $task = new \mod_competvet\task\clear_pending_todos();
 $task->set_timestamp($timestamp);
 $task->execute();

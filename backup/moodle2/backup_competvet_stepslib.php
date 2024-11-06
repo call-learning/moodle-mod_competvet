@@ -22,6 +22,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_competvet_activity_structure_step extends backup_activity_structure_step {
+    /**
+     * Define the structure of the competvet activity.
+     */
     protected function define_structure() {
         $userinfo = $this->get_setting_value('userinfo');
         // Define each element separately.
@@ -272,10 +275,10 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
         $grid->annotate_ids('user', 'usermodified');
         $grid->annotate_ids('situation', 'situationid');
 
-        // Define file annotations
+        // Define file annotations.
         $competvet->annotate_files('mod_competvet', 'intro', null);
 
-        // Return the root element (competvet), wrapped into standard activity structure
+        // Return the root element (competvet), wrapped into standard activity structure.
         return $this->prepare_activity_structure($competvet);
     }
 }

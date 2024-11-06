@@ -110,7 +110,8 @@ class criterion extends base {
             $this->get_entity_name()
         ))
             ->add_joins($this->get_joins())
-            ->add_join("LEFT JOIN {competvet_criterion} {$parentcriterionalias} ON ${parentcriterionalias}.id = {$criterionalias}.parentid")
+            ->add_join("LEFT JOIN {competvet_criterion} {$parentcriterionalias} ON {$parentcriterionalias}.id = " .
+            "{$criterionalias}.parentid")
             ->set_type(column::TYPE_TEXT)
             ->add_fields("{$parentcriterionalias}.label")
             ->set_is_sortable(true);
@@ -121,7 +122,8 @@ class criterion extends base {
             $this->get_entity_name()
         ))
             ->add_joins($this->get_joins())
-            ->add_join("LEFT JOIN {competvet_criterion} {$parentcriterionalias} ON ${parentcriterionalias}.id = {$criterionalias}.parentid")
+            ->add_join("LEFT JOIN {competvet_criterion} {$parentcriterionalias} ON {$parentcriterionalias}.id = " .
+            "{$criterionalias}.parentid")
             ->set_type(column::TYPE_TEXT)
             ->add_fields("{$parentcriterionalias}.idnumber")
             ->set_is_sortable(true);

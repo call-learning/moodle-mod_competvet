@@ -32,8 +32,11 @@ class grade extends persistent {
      */
     const TABLE = 'competvet_grades';
 
+    /** Evaluation grade */
     const EVALUATION_GRADE = 1;
+    /** Certification grade */
     const CERTIFICATION_GRADE = 2;
+    /** List grade */
     const LIST_GRADE = 3;
 
     /**

@@ -35,25 +35,19 @@
             "cases": [
                 {
                     "id": 1,
-                    "timestamp": "1611152400",
-                    "title": "Garoupa",
-                    "subtitle": "Lymphangite membre postérieur droit",
-                    "animal": "Équidé",
-                    "race": false,
-                    "age": 17,
-                    "sex": "Mâle stérilisé",
-                    "sections": [
+                    "timecreated": 1619712000,
+                    "title": "Case 1",
+                    "subtitle": "Subtitle 1",
+                    "categories": [
                         {
-                            "title": "Cas clinique",
-                            "content": "Garoupa, un cheval de 17 ans, est présenté pour une boiterie du membre postérieur droit. Le propriétaire rapporte que la boiterie est apparue brutalement il y a 3 jours. Le cheval est habituellement en bonne santé et n’a pas d’antécédents de boiterie. Il est utilisé pour des balades en forêt et des cours d’équitation pour débutants. Il est vacciné et vermifugé régulièrement. Il vit au pré avec un autre cheval et est nourri avec du foin et des granulés. Il n’a pas voyagé récemment. À l’examen clinique, Garoupa est en bonne condition corporelle. Il est alerte et réactif. Il présente une boiterie modérée du membre postérieur droit. L’examen du membre révèle une augmentation de température et un gonflement du membre. La palpation de la région inguinale est douloureuse. Le reste de l’examen clinique est normal.",
-                        },
-                        {
-                            "title": "Questions",
-                            "content": "Quelles sont les hypothèses diagnostiques pour cette boiterie ? Quels examens complémentaires proposez-vous pour confirmer le diagnostic ? Quel est votre diagnostic ? Quel est le traitement recommandé pour cette affection ?"
-                        },
-                        {
-                            "title": "Prise en charge",
-                            "content": "Garoupa est hospitalisé pour une prise en charge médicale. Il est mis sous anti-inflammatoires non stéroïdiens et sous antibiotiques. Un pansement est réalisé pour protéger la plaie. Le cheval est placé en boxe de repos. Il est nourri avec du foin et des granulés. Il est surveillé régulièrement pour évaluer l’évolution de sa boiterie. Après 3 jours de traitement, Garoupa présente une amélioration de sa boiterie. Il est sorti en paddock pour une reprise progressive de l’exercice. Après 10 jours de traitement, Garoupa est en bonne condition physique et ne présente plus de boiterie. Il est renvoyé à la maison avec des recommandations pour une reprise progressive de l’activité physique.",
+                            "name": "Animal",
+                            "fields": [
+                                {
+                                    "name": "Species",
+                                    "type": "text",
+                                    "displayvalue": "Dog"
+                                }
+                            ]
                         }
                     ]
                 }
@@ -99,7 +93,7 @@
                 <div class="case-content">
                     {{#categories}}
                         <div class="section">
-                            <h5 class="section-header">
+                            <div class="section-header h5">
                                 <div class="sectionicon firstsectionicon">
                                     {{> mod_competvet/grading/svg/paw}}
                                 </div>
@@ -110,7 +104,7 @@
                                     {{> mod_competvet/grading/svg/reader}}
                                 </div>
                                 {{name}}
-                            </h5>
+                            </div>
                             {{#fields}}
                                 <dl class="field {{type}}">
                                     <dt class="field-label">{{name}}</dt>

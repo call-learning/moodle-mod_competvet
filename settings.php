@@ -115,7 +115,7 @@ if ($hassiteconfig) {
             )
         );
 
-        // Set custom language strings for emails
+        // Set custom language strings for emails.
         $emails = [
             'end_of_planning',
             'items_todo',
@@ -141,7 +141,7 @@ if ($hassiteconfig) {
             );
 
             if ($email == 'student_graded') {
-                // add a checkbox to enable/disable the task
+                // Add a checkbox to enable/disable the task.
                 $settings->add(
                     new admin_setting_configcheckbox(
                         'mod_competvet/' . $settingname . '_enabled',
@@ -151,7 +151,7 @@ if ($hassiteconfig) {
                     )
                 );
             } else {
-                // Link to the task edit page
+                // Link to the task edit page.
                 $url = new moodle_url('/admin/tool/task/scheduledtasks.php',
                     ['action' => 'edit', 'task' => 'mod_competvet\task\\' . $email]);
                 $link = html_writer::link($url, get_string('controltask', 'mod_competvet'), ['class' => 'd-block mb-3']);
@@ -164,7 +164,7 @@ if ($hassiteconfig) {
                 );
             }
 
-            // Subject
+            // Subject.
             $subject = get_string('email:' . $email . ':subject', 'mod_competvet');
             $settings->add(
                 new admin_setting_configtext(
@@ -175,7 +175,7 @@ if ($hassiteconfig) {
                     PARAM_RAW,
                 )
             );
-            // Body
+            // Body.
             $body = get_string('email:' . $email, 'mod_competvet');
             $settings->add(
                 new admin_setting_configtextarea(
@@ -188,7 +188,7 @@ if ($hassiteconfig) {
             );
         }
 
-        // Footer content
+        // Footer content.
         $settings->add(
             new admin_setting_heading(
                 'mod_competvet/footerheader',
@@ -240,7 +240,7 @@ if ($hassiteconfig) {
             )
         );
 
-        // Add a date setting for removing pending todos
+        // Add a date setting for removing pending todos.
         $settings->add(
             new admin_setting_configtext(
                 'mod_competvet/clear_pending_todos_days',

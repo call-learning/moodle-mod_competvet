@@ -37,8 +37,17 @@ class certifications {
      * Decl status types
      */
     const GLOBAL_CERT_STATUS_NOT_DECLARED = 0;
+    /**
+     * Decl status types
+     */
     const GLOBAL_CERT_STATUS_NOT_SEEN = 1;
+    /**
+     * Decl status types
+     */
     const GLOBAL_CERT_STATUS_WAITING = 2;
+    /**
+     * Decl status types
+     */
     const GLOBAL_CERT_STATUS_VALIDATED = 3;
 
     /**
@@ -95,10 +104,10 @@ class certifications {
      * Update a declaration
      *
      * @param int $declid The declaration id
-     * @param int $level
-     * @param string $comment
-     * @param int $commentformat
-     * @param int $status
+     * @param int|null $level
+     * @param string|null $comment
+     * @param int|null $commentformat
+     * @param int|null $status
      * @return bool
      */
     public static function update_cert_declaration(
@@ -107,7 +116,7 @@ class certifications {
         ?string $comment = null,
         ?int $commentformat = null,
         ?int $status = null
-    ) {
+    ): bool {
         $arguments = compact('level', 'comment', 'commentformat', 'status');
         $arguments = array_filter($arguments, function ($value) {
             return $value !== null;
@@ -138,6 +147,7 @@ class certifications {
      *
      * @param int $declid
      * @param array $supervisorsid
+     * @param int $studentid
      * @return void
      */
     public static function declaration_supervisors_update(int $declid, array $supervisorsid, int $studentid) {
@@ -174,6 +184,8 @@ class certifications {
      *
      * @param int $declid The declaration id
      * @param int $supervisorid The supervisor id
+     * @param int $studentid The student id
+     * @return void
      */
     public static function declaration_supervisor_invite($declid, $supervisorid, $studentid): void {
         try {
@@ -190,6 +202,7 @@ class certifications {
      *
      * @param int $declid The declaration id
      * @param int $supervisorid The supervisor id
+     * @param int $studentid The student id
      * @return bool success
      */
     public static function declaration_supervisor_remove(int $declid, int $supervisorid, int $studentid) {
@@ -309,7 +322,7 @@ class certifications {
      * Get the list of certifications for a student and add the level and comment provided by the student and the supervisor(s)
      *
      * @param int $planningid The planning id
-     * @param int $studentid The student id (optional)
+     * @param int|null $studentid The student id (optional)
      * @return array The certifications
      */
     public static function get_certifications(int $planningid, ?int $studentid = null): array {
@@ -340,6 +353,12 @@ class certifications {
         return $returnarray;
     }
 
+    /**
+     * Get an empty certification record from a criterion
+     *
+     * @param criterion $criterion
+     * @return array
+     */
     private static function get_empty_cert_from_criterion(criterion $criterion): array {
         $certrecord = [];
         $certrecord['label'] = $criterion->get('label');
@@ -366,6 +385,7 @@ class certifications {
      * Get a single certification
      *
      * @param int $declid The declaration id
+     * @param bool $withfeedback Include the feedback
      */
     public static function get_certification(int $declid, bool $withfeedback = false) {
         $cert = new cert_decl($declid);
@@ -385,7 +405,7 @@ class certifications {
         $certrecord['status'] = $cert->get('status');
         $certrecord['seendone'] = ($cert->get('status') == cert_decl::STATUS_DECL_SEENDONE);
         $certrecord['notseen'] = ($cert->get('status') == cert_decl::STATUS_STUDENT_NOTSEEN);
-        $certrecord['total'] = 100; // TODO: get the total from the criterion? maybe change to grade.
+        $certrecord['total'] = 100; // TODO: MDL-000 get the total from the criterion? maybe change to grade.
         $certrecord['timecreated'] = $cert->get('timecreated');
         $certrecord['timemodified'] = $cert->get('timemodified');
         $certrecord['isdeclared'] = true; // This is the flag to determine if the certification is declared or not.

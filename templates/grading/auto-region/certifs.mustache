@@ -21,6 +21,39 @@
 
     Example context (json):
     {
+        "certifs": [
+            {
+                "description": "Certif 1",
+                "confidence": 50,
+                "seendone": true,
+                "verified": true,
+                "allcomments": [
+                    {
+                        "comment": "Comment 1",
+                        "userfullname": "User 1",
+                        "picture": "http://localhost/moodle/pluginfile.php/1/user/icon/f1"
+                    },
+                    {
+                        "comment": "Comment 2",
+                        "userfullname": "User 2",
+                        "picture": "http://localhost/moodle/pluginfile.php/2/user/icon/f1"
+                    }
+                ]
+            },
+            {
+                "description": "Certif 2",
+                "confidence": 100,
+                "seendone": false,
+                "verified": false,
+                "allcomments": [
+                    {
+                        "comment": "Comment 3",
+                        "userfullname": "User 3",
+                        "picture": "http://localhost/moodle/pluginfile.php/3/user/icon/f1"
+                    }
+                ]
+            }
+        ]
     }
 }}
 {{#certifs}}

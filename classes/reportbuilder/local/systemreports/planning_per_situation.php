@@ -39,6 +39,10 @@ use pix_icon;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class planning_per_situation extends system_report {
+
+    /**
+     * Initialise the report
+     */
     protected function initialise(): void {
         $planningentity = new planning();
 
@@ -121,6 +125,10 @@ class planning_per_situation extends system_report {
         $this->add_filters_from_entities($filters);
     }
 
+    /**
+     * Check if the user can view this report
+     * @return bool
+     */
     protected function can_view(): bool {
         return isloggedin();
     }

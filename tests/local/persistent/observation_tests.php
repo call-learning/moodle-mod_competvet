@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\persistent;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -29,7 +30,7 @@ use test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class observation_tests extends advanced_testcase {
+final class observation_tests extends advanced_testcase {
     use test_data_definition;
 
     /**
@@ -43,6 +44,10 @@ class observation_tests extends advanced_testcase {
         $this->prepare_scenario('set_3');
     }
 
+    /**
+     * Test get_all_with_planning_for_user
+     *
+     */
     public function test_observation_comment() {
         $user = core_user::get_user_by_username('student1');
         $situation1 = situation::get_record(['shortname' => 'SIT1']);

@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\observers;
 use mod_competvet\event\observation_completed;
 use mod_competvet\event\observation_requested;
@@ -39,6 +40,11 @@ class observervation_observer {
         todos::ask_for_observation($context, $planningid, $observerid, $studentid);
     }
 
+    /**
+     * An observation has been completed. We need to update the todo.
+     * @param observation_completed $event
+     * @return void
+     */
     public static function observation_completed(observation_completed $event) {
         $eventdata = $event->get_data();
         todos::complete_todo_on_observation_completed($eventdata['objectid']);

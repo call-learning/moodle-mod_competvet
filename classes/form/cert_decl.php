@@ -66,7 +66,6 @@ class cert_decl extends dynamic_form {
         $mform->addElement('hidden', 'returnurl', $returnurl);
         $mform->setType('returnurl', PARAM_URL);
 
-        // TODO - find a better way to handle this.
         if ($USER->id != $studentid && !$declid) {
             $mform->addElement('static', 'notstudent', '', 'Wait for the student');
             return;

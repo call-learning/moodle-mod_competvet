@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\external;
 // This is for 4.4 compatibility.
 defined('MOODLE_INTERNAL') || die;
@@ -29,7 +30,7 @@ use mod_competvet\local\persistent\planning;
 /**
  * Class delete_observation
  *
- * @package   mod_cveteval
+ * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -50,7 +51,10 @@ class ask_eval_observation extends external_api {
     /**
      * Execute and return observation list
      *
-     * @param int $observationid - Observation instance id
+     * @param string $context
+     * @param int $planningid
+     * @param int $observerid
+     * @param int $studentid
      * @return array|array[]
      * @throws \invalid_parameter_exception
      */

@@ -28,7 +28,9 @@ use lang_string;
  */
 class notification extends persistent {
 
-    // TABLE
+    /**
+     * Current table
+     */
     const TABLE = 'competvet_notification';
 
     /**

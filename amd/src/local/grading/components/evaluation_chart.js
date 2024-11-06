@@ -155,7 +155,7 @@ const transformContext = async(context, autoeval) => {
             pointHoverBackgroundColor: 'rgba(255, 255, 255, 1)',
             pointHoverBorderColor: 'rgba(0, 0, 0, 1)',
         };
-        graders['average'] = average;
+        graders.average = average;
     }
 
     const result = {

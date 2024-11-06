@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet;
 
 use advanced_testcase;
@@ -29,7 +30,7 @@ use mod_competvet\local\persistent\grid;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class setup_test extends advanced_testcase {
+final class setup_test extends advanced_testcase {
     /**
      * Test roles creation at install.
      *
@@ -37,7 +38,7 @@ class setup_test extends advanced_testcase {
      *
      * @covers \mod_competvet\setup::create_update_roles
      */
-    public function test_roles_setup() {
+    public function test_roles_setup(): void {
         $existingroles = get_all_roles();
         $existingrolesshortnames = array_map(function($role) {
             return $role->shortname;
@@ -54,7 +55,7 @@ class setup_test extends advanced_testcase {
      *
      * @covers \mod_competvet\setup::crerate_default_grid
      */
-    public function test_default_grid_setup() {
+    public function test_default_grid_setup(): void {
         $evalgrid = grid::get_default_grid(grid::COMPETVET_CRITERIA_EVALUATION);
         $this->assertEquals(40, criterion::count_records(['gridid' => $evalgrid->get('id')]));
         foreach (['Q001', 'Q035'] as $critname) {
@@ -76,7 +77,7 @@ class setup_test extends advanced_testcase {
      *
      * @covers \mod_competvet\setup::create_update_roles
      */
-    public function test_roles_access() {
+    public function test_roles_access(): void {
         $this->resetAfterTest();
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
@@ -131,7 +132,7 @@ class setup_test extends advanced_testcase {
      *
      * @covers \mod_competvet\setup::create_update_roles
      */
-    public function test_roles_access_with_update() {
+    public function test_roles_access_with_update(): void {
         $this->resetAfterTest();
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();

@@ -73,10 +73,9 @@ class clear_pending_todos extends \core\task\scheduled_task {
             'status = :status AND timecreated < :timecreated',
             ['status' => todo::STATUS_PENDING, 'timecreated' => $this->timestamp]
         );
-        mtrace('Removing ' . count($todos) . ' todos.');
         foreach ($todos as $todo) {
             $todo->delete();
         }
-        \core\task\logmanager::add_line('Removed all pending todos before ' . date('Y-m-d', $this->timestamp));
+        \core\task\logmanager::add_line('Removed ' . count($todos) . ' pending todos before ' . date('Y-m-d', $this->timestamp));
     }
 }

@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\persistent;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -28,7 +29,7 @@ use test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class planning_test extends advanced_testcase {
+final class planning_test extends advanced_testcase {
     use test_data_definition;
 
     /**
@@ -45,12 +46,10 @@ class planning_test extends advanced_testcase {
     /**
      * Get all for user
      *
-     * @param string $username
-     * @param array $expected
      * @return void
      * @covers       \mod_competvet\local\api\situations::get_all_situations_for
      */
-    public function test_delete_planning_and_related() {
+    public function test_delete_planning_and_related(): void {
         $situation = situation::get_record(['shortname' => 'SIT1']);
         $plannings = planning::get_records(['situationid' => $situation->get('id')]);
         $this->assertGreaterThan(0, observation::count_records());

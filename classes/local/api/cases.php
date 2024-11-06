@@ -276,6 +276,7 @@ class cases {
      *
      * @param mixed $case
      * @param string $string
+     * @param bool $rawvalue
      * @return mixed|null
      */
     private static function get_case_field_value(mixed $case, string $string, bool $rawvalue = false) {

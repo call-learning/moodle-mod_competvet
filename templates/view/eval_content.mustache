@@ -15,66 +15,24 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_competvet/eval_content
+    @template mod_competvet/view/eval_content
     Example context (json):
     {
-                  "studentid":"11",
-                  "appraiserid":"167",
-                  "evalplanid":"1",
-                  "context":"",
-                  "contextformat":"2",
-                  "comment":"",
-                  "commentformat":"2",
-                  "id":"6",
-                  "timecreated":"1694162663",
-                  "timemodified":"1694162663",
-                  "usermodified":"2",
-                  "appraisername":"Appraiser",
-                  "appraiserpicture":"<a href=\"http:\/\/competveteval.local\/user\/view.php?id=167&amp;course=3\" class=\"d-inline-block aabtn\"><span class=\"userinitials size-35\">la<\/span><\/a>",
-                  "criteria":[
-
-                  ],
-                  "planningstart":"1693983600",
-                  "planningend":"1693983600",
-                  "actions":[
-                     {
-                        "id":"single_button64fb3ab9279039",
-                        "formid":null,
-                        "method":"post",
-                        "url":"http:\/\/competveteval.local\/mod\/competvet\/view.php",
-                        "label":"Modifier",
-                        "classes":"singlebutton",
-                        "disabled":false,
-                        "tooltip":null,
-                        "primary":false,
-                        "attributes":[
-
-                        ],
-                        "params":[
-                           {
-                              "name":"id",
-                              "value":"11"
-                           },
-                           {
-                              "name":"mode",
-                              "value":"edit"
-                           },
-                           {
-                              "name":"observationid",
-                              "value":"6"
-                           },
-                           {
-                              "name":"sesskey",
-                              "value":"CIbIBKFkCE"
-                           }
-                        ],
-                        "actions":[
-
-                        ],
-                        "hasactions":false
-                     },
-                  ]
-       }
+        "criteria": [
+            {
+                "criterionname": "Criterion 1",
+                "grade": "A",
+                "comment": "Good",
+                "level": 1
+            },
+            {
+                "criterionname": "Criterion 2",
+                "grade": "B",
+                "comment": "Bad",
+                "level": 2
+            }
+        ]
+    }
 }}
 <div class="eval-content">
     <table class="table table-striped table-bordered table-condensed">

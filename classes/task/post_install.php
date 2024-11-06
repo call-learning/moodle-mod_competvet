@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\task;
 
 /**
@@ -24,6 +25,10 @@ namespace mod_competvet\task;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class post_install extends \core\task\adhoc_task {
+    /**
+     * Execute the task.
+     * @return void
+     */
     public function execute() {
         $methods = $this->get_custom_data();
         if (empty($methods)) {

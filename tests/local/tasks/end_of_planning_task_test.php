@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\tasks;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -34,7 +35,7 @@ use test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class end_of_planning_task_test extends advanced_testcase {
+final class end_of_planning_task_test extends advanced_testcase {
     use test_data_definition;
 
     /**
@@ -62,7 +63,7 @@ class end_of_planning_task_test extends advanced_testcase {
      * @return void
      * @covers       \mod_competvet\task\end_of_planning::execute
      */
-    public function test_end_of_planning_without_grade() {
+    public function test_end_of_planning_without_grade(): void {
         $emailsink = $this->redirectEmails();
         $endofplanningtasks = new end_of_planning();
         $endofplanningtasks->execute();

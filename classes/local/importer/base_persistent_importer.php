@@ -13,6 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// phpcs:ignoreFile
+
 namespace mod_competvet\local\importer;
 
 use moodle_exception;
@@ -26,9 +28,20 @@ use moodle_exception;
  */
 abstract class base_persistent_importer {
     /**
-     * Current row index. Used for sorting.
+     * @var int current index
      */
     protected $currentindex = 0;
+
+    /**
+     * @var string persistenclass
+     */
+    protected $persistenclass;
+
+    /**
+     * @var array options
+     */
+    protected $options;
+
     /**
      * Persistent class
      *
@@ -36,7 +49,9 @@ abstract class base_persistent_importer {
      * @param array|null $options options like unique for the list of fields used to check for existing records
      * @throws moodle_exception
      */
-    public function __construct(protected string $persistenclass, protected ?array $options = []) {
+    public function __construct(string $persistenclass, ?array $options = []) {
+        $this->persistenclass = $persistenclass;
+        $this->options = $options;
         if (!class_exists($this->persistenclass)) {
             throw new moodle_exception('classnotfound', 'error', '', $this->persistenclass);
         }

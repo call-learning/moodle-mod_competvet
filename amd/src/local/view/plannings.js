@@ -217,7 +217,7 @@ const hideStudentsInPlanning = (planningid, hideclass) => {
  * @param {string} situationname The name of the situation.
  * @return {void}
  */
-const exportToCsv = async (situationname) => {
+const exportToCsv = async(situationname) => {
     // If the row is hidden it has a class like studentname-d-none or groupname-d-none. Use a wildcard to select all hidden rows.
     const rows = document.querySelectorAll('tr.student:not([class*="-d-none"])');
     const csv = [];

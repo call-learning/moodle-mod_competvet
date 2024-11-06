@@ -26,7 +26,7 @@ use mod_competvet\output\view\base;
 use mod_competvet\utils;
 
 require(__DIR__ . '/../../config.php');
-
+require_login();
 global $DB, $PAGE, $OUTPUT, $USER;
 
 [$cm, $course, $moduleinstance] = utils::page_requirements('view');

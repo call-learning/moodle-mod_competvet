@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\external;
 // This is for 4.4 compatibility.
 defined('MOODLE_INTERNAL') || die;
@@ -70,7 +71,7 @@ class get_plannings extends external_api {
 
         $plannings = plannings_api::get_plannings_for_situation_id($competvet->get_situation()->get('id'), $USER->id, false);
         $timezone = core_date::get_user_timezone_object();
-        // Covert the startdate and enddate to a human readable format using yyyy-MM-dd
+        // Covert the startdate and enddate to a human readable format using yyyy-MM-dd.
         foreach ($plannings as $key => $planning) {
             $planninggroups = array_map(function ($group) use ($planning) {
                 return [

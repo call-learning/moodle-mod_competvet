@@ -39,7 +39,7 @@ const selectors = {
  * Initialize module
  * @param {Number} reportId The report id.
  */
-export const init = async (reportId) => {
+export const init = async(reportId) => {
     document.addEventListener('click', (event) => {
         const editPlanningButton = event.target.closest(selectors.EDIT_PLANNING_BUTTON_ACTION);
         const addPlanningButton = event.target.closest(selectors.ADD_PLANNING_BUTTON_ACTION);
@@ -67,15 +67,13 @@ export const init = async (reportId) => {
                     () => {
                         const planningId = deletePlanningButton.dataset?.planningId;
                         if (planningId) {
-                            deletePlanning(planningId).then(() => {
-                                // Reload the report.
-                                reloadReport(reportId);
-                            }).catch(Notification.exception);
+                            deletePlanningandReload(planningId, reportId);
                         }
 
                         return true;
                     }
                 );
+                return;
             }).catch(Notification.exception);
         } else {
             const modalForm = new ModalForm({
@@ -105,6 +103,14 @@ export const init = async (reportId) => {
     });
 };
 
+const deletePlanningandReload = async(planningId, reportId) => {
+    try {
+        await deletePlanning(planningId);
+        reloadReport(reportId);
+    } catch (error) {
+        Notification.exception(error);
+    }
+};
 /**
  * Reload report after changes.
  * @param {Number} reportId

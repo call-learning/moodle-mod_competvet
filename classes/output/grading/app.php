@@ -13,6 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// phpcs:ignoreFile
+
 namespace mod_competvet\output\grading;
 
 use core\output\named_templatable;
@@ -36,13 +38,31 @@ class app implements named_templatable, renderable {
     protected array $participants;
 
     /**
+     * @var int $userid The user we will open the grading app to.
+     */
+    public int $userid;
+
+    /**
+     * @var int $groupid If groups are enabled this is the current course group.
+     */
+    public int $groupid;
+
+    /**
+     * @var competvet $competvet The assignment class.
+     */
+    public competvet $competvet;
+
+    /**
      * Constructor for this renderable.
      *
      * @param int $userid The user we will open the grading app too.
      * @param int $groupid If groups are enabled this is the current course group.
      * @param competvet $competvet The assignment class
      */
-    public function __construct(public int $userid, public int $groupid, public competvet $competvet) {
+    public function __construct(int $userid, int $groupid, competvet $competvet) {
+        $this->userid = $userid;
+        $this->groupid = $groupid;
+        $this->competvet = $competvet;
         $this->participants = $competvet->list_participants_with_filter_status_and_group($groupid);
         if (!$this->userid && count($this->participants)) {
             $this->userid = reset($this->participants)->id;
@@ -86,6 +106,11 @@ class app implements named_templatable, renderable {
         return $export;
     }
 
+    /**
+     * Get the name of the template to use for this renderable.
+     * @param renderer_base $renderer
+     * @return string
+     */
     public function get_template_name(\renderer_base $renderer): string {
         return 'mod_competvet/grading/app';
     }

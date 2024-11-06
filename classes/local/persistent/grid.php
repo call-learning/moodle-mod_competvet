@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\persistent;
 
 use core\persistent;
@@ -41,8 +42,11 @@ class grid extends persistent {
         self::COMPETVET_CRITERIA_LIST => 'DEFAULTLISTGRID',
     ];
 
+    /** Evaluation criteria */
     const COMPETVET_CRITERIA_EVALUATION = 1;
+    /** Certification criteria */
     const COMPETVET_CRITERIA_CERTIFICATION = 2;
+    /** List criteria */
     const COMPETVET_CRITERIA_LIST = 3;
 
     /**
@@ -123,6 +127,10 @@ class grid extends persistent {
         }
     }
 
+    /**
+     * Whether the grid can be edited.
+     * @return bool
+     */
     public function canedit() {
         if ($this->get('idnumber') == self::DEFAULT_GRID_SHORTNAME[$this->get('type')]) {
             return false;

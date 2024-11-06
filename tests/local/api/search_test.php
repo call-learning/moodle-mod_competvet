@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-namespace local\api;
+
+namespace mod_competvet\local\api;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
@@ -31,9 +32,14 @@ use test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class search_test extends advanced_testcase {
+final class search_test extends advanced_testcase {
     use test_data_definition;
 
+    /**
+     * Data provider for get_query
+     *
+     * @return array
+     */
     public static function data_provider_get_query(): array {
         return [
             'simple search' => [
@@ -91,7 +97,7 @@ class search_test extends advanced_testcase {
     /**
      * Test get_entry
      *
-     * @param string $query
+     * @param string $searchtext
      * @param int $expectedcount
      * @param array $expectedresults
      * @return void

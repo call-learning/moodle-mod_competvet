@@ -68,7 +68,7 @@ class student_target extends \core\task\scheduled_task {
         foreach ($plannings as $planning) {
             $competvet = competvet::get_from_situation_id($planning->situationid);
 
-            // check if eval is enabled for this situation
+            // Check if eval is enabled for this situation.
             $situation = $competvet->get_situation();
             $modules = [];
             if ($situation->get('haseval')) {
@@ -96,6 +96,7 @@ class student_target extends \core\task\scheduled_task {
      * Check if the student has met the target for this module (eval, cert, list)
      *
      * @param object $student
+     * @param string $module
      * @return bool True if the student has met the target.
      */
     private function has_met_target($student, string $module): bool {

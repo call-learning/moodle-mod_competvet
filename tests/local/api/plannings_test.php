@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-namespace local\api;
+
+namespace mod_competvet\local\api;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
@@ -35,7 +36,7 @@ use test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class plannings_test extends advanced_testcase {
+final class plannings_test extends advanced_testcase {
     use test_data_definition;
 
     /**
@@ -93,12 +94,13 @@ class plannings_test extends advanced_testcase {
      * Get all with planning for user
      *
      * @param string $username
+     * @param bool $nofuture
      * @param array $expected
      * @return void
      * @dataProvider all_situations_with_planning
      * @covers       \mod_competvet\local\api\situations::get_all_situations_for
      */
-    public function test_get_plannings_for_situation_id(string $username, bool $nofuture, array $expected) {
+    public function test_get_plannings_for_situation_id(string $username, bool $nofuture, array $expected): void {
         $user = core_user::get_user_by_username($username);
         $situations = situation::get_all_situations_id_for($user->id);
         $allplannings = [];

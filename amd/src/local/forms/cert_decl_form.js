@@ -54,7 +54,7 @@ const defaultSubmitEventHandler = () => {
  * @param {function} submitEventHandler
  */
 export const init = (modulename, submitEventHandler = null) => {
-    document.addEventListener('click', function (event) {
+    document.addEventListener('click', function(event) {
         if (event.target.closest('[data-action="cert-decl-student"]')) {
             event.preventDefault();
 

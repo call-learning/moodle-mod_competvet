@@ -13,6 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// phpcs:ignoreFile
+
 namespace mod_competvet\local\importer;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -32,14 +34,31 @@ class csv_iterator implements Iterator {
      * @var array $dataset
      */
     private $dataset;
+
     /**
      * @var array|false $columns
      */
     private $columns;
+
     /**
      * @var int $current
      */
     private $current = 0;
+
+    /**
+     * @var string $filepath
+     */
+    private $filepath;
+
+    /**
+     * @var string $delimiter
+     */
+    private $delimiter;
+
+    /**
+     * @var string $encoding
+     */
+    private $encoding;
 
     /**
      * Constructor. Import the file.
@@ -49,10 +68,13 @@ class csv_iterator implements Iterator {
      * @param string $encoding
      */
     public function __construct(
-        private string $filepath,
-        private string $delimiter = 'semicolon',
-        private string $encoding = 'utf-8'
+        string $filepath,
+        string $delimiter = 'semicolon',
+        string $encoding = 'utf-8'
     ) {
+        $this->filepath = $filepath;
+        $this->delimiter = $delimiter;
+        $this->encoding = $encoding;
         $iid = csv_import_reader::get_new_iid(self::class);
         $csvimport = new csv_import_reader($iid, self::class);
         $content = file_get_contents($this->filepath);

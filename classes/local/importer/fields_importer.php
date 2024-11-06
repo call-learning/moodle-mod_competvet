@@ -26,16 +26,11 @@ use mod_competvet\local\persistent\case_cat;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class fields_importer extends base_persistent_importer {
-    protected $categorycache = [];
 
     /**
-     * Constructor
-     * @param string $persistenclass De class van de te persisten data.
-     * @param array|null $options Opties voor de importer.
+     * @var array $categorycache Cache for the category id.
      */
-    public function __construct(string $persistenclass, ?array $options = []) {
-        parent::__construct($persistenclass, $options);
-    }
+    protected $categorycache = [];
 
     /**
      * Zet een CSV rij om naar een object dat opgeslagen kan worden.

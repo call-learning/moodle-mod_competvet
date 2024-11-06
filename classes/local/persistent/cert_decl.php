@@ -32,10 +32,9 @@ class cert_decl extends persistent {
      */
     const TABLE = 'competvet_cert_decl';
 
-    /**
-     * Decl status types
-     */
+    /** Decl seen done */
     const STATUS_DECL_SEENDONE = 1;
+    /** Student not seen */
     const STATUS_STUDENT_NOTSEEN = 2;
 
     /**
@@ -97,6 +96,7 @@ class cert_decl extends persistent {
     /**
      * Delete dependencies
      *
+     * @param bool $result
      * @return void
      */
     protected function after_delete($result) {

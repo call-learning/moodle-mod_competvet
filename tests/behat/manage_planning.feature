@@ -82,4 +82,3 @@ Feature: Manage Plannings
     When I click the button with data-action "delete" in row number "1"
     And I am on the "S1" Activity page logged in as "teacher1"
     Then I should not see "Group1" in the ".competvet-grade-table" "css_element"
-

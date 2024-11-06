@@ -68,6 +68,7 @@ class remove_certification_invite extends external_api {
      *
      * @param int $declid The certification declaration id
      * @param int $supervisorid The supervisor id
+     * @param int $studentid The student id
      * @return stdClass
      */
     public static function execute(int $declid, int $supervisorid, int $studentid): stdClass {

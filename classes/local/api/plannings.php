@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\api;
 
 use mod_competvet\competvet;
@@ -21,6 +22,8 @@ use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\utils;
+
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->libdir . '/gradelib.php');
@@ -45,7 +48,6 @@ class plannings {
      *
      * @param int $situationid situation ID
      * @param int $userid user ID
-     * @param bool $addstats add stats to the plannning
      * @param bool $nofuture do not show future situation
      * @return array array of plannings
      */
@@ -166,6 +168,12 @@ class plannings {
         return $groupmembers;
     }
 
+    /**
+     * Get category for planning id
+     *
+     * @param int $planningid
+     * @return int
+     */
     public static function get_category_for_planning_id(int $planningid): int {
         $planning = planning::get_record(['id' => $planningid]);
         // First check: is this the current week ?
@@ -177,7 +185,7 @@ class plannings {
             return planning::CATEGORY_FUTURE;
         }
         // Second check: is this a past week and what is the status depending on the completion.
-        // TODO this will change depending on the grading strategy and we will only take grade info into account.
+        // TODO: MDL-000 this will change depending on the grading strategy and we will only take grade info into account.
         $students = self::get_students_for_planning_id($planningid);
         $nbstudents = count($students);
         $allcompletedobservations = observation::get_records([
@@ -196,7 +204,7 @@ class plannings {
         }
         $studentfullyassessed = count(array_filter($studentmembersid, fn($count) => $count >= $requiredobservations));
         if ($nbstudents == $studentfullyassessed) {
-            // return planning::CATEGORY_OBSERVER_COMPLETED. ??
+            $return = planning::CATEGORY_OBSERVER_COMPLETED;
         }
         return planning::CATEGORY_OBSERVER_LATE;
     }
@@ -325,7 +333,7 @@ class plannings {
             'type' => 'cert',
             'nbdone' => $numvalidated,
             // Change here, we consider all the criteria in the stats even if we need only certpnum / 100 * count($criteria).
-            'nbrequired' => count($criteria), // TODO: this is not really nb required so we might change the wording here.
+            'nbrequired' => count($criteria), // TODO: MDL-000 this is not really nb required so we might change the wording here.
             'pass' => 0,
         ];
         $info['list'] = [
@@ -417,7 +425,6 @@ class plannings {
      * @param int $groupid - The group id
      * @param string $startdate - The start date
      * @param string $enddate - The end date
-     * @param string $groupname - The group name
      * @param string $session - The session name
      * @return void
      */

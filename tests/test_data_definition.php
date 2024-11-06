@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\observation;
@@ -21,6 +22,10 @@ use mod_competvet\local\persistent\todo;
 
 /**
  * Competvet Trait for data test definition.
+ *
+ * @package     mod_competvet
+ * @copyright   2023 CALL Learning <contact@call-learning.fr>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 trait test_data_definition {
     /**
@@ -145,6 +150,8 @@ trait test_data_definition {
 
     /**
      * Data definition
+     * @param int $startdate
+     * @return array $datadefinition
      */
     private function get_data_definition_set_1(int $startdate): array {
         $oneweek = 60 * 60 * 24 * 7; // 1 week in seconds.
@@ -362,6 +369,9 @@ trait test_data_definition {
 
     /**
      * Data definition
+     *
+     * @param int $startdate
+     * @return array $datadefinition
      */
     private function get_data_definition_set_2(int $startdate): array {
         $oneweek = 60 * 60 * 24 * 7; // 1 week in seconds.
@@ -486,6 +496,9 @@ trait test_data_definition {
 
     /**
      * Data definition
+     *
+     * @param int $startdate
+     * @return array $datadefinition
      */
     private function get_data_definition_set_3(int $startdate): array {
         $oneweek = 60 * 60 * 24 * 7; // 1 week in seconds.
@@ -530,7 +543,7 @@ trait test_data_definition {
                                         'comments' => [
                                             ['type' => observation_comment::OBSERVATION_COMMENT, 'comment' => 'A comment'],
                                             ['type' => observation_comment::AUTOEVAL_OBSERVER_COMMENT,
-                                                'comment' => 'Another comment',],
+                                                'comment' => 'Another comment', ],
                                         ],
                                         'criteria' => [
                                             ['id' => 'Q001', 'value' => 1],
@@ -546,7 +559,7 @@ trait test_data_definition {
                                         'comments' => [
                                             ['type' => observation_comment::OBSERVATION_COMMENT, 'comment' => 'A comment'],
                                             ['type' => observation_comment::OBSERVATION_PRIVATE_COMMENT,
-                                                'comment' => 'Another comment',],
+                                                'comment' => 'Another comment', ],
                                         ],
                                         'criteria' => [
                                             ['id' => 'Q001', 'value' => 5],
@@ -616,6 +629,12 @@ trait test_data_definition {
             ],
         ];
     }
+
+    /**
+     * Data definition
+     * @param int $startdate
+     * @return array $datadefinition
+     */
     private function get_data_definition_set_4(int $startdate): array {
         $oneweek = 60 * 60 * 24 * 7; // 1 week in seconds.
         $onemonth = $oneweek * 4; // 1 month in seconds.

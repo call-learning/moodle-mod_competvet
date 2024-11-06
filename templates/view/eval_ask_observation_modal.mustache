@@ -20,14 +20,22 @@
 
     Example context (json):
     {
-        'observers': [
+        "modulename": "competvet",
+        "planningid": 1,
+        "studentid": 1,
+        "context": "Context 1",
+        "observers": [
             {
-                'fullname': 'Student 1',
-                'userpictureurl': 'http://localhost/moodle/pluginfile.php/3/user/icon/f1',
-                'viewurl': 'http://localhost/moodle/user/view.php?id=3'
+                "fullname": "Observer 1",
+                "userpictureurl": "http://localhost/moodle/pluginfile.php/1/user/icon/f1",
+                "viewurl": "http://localhost/moodle/user/view.php?id=1"
             },
-        ],
-
+            {
+                "fullname": "Observer 2",
+                "userpictureurl": "http://localhost/moodle/pluginfile.php/2/user/icon/f1",
+                "viewurl": "http://localhost/moodle/user/view.php?id=2"
+            }
+        ]
     }
 }}
 <div class="ask-observation-modal">

@@ -46,13 +46,12 @@ class notifications {
         self::log_notification($notification, $id, $competvetid, $body);
 
         // Check if redirection to catchall email is enabled.
-        $redirect_to_catchall = get_config('mod_competvet', 'redirect_to_catchall');
-        $catchall_email = get_config('mod_competvet', 'catchall_email');
-
+        $redirecttocatchall = get_config('mod_competvet', 'redirect_to_catchall');
+        $catchallemail = get_config('mod_competvet', 'catchall_email');
 
         foreach ($recipients as $recipient) {
-            if ($redirect_to_catchall && !empty($catchall_email)) {
-                $recipient->email = $catchall_email;
+            if ($redirecttocatchall && !empty($catchallemail)) {
+                $recipient->email = $catchallemail;
             }
             try {
                 $success = email_to_user($recipient, core_user::get_noreply_user(), $subject, $body);
@@ -110,17 +109,14 @@ class notifications {
      */
     public static function process_placeholders($string, $a): string {
         if (is_array($a) || is_object($a)) {
-            // Handle {$a->varname} placeholders
             foreach ($a as $key => $value) {
                 if (is_array($value) || is_object($value)) {
-                    // Skip nested arrays or objects
                     continue;
                 }
                 $placeholder = '{$a->' . $key . '}';
                 $string = str_replace($placeholder, $value, $string);
             }
         } else {
-            // Handle {$a} placeholder
             $string = str_replace('{$a}', $a, $string);
         }
         return $string;

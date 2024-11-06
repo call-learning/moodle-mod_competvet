@@ -29,6 +29,12 @@ use stdClass;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format {
+    /**
+     * Format the todo data
+     * @param string|null $value
+     * @param stdClass $row
+     * @return string
+     */
     public static function format_todo_data(?string $value, stdClass $row): string {
         if ($value === null) {
             return '';

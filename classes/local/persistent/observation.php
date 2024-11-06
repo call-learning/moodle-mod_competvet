@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\persistent;
 
 use core\persistent;
@@ -159,6 +160,7 @@ class observation extends persistent {
     /**
      * Delete dependencies
      *
+     * @param bool $result
      * @return void
      */
     public function after_delete($result) {
@@ -188,6 +190,11 @@ class observation extends persistent {
         return $this->get_criteria_element_by_criteria_sort_order(observation_criterion_comment::class);
     }
 
+    /**
+     * Get the criteria for the observation
+     * @param string $persistentname
+     * @return array
+     */
     private function get_criteria_element_by_criteria_sort_order(string $persistentname) {
         global $DB;
         $fields = $persistentname::get_sql_fields('ocl', '');

@@ -31,10 +31,16 @@ use moodle_url;
  * Observation create form
  *
  * @package    mod_competvet
+ * @copyright  2023 CALL Learning - Laurent David
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class eval_observation_ask extends dynamic_form {
 
+    /**
+     * Get the data for the dynamic submission
+     *
+     * @return array
+     */
     public function process_dynamic_submission() {
         $data = $this->get_data();
         return [
@@ -46,6 +52,9 @@ class eval_observation_ask extends dynamic_form {
         ];
     }
 
+    /**
+     * Set the data for the dynamic submission
+     */
     public function set_data_for_dynamic_submission(): void {
         $data = [
             'cmid' => $this->optional_param('cmid', null, PARAM_INT),
@@ -77,17 +86,30 @@ class eval_observation_ask extends dynamic_form {
         $mform->setType('context', PARAM_TEXT);
     }
 
+    /**
+     * Check access for the dynamic submission
+     */
     protected function check_access_for_dynamic_submission(): void {
         $context = $this->get_context_for_dynamic_submission();
         require_capability('mod/competvet:canaskobservation', $context);
     }
 
+    /**
+     * Get the context for the dynamic submission
+     *
+     * @return context
+     */
     protected function get_context_for_dynamic_submission(): context {
         $cmid = $this->optional_param('cmid', null, PARAM_INT);
         $competvet = competvet::get_from_cmid($cmid);
         return $competvet->get_context();
     }
 
+    /**
+     * Get the page URL for the dynamic submission
+     *
+     * @return moodle_url
+     */
     protected function get_page_url_for_dynamic_submission(): moodle_url {
         $cmid = $this->optional_param('cmid', null, PARAM_INT);
         return new moodle_url('/course/view.php', ['id' => $cmid]);

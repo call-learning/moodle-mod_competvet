@@ -13,12 +13,16 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// phpcs:ignoreFile
+
 use mod_competvet\local\persistent\planning;
 
 defined('MOODLE_INTERNAL') || die();
-$oneweek = 60 * 60 * 24 * 7; // 1 week in seconds.
-$onemonth = $oneweek * 4; // 1 month in seconds.
+$oneweek = 60 * 60 * 24 * 7;
+$onemonth = $oneweek * 4;
 $results = [];
+
+// Results for student1 and observer1.
 $results['student1results'] = [
     [
         'plannings' =>

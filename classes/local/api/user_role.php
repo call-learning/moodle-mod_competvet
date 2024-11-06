@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\api;
 
 use mod_competvet\competvet;
@@ -28,6 +29,12 @@ use mod_competvet\local\persistent\situation;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class user_role {
+
+    /**
+     * Roles conflicts
+     *
+     * @var array
+     */
     const ROLES_CONFLICTS = [
         ['student', 'teacher'],
         ['student', 'evaluator'],
@@ -42,7 +49,6 @@ class user_role {
      * return the capability with the highest role.
      *
      * @param int $userid
-     * @param int $situationid
      * @return string
      * @throws \moodle_exception if there are conflicts within roles for the app : like student and teacher
      */

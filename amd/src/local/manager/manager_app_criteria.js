@@ -25,7 +25,7 @@
 
 import CompetState from 'mod_competvet/local/competstate';
 import Repository from 'mod_competvet/local/new-repository';
-import { get_string as getString } from 'core/str';
+import {get_string as getString} from 'core/str';
 import './grids';
 import './navigation';
 

@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\external;
 // This is for 4.4 compatibility.
 defined('MOODLE_INTERNAL') || die;
@@ -29,7 +30,7 @@ use mod_competvet\local\api\plannings;
 
 
 /**
- * Class get_
+ * Class get_student_list
  *
  * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>

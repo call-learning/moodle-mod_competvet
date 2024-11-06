@@ -124,6 +124,8 @@ class criteria {
 
     /**
      * Get the sorted criteria for this grid
+     * @param int $gridid - The grid id
+     * @return array - A sorted array of criteria
      */
     public static function get_sorted_criteria(int $gridid): array {
         $sorted = criterion::get_records(['gridid' => $gridid, 'parentid' => 0], 'sort');

@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\persistent;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -30,7 +31,7 @@ use test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class situation_test extends advanced_testcase {
+final class situation_test extends advanced_testcase {
     use test_data_definition;
 
     /**
@@ -45,7 +46,7 @@ class situation_test extends advanced_testcase {
             'observer1 situations' => ['observer1', ['SIT1', 'SIT2', 'SIT3']],
             'observer2 situations' => ['observer2', ['SIT4', 'SIT5', 'SIT6', 'SIT7', 'SIT8', 'SIT9']],
             'teacher1 situations' => ['teacher1', []],
-            'observer and teacher situation' =>  ['observerandteacher',  ['SIT7', 'SIT8', 'SIT9']]
+            'observer and teacher situation' => ['observerandteacher',  ['SIT7', 'SIT8', 'SIT9']],
         ];
     }
 
@@ -69,7 +70,7 @@ class situation_test extends advanced_testcase {
      * @dataProvider all_for_user_provider
      * @covers       \mod_competvet\local\api\situations::get_all_situations_for
      */
-    public function test_get_all_situation_for($username, $expected) {
+    public function test_get_all_situation_for($username, $expected): void {
         $user = core_user::get_user_by_username($username);
         $situations = situation::get_all_situations_id_for($user->id);
         $situationssn = array_map(function ($situationid) {

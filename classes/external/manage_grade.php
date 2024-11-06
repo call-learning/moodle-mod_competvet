@@ -65,8 +65,7 @@ class manage_grade extends external_api {
      * @param int $planningid
      * @param string $grade
      * @param string $feedback
-     * @param int $planningid
-     * @return array
+     * @return array The processing result
      */
     public static function update($userid, $cmid, $planningid, $grade, $feedback): array {
         global $DB;
@@ -77,7 +76,7 @@ class manage_grade extends external_api {
             'grade' => $grade,
             'feedback' => $feedback,
         ]);
-        // Set the grade for this user in the Moodle gradebook
+        // Set the grade for this user in the Moodle gradebook.
         $grade = intval($params['grade']);
         $cmid = $params['cmid'];
         $planningid = $params['planningid'];
@@ -108,7 +107,7 @@ class manage_grade extends external_api {
         $customdata = json_encode((object)[
             'studentid' => $userid,
             'cmid' => $competvet->get_course_module_id(),
-            'planningid' => $planningid
+            'planningid' => $planningid,
         ]);
         $existing = $DB->record_exists_select('task_adhoc',
             "classname = :classname AND " . $DB->sql_compare_text('customdata') . " = " . $DB->sql_compare_text(':customdata'),
@@ -123,7 +122,7 @@ class manage_grade extends external_api {
             $task->set_custom_data((object)[
                 'studentid' => $userid,
                 'cmid' => $competvet->get_course_module_id(),
-                'planningid' => $planningid
+                'planningid' => $planningid,
             ]);
             \core\task\manager::queue_adhoc_task($task);
         }

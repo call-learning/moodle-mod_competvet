@@ -118,6 +118,11 @@ class planning_upload_form extends dynamic_form {
         ]);
     }
 
+    /**
+     * Set data for dynamic submission
+     *
+     * @return void
+     */
     public function set_data_for_dynamic_submission(): void {
         $data = [
             'cmid' => $this->optional_param('cmid', 0, PARAM_INT),

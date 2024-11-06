@@ -31,9 +31,15 @@ use moodle_url;
  * Observation create form
  *
  * @package    mod_competvet
+ * @copyright  2023 CALL Learning - Laurent David
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class eval_observation_add extends dynamic_form {
+    /**
+     * Get the data for the dynamic submission
+     *
+     * @return void
+     */
     public function process_dynamic_submission() {
         global $USER;
         try {
@@ -98,6 +104,11 @@ class eval_observation_add extends dynamic_form {
         }
     }
 
+    /**
+     * Get the page url for the dynamic submission
+     *
+     * @return moodle_url
+     */
     protected function get_page_url_for_dynamic_submission(): moodle_url {
         $returnurl = $this->optional_param('returnurl', null, PARAM_URL);
         if (empty($returnurl)) {
@@ -107,6 +118,9 @@ class eval_observation_add extends dynamic_form {
         return new moodle_url($returnurl);
     }
 
+    /**
+     * Set the data for the dynamic submission
+     */
     public function set_data_for_dynamic_submission(): void {
         $data = [
             'cmid' => $this->optional_param('cmid', null, PARAM_INT),
@@ -117,6 +131,10 @@ class eval_observation_add extends dynamic_form {
         parent::set_data((object) $data);
     }
 
+    /**
+     * Process the form submission
+     * @return array
+     */
     public function definition_after_data() {
         $mform = $this->_form;
         eval_observation_helper::add_comments_to_form($this, $mform, $this->_customdata['comments_repeat'] ?? 1);
@@ -151,11 +169,19 @@ class eval_observation_add extends dynamic_form {
 
     }
 
+    /**
+     * Check access for the dynamic submission
+     */
     protected function check_access_for_dynamic_submission(): void {
         $context = $this->get_context_for_dynamic_submission();
         require_capability('mod/competvet:canobserve', $context);
     }
 
+    /**
+     * Get the context for the dynamic submission
+     *
+     * @return context
+     */
     protected function get_context_for_dynamic_submission(): context {
         $cmid = $this->optional_param('cmid', null, PARAM_INT);
         $competvet = competvet::get_from_cmid($cmid);

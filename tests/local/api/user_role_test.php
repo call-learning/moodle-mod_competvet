@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\api;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -31,7 +32,7 @@ use test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class user_role_test extends advanced_testcase {
+final class user_role_test extends advanced_testcase {
     use test_data_definition;
 
     /**
@@ -71,7 +72,8 @@ class user_role_test extends advanced_testcase {
             'observer and evaluator' => [
                 'user' => 'observerandevaluator',
                 'expected_top' => ['SIT1' => 'observer', 'SIT2' => 'observer', 'SIT3' => 'observer', 'SIT4' => 'unknown',
-                    'SIT5' => 'unknown', 'SIT6' => 'unknown', 'SIT7' => 'evaluator', 'SIT8' => 'evaluator', 'SIT9' => 'evaluator', ],
+                    'SIT5' => 'unknown', 'SIT6' => 'unknown', 'SIT7' => 'evaluator', 'SIT8' => 'evaluator',
+                    'SIT9' => 'evaluator', ],
                 'expected_all' => ['SIT1' => ['observer'], 'SIT2' => ['observer'], 'SIT3' => ['observer'], 'SIT4' => ['unknown'],
                     'SIT5' => ['unknown'], 'SIT6' => ['unknown'], 'SIT7' => ['evaluator'], 'SIT8' => ['evaluator'],
                     'SIT9' => ['evaluator'], ],
@@ -87,7 +89,8 @@ class user_role_test extends advanced_testcase {
             'observer and student' => [
                 'user' => 'studentandobserver',
                 'expected_top' => ['SIT1' => 'unknown', 'SIT2' => 'unknown', 'SIT3' => 'unknown', 'SIT4' => 'unknown',
-                    'SIT5' => 'unknown', 'SIT6' => 'unknown', 'SIT7' => 'exception', 'SIT8' => 'exception', 'SIT9' => 'exception', ],
+                    'SIT5' => 'unknown', 'SIT6' => 'unknown', 'SIT7' => 'exception', 'SIT8' => 'exception',
+                    'SIT9' => 'exception', ],
                 'expected_all' => ['SIT1' => ['unknown'], 'SIT2' => ['unknown'], 'SIT3' => ['unknown'], 'SIT4' => ['unknown'],
                     'SIT5' => ['unknown'], 'SIT6' => ['unknown'], 'SIT7' => ['student', 'observer'],
                     'SIT8' => ['student', 'observer'],
@@ -142,7 +145,7 @@ class user_role_test extends advanced_testcase {
             'observer and teacher' => [
                 'user' => 'observerandteacher',
                 'expected' => 'observer',
-            ]
+            ],
         ];
     }
 
@@ -166,7 +169,7 @@ class user_role_test extends advanced_testcase {
      * @covers       \mod_competvet\local\api\user_role::get_top
      * @dataProvider all_situations_provider
      */
-    public function test_get_top_for_all_situations(string $user, string $expected) {
+    public function test_get_top_for_all_situations(string $user, string $expected): void {
         $user = core_user::get_user_by_username($user);
         if ($expected === 'exception') {
             $this->expectException(\moodle_exception::class);
@@ -185,7 +188,7 @@ class user_role_test extends advanced_testcase {
      * @covers       \mod_competvet\local\api\user_role::get_top
      * @dataProvider user_enrolments_provider_top
      */
-    public function test_get_top(string $user, array $expected) {
+    public function test_get_top(string $user, array $expected): void {
         $user = core_user::get_user_by_username($user);
         $situations = situation::get_records([], 'shortname', 'ASC');
         $result = [];
@@ -208,7 +211,7 @@ class user_role_test extends advanced_testcase {
      * @covers       \mod_competvet\local\api\user_role::get_all
      * @dataProvider user_enrolments_provider_all
      */
-    public function test_get_all(string $user, array $expected) {
+    public function test_get_all(string $user, array $expected): void {
         $user = core_user::get_user_by_username($user);
         $situations = situation::get_records([], 'shortname', 'ASC');
         $result = [];

@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\observation;
@@ -242,6 +243,12 @@ class behat_mod_competvet_generator extends behat_generator_base {
         return $data;
     }
 
+    /**
+     * Preprocess the data so to split the comments into the different types.
+     *
+     * @param array $data
+     * @return array
+     */
     protected function preprocess_certification(array $data): array {
         if (isset($data['validations'])) {
             $validations = json_decode('[' . $data['validations'] . ']', false);
@@ -260,6 +267,12 @@ class behat_mod_competvet_generator extends behat_generator_base {
         return $data;
     }
 
+    /**
+     * Preprocess the data.
+     *
+     * @param array $data
+     * @return array
+     */
     protected function preprocess_case(array $data): array {
         if (isset($data['fields'])) {
             $fields = json_decode('{' . $data['fields'] . '}', false);

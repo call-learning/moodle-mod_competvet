@@ -18,7 +18,7 @@
  * Caches for CompetVet
  *
  * @package     mod_competvet
- * @category    cach
+ * @category    cache
  * @copyright   2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

@@ -43,7 +43,7 @@ $tasks = [
         'minute' => '0',
         'hour' => '16',
         'day' => '*',
-        // Run on Monday, Wednesday, and Friday
+        // Run on Monday, Wednesday, and Friday.
         'dayofweek' => '1,3,5',
         'month' => '*',
     ],

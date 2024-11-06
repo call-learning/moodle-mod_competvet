@@ -13,6 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// phpcs:ignoreFile
+
 namespace mod_competvet;
 
 use advanced_testcase;
@@ -44,13 +46,15 @@ require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
  * @copyright 2024 CALL Learning
  * @license https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class backup_restore_test extends advanced_testcase {
+final class backup_restore_test extends advanced_testcase {
     use test_data_definition;
 
     /**
      * Test backup and restore of a competvet activity.
+     * @covers \mod_competvet\backup\backup_competvet_activity_task
+     * @covers \mod_competvet\backup\restore_competvet_activity_task
      */
-    public function test_backup_restore() {
+    public function test_backup_restore(): void {
         global $DB;
         $this->resetAfterTest(true);
 
@@ -124,6 +128,9 @@ class backup_restore_test extends advanced_testcase {
 
     /**
      * Test backup and restore of a competvet activity.
+     *
+     * @param situation $oldsituation
+     * @param situation $newsituation
      */
     private function check_created_instances(situation $oldsituation, situation $newsituation) {
         // Check that situation was restored correctly.
@@ -147,6 +154,12 @@ class backup_restore_test extends advanced_testcase {
         }
     }
 
+    /**
+     * Assert that two arrays are equal, ignoring the id fields.
+     * @param array|object $expected
+     * @param array|object $actual
+     * @param array $additionalexcludedkeys
+     */
     private function assertequalwithoutids($expected, $actual, array $additionalexcludedkeys =[]) {
         $expected = (array) $expected;
         $actual = (array) $actual;
@@ -172,8 +185,8 @@ class backup_restore_test extends advanced_testcase {
     /**
      * Check created observations.
      *
-     * @param $newplanning
-     * @param $oldplanning
+     * @param planning $newplanning
+     * @param planning $oldplanning
      * @return void
      */
     private function check_created_observations($newplanning, $oldplanning) {
@@ -214,7 +227,7 @@ class backup_restore_test extends advanced_testcase {
      * Check created certifications
      *
      * @param planning $newplanning
-     * @param bool|planning $oldplanning
+     * @param planning $oldplanning
      * @return void
      */
     private function check_created_certifications(planning $newplanning, planning $oldplanning) {
@@ -238,7 +251,7 @@ class backup_restore_test extends advanced_testcase {
      * Check created caselog
      *
      * @param planning $newplanning
-     * @param bool|planning $oldplanning
+     * @param planning $oldplanning
      * @return void
      */
     private function check_created_caselog(planning $newplanning, planning $oldplanning) {

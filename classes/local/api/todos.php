@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\api;
 
 use mod_competvet\local\persistent\cert_decl;
@@ -71,6 +72,12 @@ class todos {
         return $todo;
     }
 
+    /**
+     * Complete a todo when an observation is completed
+     *
+     * @param int $observationid
+     * @return void
+     */
     public static function complete_todo_on_observation_completed(int $observationid) {
         $observation = observation::get_record(['id' => $observationid]);
         $todos = todo::get_records([
@@ -168,6 +175,13 @@ class todos {
             }
         }
     }
+
+    /**
+     * Get todos for a given user
+     * @param int $userid
+     * @param string $key
+     * @return array
+     */
     private static function get_todos_for(int $userid, string $key): array {
         $todos = todo::get_records([
             $key => $userid,

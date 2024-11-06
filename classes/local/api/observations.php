@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\api;
 
 use mod_competvet\competvet;
@@ -56,6 +57,7 @@ class observations {
      * Get observation information
      *
      * @param int $observationid
+     * @param bool $includedetails
      * @return array
      */
     public static function get_observation_information(int $observationid, bool $includedetails = true): array {
@@ -177,6 +179,8 @@ class observations {
      * @param int $studentid
      * @param int|null $observerid
      * @param string|null $context
+     * @param array|null $comments
+     * @param array|null $criteria
      * @return int
      */
     public static function create_observation(
@@ -281,14 +285,14 @@ class observations {
      * Edit an observation
      *
      * @param int $observationid
-     * @param object|null $context
+     * @param string|null $context
      * @param array $comments
      * @param array $criteria
      * @return void
      */
     public static function edit_observation(
         int $observationid,
-        string $context = null,
+        ?string $context = null,
         array $comments = [],
         array $criteria = [],
     ) {
@@ -385,6 +389,13 @@ class observations {
         }
     }
 
+    /**
+     * Get and normalise comments
+     *
+     * @param int $observationid
+     * @param int $commentype
+     * @return observation_comment|null
+     */
     private static function get_and_normalise_comments(int $observationid, int $commentype): ?observation_comment {
         $comments = observation_comment::get_records(['observationid' => $observationid, 'type' => $commentype], 'timecreated');
         if (empty($comments)) {

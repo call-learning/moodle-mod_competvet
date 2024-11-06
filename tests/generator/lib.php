@@ -32,8 +32,6 @@ use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\local\persistent\todo;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Competvet module data generator class
  *
@@ -51,7 +49,7 @@ class mod_competvet_generator extends testing_module_generator {
      * @param array|null $options
      * @return stdClass
      */
-    public function create_instance($record = null, array $options = null) {
+    public function create_instance($record = null, ?array $options = null) {
         $record = (object) (array) $record;
 
         $defaultsettings = [
@@ -121,9 +119,9 @@ class mod_competvet_generator extends testing_module_generator {
     /**
      * Check grid value and set it to the right value.
      *
-     * @param $record
-     * @param $property
-     * @param $grid_type
+     * @param object $record
+     * @param string $property
+     * @param int $gridtype
      * @return void
      */
     private function check_and_set_grid(&$record, $property, $gridtype) {
@@ -235,7 +233,7 @@ class mod_competvet_generator extends testing_module_generator {
     /**
      * Observation status
      *
-     * @param $record
+     * @param array|stdClass|null $record
      * @return void
      * @throws moodle_exception
      */
@@ -253,7 +251,7 @@ class mod_competvet_generator extends testing_module_generator {
     /**
      * Observation category
      *
-     * @param $record
+     * @param array|stdClass|null $record
      * @return void
      * @throws moodle_exception
      */
@@ -284,6 +282,7 @@ class mod_competvet_generator extends testing_module_generator {
     /**
      * Create a new instance of the Competvet activity.
      *
+     * @param class $entityclass
      * @param array|stdClass|null $record
      * @return stdClass
      */
@@ -497,7 +496,7 @@ class mod_competvet_generator extends testing_module_generator {
     /**
      * Create certification validation
      *
-     * @param $record
+     * @param array|stdClass|null $record
      * @return int|null
      */
     public function create_certification_validation($record) {
@@ -528,7 +527,7 @@ class mod_competvet_generator extends testing_module_generator {
             unset($record->student);
         }
         $fields = $record->fields ?? [];
-        foreach($fields as $key => $field) {
+        foreach ($fields as $key => $field) {
             if (!is_number($key)) {
                 $newkey = (case_field::get_record(['idnumber' => trim($key)]))->get('id');
                 unset($fields[$key]);

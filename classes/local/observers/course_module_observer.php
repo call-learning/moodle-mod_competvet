@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\observers;
 /**
  * Course module observers
@@ -37,7 +38,6 @@ class course_module_observer {
      * Get module information from create or delete event
      *
      * @param array $eventdata
-     * @param int|null $courseid
      * @return void
      */
     private static function reset_user_cache_from_event(array $eventdata) {

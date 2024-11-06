@@ -27,22 +27,42 @@ use mod_competvet\local\persistent\case_entry;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class case_created extends \core\event\base {
+    /**
+     * Get the name of the event
+     * @return string
+     */
     public static function get_name() {
         return get_string('event_case_entrycreated', 'mod_competvet');
     }
 
+    /**
+     * Get the objectid mapping
+     * @return array
+     */
     public static function get_objectid_mapping() {
         return ['db' => case_entry::TABLE, 'restore' => 'case_entry'];
     }
 
+    /**
+     * Get the description of the event
+     * @return string
+     */
     public function get_description() {
         return "The user with id {$this->userid} created a case_entry with id {$this->objectid}.";
     }
 
+    /**
+     * Get the url of the event
+     * @return \moodle_url
+     */
     public function get_url() {
         return new \moodle_url('/local/mod/case.php', ['id' => $this->objectid]);
     }
 
+    /**
+     * Get the other mapping
+     * @return array
+     */
     protected function init() {
         $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_OTHER;

@@ -21,13 +21,14 @@
 
     Example context (json):
     {
+        "id": 1001,
+        "lintonly": true
     }
 }}
 <a role="button" data-toggle="collapse"
     href="#collapse{{$id}}{{id}}{{/id}}"
     id="collapsereport{{$id}}{{id}}{{/id}}"
     aria-expanded="{{^contentcollapsed}}true{{/contentcollapsed}}{{#contentcollapsed}}false{{/contentcollapsed}}"
-    aria-controls="collapse{{$id}}{{id}}{{/id}}"
     class="btn btn-icon mr-1 icons-collapse-expand justify-content-center stretched-link
         {{#contentcollapsed}} collapsed {{/contentcollapsed}}"
     aria-label="{{title}}">
@@ -39,3 +40,6 @@
         <span class="dir-ltr-hide">{{#pix}} t/collapsedchevron_rtl, core {{/pix}}</span>
     </span>
 </a>
+{{#lintonly}}
+    <div class="collapse" id="collapse{{$id}}{{id}}{{/id}}"></div>
+{{/lintonly}}

@@ -46,7 +46,8 @@ class student_tabs {
 
     /**
      * Export the tabs
-     *
+     * @param int $planningid The planning id.
+     * @param int $studentid The student id.
      * @return array|array[]|stdClass
      */
     public static function export_tabs($planningid, $studentid) {
@@ -112,7 +113,7 @@ class student_tabs {
                 }
             }
             $tabtree[] = new tabobject(
-                $tab, // 'id' is used in the template to set the 'active' class
+                $tab, // The 'id' is used in the template to set the 'active' class.
                 $url->out(false),
                 get_string('tab:' . $tab, 'mod_competvet', $stringcontext),
             );

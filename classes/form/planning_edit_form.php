@@ -27,6 +27,7 @@ use moodle_url;
  * Planning edit form.
  *
  * @package    mod_competvet
+ * @copyright  2023 CALL Learning - Laurent David
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class planning_edit_form extends dynamic_form {
@@ -148,6 +149,9 @@ class planning_edit_form extends dynamic_form {
         return $indexedgroups;
     }
 
+    /**
+     * Set the data for the dynamic submission
+     */
     public function set_data_for_dynamic_submission(): void {
         $data = [
             'cmid' => $this->optional_param('cmid', 0, PARAM_INT),

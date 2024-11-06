@@ -29,14 +29,26 @@ use mod_competvet\local\persistent\planning;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cert_validation_requested extends \core\event\base {
+    /**
+     * Get the name of the event
+     * @return string
+     */
     public static function get_name() {
         return get_string('event_certvalidationrequested', 'mod_competvet');
     }
 
+    /**
+     * Get the objectid mapping
+     * @return int
+     */
     public static function get_objectid_mapping() {
         return self::NOT_MAPPED;
     }
 
+    /**
+     * Get the other mapping
+     * @return array
+     */
     public static function get_other_mapping() {
         $othermapped = [];
         $othermapped['userid'] = ['db' => 'user', 'restore' => 'user'];
@@ -49,8 +61,8 @@ class cert_validation_requested extends \core\event\base {
      * Create an observation requested event from a planning
      *
      * @param int $declid
-     * @param int $studentid
      * @param int $supervisorid
+     * @param int $studentid
      * @return base
      */
     public static function create_from_decl_and_supervisor(
@@ -73,10 +85,18 @@ class cert_validation_requested extends \core\event\base {
         ]);
     }
 
+    /**
+     * Get the description of the event
+     * @return string
+     */
     public function get_description() {
         return "The user with id {$this->userid} asked a validation with id with id {$this->objectid}.";
     }
 
+    /**
+     * Get the legacy log data
+     * @return array
+     */
     protected function init() {
         $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;

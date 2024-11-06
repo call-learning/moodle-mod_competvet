@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\importer;
 
 use advanced_testcase;
@@ -26,7 +27,7 @@ use mod_competvet\local\persistent\grid;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class grid_test extends advanced_testcase {
+final class grid_test extends advanced_testcase {
     /**
      * Sample file path
      */
@@ -42,7 +43,7 @@ class grid_test extends advanced_testcase {
      * @return void
      * @covers \mod_competvet\local\persistent\grid
      */
-    public function test_import_criterion() {
+    public function test_import_criterion(): void {
         global $CFG;
         $this->resetAfterTest();
         $evalgrid =
@@ -72,7 +73,7 @@ class grid_test extends advanced_testcase {
      * @return void
      * @covers \mod_competvet\local\persistent\grid
      */
-    public function test_import_criterion_update() {
+    public function test_import_criterion_update(): void {
         global $CFG;
         $this->resetAfterTest();
         $evalgrid = new grid(0, (object) [

@@ -15,12 +15,73 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_competvet/grading/components/certification-results
+    @template mod_competvet/grading/components/evaluation-results
 
     TODO describe template certification-results
 
     Example context (json):
     {
+        "evaluation-results": [
+            {
+                "hasanyobservations": true,
+                "hasobserverevaluations": true,
+                "observations": [
+                    {
+                        "criterion": {
+                            "label": "Criterion 1"
+                        },
+                        "grades": [
+                            {
+                                "level": "A",
+                                "graderinfo": {
+                                    "fullname": "Grader 1"
+                                }
+                            },
+                            {
+                                "level": "B",
+                                "graderinfo": {
+                                    "fullname": "Grader 2"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "criterion": {
+                            "label": "Criterion 2"
+                        },
+                        "grades": [
+                            {
+                                "level": "C",
+                                "graderinfo": {
+                                    "fullname": "Grader 1"
+                                }
+                            },
+                            {
+                                "level": "D",
+                                "graderinfo": {
+                                    "fullname": "Grader 2"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "evalcomments": [
+                    {
+                        "fullname": "Grader 1",
+                        "picture": "http://placekitten.com/100/100",
+                        "categorytext": "Category 1",
+                        "timecreated": 1619712000,
+                        "private": true
+                    },
+                    {
+                        "fullname": "Grader 2",
+                        "picture": "http://placekitten.com/110/110",
+                        "categorytext": "Category 2",
+                        "timecreated": 1619712000
+                    }
+                ]
+            }
+        ]
     }
 }}
 {{#evaluation-results}}

@@ -62,7 +62,6 @@ class cert_decl_student extends dynamic_form {
             $mform->setType('declid', PARAM_INT);
         }
 
-        // TODO - find a better way to handle this.
         if ($USER->id != $studentid) {
             $mform->addElement('static', 'notstudent', '', 'You can\'t declare certifications for other students.');
             return;

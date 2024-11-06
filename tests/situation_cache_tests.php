@@ -13,22 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-namespace mod_competvet;
+// phpcs:ignoreFile
 
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace mod_competvet;
 
 defined('MOODLE_INTERNAL') || die();
@@ -64,7 +50,6 @@ class situation_cache_tests extends advanced_testcase {
     /**
      * Test create situation cache
      *
-     * @covers \mod_competvet\local\observers\course_module_observer::module_created
      * @return void
      */
     public function test_create_situation_cache() {
@@ -85,7 +70,7 @@ class situation_cache_tests extends advanced_testcase {
     /**
      * Test delete situation cache
      *
-     * @covers \mod_competvet\local\observers\course_module_observer::module_deleted
+     * @covers \mod_competvet\local\persistent\situation::get_all_situations_id_for
      * @return void
      */
     public function test_delete_situation_cache() {
@@ -108,7 +93,7 @@ class situation_cache_tests extends advanced_testcase {
     /**
      * Test enrol student
      *
-     * @covers \mod_competvet\local\observers\user_enrolment_observer::user_enrolment_created
+     * @covers \mod_competvet\local\persistent\situation::get_all_situations_id_for
      * @return void
      */
     public function test_enrol_student() {
@@ -123,7 +108,7 @@ class situation_cache_tests extends advanced_testcase {
     /**
      * Test enrol student
      *
-     * @covers \mod_competvet\local\observers\user_enrolment_observer::user_enrolment_deleted
+     * @covers \mod_competvet\local\persistent\situation::get_all_situations_id_for
      * @return void
      */
     public function test_unenrol_student() {

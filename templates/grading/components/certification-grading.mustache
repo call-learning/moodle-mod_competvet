@@ -21,6 +21,30 @@
 
     Example context (json):
     {
+        "certification-grading": {
+            "grading": {
+                "numcertifvalidated": 1,
+                "maxcertifvalidated": 2,
+                "statusproposed": true,
+                "certifpnum": 50,
+                "evaloptions": [
+                    {
+                        "key": "validated",
+                        "valuestring": "Validated",
+                        "selected": true
+                    },
+                    {
+                        "key": "notvalidated",
+                        "valuestring": "Not validated",
+                        "selected": false
+                    }
+                ],
+                "comment": "Comment",
+                "isvalid": true,
+                "isinvalid": false,
+                "cangrade": true
+            }
+        }
     }
 }}
 {{#certification-grading}}
@@ -79,7 +103,7 @@
         </div>
         <div class="mb-5">
             <div class="form-group">
-                <label for="evalcomment">
+                <label for="comment">
                     {{#str}}evalcomment, mod_competvet{{/str}}
                 </label>
                 <textarea

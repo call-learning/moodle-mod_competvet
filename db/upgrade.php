@@ -17,6 +17,10 @@
 /**
  * Execute local_cveteval upgrade from the given old version.
  *
+ * @package     mod_competvet
+ * @copyright   2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
  * @param int $oldversion
  * @return bool
  */

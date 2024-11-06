@@ -21,6 +21,33 @@
 
     Example context (json):
     {
+        "certification-results": {
+            "isdeclared": true,
+            "certifications": [
+                {
+                    "declid": 1,
+                    "label": "Criterion 1",
+                    "feedback": [
+                        {
+                            "fullname": "John Doe",
+                            "picture": "http://placekitten.com/100/100",
+                            "info": "Feedback 1",
+                            "seendone": true,
+                            "timemodified": 1619712000
+                        }
+                    ],
+                    "validations": [
+                        {
+                            "fullname": "Jane Doe",
+                            "picture": "http://placekitten.com/110/110",
+                            "info": "Validation 1",
+                            "confirmed": true,
+                            "timemodified": 1619712000
+                        }
+                    ]
+                }
+            ]
+        }
     }
 }}
 {{#certification-results}}

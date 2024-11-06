@@ -38,71 +38,70 @@ Feature: Check disabled module features
       | SIT1      | G1    | last Monday      | Monday next week      | SESSION1 |
       | SIT1      | G2    | Monday next week | Monday next fortnight | SESSION1 |
 
-    @javascript
-    Scenario: Verify only the appropriate tabs are shown when list feature is disabled
-      Given I am on the "S1" Activity page logged in as "teacher1"
-        And I open grading page for "Student One"
-        Then I should see "evaluate" tab
-        And I should see "certify" tab
-        And I should not see "list" tab
+  @javascript
+  Scenario: Verify only the appropriate tabs are shown when list feature is disabled
+    Given I am on the "S1" Activity page logged in as "teacher1"
+    And I open grading page for "Student One"
+    Then I should see "evaluate" tab
+    And I should see "certify" tab
+    And I should not see "list" tab
 
-    @javascript
-    Scenario: Verify only the appropriate tabs are shown when eval feature is disabled
-        Given I am on the "S1" Activity page logged in as "teacher1"
-        And I navigate to "Settings" in current page administration
-        And I expand all fieldsets
-        And I set the following fields to these values:
-          | haseval   | 0 |
-          | hascertif | 1 |
-          | hascase   | 1 |
-        And I press "Save and display"
-        And I open grading page for "Student One"
-        Then I should not see "evaluate" tab
-        And I should see "certify" tab
-        And I should see "list" tab
+  @javascript
+  Scenario: Verify only the appropriate tabs are shown when eval feature is disabled
+    Given I am on the "S1" Activity page logged in as "teacher1"
+    And I navigate to "Settings" in current page administration
+    And I expand all fieldsets
+    And I set the following fields to these values:
+      | haseval   | 0 |
+      | hascertif | 1 |
+      | hascase   | 1 |
+    And I press "Save and display"
+    And I open grading page for "Student One"
+    Then I should not see "evaluate" tab
+    And I should see "certify" tab
+    And I should see "list" tab
 
-    @javascript
-    Scenario: Verify only the appropriate tabs are shown when certif feature is disabled
-        Given I am on the "S1" Activity page logged in as "teacher1"
-        And I navigate to "Settings" in current page administration
-        And I expand all fieldsets
-        And I set the following fields to these values:
-          | haseval   | 1 |
-          | hascertif | 0 |
-          | hascase   | 1 |
-        And I press "Save and display"
-        And I open grading page for "Student One"
-        Then I should see "evaluate" tab
-        And I should not see "certify" tab
-        And I should see "list" tab
+  @javascript
+  Scenario: Verify only the appropriate tabs are shown when certif feature is disabled
+    Given I am on the "S1" Activity page logged in as "teacher1"
+    And I navigate to "Settings" in current page administration
+    And I expand all fieldsets
+    And I set the following fields to these values:
+      | haseval   | 1 |
+      | hascertif | 0 |
+      | hascase   | 1 |
+    And I press "Save and display"
+    And I open grading page for "Student One"
+    Then I should see "evaluate" tab
+    And I should not see "certify" tab
+    And I should see "list" tab
 
+  @javascript
+  Scenario: Verify only the appropriate tabs are shown when certif and eval features are disabled
+    Given I am on the "S1" Activity page logged in as "teacher1"
+    And I navigate to "Settings" in current page administration
+    And I expand all fieldsets
+    And I set the following fields to these values:
+      | haseval   | 0 |
+      | hascertif | 0 |
+      | hascase   | 1 |
+    And I press "Save and display"
+    And I open grading page for "Student One"
+    Then I should not see "evaluate" tab
+    And I should not see "certify" tab
+    And I should see "list" tab
 
-    @javascript
-    Scenario: Verify only the appropriate tabs are shown when certif and eval features are disabled
-        Given I am on the "S1" Activity page logged in as "teacher1"
-        And I navigate to "Settings" in current page administration
-        And I expand all fieldsets
-        And I set the following fields to these values:
-          | haseval   | 0 |
-          | hascertif | 0 |
-          | hascase   | 1 |
-        And I press "Save and display"
-        And I open grading page for "Student One"
-        Then I should not see "evaluate" tab
-        And I should not see "certify" tab
-        And I should see "list" tab
-
-    @javascript
-    Scenario: Verify only the appropriate tabs are shown when case and certif features are disabled
-        Given I am on the "S1" Activity page logged in as "teacher1"
-        And I navigate to "Settings" in current page administration
-        And I expand all fieldsets
-        And I set the following fields to these values:
-          | haseval   | 1 |
-          | hascertif | 0 |
-          | hascase   | 0 |
-        And I press "Save and display"
-        And I open grading page for "Student One"
-        Then I should see "evaluate" tab
-        And I should not see "certify" tab
-        And I should not see "list" tab
+  @javascript
+  Scenario: Verify only the appropriate tabs are shown when case and certif features are disabled
+    Given I am on the "S1" Activity page logged in as "teacher1"
+    And I navigate to "Settings" in current page administration
+    And I expand all fieldsets
+    And I set the following fields to these values:
+      | haseval   | 1 |
+      | hascertif | 0 |
+      | hascase   | 0 |
+    And I press "Save and display"
+    And I open grading page for "Student One"
+    Then I should see "evaluate" tab
+    And I should not see "certify" tab
+    And I should not see "list" tab

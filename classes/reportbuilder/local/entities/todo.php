@@ -100,7 +100,7 @@ class todo extends base {
         ))
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_LONGTEXT)
-            ->add_fields("{$todoalias}.data, {$todoalias}.action, {$todoalias}.status, 
+            ->add_fields("{$todoalias}.data, {$todoalias}.action, {$todoalias}.status,
             {$todoalias}.planningid, {$todoalias}.targetuserid, {$todoalias}.userid")
             ->set_is_sortable(false)
             ->set_callback([format::class, 'format_todo_data']);

@@ -112,8 +112,6 @@ class get_certifications extends external_api {
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
 
-
-
         $certifications = certifications::get_certifications($planningid, $studentid);
         // Get an array of all validations.
         $numvalidated = 0;

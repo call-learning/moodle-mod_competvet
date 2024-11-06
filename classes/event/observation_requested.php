@@ -27,14 +27,26 @@ use mod_competvet\local\persistent\planning;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class observation_requested extends \core\event\base {
+    /**
+     * Get the name of the event
+     * @return string
+     */
     public static function get_name() {
         return get_string('event_observationrequested', 'mod_competvet');
     }
 
+    /**
+     * Get the objectid mapping
+     * @return int
+     */
     public static function get_objectid_mapping() {
         return self::NOT_MAPPED;
     }
 
+    /**
+     * Get the other mapping
+     * @return array
+     */
     public static function get_other_mapping() {
         $othermapped = [];
         $othermapped['userid'] = ['db' => 'user', 'restore' => 'user'];
@@ -71,10 +83,17 @@ class observation_requested extends \core\event\base {
         ]);
     }
 
+    /**
+     * Get the description of the event
+     * @return string
+     */
     public function get_description() {
         return "The user with id {$this->userid} created an observation with id {$this->objectid}.";
     }
 
+    /**
+     * Init method
+     */
     protected function init() {
         $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;

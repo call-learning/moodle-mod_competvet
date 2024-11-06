@@ -48,6 +48,9 @@ class situations extends system_report {
         return [];
     }
 
+    /**
+     * Initialise the report
+     */
     protected function initialise(): void {
         $situationentity = new situation();
 
@@ -146,6 +149,10 @@ class situations extends system_report {
         }));
     }
 
+    /**
+     * Check if the user can view the report
+     * @return bool
+     */
     protected function can_view(): bool {
         return isloggedin();
     }

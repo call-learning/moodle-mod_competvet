@@ -54,8 +54,7 @@ class case_form_add extends dynamic_form {
                 }
                 if ($field->type == 'textarea') {
                     $rows = 2;
-                    if (isset($field->configdata)){
-                        // remove the backslashes from the configdata string
+                    if (isset($field->configdata)) {
                         $json = json_decode(stripslashes($field->configdata));
                         $rows = $json->rows;
                     }
@@ -64,7 +63,7 @@ class case_form_add extends dynamic_form {
                 }
                 if ($field->type == 'select') {
                     $options = [];
-                    if (isset($field->configdata)){
+                    if (isset($field->configdata)) {
                         $json = json_decode(stripslashes($field->configdata));
                         $options = (array)$json->options;
                     }

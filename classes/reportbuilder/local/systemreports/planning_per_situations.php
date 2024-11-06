@@ -46,6 +46,9 @@ class planning_per_situations extends system_report {
         return [];
     }
 
+    /**
+     * Initialise the report
+     */
     protected function initialise(): void {
         $situationentity = new situation();
 
@@ -163,6 +166,10 @@ class planning_per_situations extends system_report {
         }));
     }
 
+    /**
+     * Check if the user can view this report
+     * @return bool
+     */
     protected function can_view(): bool {
         return isloggedin();
     }

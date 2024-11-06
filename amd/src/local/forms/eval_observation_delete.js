@@ -28,7 +28,7 @@ import ModalEvents from 'core/modal_events';
 import Ajax from 'core/ajax';
 import {getSelectedElement} from './generic_form_helper';
 
-export const init = async (modulename) => {
+export const init = async(modulename) => {
     const selectedElements = getSelectedElement('observation:delete');
     if (!selectedElements) {
         return;
@@ -38,7 +38,7 @@ export const init = async (modulename) => {
         {key: 'observation:delete:confirm', component: modulename},
     ]);
     selectedElements.forEach((element) => {
-        element.addEventListener('click', async (event) => {
+        element.addEventListener('click', async(event) => {
             event.preventDefault();
             // Init an ok cancel modal.
             const modal = await ModalFactory.create({

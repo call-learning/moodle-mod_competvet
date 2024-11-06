@@ -1,5 +1,5 @@
-@local_competvet
-Feature: Edit completion settings of an activity
+@mod @mod_competvet
+Feature: Setup Compet Vet activity
   In order to edit completion settings without accidentally breaking user data
   As a teacher
   I need to edit the activity and use the unlock button if required

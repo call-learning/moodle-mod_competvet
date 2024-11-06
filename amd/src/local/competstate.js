@@ -27,8 +27,8 @@
  */
 class CompetState {
     /**
-    * Constructor.
-    */
+     * Constructor.
+     */
     constructor() {
         this.data = {};
         this.subscribers = [];
@@ -128,7 +128,7 @@ class CompetState {
 
     /**
      * Debugging function.
-    */
+     */
     debug() {
         const debugRegion = document.getElementById('debug');
         if (debugRegion) {

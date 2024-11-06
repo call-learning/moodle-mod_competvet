@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\form;
 defined('MOODLE_INTERNAL') || die();
 
@@ -22,8 +23,8 @@ require_once($CFG->libdir.'/formslib.php');
 /**
  * Assignment grade form
  *
- * @package   mod_assign
- * @copyright 2012 NetSpot {@link http://www.netspot.com.au}
+ * @package   mod_competvet
+ * @copyright 2023 CALL Learning
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class grade_form extends \moodleform {

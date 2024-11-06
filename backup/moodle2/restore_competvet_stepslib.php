@@ -22,6 +22,11 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_competvet_activity_structure_step extends restore_activity_structure_step {
+    /**
+     * Define the structure for the restore process.
+     *
+     * @return array The paths wrapped into standard activity structure.
+     */
     protected function define_structure() {
         // Define each element separately.
         $competvet = new restore_path_element('competvet', '/activity/competvet');
@@ -64,7 +69,8 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
             '/activity/competvet/situations/situation/plannings/planning/caseentries/caseentry'
         );
         $casedata =
-            new restore_path_element('casedata', '/activity/competvet/situations/situation/plannings/planning/caseentries/caseentry/casedatas/casedata');
+            new restore_path_element('casedata',
+                '/activity/competvet/situations/situation/plannings/planning/caseentries/caseentry/casedatas/casedata');
         $formdata =
             new restore_path_element('formdata', '/activity/competvet/situations/situation/plannings/planning/formdatas/formdata');
         $casefieldmap = new restore_path_element(
@@ -80,6 +86,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         ]);
     }
 
+    /**
+     * Process the competvet data.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
     protected function process_competvet($data) {
         global $DB;
 
@@ -92,6 +104,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $this->apply_activity_instance($newitemid);
     }
 
+    /**
+     * Process the situation data.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
     protected function process_situation($data) {
         global $DB;
 
@@ -109,6 +127,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $this->set_mapping('situation', $oldid, $newitemid);
     }
 
+    /**
+     * Process the planning data.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
     protected function process_planning($data) {
         global $DB;
 
@@ -123,6 +147,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $this->set_mapping('planning', $oldid, $newitemid);
     }
 
+    /**
+     * Process the grid data.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
     protected function process_grid($data) {
         global $DB;
 
@@ -133,7 +163,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
 
         // Check if the grid already exists.
         if (!$DB->record_exists('competvet_grid', ['idnumber' => $data->idnumber])) {
-            // Insert the grid record
+            // Insert the grid record.
             $newitemid = $DB->insert_record('competvet_grid', $data);
         } else {
             $newitemid = $DB->get_field('competvet_grid', 'id', ['idnumber' => $data->idnumber]);
@@ -141,6 +171,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $this->set_mapping('grid', $oldid, $newitemid);
     }
 
+    /**
+     * Process the criterion data.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
     protected function process_criterion($data) {
         global $DB;
 
@@ -160,6 +196,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $this->set_mapping('criterion', $oldid, $criterionitemid);
     }
 
+    /**
+     * Process the observation data.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
     protected function process_observation($data) {
         global $DB;
 
@@ -174,6 +216,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $this->set_mapping('observation', $oldid, $newitemid);
     }
 
+    /**
+     * Process the observation comment data.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
     protected function process_obscomment($data) {
         global $DB;
 
@@ -186,6 +234,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $DB->insert_record('competvet_obs_comment', $data);
     }
 
+    /**
+     * Process the grade data.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
     protected function process_grade($data) {
         global $DB;
 
@@ -199,6 +253,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $DB->insert_record('competvet_grades', $data);
     }
 
+    /**
+     * Process the observation criteria level data.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
     protected function process_obscritlevel($data) {
         global $DB;
 
@@ -211,6 +271,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $DB->insert_record('competvet_obs_crit_level', $data);
     }
 
+    /**
+     * Process the observation criteria comment data.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
     protected function process_obscritcom($data) {
         global $DB;
 
@@ -223,6 +289,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $DB->insert_record('competvet_obs_crit_com', $data);
     }
 
+    /**
+     * Process the todo data.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
     protected function process_todo($data) {
         global $DB;
 
@@ -236,6 +308,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $DB->insert_record('competvet_todo', $data);
     }
 
+    /**
+     * Process the certification declaration data.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
     protected function process_certdecl($data) {
         global $DB;
 
@@ -250,6 +328,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $this->set_mapping('certdecl', $oldid, $newitemid);
     }
 
+    /**
+     * Process the certification declaration association data.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
     protected function process_certdeclasso($data) {
         global $DB;
 
@@ -262,6 +346,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $DB->insert_record('competvet_cert_decl_asso', $data);
     }
 
+    /**
+     * Process the certification validation data.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
     protected function process_certvalid($data) {
         global $DB;
 
@@ -274,6 +364,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $DB->insert_record('competvet_cert_valid', $data);
     }
 
+    /**
+     * Process the case category data.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
     protected function process_casecat($data) {
         global $DB;
 
@@ -290,6 +386,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $this->set_mapping('casecat', $oldid, $casecatid);
     }
 
+    /**
+     * Process the case field data.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
     protected function process_casefield($data) {
         global $DB;
 
@@ -305,6 +407,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $this->set_mapping('casefield', $oldid, $casefieldid);
     }
 
+    /**
+     * Process the case entry data.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
     protected function process_caseentry($data) {
         global $DB;
 
@@ -318,6 +426,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $this->set_mapping('caseentry', $oldid, $entryid);
     }
 
+    /**
+     * Process the case data data.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
     protected function process_casedata($data) {
         global $DB;
 
@@ -330,6 +444,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $DB->insert_record('competvet_case_data', $data);
     }
 
+    /**
+     * Process the form data data.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
     protected function process_formdata($data) {
         global $DB;
 
@@ -342,6 +462,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $DB->insert_record('competvet_formdata', $data);
     }
 
+    /**
+     * Process the case field map data.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
     protected function process_casefieldmap($data) {
         global $DB;
 
@@ -354,6 +480,11 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $DB->insert_record('competvet_case_fields', $data);
     }
 
+    /**
+     * Define the contents of the competvet activity.
+     *
+     * @return void
+     */
     protected function after_execute() {
         // Add competvet related files, no need to match by itemname (just internally handled context).
         $this->add_related_files('mod_competvet', 'intro', null);

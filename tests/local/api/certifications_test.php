@@ -13,7 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-namespace local\api;
+
+namespace mod_competvet\local\api;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
@@ -35,7 +36,7 @@ use test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class certifications_test extends advanced_testcase {
+final class certifications_test extends advanced_testcase {
     use test_data_definition;
 
     /**
@@ -52,9 +53,9 @@ class certifications_test extends advanced_testcase {
 
     /**
      * Test the creation of a certification
-     * @covers certifications::add_cert_declaration
+     * @covers \mod_competvet\local\api\certifications::add_cert_declaration
      */
-    public function test_add_certification() {
+    public function test_add_certification(): void {
         $student = core_user::get_user_by_username('student1');
         $situation = situation::get_record(['shortname' => 'SIT1']);
         $plannings = plannings::get_plannings_for_situation_id($situation->get('id'), $student->id);
@@ -85,9 +86,9 @@ class certifications_test extends advanced_testcase {
 
     /**
      * Test the editing of a certification
-     * @covers certifications::update_cert_declaration
+     * @covers \mod_competvet\local\api\certifications::update_cert_declaration
      */
-    public function test_update_certification() {
+    public function test_update_certification(): void {
         $certification = $this->get_certification_declaration();
         // Act: Call the method under test.
         $success = certifications::update_cert_declaration(
@@ -118,9 +119,9 @@ class certifications_test extends advanced_testcase {
 
     /**
      * Test the deletion of a certification
-     * @covers certifications::delete_cert_declaration
+     * @covers \mod_competvet\local\api\certifications::delete_cert_declaration
      */
-    public function test_delete_certification() {
+    public function test_delete_certification(): void {
         $certification = $this->get_certification_declaration();
         // Act: Call the method under test.
         $success = certifications::delete_cert_declaration($certification->id);
@@ -132,28 +133,28 @@ class certifications_test extends advanced_testcase {
 
     /**
      * Test getting the supervisor invitations for a certification
-     * @covers certifications::get_declaration_supervisors
+     * @covers \mod_competvet\local\api\certifications::get_declaration_supervisors
      */
-    public function test_get_certification_supervisors() {
+    public function test_get_certification_supervisors(): void {
         $certification = $this->get_certification_declaration();
         $supervisors = certifications::get_declaration_supervisors($certification->id);
 
-        // Assert: Check that the results are as expected
+        // Assert: Check that the results are as expected.
         $this->assertIsArray($supervisors, "Should return an array of supervisor ids");
         $this->assertCount(2, $supervisors, "Should return 2 supervisor ids");
     }
 
     /**
      * Test inviting a supervisor to reply on a certification
-     * @covers certifications::declaration_supervisor_invite
+     * @covers \mod_competvet\local\api\certifications::declaration_supervisor_invite
      */
-    public function test_certification_supervisor_invite() {
+    public function test_certification_supervisor_invite(): void {
         $certification = $this->get_certification_declaration();
 
         $observer3 = $this->getDataGenerator()->create_user();
 
         $student1 = core_user::get_user_by_username('student1');
-        // Act: Call the method under test
+        // Act: Call the method under test.
         certifications::declaration_supervisor_invite(
             $certification->id,
             $observer3->id,
@@ -165,9 +166,9 @@ class certifications_test extends advanced_testcase {
 
     /**
      * Test removing the invitation for a supervisor to reply on a certification
-     * @covers certifications::declaration_supervisor_remove
+     * @covers \mod_competvet\local\api\certifications::declaration_supervisor_remove
      */
-    public function test_certification_supervisor_remove() {
+    public function test_certification_supervisor_remove(): void {
         $certification = $this->get_certification_declaration();
 
         $observer2 = core_user::get_user_by_username('observer2');
@@ -175,26 +176,24 @@ class certifications_test extends advanced_testcase {
         // Act: Call the method under test.
         $success = certifications::declaration_supervisor_remove($certification->id, $observer2->id, $student1->id);
 
-        // Assert: Check that the results are as expected
+        // Assert: Check that the results are as expected.
         $this->assertTrue($success, "Removing supervisor should return true");
         $this->assertNotContainsEquals($observer2->id, certifications::get_declaration_supervisors($certification->id));
     }
-
-    // Test fetching a certification by ID
 
     /**
      * Test fetching a certification by ID
      *
      * @return void
-     * @covers certifications::get_certification
+     * @covers \mod_competvet\local\api\certifications::get_certification
      */
-    public function test_get_certification_by_id() {
-        // Create a certification
+    public function test_get_certification_by_id(): void {
+        // Create a certification.
         $cert = $this->get_certification_declaration();
-        // Fetch the certification using the API
+        // Fetch the certification using the API.
         $certification = certifications::get_certification($cert->id);
 
-        // Assertions
+        // Assertions.
         $this->assertNotEmpty($certification);
         $grid = grid::get_record(['type' => grid::COMPETVET_CRITERIA_CERTIFICATION]);
         $criterion = criterion::get_record(['idnumber' => 'CERT1', 'gridid' => $grid->get('id')]);
@@ -205,9 +204,9 @@ class certifications_test extends advanced_testcase {
      * Test fetching all certifications
      *
      * @return void
-     * @covers certifications::get_certifications
+     * @covers \mod_competvet\local\api\certifications::get_certifications
      */
-    public function test_get_certifications() {
+    public function test_get_certifications(): void {
         $this->get_certification_declaration();
 
         $student = core_user::get_user_by_username('student1');
@@ -215,7 +214,7 @@ class certifications_test extends advanced_testcase {
         $plannings = plannings::get_plannings_for_situation_id($situation->get('id'), $student->id);
         $planning = array_shift($plannings);
 
-        // Fetch all certifications using the API
+        // Fetch all certifications using the API.
         $certifications = certifications::get_certifications($planning['id']);
 
         $this->assertCount(5, $certifications);

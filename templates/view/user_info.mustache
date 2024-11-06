@@ -20,14 +20,22 @@
 
     Example context (json):
     {
-        'fullname': 'Student 1',
-        'userpictureurl': 'http://localhost/moodle/pluginfile.php/3/user/icon/f1',
-        'viewurl': 'http://localhost/moodle/user/view.php?id=3'
+        "id": 1,
+        "userpictureurl": "http://localhost/moodle/pluginfile.php/1/user/icon/f1",
+        "fullname": "Observer 1",
+        "viewurl": "http://localhost/moodle/user/view.php?id=1",
+        "stats": [
+            {
+                "nbdone": 1,
+                "nbrequired": 2,
+                "label": "Observations"
+            }
+        ]
     }
 }}
 <div class="user-info container m-3 py-1">
 
-    <div data-user-id="{{id}}" role="button" class="d-flex align-items-center">
+    <div data-user-id="{{id}}" class="d-flex align-items-center">
         <div class="btn btn-link text-body">
             <img src="{{userpictureurl}}" alt="{{label}}" class="userpicture">
             {{#viewurl}}

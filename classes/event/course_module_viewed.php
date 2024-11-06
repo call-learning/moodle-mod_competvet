@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\event;
 
 /**
@@ -52,6 +53,10 @@ class course_module_viewed extends \core\event\course_module_viewed {
         $this->data['objecttable'] = 'competvet';
     }
 
+    /**
+     * Get the objectid mapping.
+     * @return array
+     */
     public static function get_objectid_mapping() {
         return ['db' => 'competvet', 'restore' => 'competvet'];
     }

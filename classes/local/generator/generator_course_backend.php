@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\local\generator;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -94,6 +95,10 @@ class generator_course_backend extends tool_generator_course_backend {
     . 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor '
     . 'incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation '
     . 'ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>';
+
+    /**
+     * @var array Param groups
+     */
     private static $paramgroups = [1, 5, 10, 100, 300, 500];
     /**
      * @var array Number of assignments in course
@@ -229,6 +234,9 @@ class generator_course_backend extends tool_generator_course_backend {
         }
     }
 
+    /**
+     * Creates a number of groups.
+     */
     private function create_groups() {
         $generatoreflection = new ReflectionClass($this);
         $useridsprop = $generatoreflection->getParentClass()->getProperty('userids');
@@ -316,6 +324,8 @@ class generator_course_backend extends tool_generator_course_backend {
      * Creates a number of user accounts and enrols them on the course.
      * Note: Existing user accounts that were created by this system are
      * reused if available.
+     * @throws coding_exception
+     * @param string $rolename
      */
     private function create_users_with_roles($rolename) {
         global $DB;
@@ -393,6 +403,7 @@ class generator_course_backend extends tool_generator_course_backend {
     /**
      * Creates user accounts with a numeric range.
      *
+     * @param string $rolename Role name
      * @param int $first Number of first user
      * @param int $last Number of last user
      */
@@ -462,13 +473,15 @@ class generator_course_backend extends tool_generator_course_backend {
                             $this->fixeddataset ? min($observationcount, $observerscount - 1) :
                                 random_int(0, $observerscount - 1);
                         $observerid = $observers[$observerindex];
-                        $this->create_observation(observation::CATEGORY_EVAL_OBSERVATION, $situation, $planning, $studentid, $observerid);
+                        $this->create_observation(observation::CATEGORY_EVAL_OBSERVATION, $situation, $planning, $studentid,
+                            $observerid);
                     }
                     // Autoevaluations.
                     $maxcount = $situation->get('autoevalnum');
                     $observationcount = $this->fixeddataset ? $maxcount : random_int(1, $maxcount + 1 ?? 2);
                     for (; $observationcount > 0; $observationcount--) {
-                        $this->create_observation(observation::CATEGORY_EVAL_AUTOEVAL, $situation, $planning, $studentid, $studentid);
+                        $this->create_observation(observation::CATEGORY_EVAL_AUTOEVAL, $situation, $planning, $studentid,
+                            $studentid);
                     }
                     $this->dot($done++, $count);
                 }
@@ -486,6 +499,7 @@ class generator_course_backend extends tool_generator_course_backend {
      * @param planning $planning
      * @param int $studentid
      * @param int $observerid
+     * @param int|null $obstatus
      * @return void
      */
     private function create_observation(
@@ -545,6 +559,7 @@ class generator_course_backend extends tool_generator_course_backend {
     /**
      * Get an substring from the LOREM_IPSUM
      *
+     * @param int $size
      * @return string
      */
     private function generate_text(int $size): string {

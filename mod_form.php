@@ -166,7 +166,8 @@ class mod_competvet_mod_form extends moodleform_mod {
     /**
      * Enforce validation rules here
      *
-     * @param object $data Post data to validate
+     * @param array $data Post data to validate
+     * @param array $files File data to validate
      * @return array
      **/
     public function validation($data, $files) {

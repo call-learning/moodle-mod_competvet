@@ -133,8 +133,9 @@ class competvet {
      * Constructor for the competVet class
      *
      * @param int $cmid
+     * @param int|null $instanceid
      */
-    private function __construct(int $cmid, int $instanceid = null) {
+    private function __construct(int $cmid, ?int $instanceid = null) {
         if (!empty($instanceid)) {
             [$this->course, $this->cminfo] = get_course_and_cm_from_instance($instanceid, self::MODULE_NAME);
         } else {
@@ -204,7 +205,6 @@ class competvet {
     /**
      * Require view access
      *
-     * @param int $situationid
      * @param int $userid
      * @return bool
      * @throws \moodle_exception
@@ -221,7 +221,7 @@ class competvet {
     /**
      * Get the competVet instance from the context (module)
      *
-     * @param \context $context
+     * @param situation $situation
      * @return self
      * @throws \coding_exception
      */
@@ -241,6 +241,12 @@ class competvet {
         return $this->context;
     }
 
+    /**
+     * Get all participants
+     *
+     * @param int $groupid
+     * @return array
+     */
     public function list_participants_with_filter_status_and_group(int $groupid): array {
         return [];
     }
@@ -378,7 +384,7 @@ class competvet {
     /**
      * Get the final grade for a student
      *
-     * @param competvet $competvet
+     * @param int $userid
      * @return \grade_grade The grade object
      */
     public function get_final_grade_for_student($userid): \grade_grade {

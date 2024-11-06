@@ -13,6 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// phpcs:ignoreFile
+
 namespace mod_competvet\output\view;
 
 use core\output\named_templatable;
@@ -35,6 +37,9 @@ abstract class base implements renderable, named_templatable {
      * @param int $userid The user we will open the grading app too.
      * @param string $pagetype
      * @param \moodle_url $baseurl
+     * @param int $currentuserid
+     * @param string $currentmodule
+     * @param \moodle_url|null $backurl
      */
     protected function __construct(
         protected int $userid,
@@ -55,6 +60,9 @@ abstract class base implements renderable, named_templatable {
      *
      * @param int $userid The user ID for which the renderable object needs to be created.
      * @param string|null $pagetype
+     * @param int $currentuserid
+     * @param string $currentmodule
+     * @param \moodle_url|null $backurl
      * @return renderable
      */
     public static function factory(

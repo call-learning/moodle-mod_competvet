@@ -27,7 +27,7 @@ import CompetState from 'mod_competvet/local/competstate';
 import Repository from 'mod_competvet/local/new-repository';
 import './plannings';
 import ModalSaveCancel from 'core/modal_save_cancel';
-import { getString } from 'core/str';
+import {getString} from 'core/str';
 import ModalEvents from 'core/modal_events';
 
 /*

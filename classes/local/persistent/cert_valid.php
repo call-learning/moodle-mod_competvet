@@ -32,8 +32,11 @@ class cert_valid extends persistent {
      */
     const TABLE = 'competvet_cert_valid';
 
+    /** Status confirmed */
     const STATUS_CONFIRMED = 1;
+    /** Status observer not seen */
     const STATUS_OBSERVER_NOTSEEN = 2;
+    /** Status level not reached */
     const STATUS_LEVEL_NOT_REACHED = 3;
 
     /**

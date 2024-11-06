@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\reportbuilder\local\helpers;
 
 use core_reportbuilder\local\entities\user;
@@ -36,7 +37,6 @@ trait observations_helper {
      *
      * User both in the datasource and system report.
      *
-     * @param base $this
      */
     protected function add_observations_entities(): void {
         $observationentity = new observation();
@@ -102,7 +102,9 @@ trait observations_helper {
         $obscommentalias = $obscommententity->get_table_alias('competvet_obs_comment');
         $this->add_entity($obscommententity
             ->add_join(
-                "LEFT JOIN {competvet_obs_comment} {$obscommentalias} ON {$obscommentalias}.observationid = {$observationalias}.id AND {$obscommentalias}.type = {$type}"
+                "LEFT JOIN {competvet_obs_comment} {$obscommentalias} ON " .
+                "{$obscommentalias}.observationid = {$observationalias}.id " .
+                "AND {$obscommentalias}.type = {$type}"
             ));
     }
 }

@@ -34,16 +34,29 @@ use mod_competvet\local\api\todos as todos_api;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class delete_todos extends external_api {
+
+    /**
+     * Returns description of method parameters
+     * @return external_function_parameters
+     */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'todoids' => new external_multiple_structure(new external_value(PARAM_INT, 'Todo ID', VALUE_REQUIRED)),
         ]);
     }
 
+    /**
+     * Delete todos
+     * @param array $todoids
+     */
     public static function execute(array $todoids): void {
         todos_api::delete_todos($todoids);
     }
 
+    /**
+     * Returns description of method result value
+     * @return external_value
+     */
     public static function execute_returns(): external_value {
         return new external_value(PARAM_BOOL, 'Success');
     }

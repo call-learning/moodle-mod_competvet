@@ -20,13 +20,15 @@
 
     Example context (json):
     {
-
+        "locked": false,
+        "cmid": 1,
+        "userid": 1
     }
 }}
 <div id="managetodos" data-locked="{{locked}}" class="manageplanning manage" data-region="managetodos" data-cm-id="{{cmid}}" data-user-id="{{userid}}">
-        <div class="alert alert-warning d-none" data-empty-todos="true">
-            {{#str}}todo:notodos, mod_competvet{{/str}}
-        </div>
+    <div class="alert alert-warning d-none" data-empty-todos="true">
+        {{#str}}todo:notodos, mod_competvet{{/str}}
+    </div>
 
     <div>
         <div class="competvet-view-todos">

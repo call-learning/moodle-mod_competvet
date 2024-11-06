@@ -58,7 +58,6 @@ class cert_decl_evaluator extends cert_decl_student {
             $mform->setType('declid', PARAM_INT);
         }
 
-        // TODO - find a better way to handle this
         if ($USER->id != $studentid && !$declid) {
             $mform->addElement('static', 'notstudent', '', 'Wait for the student');
             return;
@@ -79,7 +78,7 @@ class cert_decl_evaluator extends cert_decl_student {
         $mform->addElement('static', 'usercomment', '');
         $mform->setType('usercomment', PARAM_RAW);
 
-        // Check if user is supervisor for this declaration
+        // Check if user is supervisor for this declaration.
         $supervisors = certifications::get_declaration_supervisors($declid);
         $issupervisor = in_array($USER->id, $supervisors);
         if (!$issupervisor) {

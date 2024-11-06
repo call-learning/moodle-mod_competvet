@@ -69,7 +69,8 @@ class manage_criteria extends external_api {
                             'idnumber' => new external_value(PARAM_TEXT, 'The id number of the criterion', VALUE_REQUIRED),
                             'sortorder' => new external_value(PARAM_INT, 'The sort order of the criterion', VALUE_REQUIRED),
                             'haschanged' => new external_value(PARAM_BOOL, 'Has the criterion changed', VALUE_OPTIONAL),
-                            'updatesortorder' => new external_value(PARAM_BOOL, 'Update the sort order of the options', VALUE_OPTIONAL),
+                            'updatesortorder' => new external_value(PARAM_BOOL, 'Update the sort order of the options',
+                                VALUE_OPTIONAL),
                             'deleted' => new external_value(PARAM_BOOL, 'Is the criterion deleted', VALUE_OPTIONAL),
                             'hasoptions' => new external_value(PARAM_BOOL, 'Does the criterion have options', VALUE_OPTIONAL),
                             'options' => new external_multiple_structure(

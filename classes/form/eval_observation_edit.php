@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace mod_competvet\form;
 
 use context;
@@ -28,9 +29,15 @@ use moodle_url;
  * Observation edit form
  *
  * @package    mod_competvet
+ * @copyright  2023 CALL Learning - Laurent David
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class eval_observation_edit extends dynamic_form {
+    /**
+     * Get the data for the dynamic submission
+     *
+     * @return void
+     */
     public function set_data_for_dynamic_submission(): void {
         $observationid = $this->optional_param('id', null, PARAM_INT);
         $data = observations::get_observation_information($observationid);
@@ -39,6 +46,7 @@ class eval_observation_edit extends dynamic_form {
 
     /**
      * Set form data from observation information
+     * @param array $data
      */
     protected function set_data_for_dynamic_submission_helper($data) {
         if (empty($data['context'])) {
@@ -97,6 +105,11 @@ class eval_observation_edit extends dynamic_form {
         parent::set_data((object) $data);
     }
 
+    /**
+     * Process dynamic submission
+     *
+     * @return array
+     */
     public function process_dynamic_submission() {
         try {
             $data = $this->get_data();
@@ -123,6 +136,11 @@ class eval_observation_edit extends dynamic_form {
         }
     }
 
+    /**
+     * Get page URL
+     *
+     * @return moodle_url
+     */
     protected function get_page_url_for_dynamic_submission(): moodle_url {
         $returnurl = $this->optional_param('returnurl', null, PARAM_URL);
         if (empty($returnurl)) {
@@ -134,6 +152,9 @@ class eval_observation_edit extends dynamic_form {
         return new moodle_url($returnurl);
     }
 
+    /**
+     * Define form
+     */
     public function definition_after_data() {
         $mform = $this->_form;
         eval_observation_helper::add_comments_to_form($this, $mform, $this->_customdata['comments_repeat'] ?? 1);
@@ -163,11 +184,19 @@ class eval_observation_edit extends dynamic_form {
         eval_observation_helper::add_criteria_to_form($observation->get_situation(), $this, $mform);
     }
 
+    /**
+     * Check access for the dynamic submission
+     */
     protected function check_access_for_dynamic_submission(): void {
         $context = $this->get_context_for_dynamic_submission();
         require_capability('mod/competvet:canobserve', $context);
     }
 
+    /**
+     * Get the context for the dynamic submission
+     *
+     * @return context
+     */
     protected function get_context_for_dynamic_submission(): context {
         $observationid = $this->optional_param('id', null, PARAM_INT);
         $observation = observation::get_record(['id' => $observationid]);

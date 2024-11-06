@@ -23,6 +23,50 @@
 
     Example context (json):
     {
+        "list-grading": [
+            {
+                "grading": {
+                    "criteria": [
+                        {
+                            "criterionid": 1,
+                            "label": "Criterion 1",
+                            "options": [
+                                {
+                                    "optionid": 1,
+                                    "label": "Option 1",
+                                    "grade": 1,
+                                    "selected": false,
+                                    "isvalid": false,
+                                    "isinvalid": false,
+                                    "cangrade": true
+                                },
+                                {
+                                    "optionid": 2,
+                                    "label": "Option 2",
+                                    "grade": 2,
+                                    "selected": false,
+                                    "isvalid": false,
+                                    "isinvalid": false,
+                                    "cangrade": true
+                                }
+                            ],
+                            "comment": "",
+                            "isvalid": false,
+                            "isinvalid": false,
+                            "cangrade": true
+                        }
+                    ],
+                    "finalscore": 0,
+                    "maxfinalscore": 0,
+                    "hideaccept": false,
+                    "scoreevaluator": 0,
+                    "comment": "",
+                    "isvalid": false,
+                    "isinvalid": false,
+                    "cangrade": true
+                }
+            }
+        ]
     }
 }}
 {{#list-grading}}
@@ -116,13 +160,13 @@
                         step="1"
                         {{^cangrade}}disabled{{/cangrade}}
                         {{^cangrade}}disabled{{/cangrade}}
-                    />
+                    >
                 </div>
             </div>
         </div>
         <div class="mb-5">
             <div class="form-group">
-                <label for="freecommentlist">
+                <label for="comment">
                     {{#str}}freecommentlist, mod_competvet{{/str}}
                 </label>
                 <textarea

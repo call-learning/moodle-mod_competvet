@@ -20,14 +20,17 @@
 
     Example context (json):
     {
-
+        "userpictureurl": "http://localhost/moodle/pluginfile.php/1/user/icon/f1",
+        "fullname": "Observer 1",
+        "viewurl": "http://localhost/moodle/user/view.php?id=1",
+        "evaluationtime": 1619712000
     }
 }}
 <div class="container ml-0 my-3">
     <div class="card w-50">
         <div class="card-header">
             <div>
-                <img src="{{userpictureurl}}" class="rounded-circle" width="50" height="50">
+                <img src="{{userpictureurl}}" class="rounded-circle" width="50" height="50" alt="{{#str}}pictureof, core, {{fullname}}{{/str}}">
                 <a href="{{viewurl}}"><span>{{fullname}}</span></a>
             </div>
         </div>
