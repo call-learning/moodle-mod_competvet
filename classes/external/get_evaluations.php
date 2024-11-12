@@ -98,6 +98,7 @@ class get_evaluations extends external_api {
                 'hasobserverevaluations' => new external_value(PARAM_BOOL, 'Has observer evaluations'),
                 'hasanyobservations' => new external_value(PARAM_BOOL, 'Has any observations'),
                 'totalaverage' => new external_value(PARAM_INT, 'Total average'),
+                'numberofobservations' => new external_value(PARAM_INT, 'Number of observations'),
                 'observations' => new external_multiple_structure(
                     self::get_grade_structure()
                 ),
@@ -165,12 +166,14 @@ class get_evaluations extends external_api {
         self::collect_todos($todos, $comments);
         $gradedobservations = [];
         $gradedautoevals = [];
+        $numberofobservations = 0;
         foreach ($userobservations as $userobservation) {
             self::collect_grades($userobservation, $criteria, $gradedobservations, $gradedautoevals);
             self::collect_comments($userobservation, $comments);
             self::collect_subcriteria_comments($userobservation, $comments);
             if ($userobservation['category'] == observation::CATEGORY_EVAL_OBSERVATION) {
                 $hasobserverevaluations = true;
+                $numberofobservations++;
             } else {
                 $hasautoevaluations = true;
             }
@@ -196,6 +199,7 @@ class get_evaluations extends external_api {
             'hasanyobservations' => $hasautoevaluations || $hasobserverevaluations,
             'evalcomments' => $comments,
             'totalaverage' => $totalaveragecount > 0 ? round($totalaverage / $totalaveragecount) : 0,
+            'numberofobservations' => $numberofobservations,
         ];
     }
 
