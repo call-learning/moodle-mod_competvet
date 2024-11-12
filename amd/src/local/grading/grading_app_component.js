@@ -294,7 +294,7 @@ class Competvet {
         // Update the values numberofobservations and maxobservations based on the evaluation-results
         context.grading.evalnum = this.gradingApp.dataset.evalnum;
 
-        let numberofobservations = evalResults.observations.length;
+        let numberofobservations = evalResults.numberofobservations;
         let numberofselfevaluations = evalResults.autoevals.length;
         let noSelfEvalPenalty = -30;
         if (numberofselfevaluations > 0) {
