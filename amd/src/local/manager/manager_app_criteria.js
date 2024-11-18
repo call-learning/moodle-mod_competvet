@@ -208,6 +208,7 @@ class Manager {
                 newOption.hasgrade = true;
                 newOption.grade = 0;
             }
+
             criterion.options.push(newOption);
         }
         CompetState.setValue('datatree', state);
@@ -368,6 +369,9 @@ class Manager {
                     Object.keys(element).forEach((key) => {
                         if (!this.optionObjectKeys.includes(key)) {
                             delete element[key];
+                        }
+                        if (this.dataset !== COMPETVET_CRITERIA_LIST) {
+                            delete element.grade;
                         }
                     });
                 });

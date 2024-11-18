@@ -35,7 +35,7 @@ if (!is_siteadmin()) {
 $url = new moodle_url('/mod/competvet/manageglobalcriteria.php', []);
 $PAGE->set_url($url);
 $PAGE->set_context(context_system::instance());
-$PAGE->set_heading($SITE->fullname);
+$PAGE->set_heading('managecriteria', 'mod_competvet');
 echo $OUTPUT->header();
 $settingspage = new moodle_url('/admin/settings.php', ['section' => 'mod_competvet_settings']);
 $iconback = html_writer::tag('i', '', ['class' => 'icon fa fa-arrow-left']);

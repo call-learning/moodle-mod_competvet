@@ -20,6 +20,7 @@
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
 use Behat\Mink\Exception\ElementNotFoundException;
+use Behat\Mink\Exception\ExpectationException as ExpectationException;
 
 /**
  * Behat steps in plugin mod_competvet
@@ -441,4 +442,165 @@ class behat_mod_competvet extends behat_base {
         }
         $link->click();
     }
+
+    /**
+     * Navigates to the manage criteria page.
+     *
+     * Example: And I navigate to the manage criteria page
+     *
+     * @Given /^I navigate to the manage criteria page$/
+     * @throws Exception
+     */
+    public function i_navigate_to_manage_criteria_page() {
+        // Construct the URL for the manage criteria page.
+        $url = new moodle_url('/mod/competvet/manageglobalcriteria.php');
+
+        // Navigate to the URL.
+        $this->getSession()->visit($url);
+
+        $exception = new ExpectationException('Manage Global Criteria page did not load correctly', $this->getSession());
+
+
+        // Wait for the page to load by checking for a specific element on the manage criteria page.
+        $this->spin(
+            function($context) {
+                $page = $context->getSession()->getPage();
+                return $page->hasContent(get_string('defaultcriteria', 'mod_competvet'));
+            },
+            [],
+            behat_base::get_extended_timeout(),
+            $exception
+        );
+    }
+
+    /**
+     * Changes the label of a criterion in a specific grid by row numbers.
+     *
+     * Example: And I change criterium row "1" in grid row "1" to "Aisance relationnelle"
+     *
+     * @Given /^I change criterium row "(?P<criterion_row>\d+)" in grid row "(?P<grid_row>\d+)" to "(?P<new_label>(?:[^"]|\\")*)"$/
+     * @param int $criterionrow The row number of the criterion to change
+     * @param int $gridrow The row number of the grid containing the criterion
+     * @param string $newlabel The new label to set for the criterion
+     * @throws Exception
+     */
+    public function i_change_criterion_label_in_grid($criterionrow, $gridrow, $newlabel) {
+        // Convert the row numbers to 0-based indices for array indexing.
+        $gridindex = $gridrow - 1;
+        $criterionindex = $criterionrow - 1;
+
+        // Find the container for grids.
+        $container = $this->find('css', '#managecriteria > div.grids');
+        if (!$container) {
+            throw new Exception('Grids container not found');
+        }
+
+        // Find all grids within the container.
+        $grids = $container->findAll('css', 'div[data-region="grid"]');
+        if (!isset($grids[$gridindex])) {
+            throw new Exception('Grid row "' . $gridrow . '" not found');
+        }
+
+        $grid = $grids[$gridindex];
+
+        // Find all criteria within the grid.
+        $criteria = $grid->findAll('css', 'div[data-region="criterion"]');
+        if (!isset($criteria[$criterionindex])) {
+            throw new Exception('Criterion row "' . $criterionrow . '" not found in grid row "' . $gridrow . '"');
+        }
+
+        $criterion = $criteria[$criterionindex];
+
+        // Click the edit button within the criterion row.
+        $editbutton = $criterion->find('css', 'button[data-action="edit"][data-type="criterion"]');
+        if (!$editbutton) {
+            throw new Exception('Edit button not found for criterion row "' . $criterionrow . '"');
+        }
+        $editbutton->click();
+
+        // Find the input field for the criterion label and set the new value.
+        $inputfield = $criterion->find('css', 'input[data-field="label"]');
+        if (!$inputfield) {
+            throw new Exception('Input field for criterion label not found for criterion row "' . $criterionrow . '"');
+        }
+        $inputfield->setValue($newlabel);
+
+        // Click the save button within the criterion row.
+        $savebutton = $criterion->find('css', 'button[data-action="save"][data-type="criterion"]');
+        if (!$savebutton) {
+            throw new Exception('Save button not found for criterion row "' . $criterionrow . '"');
+        }
+        $savebutton->click();
+    }
+
+    /**
+     * Changes the label of an option within a criterion in a specific grid by row numbers.
+     *
+     * Example: And I change option row "1" in criterium row "1" in grid row "1" to "Rigueur horaire"
+     *
+     * @Given /^I change option row "(?P<option_row>\d+)" in criterium row "(?P<criterion_row>\d+)" in grid row "(?P<grid_row>\d+)" to "(?P<new_label>(?:[^"]|\\")*)"$/
+     * @param int $optionrow The row number of the option to change
+     * @param int $criterionrow The row number of the criterion containing the option
+     * @param int $gridrow The row number of the grid containing the criterion
+     * @param string $newlabel The new label to set for the option
+     * @throws Exception
+     */
+    public function i_change_option_label_in_criterion_in_grid($optionrow, $criterionrow, $gridrow, $newlabel) {
+        // Convert the row numbers to 0-based indices for array indexing.
+        $gridindex = $gridrow - 1;
+        $criterionindex = $criterionrow - 1;
+        $optionindex = $optionrow - 1;
+
+        // Find the container for grids.
+        $container = $this->find('css', '#managecriteria > div.grids');
+        if (!$container) {
+            throw new Exception('Grids container not found');
+        }
+
+        // Find all grids within the container.
+        $grids = $container->findAll('css', 'div[data-region="grid"]');
+        if (!isset($grids[$gridindex])) {
+            throw new Exception('Grid row "' . $gridrow . '" not found');
+        }
+
+        $grid = $grids[$gridindex];
+
+        // Find all criteria within the grid.
+        $criteria = $grid->findAll('css', 'div[data-region="criterion"]');
+        if (!isset($criteria[$criterionindex])) {
+            throw new Exception('Criterion row "' . $criterionrow . '" not found in grid row "' . $gridrow . '"');
+        }
+
+        $criterion = $criteria[$criterionindex];
+
+        // Find all options within the criterion.
+        $options = $criterion->findAll('css', 'div[data-region="option"]');
+        if (!isset($options[$optionindex])) {
+            throw new Exception('Option row "' . $optionrow . '" not found in criterion row "' . $criterionrow . '" in grid row "' . $gridrow . '"');
+        }
+
+        $option = $options[$optionindex];
+
+        // Click the edit button within the criterion row.
+        $editbutton = $criterion->find('css', 'button[data-action="edit"][data-type="criterion"]');
+        if (!$editbutton) {
+            throw new Exception('Edit button not found for criterion row "' . $criterionrow . '"');
+        }
+        $editbutton->click();
+
+        // Find the input field for the option label and set the new value.
+        $inputfield = $option->find('css', 'input[data-field="label"]');
+        if (!$inputfield) {
+            throw new Exception('Input field for option label not found for option row "' . $optionrow . '"');
+        }
+        $inputfield->setValue($newlabel);
+
+        // Click the save button within the criterion row.
+        $savebutton = $criterion->find('css', 'button[data-action="save"][data-type="criterion"]');
+        if (!$savebutton) {
+            throw new Exception('Save button not found for criterion row "' . $criterionrow . '"');
+        }
+        $savebutton->click();
+    }
+
 }

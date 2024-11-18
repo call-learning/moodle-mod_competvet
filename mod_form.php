@@ -84,6 +84,20 @@ class mod_competvet_mod_form extends moodleform_mod {
         $mform->addElement('header', 'situationdef', get_string('situation:def', 'competvet'));
         $mform->setExpanded('situationdef');
 
+        $hasdata = false;
+
+        // Check if the user has already filled in some data.
+        if ($competvetid = $this->get_current()->id) {
+            $situation = situation::get_record(['competvetid' => $competvetid]);
+            $plannings = plannings_api::get_plannings_for_situation_id($situation->get('id'), $USER->id, false);
+            foreach ($plannings as $planning) {
+                $data = plannings_api::has_user_data($planning['id']);
+                if ($data) {
+                    $mform->addElement('hidden', 'hasactivity', 1);
+                }
+            }
+        }
+
         $situationfields = utils::get_persistent_fields_without_internals(situation::class);
         foreach ($situationfields as $situationfield => $situationfielddefinition) {
             $elementtype = $situationfielddefinition['formtype'] ?? 'text';
@@ -111,17 +125,6 @@ class mod_competvet_mod_form extends moodleform_mod {
             $mform->setType('hasactivity', PARAM_INT);
 
             if (in_array($situationfield, ['haseval', 'hascase', 'hascertif'])) {
-                if ($competvetid = $this->get_current()->id) {
-                    $situation = situation::get_record(['competvetid' => $competvetid]);
-                    $plannings = plannings_api::get_plannings_for_situation_id($situation->get('id'), $USER->id, false);
-                    foreach ($plannings as $planning) {
-                        $data = plannings_api::has_user_data($planning['id']);
-                        if ($data) {
-                            $mform->addElement('hidden', 'hasactivity', 1);
-                            break;
-                        }
-                    }
-                }
                 $mform->disabledIf($situationfield, 'hasactivity', 'eq', 1);
             }
 
@@ -160,6 +163,7 @@ class mod_competvet_mod_form extends moodleform_mod {
                 $evalgridchoices,
                 !empty($defaultgrid) ? $defaultgrid->get('id') : null);
             $mform->setType($fieldname, PARAM_INT);
+            $mform->disabledIf($fieldname, 'hasactivity', 'eq', 1);
         }
     }
 

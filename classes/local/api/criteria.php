@@ -187,7 +187,7 @@ class criteria {
      * @param int $sortorder - The sort order
      * @param int $gridid - The grid id
      * @param int $parentid - The parent id
-     * @param int $grade - The grade
+     * @param float|null $grade - The grade
      * @return int - The criterion id
      */
     public static function update_criterion(
@@ -197,7 +197,7 @@ class criteria {
         int $sortorder,
         int $gridid,
         int $parentid,
-        int $grade
+        ?float $grade
     ): int {
         $criterion = criterion::get_record(['id' => $criterionid]);
         if (!$criterion) {

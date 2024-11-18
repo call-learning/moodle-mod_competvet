@@ -112,41 +112,41 @@ class manage_criteria extends external_api {
         // Loop through the grids, if a grid has the haschanged flag set to true,
         // update or insert the grid by calling the correct API.
         foreach ($grids as $grid) {
-            if ($grid['deleted']) {
+            if ($grid['deleted'] ?? false) {
                 criteria::delete_grid($grid['gridid']);
                 continue;
             }
             $gridid = $grid['gridid'];
-            if ($grid['haschanged']) {
+            if ($grid['haschanged'] ?? false) {
                 $gridid = criteria::update_grid(
                     $grid['gridid'],
-                    $grid['gridname'],
-                    $grid['sortorder'],
-                    $grid['situationid'],
+                    $grid['gridname'] ?? '',
+                    $grid['sortorder'] ?? 0,
+                    $grid['situationid'] ?? 0,
                     $type
                 );
             }
-            if ($grid['updatesortorder']) {
+            if ($grid['updatesortorder'] ?? false) {
                 $criteriaorder = array_map(function ($criterion) {
                     return $criterion['criterionid'];
                 }, $grid['criteria']);
                 criteria::update_criteria_sortorder($criteriaorder);
             }
             foreach ($grid['criteria'] as $criterion) {
-                if ($criterion['deleted'] || $criterion['updatesortorder'] || $criterion['haschanged']) {
+                if (($criterion['deleted'] ?? false) || ($criterion['updatesortorder'] ?? false) || ($criterion['haschanged'] ?? false)) {
                     $setgridmodified = true;
                 }
-                if ($criterion['deleted']) {
+                if ($criterion['deleted'] ?? false) {
                     criteria::delete_criterion($criterion['criterionid']);
                     continue;
                 }
-                if ($criterion['updatesortorder']) {
-                    $citeriaorder = array_map(function ($option) {
+                if ($criterion['updatesortorder'] ?? false) {
+                    $criteriaorder = array_map(function ($option) {
                         return $option['optionid'];
                     }, $criterion['options']);
                     criteria::update_criteria_sortorder($criteriaorder);
                 }
-                if ($criterion['haschanged']) {
+                if ($criterion['haschanged'] ?? false) {
                     $criterionid = criteria::update_criterion(
                         $criterion['criterionid'],
                         $criterion['label'],
@@ -154,14 +154,14 @@ class manage_criteria extends external_api {
                         $criterion['sortorder'],
                         $gridid,
                         0,
-                        0,
+                        null
                     );
-                    if ($criterion['hasoptions']) {
+                    if ($criterion['hasoptions'] ?? false) {
                         foreach ($criterion['options'] as $option) {
-                            if ($option['deleted']) {
+                            if ($option['deleted'] ?? false) {
                                 criteria::delete_criterion($option['optionid']);
                             }
-                            $grade = isset($option['grade']) ? $option['grade'] : 0;
+                            $grade = $option['grade'] ?? null;
                             criteria::update_criterion(
                                 $option['optionid'],
                                 $option['label'],
@@ -169,7 +169,7 @@ class manage_criteria extends external_api {
                                 $option['sortorder'],
                                 $gridid,
                                 $criterionid,
-                                $grade,
+                                $grade
                             );
                         }
                     }

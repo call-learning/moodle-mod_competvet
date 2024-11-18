@@ -56,7 +56,6 @@
             {{#edit}}<input type="text" class="form-control" value="{{{label}}}" placeholder="{{{placeholder}}}" data-field="label">{{/edit}}{{^edit}}{{{label}}}{{/edit}}
         </div>
         <div class="span2 col-2 tcell">
-            {{#canedit}}
             {{^edit}}
             <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-grid-id="{{gridid}}" data-id="{{criterionid}}" data-action="edit" data-type="criterion">{{#pix}}i/edit, core, {{#str}}edit{{/str}}{{/pix}}</button>
             {{/edit}}
@@ -66,6 +65,7 @@
                 <span class="savingicon">{{#pix}}i/loading, core, {{#str}}saving, mod_competvet{{/str}}{{/pix}}</span>
             </button>
             {{/edit}}
+            {{#canedit}}
             <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-grid-id="{{gridid}}" data-id="{{criterionid}}" data-action="delete" data-type="criterion">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
             {{/canedit}}
         </div>
@@ -76,14 +76,16 @@
             {{^deleted}}
                 <div class="row option-item" data-region="option" data-id="{{optionid}}">
                     <div class="tcell move">
+                        {{#canedit}}
                         {{#edit}}<span class="drag-handle">{{#pix}}i/move_2d, core, {{#str}}move{{/str}}{{/pix}}</span>{{/edit}}
+                        {{/canedit}}
                     </div>
                     <div class="{{#hasgrade}}span7 col-7{{/hasgrade}}{{^hasgrade}}span9 col-9{{/hasgrade}} subitem tcell{{#edit}} editable{{/edit}}" >
                         {{#edit}}<input type="text" class="form-control" value="{{{label}}}" placeholder="{{{placeholder}}}" data-field="label">{{/edit}}{{^edit}}{{{label}}}{{/edit}}
                     </div>
                     {{#hasgrade}}
                         <div class="span2 col-2 tcell{{#edit}} editable{{/edit}}">
-                            {{#edit}}<input type="number" class="form-control" value="{{{grade}}}" data-field="grade">{{/edit}}{{^edit}}{{{grade}}}{{/edit}}
+                            {{#edit}}<input type="float" class="form-control" value="{{{grade}}}" data-field="grade">{{/edit}}{{^edit}}{{{grade}}}{{/edit}}
                         </div>
                     {{/hasgrade}}
                     <div class="span2 col-2 tcell">
