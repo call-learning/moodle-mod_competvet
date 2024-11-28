@@ -4,7 +4,7 @@ Feature: Testing manage_criteria in mod_competvet
   as an admin
   I need to be able change the criteria text
 
-@javascript
+  @javascript
   Scenario: Edit the Evaluation criteria and option texts
     Given I am logged in as "admin"
     And I navigate to the manage criteria page
@@ -16,7 +16,7 @@ Feature: Testing manage_criteria in mod_competvet
     And I reload the page
     And I should see "Rigueur horaire"
 
-@javascript
+  @javascript
   Scenario: Edit the Certification criteria
     Given I am logged in as "admin"
     And I navigate to the manage criteria page
@@ -29,7 +29,7 @@ Feature: Testing manage_criteria in mod_competvet
     Then I should see "Effectuer une évaluation clinique"
     And I should see "Réaliser un diagnostic"
 
-@javascript
+  @javascript
   Scenario: Edit the List criteria
     Given I am logged in as "admin"
     And I navigate to the manage criteria page

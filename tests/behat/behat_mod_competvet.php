@@ -519,7 +519,7 @@ class behat_mod_competvet extends behat_base {
         $editbutton->click();
 
         // Find the input field for the criterion label and set the new value.
-        $inputfield = $criterion->find('css', 'input[data-field="label"]');
+        $inputfield = $criterion->find('css', '.criterion-item input[data-field="label"]');
         if (!$inputfield) {
             throw new Exception('Input field for criterion label not found for criterion row "' . $criterionrow . '"');
         }
