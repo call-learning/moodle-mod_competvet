@@ -65,11 +65,14 @@ class items_todo extends \core\task\scheduled_task {
                     continue;
                 }
                 if (!isset($recipients[$observer->id])) {
-                    $recipients[$observer->id] = $observer;
+                    $recipients[$observer->id] = [$observer, $situation->competvetid];
                 }
             }
         }
 
-        notifications::send_email($this->taskname, 0, $competvet->get_instance_id(), $recipients, []);
+        foreach ($recipients as $recipient) {
+            notifications::send_email($this->taskname, 0, $recipient[1], [$recipient[0]], []);
+            \core\task\logmanager::add_line('Todos for CID ' . $recipient[1] . ' user ' . $recipient[0]->email);
+        }
     }
 }
