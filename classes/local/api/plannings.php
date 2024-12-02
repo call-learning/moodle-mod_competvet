@@ -21,6 +21,7 @@ use mod_competvet\local\persistent\case_entry;
 use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\planning;
+use mod_competvet\local\persistent\planning_pause;
 use mod_competvet\utils;
 
 defined('MOODLE_INTERNAL') || die();
@@ -179,6 +180,10 @@ class plannings {
         // First check: is this the current week ?
         $now = time();
         if ($now >= $planning->get('startdate') && $now <= $planning->get('enddate')) {
+            // Check if the planning is paused.
+            if (self::is_planning_paused($planningid)) {
+                return planning::CATEGORY_PAUSED;
+            }
             return planning::CATEGORY_CURRENT;
         }
         if ($now < $planning->get('startdate')) {
@@ -486,5 +491,89 @@ class plannings {
         $hascases = case_entry::count_records(['planningid' => $planningid]) > 0;
         $hascertifications = cert_decl::count_records(['planningid' => $planningid]) > 0;
         return $hasobservations || $hascases || $hascertifications;
+    }
+
+    /**
+     * Get planning pauses for a given planning ID
+     *
+     * @param int $planningid The ID of the planning.
+     * @return array An array of planning pauses.
+     */
+    public static function get_planning_pauses(int $planningid): array {
+        $pauses = planning_pause::get_records(['planningid' => $planningid]);
+        $pauseinfo = [];
+        foreach ($pauses as $pause) {
+            $pauseinfo[] = [
+                'id' => $pause->get('id'),
+                'planningid' => $pause->get('planningid'),
+                'startdate' => userdate($pause->get('startdate'), '%Y-%m-%dT%H:%M'),
+                'startdatets' => $pause->get('startdate'),
+                'enddate' => userdate($pause->get('enddate'), '%Y-%m-%dT%H:%M'),
+                'enddatets' => $pause->get('enddate'),
+                'usermodified' => $pause->get('usermodified'),
+                'timecreated' => $pause->get('timecreated'),
+                'timemodified' => $pause->get('timemodified'),
+            ];
+        }
+        return $pauseinfo;
+    }
+
+    /**
+     * Delete a pause by its ID.
+     *
+     * @param int $pauseid The ID of the pause to delete.
+     * @return bool True if the pause was deleted, false otherwise.
+     */
+    public static function delete_pause(int $pauseid): bool {
+        $pause = new planning_pause($pauseid);
+        if (!$pause->get('id')) {
+            return false;
+        }
+        return $pause->delete();
+    }
+
+    /**
+     * Update or insert a pause.
+     *
+     * @param int $pauseid The ID of the pause.
+     * @param int $planningid The ID of the planning.
+     * @param string $startdate The start date of the pause.
+     * @param string $enddate The end date of the pause.
+     * @return planning_pause The pause object.
+     */
+    public static function update_pause(int $pauseid, int $planningid, string $startdate, string $enddate): planning_pause {
+        $data = [
+            'planningid' => $planningid,
+            'startdate' => strtotime($startdate),
+            'enddate' => strtotime($enddate),
+        ];
+
+        if ($pauseid) {
+            $pause = new planning_pause($pauseid);
+            $pause->set('startdate', $data['startdate']);
+            $pause->set('enddate', $data['enddate']);
+            $pause->update();
+        } else {
+            $pause = new planning_pause(0, (object) $data);
+            $pause->create();
+        }
+        return $pause;
+    }
+
+    /**
+     * Check if the planning is paused
+     *
+     * @param int $planningid The ID of the planning.
+     * @return bool True if the planning is paused, false otherwise.
+     */
+    public static function is_planning_paused(int $planningid): bool {
+        $now = time();
+        $pauses = planning_pause::get_records(['planningid' => $planningid]);
+        foreach ($pauses as $pause) {
+            if ($now >= $pause->get('startdate') && $now <= $pause->get('enddate')) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -1,4 +1,4 @@
-@mod @mod_competvet
+@mod @mod_competvet @javascript
 Feature: Manage Plannings
   In order to manage session plannings
   As a teacher
@@ -33,7 +33,6 @@ Feature: Manage Plannings
       | activity  | course | idnumber | intro | name    | shortname | completion | completionview | situationtags | grade | haseval | hascertif | hascase |
       | competvet | CVET1  | S1       | x     | MEDCHIR | SIT1      | 0          | 1              | y:1           | 100   | 1       | 1         | 0       |
 
-  @javascript
   Scenario: Add a new planning
     Given I am on the "S1" Activity page logged in as "teacher1"
     And I navigate to "Planning" in current page administration
@@ -41,13 +40,14 @@ Feature: Manage Plannings
     And I update date "startdate" to "2024-08-24T16:00" in row number "1"
     And I update date "enddate" to "2025-12-25T11:00" in row number "1"
     And I select "Group1" in the "groupid" field in row number "1"
+    And I wait "20" seconds
     And I update "session" to "Session1" in row number "1"
     And I click the button with data-action "save" in row number "1"
     And I should see "Session1" in the planning table
     And I am on the "S1" Activity page logged in as "teacher1"
     Then I should see "Group1" in the ".competvet-grade-table" "css_element"
+    And I wait "5" seconds
 
-  @javascript
   Scenario: Update a planning
     Given I am on the "S1" Activity page logged in as "teacher1"
     And I navigate to "Planning" in current page administration
@@ -66,7 +66,6 @@ Feature: Manage Plannings
     And I am on the "S1" Activity page logged in as "teacher1"
     Then I should see "Group2" in the ".competvet-grade-table" "css_element"
 
-  @javascript
   Scenario: Delete a planning
     Given I am on the "S1" Activity page logged in as "teacher1"
     And I navigate to "Planning" in current page administration
@@ -82,3 +81,18 @@ Feature: Manage Plannings
     When I click the button with data-action "delete" in row number "1"
     And I am on the "S1" Activity page logged in as "teacher1"
     Then I should not see "Group1" in the ".competvet-grade-table" "css_element"
+
+  Scenario: Add a planning pause
+    Given I am on the "S1" Activity page logged in as "teacher1"
+    And I navigate to "Planning" in current page administration
+    When I click the link with data-action "add"
+    And I update date "startdate" to "2024-08-24T16:00" in row number "1"
+    And I update date "enddate" to "2025-12-25T11:00" in row number "1"
+    And I select "Group1" in the "groupid" field in row number "1"
+    And I click the button with data-action "save" in row number "1"
+    And I click the button with data-action "add" in row number "1"
+    And I update date "startdate" to "2024-08-24T16:00" in row number "2"
+    And I update date "enddate" to "2025-12-24T11:00" in row number "2"
+    And I click the button with data-action "save" in row number "2"
+    And I am on the "S1" Activity page logged in as "teacher1"
+    Then I should see "Paused" in the ".competvet-grade-table" "css_element"

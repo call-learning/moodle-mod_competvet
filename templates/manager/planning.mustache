@@ -91,6 +91,14 @@
         </a>
     </div>
 </div>
+{{#debug}}
+<a href="#debugcontainer" data-toggle="collapse">
+    {{#str}}debuginfo, debug{{/str}}
+</a>
+<div id="debugcontainer" class="collapse">
+    <pre id="debug"></pre>
+</div>
+{{/debug}}
 {{#js}}
 require(['mod_competvet/local/manager/manager_app_planning', 'mod_competvet/planning_upload_form'], function(manager, form) {
     manager.init();

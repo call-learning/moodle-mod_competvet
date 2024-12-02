@@ -105,12 +105,24 @@ class Manager {
             state.plannings.push({
                 id: 0,
                 situationid: this.situationId, // TODO set the correct situation id.
-                startdate: '',
-                enddate: '',
+                startdate: this.getSuggested('startdate'),
+                enddate: this.getSuggested('enddate'),
                 groupid: '',
-                session: '',
+                session: this.getSuggested('session'),
                 edit: true,
                 groups: state.groups,
+                pauses: [],
+            });
+        }
+        if (btn.dataset.type === 'pause') {
+            const planningid = parseInt(btn.dataset.id);
+            const planning = state.plannings.find((element) => element.id === planningid);
+            planning.pauses.push({
+                id: 0,
+                planningid: planningid,
+                startdate: planning.startdate,
+                enddate: planning.enddate,
+                editpause: true,
             });
         }
         CompetState.setData(state);
@@ -141,9 +153,14 @@ class Manager {
             } else {
                 deletePlanning();
             }
-
         }
-
+        if (btn.dataset.type === 'pause') {
+            const pauseid = parseInt(btn.dataset.id);
+            const pause = this.getPause(pauseid);
+            pause.deleted = true;
+            CompetState.setData(state);
+            this.save();
+        }
     }
 
     /**
@@ -156,12 +173,39 @@ class Manager {
         // Remove edit from all fields.
         state.plannings.forEach((element) => {
             element.edit = false;
+            element.pauses.forEach((pause) => {
+                pause.editpause = false;
+            });
         });
         if (btn.dataset.type === 'planning') {
             let planning = state.plannings.find((element) => element.id === parseInt(btn.dataset.id));
             planning.edit = true;
         }
+        if (btn.dataset.type === 'pause') {
+            const pause = this.getPause(parseInt(btn.dataset.id));
+            if (pause) {
+                pause.editpause = true;
+            }
+        }
         CompetState.setData(state);
+    }
+
+    /**
+     * Get the pause object from the state.
+     * @param {Int} id The id of the pause.
+     * @return {Object} The pause object.
+     */
+    getPause(id) {
+        const state = CompetState.getData();
+        for (const planning of state.plannings) {
+            if (planning.pauses) {
+                const pause = planning.pauses.find((element) => element.id === id);
+                if (pause) {
+                    return pause;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -172,6 +216,9 @@ class Manager {
         // Remove edit from all fields.
         state.plannings.forEach((element) => {
             element.edit = false;
+            element.pauses.forEach((pause) => {
+                pause.editpause = false;
+            });
         });
         CompetState.setData(state);
     }
@@ -206,16 +253,70 @@ class Manager {
                 if (element.startdate !== '' && element.enddate !== '' && element.groupid !== '') {
                     element.error = false;
                 }
+                if (!element.session) {
+                    element.errorsession = true;
+                    element.error = true;
+                }
             }
+            this.updatePauses(element);
         });
         CompetState.setData(state);
+    }
+
+    /**
+     * Update the pauses.
+     * @param {Object} element The element to update.
+     */
+    updatePauses(element) {
+        element.pauses.forEach((pause) => {
+            pause.haschanged = false;
+            if (pause.editpause) {
+                // Update the grid with the new values from the UI.
+                pause.haschanged = true;
+                pause.startdate = this.getValue('pauseitem', 'startdate', pause.id);
+                pause.enddate = this.getValue('pauseitem', 'enddate', pause.id);
+                // Set the error flag if startdate, enddate or groupid are empty.
+                // Get timestamp from iso date.
+                const startdate = new Date(pause.startdate).getTime();
+                const enddate = new Date(pause.enddate).getTime();
+                const elementstartdate = new Date(element.startdate).getTime();
+                const elementenddate = new Date(element.enddate).getTime();
+                if (startdate < elementstartdate) {
+                    pause.errorstartdate = true;
+                    pause.error = true;
+                }
+                if (enddate > elementenddate) {
+                    pause.errorenddate = true;
+                    pause.error = true;
+                }
+                if (pause.startdate === '') {
+                    pause.errorstartdate = true;
+                    pause.error = true;
+                }
+                if (pause.enddate === '') {
+                    pause.errorenddate = true;
+                    pause.error = true;
+                }
+                if (pause.startdate !== '' && pause.enddate !== '') {
+                    pause.error = false;
+                }
+            }
+        });
     }
 
     /**
      * Get the planning object structure.
      */
     get planningObjectKeys() {
-        return ['id', 'situationid', 'startdate', 'enddate', 'groupid', 'session', 'haschanged', 'deleted'];
+        return ['id', 'situationid', 'startdate', 'enddate', 'groupid', 'session', 'pauses', 'haschanged', 'deleted'];
+    }
+
+    /**
+     * Get the pause object structure.
+     * @return {Array} The pause object keys.
+     */
+    get pauseObjectKeys() {
+        return ['id', 'planningid', 'startdate', 'enddate', 'haschanged', 'deleted'];
     }
 
     /**
@@ -230,6 +331,10 @@ class Manager {
         if (state.plannings.find((element) => element.error)) {
             return false;
         }
+        // If any pause has an error, do not save.
+        if (state.plannings.find((element) => element.pauses.find((pause) => pause.error))) {
+            return false;
+        }
         const saveState = {
             plannings: [],
         };
@@ -242,6 +347,13 @@ class Manager {
                 if (!this.planningObjectKeys.includes(key)) {
                     delete element[key];
                 }
+            });
+            element.pauses.forEach((pause) => {
+                Object.keys(pause).forEach((key) => {
+                    if (!this.pauseObjectKeys.includes(key)) {
+                        delete pause[key];
+                    }
+                });
             });
         });
         const result = await Repository.savePlannings(saveState);
@@ -267,6 +379,53 @@ class Manager {
             }
         }
         return domNode.value;
+    }
+
+    /**
+     * Get suggested values for the planning, based on the last planning.
+     *
+     * The startdate is the monday after the startdate of the last planning
+     * The enddate is the friday after the monday after the startdate of the last planning
+     * The session is the session of the last planning + 1, sessions need to be unique.
+     * @param {String} property The property to get the suggested value for.
+     * @return {String|Int} The suggested value.
+     */
+    getSuggested(property) {
+        const state = CompetState.getData();
+        let lastPlanning = state.plannings[state.plannings.length - 1];
+        let starttime = new Date().getTime();
+        let sessionDefault = 's';
+        if (lastPlanning) {
+            starttime = new Date(lastPlanning.enddate).getTime();
+        }
+
+        if (property === 'startdate') {
+            const date = new Date(starttime);
+            // Find the next monday.
+            date.setDate(date.getDate() + (1 + 7 - date.getDay()) % 7);
+           // Return in format yyyy-mm-ddThh:mm
+            return date.toISOString().slice(0, 16);
+        }
+        if (property === 'enddate') {
+            const date = new Date(starttime);
+            // Find the next monday.
+            date.setDate(date.getDate() + (1 + 7 - date.getDay()) % 7);
+            // Add 6 days.
+            date.setDate(date.getDate() + 6);
+            return date.toISOString().slice(0, 16);
+        }
+        if (property === 'session') {
+            // Check if this sessionname is unique.
+            const sessionnames = state.plannings.map((element) => element.session);
+            let counter = 1;
+            let session = sessionDefault + '-' + counter;
+            while (sessionnames.includes(session)) {
+                counter++;
+                session = sessionDefault + '-' + counter;
+            }
+            return session;
+        }
+        return '';
     }
 }
 

@@ -133,7 +133,8 @@ class manage_criteria extends external_api {
                 criteria::update_criteria_sortorder($criteriaorder);
             }
             foreach ($grid['criteria'] as $criterion) {
-                if (($criterion['deleted'] ?? false) || ($criterion['updatesortorder'] ?? false) || ($criterion['haschanged'] ?? false)) {
+                if (($criterion['deleted'] ?? false) || ($criterion['updatesortorder'] ?? false) ||
+                    ($criterion['haschanged'] ?? false)) {
                     $setgridmodified = true;
                 }
                 if ($criterion['deleted'] ?? false) {
