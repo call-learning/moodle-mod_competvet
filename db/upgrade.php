@@ -209,5 +209,31 @@ function xmldb_competvet_upgrade($oldversion) {
         // Competvet savepoint reached.
         upgrade_mod_savepoint(true, 2024101603, 'competvet');
     }
+    if ($oldversion < 2024112600) {
+
+        // Define table competvet_planning_pause to be created.
+        $table = new xmldb_table('competvet_planning_pause');
+
+        // Adding fields to table competvet_planning_pause.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('planningid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('startdate', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('enddate', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table competvet_planning_pause.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+
+        // Conditionally launch create table for competvet_planning_pause.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024112600, 'competvet');
+    }
     return true;
 }

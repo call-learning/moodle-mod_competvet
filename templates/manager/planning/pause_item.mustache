@@ -1,0 +1,78 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_competvet/manager/planning/pause_item
+
+    TODO describe template pause_item
+
+    Example context (json):
+    {
+        "id": 1,
+        "startdatets": 1234567890,
+        "enddatets": 1234567890,
+        "editpause": false
+    }
+}}
+<div class="row" data-region="pauseitem" data-id="{{id}}">
+
+    <div class="col-3 tcell pause {{#editpause}}editable{{/editpause}}">
+        {{^editpause}}
+        <div class=" pauseicon">
+            {{#pix}}i/enrolmentsuspended, core, {{#str}}pausetour, tool_usertours{{/str}}{{/pix}}
+        </div>
+        {{/editpause}}
+        {{#editpause}}
+            <input type="datetime-local" name="startdate{{id}}" data-initial-value="{{startdate}}" value="{{startdate}}" data-field="startdate" class="form-control {{#errorstartdate}}error{{/errorstartdate}}">
+        {{/editpause}}
+        {{^editpause}}
+            {{#startdatets}}
+                {{#userdate}} {{startdatets}}, {{#str}} strftimedatetimeshort, core_langconfig {{/str}} {{/userdate}}
+            {{/startdatets}}
+        {{/editpause}}
+    </div>
+    <div class="col-3 tcell pause {{#editpause}}editable{{/editpause}}">
+        {{^editpause}}
+        <div class=" pauseicon">
+            {{#pix}}i/enrolmentsuspended, core, {{#str}}pausetour, tool_usertours{{/str}}{{/pix}}
+        </div>
+        {{/editpause}}
+        {{#editpause}}
+            <input type="datetime-local" name="enddate{{id}}" data-initial-value="{{enddate}}" value="{{enddate}}" data-field="enddate" class="form-control {{#errorenddate}}error{{/errorenddate}}">
+        {{/editpause}}
+        {{^editpause}}
+            {{#enddatets}}
+                {{#userdate}} {{enddatets}}, {{#str}} strftimedatetimeshort, core_langconfig {{/str}} {{/userdate}}
+            {{/enddatets}}
+        {{/editpause}}
+    </div>
+    <div class="col-2 tcell pause">
+    </div>
+    <div class="col-2 tcell pause">
+    </div>
+    <div class="col-2 tcell pause">
+        {{^editpause}}
+            <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-id="{{id}}" data-action="edit" data-type="pause">{{#pix}}i/edit, core, {{#str}}edit{{/str}}{{/pix}}</button>
+        {{/editpause}}
+        {{#editpause}}
+            <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-id="{{id}}" data-action="save" data-type="pause">
+                <span class="defaulticon">{{#pix}}e/save, core, {{#str}}save{{/str}}{{/pix}}</span>
+                <span class="savingicon">{{#pix}}i/loading, core, {{#str}}saving, mod_competvet{{/str}}{{/pix}}</span>
+            </button>
+        {{/editpause}}
+        <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-id="{{id}}" data-action="delete" data-type="pause">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
+    </div>
+</div>

@@ -75,5 +75,9 @@
         </button>
         {{/edit}}
         <button class="btn btn-icon icon-no-margin mr-1 jsbutton {{#hasuserdata}}btn-warning{{/hasuserdata}}" data-id="{{id}}" data-action="delete" data-type="planning">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
+        <button class="btn btn-icon icon-no-margin mr-1 ml-auto jsbutton" data-id="{{id}}" data-action="add" data-type="pause">{{#pix}}e/insert, core, {{#str}}pauseplanningadd, mod_competvet{{/str}}{{/pix}}</button>
     </div>
 </div>
+{{#pauses}}
+    {{> mod_competvet/manager/planning/pause_item}}
+{{/pauses}}

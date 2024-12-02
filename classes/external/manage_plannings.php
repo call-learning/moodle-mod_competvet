@@ -21,13 +21,12 @@ global $CFG;
 require_once("$CFG->libdir/externallib.php");
 
 use context_system;
-use external_api;
-use external_description;
-use external_function_parameters;
-use external_value;
-use external_single_structure;
-use external_multiple_structure;
-use external_warnings;
+use core_external\external_api;
+use core_external\external_description;
+use core_external\external_function_parameters;
+use core_external\external_value;
+use core_external\external_single_structure;
+use core_external\external_multiple_structure;
 use mod_competvet\local\api\plannings;
 
 define('COMPETVET_CRITERIA_EVALUATION', 1);
@@ -62,6 +61,16 @@ class manage_plannings extends external_api {
                     'session' => new external_value(PARAM_TEXT, 'Session name', VALUE_REQUIRED),
                     'haschanged' => new external_value(PARAM_BOOL, 'Has changed', VALUE_OPTIONAL),
                     'deleted' => new external_value(PARAM_BOOL, 'Is the grid deleted', VALUE_OPTIONAL),
+                    'pauses' => new external_multiple_structure(
+                        new external_single_structure([
+                            'id' => new external_value(PARAM_INT, 'Pause Id', VALUE_REQUIRED),
+                            'planningid' => new external_value(PARAM_INT, 'Planning Id', VALUE_REQUIRED),
+                            'startdate' => new external_value(PARAM_TEXT, 'Pause start date', VALUE_REQUIRED),
+                            'enddate' => new external_value(PARAM_TEXT, 'Pause end date', VALUE_REQUIRED),
+                            'haschanged' => new external_value(PARAM_BOOL, 'Has changed', VALUE_OPTIONAL),
+                            'deleted' => new external_value(PARAM_BOOL, 'Is the pause deleted', VALUE_OPTIONAL),
+                        ])
+                    ),
                 ]
             )),
         ]);
@@ -95,6 +104,22 @@ class manage_plannings extends external_api {
                     $planning['enddate'],
                     $planning['session']
                 );
+            }
+
+            // Handle pauses
+            foreach ($planning['pauses'] as $pause) {
+                if (isset($pause['deleted']) && $pause['deleted']) {
+                    plannings::delete_pause($pause['id']);
+                    continue;
+                }
+                if ($pause['haschanged']) {
+                    plannings::update_pause(
+                        $pause['id'],
+                        $pause['planningid'],
+                        $pause['startdate'],
+                        $pause['enddate']
+                    );
+                }
             }
         }
 

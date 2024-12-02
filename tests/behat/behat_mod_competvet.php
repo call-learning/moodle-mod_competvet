@@ -485,31 +485,7 @@ class behat_mod_competvet extends behat_base {
      * @throws Exception
      */
     public function i_change_criterion_label_in_grid($criterionrow, $gridrow, $newlabel) {
-        // Convert the row numbers to 0-based indices for array indexing.
-        $gridindex = $gridrow - 1;
-        $criterionindex = $criterionrow - 1;
-
-        // Find the container for grids.
-        $container = $this->find('css', '#managecriteria > div.grids');
-        if (!$container) {
-            throw new Exception('Grids container not found');
-        }
-
-        // Find all grids within the container.
-        $grids = $container->findAll('css', 'div[data-region="grid"]');
-        if (!isset($grids[$gridindex])) {
-            throw new Exception('Grid row "' . $gridrow . '" not found');
-        }
-
-        $grid = $grids[$gridindex];
-
-        // Find all criteria within the grid.
-        $criteria = $grid->findAll('css', 'div[data-region="criterion"]');
-        if (!isset($criteria[$criterionindex])) {
-            throw new Exception('Criterion row "' . $criterionrow . '" not found in grid row "' . $gridrow . '"');
-        }
-
-        $criterion = $criteria[$criterionindex];
+        $criterion = $this->get_criterion($criterionrow, $gridrow);
 
         // Click the edit button within the criterion row.
         $editbutton = $criterion->find('css', 'button[data-action="edit"][data-type="criterion"]');
@@ -518,6 +494,8 @@ class behat_mod_competvet extends behat_base {
         }
         $editbutton->click();
 
+        // Get the criterion again after clicking the edit button (the DOM has changed).
+        $criterion = $this->get_criterion($criterionrow, $gridrow);
         // Find the input field for the criterion label and set the new value.
         $inputfield = $criterion->find('css', '.criterion-item input[data-field="label"]');
         if (!$inputfield) {
@@ -534,22 +512,16 @@ class behat_mod_competvet extends behat_base {
     }
 
     /**
-     * Changes the label of an option within a criterion in a specific grid by row numbers.
-     *
-     * Example: And I change option row "1" in criterium row "1" in grid row "1" to "Rigueur horaire"
-     *
-     * @Given /^I change option row "(?P<option_row>\d+)" in criterium row "(?P<criterion_row>\d+)" in grid row "(?P<grid_row>\d+)" to "(?P<new_label>(?:[^"]|\\")*)"$/
-     * @param int $optionrow The row number of the option to change
-     * @param int $criterionrow The row number of the criterion containing the option
+     * Gets a criterion element within a specific grid by row numbers.
+     * This function is used to locate a specific criterion within a grid.
+     * @param int $criterionrow The row number of the criterion to locate
      * @param int $gridrow The row number of the grid containing the criterion
-     * @param string $newlabel The new label to set for the option
-     * @throws Exception
+     * @return NodeElement The criterion element
      */
-    public function i_change_option_label_in_criterion_in_grid($optionrow, $criterionrow, $gridrow, $newlabel) {
+    private function get_criterion($criterionrow, $gridrow) {
         // Convert the row numbers to 0-based indices for array indexing.
         $gridindex = $gridrow - 1;
         $criterionindex = $criterionrow - 1;
-        $optionindex = $optionrow - 1;
 
         // Find the container for grids.
         $container = $this->find('css', '#managecriteria > div.grids');
@@ -571,15 +543,24 @@ class behat_mod_competvet extends behat_base {
             throw new Exception('Criterion row "' . $criterionrow . '" not found in grid row "' . $gridrow . '"');
         }
 
-        $criterion = $criteria[$criterionindex];
+        return $criteria[$criterionindex];
+    }
 
-        // Find all options within the criterion.
-        $options = $criterion->findAll('css', 'div[data-region="option"]');
-        if (!isset($options[$optionindex])) {
-            throw new Exception('Option row "' . $optionrow . '" not found in criterion row "' . $criterionrow . '" in grid row "' . $gridrow . '"');
-        }
+    /**
+     * Changes the label of an option within a criterion in a specific grid by row numbers.
+     *
+     * Example: And I change option row "1" in criterium row "1" in grid row "1" to "Rigueur horaire"
+     *
+     * @Given /^I change option row "(?P<option_row>\d+)" in criterium row "(?P<criterion_row>\d+)" in grid row "(?P<grid_row>\d+)" to "(?P<new_label>(?:[^"]|\\")*)"$/
+     * @param int $optionrow The row number of the option to change
+     * @param int $criterionrow The row number of the criterion containing the option
+     * @param int $gridrow The row number of the grid containing the criterion
+     * @param string $newlabel The new label to set for the option
+     * @throws Exception
+     */
+    public function i_change_option_label_in_criterion_in_grid($optionrow, $criterionrow, $gridrow, $newlabel) {
 
-        $option = $options[$optionindex];
+        $criterion = $this->get_criterion($optionrow, $criterionrow, $gridrow);
 
         // Click the edit button within the criterion row.
         $editbutton = $criterion->find('css', 'button[data-action="edit"][data-type="criterion"]');
@@ -587,6 +568,9 @@ class behat_mod_competvet extends behat_base {
             throw new Exception('Edit button not found for criterion row "' . $criterionrow . '"');
         }
         $editbutton->click();
+
+        // Get the criterion again after clicking the edit button (the DOM has changed).
+        $option = $this->get_option($optionrow, $criterionrow, $gridrow);
 
         // Find the input field for the option label and set the new value.
         $inputfield = $option->find('css', 'input[data-field="label"]');
@@ -603,4 +587,26 @@ class behat_mod_competvet extends behat_base {
         $savebutton->click();
     }
 
+    /**
+     * Gets the option element within a specific criterion in a grid by row numbers.
+     * This function is used to locate a specific option within a criterion.
+     * @param int $optionrow The row number of the option to locate
+     * @param int $criterionrow The row number of the criterion containing the option
+     * @param int $gridrow The row number of the grid containing the criterion
+     * @return NodeElement The option element
+     */
+    private function get_option($optionrow, $criterionrow, $gridrow) {
+        // Convert the row numbers to 0-based indices for array indexing.
+        $optionindex = $optionrow - 1;
+
+        $criterion = $this->get_criterion($criterionrow, $gridrow);
+
+        // Find all options within the criterion.
+        $options = $criterion->findAll('css', 'div[data-region="option"]');
+        if (!isset($options[$optionindex])) {
+            throw new Exception('Option row "' . $optionrow . '" not found in criterion row "' . $criterionrow . '" in grid row "' . $gridrow . '"');
+        }
+
+        return $options[$optionindex];
+    }
 }

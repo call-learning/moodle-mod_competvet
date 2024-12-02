@@ -18,6 +18,7 @@ namespace mod_competvet\local\importer;
 
 use DateTime;
 use mod_competvet\local\persistent\planning;
+use mod_competvet\local\persistent\planning_pause;
 use cache;
 use cache_store;
 
@@ -47,6 +48,7 @@ class planning_importer extends base_persistent_importer {
         'Start Date' => 'startdate',
         'End Date' => 'enddate',
         'Session' => 'session',
+        'Pauses' => 'pauses',
     ];
 
     /**
@@ -97,6 +99,62 @@ class planning_importer extends base_persistent_importer {
         $data->situationid = $this->situationid;
 
         return $data;
+    }
+
+    /**
+     * Persist data and handle pauses
+     *
+     * @param object $data
+     * @return void
+     */
+    protected function persist_data(object $data) {
+        $uniquekeys = $this->options['uniquekeys'] ?? [];
+        if ($uniquekeys) {
+            $existing = planning::get_record(array_intersect_key((array) $data, array_flip($uniquekeys)));
+            if ($existing) {
+                $existing->from_record($data);
+                $existing->update();
+                $planningid = $existing->get('id');
+            } else {
+                $planning = new planning(0, $data);
+                $planning->save();
+                $planningid = $planning->get('id');
+            }
+        } else {
+            $planning = new planning(0, $data);
+            $planning->save();
+            $planningid = $planning->get('id');
+        }
+
+        // Handle pauses after planning data is persisted
+        if (!empty($data->pauses)) {
+            $this->handle_pauses($data->pauses, $planningid);
+        }
+    }
+
+    /**
+     * Handle pauses
+     *
+     * @param string $pauses
+     * @param int $planningid
+     * @return void
+     */
+    private function handle_pauses(string $pauses, int $planningid) {
+        global $USER;
+        $pauseEntries = explode(',', $pauses);
+        foreach ($pauseEntries as $pauseEntry) {
+            list($pauseStart, $pauseEnd) = explode(' - ', $pauseEntry);
+            $pauseData = [
+                'planningid' => $planningid,
+                'startdate' => $this->process_date($pauseStart),
+                'enddate' => $this->process_date($pauseEnd),
+                'usermodified' => $USER->id,
+                'timecreated' => time(),
+                'timemodified' => time(),
+            ];
+            $pause = new planning_pause(0, (object) $pauseData);
+            $pause->save();
+        }
     }
 
     /**

@@ -25,6 +25,23 @@
                 }
             }
         }
+        &.pause {
+            background-color: #fffcef;
+            padding: 0.25rem 0.5rem;
+        }
+    }
+    .pauseicon {
+        .icon {
+            width: 24px;
+            height: 24px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #dee2e6;
+            color: #dcdcdc;
+        }
     }
     .tcell.move {
         width: 3rem;

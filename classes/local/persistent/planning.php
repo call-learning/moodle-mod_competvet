@@ -226,6 +226,7 @@ class planning extends persistent {
         self::CATEGORY_OTHER => 'other',
         self::CATEGORY_OBSERVER_LATE => 'observerlate',
         self::CATEGORY_OBSERVER_COMPLETED => 'observercompleted',
+        self::CATEGORY_PAUSED => 'paused',
     ];
 
     /**
@@ -248,4 +249,8 @@ class planning extends persistent {
      * Category completed: observation that have been finished.
      */
     const CATEGORY_OBSERVER_COMPLETED = 11;
+    /**
+     * Category paused: observation that have been paused.
+     */
+    const CATEGORY_PAUSED = 12;
 }

@@ -41,11 +41,13 @@ class manageplanning extends base {
      * @return array|array[]|stdClass
      */
     public function export_for_template(renderer_base $output) {
+        global $CFG;
         $data = parent::export_for_template($output);
         $data['version'] = time();
         $data['cmid'] = $this->competvet->get_course_module_id();
         $data['courseid'] = $this->competvet->get_course_id();
         $data['situationid'] = $this->competvet->get_situation()->get('id');
+        $data['debug'] = $CFG->debugdisplay;
         return $data;
     }
 

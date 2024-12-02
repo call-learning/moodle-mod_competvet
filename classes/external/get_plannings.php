@@ -20,12 +20,12 @@ defined('MOODLE_INTERNAL') || die;
 global $CFG;
 require_once("$CFG->libdir/externallib.php");
 
-use external_api;
-use external_function_parameters;
-use external_value;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_value;
 use core_date;
-use external_single_structure;
-use external_multiple_structure;
+use core_external\external_single_structure;
+use core_external\external_multiple_structure;
 use mod_competvet\competvet;
 use mod_competvet\local\api\plannings as plannings_api;
 
@@ -86,6 +86,7 @@ class get_plannings extends external_api {
             $plannings[$key]['enddatets'] = $planning['enddate'];
             $plannings[$key]['groups'] = $planninggroups;
             $plannings[$key]['hasuserdata'] = plannings_api::has_user_data($planning['id']);
+            $plannings[$key]['pauses'] = plannings_api::get_planning_pauses($planning['id']);
         }
 
         return [
@@ -117,6 +118,17 @@ class get_plannings extends external_api {
                     'id' => new external_value(PARAM_INT, 'Id', VALUE_REQUIRED),
                     'name' => new external_value(PARAM_TEXT, 'Name', VALUE_REQUIRED),
                     'selected' => new external_value(PARAM_BOOL, 'Selected', VALUE_OPTIONAL),
+                ])),
+                'pauses' => new external_multiple_structure(new external_single_structure([
+                    'id' => new external_value(PARAM_INT, 'Pause Id', VALUE_REQUIRED),
+                    'planningid' => new external_value(PARAM_INT, 'Planning Id', VALUE_REQUIRED),
+                    'startdate' => new external_value(PARAM_TEXT, 'Pause start date', VALUE_REQUIRED),
+                    'startdatets' => new external_value(PARAM_INT, 'Pause start date timestamp', VALUE_REQUIRED),
+                    'enddate' => new external_value(PARAM_TEXT, 'Pause end date', VALUE_REQUIRED),
+                    'enddatets' => new external_value(PARAM_INT, 'Pause end date timestamp', VALUE_REQUIRED),
+                    'usermodified' => new external_value(PARAM_INT, 'User who modified', VALUE_REQUIRED),
+                    'timecreated' => new external_value(PARAM_INT, 'Time created', VALUE_REQUIRED),
+                    'timemodified' => new external_value(PARAM_INT, 'Time modified', VALUE_REQUIRED),
                 ])),
             ])),
             'groups' => new external_multiple_structure(new external_single_structure([
