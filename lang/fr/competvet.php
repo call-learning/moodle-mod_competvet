@@ -345,6 +345,7 @@ $string['notification:notification'] = 'Notification';
 $string['notification:student_graded'] = 'Étudiant noté';
 $string['notification:student_graded:enabled'] = 'Activer les notifications de notation';
 $string['notification:student_target'] = 'Objectifs étudiants';
+$string['notification:student_target:alltasks'] = '(Une tâche pour tous les objectifs étudiants)';
 $string['notification:student_target:autoeval'] = 'Objectifs étudiants : Auto-évaluations';
 $string['notification:student_target:cert'] = 'Objectifs étudiants : Certifications';
 $string['notification:student_target:eval'] = 'Objectifs étudiants : Évaluations';
