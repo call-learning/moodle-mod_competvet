@@ -150,11 +150,28 @@ if ($hassiteconfig) {
                         1,
                     )
                 );
+            } else if (strpos($settingname, 'student_target') === 0) {
+                if ($settingname == 'student_target_eval') {
+                    // Add a checkbox to enable/disable the task.
+                    $url = new moodle_url('/admin/tool/task/scheduledtasks.php',
+                    ['action' => 'edit', 'task' => 'mod_competvet\task\student_target']);
+                    $link = html_writer::link($url, get_string('controltask', 'mod_competvet'));
+                    $explainer = html_writer::tag('div', $link . ' ' . get_string('notification:student_target:alltasks', 'mod_competvet'),
+                        ['class' => 'd-block mb-3']);
+                    $settings->add(
+                        new admin_setting_description(
+                            'mod_competvet/' . $settingname . '_edit',
+                            get_string('schedule', 'core'),
+                            $explainer,
+                        )
+                    );
+                }
             } else {
                 // Link to the task edit page.
                 $url = new moodle_url('/admin/tool/task/scheduledtasks.php',
                     ['action' => 'edit', 'task' => 'mod_competvet\task\\' . $email]);
                 $link = html_writer::link($url, get_string('controltask', 'mod_competvet'), ['class' => 'd-block mb-3']);
+
                 $settings->add(
                     new admin_setting_description(
                         'mod_competvet/' . $settingname . '_edit',

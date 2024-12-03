@@ -345,6 +345,7 @@ $string['notification:notification'] = 'Notification';
 $string['notification:student_graded'] = 'Student graded';
 $string['notification:student_graded:enabled'] = 'Student graded is an ad-hoc notification, enable or disable it here';
 $string['notification:student_target'] = 'Student objectives';
+$string['notification:student_target:alltasks'] = '(One task for all student objectives)';
 $string['notification:student_target:autoeval'] = 'Student objectives: Self-evaluations';
 $string['notification:student_target:cert'] = 'Student objectives: Certifications';
 $string['notification:student_target:eval'] = 'Student objectives: Evaluations';
