@@ -16,10 +16,10 @@
 
 namespace mod_competvet\task;
 
-use mod_competvet\notifications;
+use core_user;
 use mod_competvet\competvet;
 use mod_competvet\local\api\grading as grading_api;
-use core_user;
+use mod_competvet\notifications;
 
 /**
  * Class end_of_planning
@@ -51,9 +51,18 @@ class end_of_planning extends \core\task\scheduled_task {
      * and sending reminder emails to evaluators if not already sent.
      */
     public function execute() {
-        global $DB;
+        $notifications = $this->get_notifications_to_send();
+        $this->send_notifications($notifications);
+    }
 
-        // Get plannings that are near the end, not fully evaluated, and have no sent notification.
+    /**
+     * Get the notifications to be sent.
+     *
+     * @return array
+     */
+    public function get_notifications_to_send() {
+        $notifications = [];
+        global $DB;
         $plannings = $DB->get_records_sql("
             SELECT p.*
             FROM {competvet_planning} p
@@ -66,12 +75,10 @@ class end_of_planning extends \core\task\scheduled_task {
             'now' => time(),
             'notification' => $this->taskname,
         ]);
-
-        // Send a reminder email for each planning that does not have a notification.
         foreach ($plannings as $planning) {
             $ungradedstudents = $this->get_ungraded_students($planning->id);
             if (empty($ungradedstudents)) {
-                continue;
+                return $notifications;
             }
             $competvet = competvet::get_from_situation_id($planning->situationid);
             $modulecontext = $competvet->get_context();
@@ -83,8 +90,15 @@ class end_of_planning extends \core\task\scheduled_task {
                 return '<li>' . fullname($student) . '</li>';
             }, $ungradedstudents));
 
-            notifications::send_email($this->taskname, $planning->id, $competvet->get_instance_id(), $recipients, $context);
+            $notifications[] = [
+                'planning' => $planning,
+                'competvet' => $competvet,
+                'recipients' => $recipients,
+                'context' => $context
+            ];
         }
+
+        return $notifications;
     }
 
     /**
@@ -107,5 +121,22 @@ class end_of_planning extends \core\task\scheduled_task {
             }
         }
         return $studenstwithinfo;
+    }
+
+    /**
+     * Send notifications by email.
+     *
+     * @param array $notifications
+     */
+    public function send_notifications($notifications) {
+        foreach ($notifications as $notification) {
+            notifications::send_email(
+                $this->taskname,
+                $notification['planning']->id,
+                $notification['competvet']->get_instance_id(),
+                $notification['recipients'],
+                $notification['context']
+            );
+        }
     }
 }

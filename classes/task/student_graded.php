@@ -42,6 +42,7 @@ class student_graded extends \core\task\adhoc_task {
         return get_string('notification:' . $this->taskname, 'mod_competvet');
     }
 
+
     /**
      * Execute the task.
      */
@@ -51,27 +52,55 @@ class student_graded extends \core\task\adhoc_task {
             return;
         }
         $data = $this->get_custom_data();
-        $cmid = $data->cmid;
+        $notifications = $this->get_notifications_to_send($data->planningid, $data->cmid, $data->studentid);
+        $this->send_notifications($notifications);
+    }
+
+    /**
+     * Get the notifications to be sent.
+     *
+     * @param $planningid
+     * @param $cmid
+     * @param $studentid
+     * @return array
+     */
+    public function get_notifications_to_send($planningid, $cmid, $studentid) {
+        $notifications = [];
         $competvet = competvet::get_from_cmid($cmid);
-        $studentid = $data->studentid;
         $student = core_user::get_user($studentid);
         if (!$student) {
-            return;
+            return $notifications;
         }
 
         // First clear out all pending tasks for this user.
         $todos = todo::get_records_select(
             'status = :status AND targetuserid = :targetuserid AND planningid = :planningid',
-            ['status' => todo::STATUS_PENDING, 'targetuserid' => $studentid, 'planningid' => $data->planningid]
+            ['status' => todo::STATUS_PENDING, 'targetuserid' => $studentid, 'planningid' => $planningid]
         );
         foreach ($todos as $todo) {
             $todo->delete();
         }
 
-        // Send the email.
-        $recipients[] = $student;
-        $context = $this->get_email_context($competvet, $student);
-        notifications::send_email($this->taskname, $student->id, $competvet->get_instance_id(), $recipients, $context);
+        // Prepare the notification.
+        $notifications[] = [
+            'student' => $student,
+            'competvet' => $competvet,
+            'context' => $this->get_email_context($competvet, $student)
+        ];
+
+        return $notifications;
+    }
+
+    /**
+     * Send notifications by email.
+     *
+     * @param array $notifications
+     */
+    public function send_notifications($notifications) {
+        foreach ($notifications as $notification) {
+            $recipients[] = $notification['student'];
+            notifications::send_email($this->taskname, $notification['student']->id, $notification['competvet']->get_instance_id(), $recipients, $notification['context']);
+        }
     }
 
     /**

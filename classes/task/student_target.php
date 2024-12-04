@@ -15,10 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\task;
-use mod_competvet\notifications;
+
+use core_user;
 use mod_competvet\competvet;
 use mod_competvet\local\api\grading as grading_api;
-use core_user;
+use mod_competvet\notifications;
 
 /**
  * Class student_target
@@ -46,9 +47,18 @@ class student_target extends \core\task\scheduled_task {
      * and sending reminder emails to students who have not met the target.
      */
     public function execute() {
-        global $DB;
+        $plannings = $this->get_plannings();
+        $notifications = $this->get_notifications_to_send();
+        $this->send_notifications($notifications);
+    }
 
-        // Get plannings that are near the end, not fully evaluated, and have no sent notification.
+    /**
+     * Get the notifications to be sent.
+     *
+     * @return array
+     */
+    public function get_notifications_to_send() {
+        global $DB;
         $plannings = $DB->get_records_sql("
             SELECT p.*
             FROM {competvet_planning} p
@@ -56,8 +66,7 @@ class student_target extends \core\task\scheduled_task {
             ON p.id = n.notifid
             AND (n.notification = :eval OR n.notification = :autoeval OR n.notification = :cert OR n.notification = :list)
             WHERE p.enddate > :now AND p.enddate < :in72hours
-            AND n.id IS NULL
-        ", [
+            AND n.id IS NULL", [
             'in72hours' => time() + 72 * 3600, // 72 hours from now
             'now' => time(),
             'eval' => $this->taskname . ':eval',
@@ -66,6 +75,7 @@ class student_target extends \core\task\scheduled_task {
             'list' => $this->taskname . ':list',
         ]);
         foreach ($plannings as $planning) {
+
             $competvet = competvet::get_from_situation_id($planning->situationid);
 
             // Check if eval is enabled for this situation.
@@ -81,34 +91,21 @@ class student_target extends \core\task\scheduled_task {
             if ($situation->get('hascase')) {
                 $modules[] = 'list';
             }
+
             foreach ($modules as $module) {
                 $studenttargets = $this->get_student_for_targets($planning->id, $module);
-                if (empty($studenttargets)) {
-                    continue;
+                if (!empty($studenttargets)) {
+                    $notifications[] = [
+                        'module' => $module,
+                        'planning' => $planning,
+                        'competvet' => $competvet,
+                        'studenttargets' => $studenttargets
+                    ];
                 }
-                notifications::send_email($this->taskname . ':' . $module, $planning->id, $competvet->get_instance_id(),
-                    $studenttargets, []);
             }
-        }
-    }
 
-    /**
-     * Check if the student has met the target for this module (eval, cert, list)
-     *
-     * @param object $student
-     * @param string $module
-     * @return bool True if the student has met the target.
-     */
-    private function has_met_target($student, string $module): bool {
-        // Check if the student has met the target for this module.
-        if ($student->planninginfo['stats'][$module]) {
-            $nbdone = $student->planninginfo['stats'][$module]['nbdone'];
-            $nbrequired = $student->planninginfo['stats'][$module]['nbrequired'];
-            if ($nbdone >= $nbrequired) {
-                return true;
-            }
         }
-        return false;
+        return $notifications;
     }
 
     /**
@@ -135,5 +132,41 @@ class student_target extends \core\task\scheduled_task {
             }
         }
         return $studenstwithinfo;
+    }
+
+    /**
+     * Check if the student has met the target for this module (eval, cert, list)
+     *
+     * @param object $student
+     * @param string $module
+     * @return bool True if the student has met the target.
+     */
+    private function has_met_target($student, string $module): bool {
+        // Check if the student has met the target for this module.
+        if ($student->planninginfo['stats'][$module]) {
+            $nbdone = $student->planninginfo['stats'][$module]['nbdone'];
+            $nbrequired = $student->planninginfo['stats'][$module]['nbrequired'];
+            if ($nbdone >= $nbrequired) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Send notifications by email.
+     *
+     * @param array $notifications
+     */
+    public function send_notifications($notifications) {
+        foreach ($notifications as $notification) {
+            notifications::send_email(
+                $this->taskname . ':' . $notification['module'],
+                $notification['planning']->id,
+                $notification['competvet']->get_instance_id(),
+                $notification['studenttargets'],
+                []
+            );
+        }
     }
 }

@@ -46,18 +46,26 @@ class items_todo extends \core\task\scheduled_task {
      * Execute the task sending reminders to students who have items to do.
      */
     public function execute() {
-        global $DB;
-        // Get all situations.
-        $situations = $DB->get_records('competvet_situation');
-        $recipients = [];
+        $notifications = $this->get_notifications_to_send();
+        $this->send_notifications($notifications);
+    }
 
+    /**
+     * Get recipients who have items to do.
+     *
+     * @return array
+     */
+    public function get_notifications_to_send() {
+        global $DB;
+        $notifications = [];
+        $situations =  $DB->get_records('competvet_situation');
         foreach ($situations as $situation) {
             $competvet = competvet::get_from_instance_id($situation->competvetid);
             $modulecontext = $competvet->get_context();
             $observers = get_users_by_capability($modulecontext, 'mod/competvet:canobserve');
 
             foreach ($observers as $observer) {
-                if (array_key_exists($observer->id, $recipients)) {
+                if (array_key_exists($observer->id, $notifications)) {
                     continue;
                 }
                 $todos = todos::get_todos_for_user($observer->id);
@@ -65,14 +73,26 @@ class items_todo extends \core\task\scheduled_task {
                     continue;
                 }
                 if (!isset($recipients[$observer->id])) {
-                    $recipients[$observer->id] = [$observer, $situation->competvetid];
+                    $notifications[$observer->id] = [$observer, $situation->competvetid];
                 }
             }
         }
+        return $notifications;
+    }
 
-        foreach ($recipients as $recipient) {
-            notifications::send_email($this->taskname, 0, $recipient[1], [$recipient[0]], []);
-            \core\task\logmanager::add_line('Todos for CID ' . $recipient[1] . ' user ' . $recipient[0]->email);
+    /**
+     * Send notifications by email.
+     *
+     * @param array $notifications
+     */
+    public function send_notifications($notifications) {
+        foreach ($notifications as $notification) {
+            notifications::send_email(
+                $this->taskname,
+                $notification[1],
+                [$notification[0]],
+                $notification[0]->email
+            );
         }
     }
 }
