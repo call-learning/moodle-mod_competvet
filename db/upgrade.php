@@ -235,5 +235,38 @@ function xmldb_competvet_upgrade($oldversion) {
         // Competvet savepoint reached.
         upgrade_mod_savepoint(true, 2024112600, 'competvet');
     }
+
+    if ($oldversion < 2024120401) {
+
+        // Define field recipientid to be added to competvet_notification.
+        $table = new xmldb_table('competvet_notification');
+        $field = new xmldb_field('recipientid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'competvetid');
+
+        // Conditionally launch add field recipientid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('subject', XMLDB_TYPE_TEXT, null, null, null, null, null, 'notification');
+
+        // Conditionally launch add field subject.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '4', null, null, null, null, 'body');
+
+        // Conditionally launch add field status.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Delete all existing notifications.
+        $DB->delete_records('competvet_notification');
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2024120401, 'competvet');
+    }
+
     return true;
 }

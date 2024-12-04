@@ -59,10 +59,10 @@ class end_of_planning extends \core\task\scheduled_task {
             FROM {competvet_planning} p
             LEFT JOIN {competvet_notification} n
             ON p.id = n.notifid AND n.notification = :notification
-            WHERE p.enddate > :oneday AND p.enddate < :now
+            WHERE p.enddate > :now AND p.enddate < :tomorrow
             AND n.id IS NULL
         ", [
-            'oneday' => strtotime('-1 days'),  // Plannings ending in the next 24 hours.
+            'tomorrow' => strtotime('+1 days'),  // Plannings ending in the next 24 hours.
             'now' => time(),
             'notification' => $this->taskname,
         ]);
@@ -75,7 +75,7 @@ class end_of_planning extends \core\task\scheduled_task {
             }
             $competvet = competvet::get_from_situation_id($planning->situationid);
             $modulecontext = $competvet->get_context();
-            $recipients = get_users_by_capability($modulecontext, 'mod/competvet:cangrade');
+            $recipients = get_users_by_capability($modulecontext, 'mod/competvet:canobserve');
 
             $context = [];
             $context['enddate'] = userdate($planning->enddate);
@@ -83,7 +83,7 @@ class end_of_planning extends \core\task\scheduled_task {
                 return '<li>' . fullname($student) . '</li>';
             }, $ungradedstudents));
 
-            notifications::send_email($this->taskname, $planning->id, $competvet->get_instance_id(), $recipients, $context);
+            notifications::setnotification($this->taskname, $planning->id, $competvet->get_instance_id(), $recipients, $context);
         }
     }
 

@@ -18,7 +18,7 @@ namespace mod_competvet;
 use mod_competvet\competvet;
 use core_user;
 use moodle_url;
-use mod_competvet\local\persistent\notification as notificationlog;
+use mod_competvet\local\persistent\notification as notification;
 
 /**
  * Class notifications
@@ -30,37 +30,51 @@ use mod_competvet\local\persistent\notification as notificationlog;
 class notifications {
 
     /**
-     * Sends an email to a list of recipients.
+     * Set the notification for the given planning.
      *
-     * @param string $notification The type of notification to send.
+     * @param string $type The type of notification to send.
      * @param int $id The Notification ID.
      * @param int $competvetid The Competvet ID.
      * @param array $recipients List of users to send the email to.
      * @param array $context The email template context (planning, students, etc.).
      */
-    public static function send_email($notification, $id, $competvetid, $recipients, $context = []) {
+    public static function setnotification($type, $id, $competvetid, $recipients, $context = []) {
         $context = self::add_global_context($context, $competvetid);
         // Get the default language for the emails from the competvet settings.
-        $subject = self::local_get_string('email:' . $notification . ':subject', $context);
-        $body = self::get_email_body($notification, $context);
-        self::log_notification($notification, $id, $competvetid, $body);
+        $subject = self::local_get_string('email:' . $type . ':subject', $context);
+        $body = self::get_email_body($type, $context);
 
-        // Check if redirection to catchall email is enabled.
-        $redirecttocatchall = get_config('mod_competvet', 'redirect_to_catchall');
-        $catchallemail = get_config('mod_competvet', 'catchall_email');
+        $immediateemail = get_config('mod_competvet', 'immediate_email');
 
         foreach ($recipients as $recipient) {
-            if ($redirecttocatchall && !empty($catchallemail)) {
-                $recipient->email = $catchallemail;
-            }
             try {
-                $success = email_to_user($recipient, core_user::get_noreply_user(), $subject, $body);
-                if (!$success) {
-                    debugging("Failed to send email to user ID {$recipient->id}", DEBUG_DEVELOPER);
+                $nf = self::create($type, $id, $competvetid, $recipient->id, $subject, $body, notification::STATUS_PENDING);
+                if ($immediateemail) {
+                    self::send_email($nf);
                 }
             } catch (\exception $e) {
                 debugging("Exception when sending email to user ID {$recipient->id}: " . $e->getMessage(), DEBUG_DEVELOPER);
             }
+        }
+    }
+
+    /**
+     * Send the email notification to the given recipient.
+     * @param notification $notification
+     */
+    public static function send_email(notification $notification) {
+        if ($notification->get('status') == notification::STATUS_SEND) {
+            return;
+        }
+        $recipient = core_user::get_user($notification->get('recipientid'));
+        $subject = $notification->get('subject');
+        $body = $notification->get('body');
+        $success = email_to_user($recipient, core_user::get_noreply_user(), $subject, $body);
+        if (!$success) {
+            debugging("Failed to send email to user ID {$recipient->id}", DEBUG_DEVELOPER);
+        } else {
+            $notification->set('status', notification::STATUS_SEND);
+            $notification->save();
         }
     }
 
@@ -137,21 +151,29 @@ class notifications {
     }
 
     /**
-     * Logs the email sending for the given planning.
+     * Create a new notification.
      *
-     * @param string $notification The type of notification sent.
+     * @param string $type The type of notification sent.
      * @param int $id The Notification ID.
      * @param int $competvetid The Competvet ID.
+     * @param int $recipientid The ID of the recipient.
+     * @param string $subject The email subject.
      * @param string $body The email body content.
+     * @param int $status The status of the notification.
+     * @return notification
      */
-    public static function log_notification($notification, $id, $competvetid, $body) {
-        $log = new notificationlog(0,
+    public static function create($type, $id, $competvetid, $recipientid, $subject, $body, $status) {
+        $nf = new notification(0,
         (object) [
+            'notification' => $type,
             'notifid' => $id,
             'competvetid' => $competvetid,
-            'notification' => $notification,
+            'recipientid' => $recipientid,
+            'subject' => $subject,
             'body' => $body,
+            'status' => $status,
         ]);
-        $log->save();
+        $nf->save();
+        return $nf;
     }
 }

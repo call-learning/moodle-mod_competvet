@@ -19,6 +19,8 @@ namespace mod_competvet\output\view;
 use context_system;
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\notification;
+use mod_competvet\notifications as notifications_manager;
+use mod_competvet\utils;
 use renderer_base;
 use stdClass;
 use moodle_url;
@@ -42,6 +44,16 @@ class viewnotifications extends base {
     protected $cmid;
 
     /**
+     * @var $tasks The tasks to display.
+     */
+    protected $task;
+
+    /**
+     * @var $status The status to display.
+     */
+    protected $status;
+
+    /**
      * Export this data so it can be used in a mustache template.
      *
      * @param renderer_base $output
@@ -50,38 +62,194 @@ class viewnotifications extends base {
     public function export_for_template(renderer_base $output) {
         global $CFG;
         $data = parent::export_for_template($output);
-        $competvetid = $this->competvetid;
+
+        $this->before_render();
+
+        $data['selectcompetvet'] = array_values($this->get_competvet_select());
+        $data['tasks'] = $this->get_task_select();
+        $data['status'] = $this->get_status_select();
+
+        $searchparams = ['competvetid' => $this->competvetid];
+        if ($this->task) {
+            $searchparams['notification'] = $this->task;
+        }
+        if ($this->status) {
+            $searchparams['status'] = $this->status;
+        }
+
+        $notifications = notification::get_records($searchparams);
+
+        $data['notifications'] = [];
+        $numpending = 0;
+        foreach ($notifications as $notification) {
+            $body = $notification->get('body');
+            // Get a short version of the body in plain text.
+            $shortmessage = strip_tags($body);
+            $shortmessage = substr($shortmessage, 0, 30);
+            $user = (object) utils::get_user_info($notification->get('recipientid'));
+            $status = $notification->get('status');
+            if ($status === notification::STATUS_PENDING) {
+                $numpending++;
+            };
+            $delete = new moodle_url('/mod/competvet/view.php', array_merge($this->get_url_params(),
+                ['delete' => $notification->get('id')]));
+
+            $send = new moodle_url('/mod/competvet/view.php', array_merge($this->get_url_params(),
+                ['send' => $notification->get('id')]));
+
+            $data['notifications'][] = [
+                'id' => $notification->get('id'),
+                'timecreated' => $notification->get('timecreated'),
+                'notification' => get_string('notification:' . $notification->get('notification'),
+                    'mod_competvet'),
+                'shortmessage' => $shortmessage,
+                'recipient' => fullname($user),
+                'subject' => $notification->get('subject'),
+                'body' => $body,
+                'delete' => $delete->out(),
+                'send' => $send->out(),
+                'status' => get_string('notification:status:' . notification::STATUS_TYPES[$status], 'mod_competvet'),
+                'cansend' => $notification->can_send(),
+            ];
+        }
+        if ($numpending) {
+            $data['numpending'] = $numpending;
+            $data['sendallurl'] = new moodle_url('/mod/competvet/view.php',
+            array_merge($this->get_url_params(), ['sendall' => 1]));
+        }
+        $data['numnotifications'] = count($notifications);
+        if (count($notifications) > 0) {
+            $data['deleteallurl'] = new moodle_url('/mod/competvet/view.php',
+            array_merge($this->get_url_params(), ['deleteall' => 1]));
+        }
+
+        $data['version'] = time();
+        $data['debug'] = $CFG->debugdisplay;
+
+        return $data;
+    }
+
+    /**
+     * Get the competvet selector
+     * @return array
+     */
+    public function get_competvet_select(): array {
+        global $DB;
+        $allinstances = $DB->get_records('competvet');
+        // Map these instances to an array with the id as key, the course and the name as value.
+        return array_map(function ($instance) {
+            return [
+                'id' => $instance->id,
+                'course' => get_course($instance->course)->fullname,
+                'name' => $instance->name,
+                'selected' => $instance->id == $this->competvetid,
+                'url' => new moodle_url('/mod/competvet/view.php', ['pagetype' => 'viewnotifications', 'c' => $instance->id]),
+            ];
+        }, $allinstances);
+    }
+
+    /**
+     * Get task selector
+     * @return array
+     */
+    public function get_task_select(): array {
+        $tasks = $this->get_tasks();
+        $data = [];
+        $data[] = [
+            'key' => '',
+            'name' => get_string('all'),
+            'url' => new moodle_url('/mod/competvet/view.php', ['pagetype' => 'viewnotifications', 'id' => $this->cmid]),
+            'selected' => empty($this->task),
+        ];
+        foreach ($tasks as $key => $task) {
+            $data[] = [
+                'key' => $key,
+                'name' => $task,
+                'url' => new moodle_url('/mod/competvet/view.php',
+                    ['pagetype' => 'viewnotifications', 'id' => $this->cmid, 'task' => $key]),
+                'selected' => $key == $this->task,
+            ];
+        }
+        return $data;
+    }
+
+    /**
+     * Get the status selector
+     * @return array
+     */
+    public function get_status_select(): array {
+        $data = [];
+        $data[] = [
+            'key' => '',
+            'name' => get_string('all'),
+            'url' => new moodle_url('/mod/competvet/view.php', ['pagetype' => 'viewnotifications', 'id' => $this->cmid, 'task' => $this->task]),
+            'selected' => empty($this->status),
+        ];
+        foreach (notification::STATUS_TYPES as $key => $status) {
+            $data[] = [
+                'key' => $key,
+                'name' => get_string('notification:status:' . $status, 'mod_competvet'),
+                'url' => new moodle_url('/mod/competvet/view.php',
+                    ['pagetype' => 'viewnotifications', 'id' => $this->cmid, 'task' => $this->task, 'status' => $key]),
+                'selected' => $key == $this->status,
+            ];
+        }
+        return $data;
+    }
+
+    /**
+     * Get the url parameters for this renderable.
+     * @return array
+     */
+    public function get_url_params(): array {
+        return [
+            'pagetype' => 'viewnotifications',
+            'c' => $this->competvetid,
+            'task' => $this->task,
+            'status' => $this->status,
+        ];
+    }
+
+    /**
+     * Perform actions before rendering.
+     * @return void
+     */
+    public function before_render(): void {
         $delete = optional_param('delete', null, PARAM_INT);
         if ($delete) {
             $todelete = notification::get_record(['id' => $delete]);
             $todelete->delete();
         }
-        $notifications = notification::get_records(['competvetid' => $competvetid]);
-        $data['notifications'] = [];
-        foreach ($notifications as $notification) {
-            $body = $notification->get('body');
-            // Get a short version of the body in plain text.
-            $shortmessage = strip_tags($body);
-            $shortmessage = substr($shortmessage, 0, 100);
-            $delete = new moodle_url('/mod/competvet/view.php',
-                [
-                    'pagetype' => 'viewnotifications',
-                    'id' => $this->cmid,
-                    'delete' => $notification->get('id'),
-                ]);
-            $data['notifications'][] = [
-                'id' => $notification->get('id'),
-                'timecreated' => $notification->get('timecreated'),
-                'notification' => get_string('notification:' . $notification->get('notification', 'mod_competvet'),
-                    'mod_competvet'),
-                'shortmessage' => $shortmessage,
-                'body' => $body,
-                'delete' => $delete->out(),
-            ];
+
+        $send = optional_param('send', null, PARAM_INT);
+        if ($send) {
+            $notification = notification::get_record(['id' => $send]);
+            notifications_manager::send_email($notification);
         }
-        $data['version'] = time();
-        $data['debug'] = $CFG->debugdisplay;
-        return $data;
+
+        $sendall = optional_param('sendall', null, PARAM_INT);
+        if ($sendall) {
+            $params = ['competvetid' => $this->competvetid];
+            if ($this->task) {
+                $params['notification'] = $this->task;
+            }
+            $notifications = notification::get_records($params);
+            foreach ($notifications as $notification) {
+                notifications_manager::send_email($notification);
+            }
+        }
+
+        $deleteall = optional_param('deleteall', null, PARAM_INT);
+        if ($deleteall) {
+            $params = ['competvetid' => $this->competvetid];
+            if ($this->task) {
+                $params['notification'] = $this->task;
+            }
+            $notifications = notification::get_records($params);
+            foreach ($notifications as $notification) {
+                $notification->delete();
+            }
+        }
     }
 
     /**
@@ -99,17 +267,34 @@ class viewnotifications extends base {
         if (empty($data)) {
             global $PAGE;
             if ($PAGE->context->contextlevel === CONTEXT_MODULE) {
-                $context = $PAGE->context;
                 $PAGE->set_secondary_active_tab('viewnotifications');
-                $competvet = competvet::get_from_context($context);
-                $competvetid = $competvet->get_instance_id();
+
+                $competvetid = optional_param('c', null, PARAM_INT);
+                $task = optional_param('task', null, PARAM_RAW);
+                $tasks = $this->get_tasks();
+                if (!array_key_exists($task, $tasks)) {
+                    $task = null;
+                }
+
+                $status = optional_param('status', null, PARAM_INT);
+                if (!array_key_exists($status, notification::STATUS_TYPES)) {
+                    $status = null;
+                }
+
                 $cmid = $PAGE->cm->id;
-                $data = [$competvetid, $cmid];
+                if (!$competvetid) {
+                    $competvet = competvet::get_from_context($PAGE->context);
+                    $competvetid = $competvet->get_instance_id();
+                } else {
+                    $competvet = competvet::get_from_instance_id($competvetid);
+                    $cmid = $competvet->get_course_module_id();
+                }
+                $data = [$competvetid, $cmid, $task, $status];
             } else {
                 $data = [null];
             }
         }
-        [$this->competvetid, $this->cmid] = $data;
+        [$this->competvetid, $this->cmid, $this->task, $this->status] = $data;
     }
 
     /**
@@ -133,5 +318,21 @@ class viewnotifications extends base {
      */
     public function get_template_name(\renderer_base $renderer): string {
         return 'mod_competvet/manager/notifications';
+    }
+
+    /**
+     * Get the available tasks for the notifications.
+     * @return array
+     */
+    private function get_tasks(): array {
+        return [
+            'items_todo' => get_string('notification:items_todo', 'mod_competvet'),
+            'end_of_planning' => get_string('notification:end_of_planning', 'mod_competvet'),
+            'student_graded' => get_string('notification:student_graded', 'mod_competvet'),
+            'student_target:eval' => get_string('notification:student_target:eval', 'mod_competvet'),
+            'student_target:autoeval' => get_string('notification:student_target:autoeval', 'mod_competvet'),
+            'student_target:cert' => get_string('notification:student_target:cert', 'mod_competvet'),
+            'student_target:list' => get_string('notification:student_target:list', 'mod_competvet'),
+        ];
     }
 }
