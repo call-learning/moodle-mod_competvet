@@ -23,12 +23,58 @@
     {
     }
 }}
+<div class="d-flex mb-3">
+    <div class="select-instance">
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center" type="button" data-toggle="dropdown" aria-expanded="false">
+                {{#str}}selectcompetvet, mod_competvet{{/str}}
+            </button>
+            <div class="dropdown-menu">
+                {{#selectcompetvet}}
+                    <a href="{{{url}}}" class="dropdown-item  {{#selected}}active{{/selected}}">
+                        {{name}} ( {{{course}}} )
+                    </a>
+                {{/selectcompetvet}}
+            </div>
+        </div>
+    </div>
+    <div class="select-task ml-2">
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center" type="button" data-toggle="dropdown" aria-expanded="false">
+                {{#str}}selecttype, mod_competvet{{/str}}
+            </button>
+            <div class="dropdown-menu">
+                {{#tasks}}
+                    <a href="{{{url}}}" class="dropdown-item {{#selected}}active{{/selected}}">
+                        {{name}}
+                    </a>
+                {{/tasks}}
+            </div>
+        </div>
+    </div>
+    <div class="select-status ml-2">
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center" type="button" data-toggle="dropdown" aria-expanded="false">
+                {{#str}}selectstatus, mod_competvet{{/str}}
+            </button>
+            <div class="dropdown-menu">
+                {{#status}}
+                    <a href="{{{url}}}" class="dropdown-item {{#selected}}active{{/selected}}">
+                        {{name}}
+                    </a>
+                {{/status}}
+            </div>
+        </div>
+    </div>
+</div>
 <table class="table table-striped">
     <thead>
         <tr>
             <th>{{#str}}notification:notification, mod_competvet{{/str}}</th>
             <th>{{#str}}notification:timecreated, mod_competvet{{/str}}</th>
+            <th>{{#str}}notification:recipient, mod_competvet{{/str}}</th>
             <th>{{#str}}notification:message, mod_competvet{{/str}}</th>
+            <th>{{#str}}status, mod_competvet{{/str}}</th>
         </tr>
     </thead>
     <tbody>
@@ -36,6 +82,7 @@
         <tr>
             <td>{{notification}}</td>
             <td>{{#userdate}}{{timecreated}}, {{#str}}strftimedatetime, langconfig{{/str}}{{/userdate}}</td>
+            <td>{{recipient}}</td>
             <td>
                 <a href="#" data-toggle="modal" data-target="#messageModal-{{id}}" class="text-decoration-none">
                     {{{shortmessage}}}
@@ -45,13 +92,18 @@
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="messageModalLabel-{{id}}">{{notification}}</h5>
+                                <h5 class="modal-title" id="messageModalLabel-{{id}}">{{recipient}}</h5>
                                 <button type="button" class="btn-close" data-dismiss="modal" aria-label="{{#str}}close, form{{/str}}"></button>
                             </div>
                             <div class="modal-body">
+                                <div class="subject mb-3">{{subject}}</div>
+                                <hr>
                                 {{{body}}}
                             </div>
                             <div class="modal-footer">
+                                {{#cansend}}
+                                    <a href="{{{send}}}" class="btn btn-success mr-2">{{#str}}send, message{{/str}}</a>
+                                {{/cansend}}
                                 <a href="{{{delete}}}" class="btn btn-danger">{{#str}}delete, mod_competvet{{/str}}</a>
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">{{#str}}close, form{{/str}}</button>
                             </div>
@@ -59,7 +111,18 @@
                     </div>
                 </div>
             </td>
+            <td>
+                {{status}}
+            </td>
         </tr>
         {{/notifications}}
     </tbody>
 </table>
+<div class="d-flex justify-content-end mt-3">
+    {{#sendallurl}}
+        <a href="{{{sendallurl}}}" class="btn btn-success">{{#str}}notification:sendall, mod_competvet, {{numpending}}{{/str}}</a>
+    {{/sendallurl}}
+    {{#deleteallurl}}
+        <a href="{{{deleteallurl}}}" class="btn btn-danger ml-2">{{#str}}notification:deleteall, mod_competvet, {{numnotifications}}{{/str}}</a>
+    {{/deleteallurl}}
+</div>

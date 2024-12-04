@@ -34,6 +34,24 @@ class notification extends persistent {
     const TABLE = 'competvet_notification';
 
     /**
+     * Status of the notification pending.
+     */
+    const STATUS_PENDING = 2;
+
+    /**
+     * Status of the notification send.
+     */
+    const STATUS_SEND = 1;
+
+    /**
+     * Notification types array
+     */
+    const STATUS_TYPES = [
+        self::STATUS_PENDING => 'pending',
+        self::STATUS_SEND => 'send',
+    ];
+
+    /**
      * Return the custom definition of the properties of this model.
      *
      * Each property MUST be listed here.
@@ -53,15 +71,30 @@ class notification extends persistent {
                 'type' => PARAM_INT,
                 'message' => new lang_string('invaliddata', 'competvet', 'competvetid'),
             ],
+            'recipientid' => [
+                'null' => NULL_NOT_ALLOWED,
+                'type' => PARAM_INT,
+                'message' => new lang_string('invaliddata', 'competvet', 'recipientid'),
+            ],
             'notification' => [
                 'null' => NULL_NOT_ALLOWED,
                 'type' => PARAM_TEXT,
                 'message' => new lang_string('invaliddata', 'competvet', 'notification'),
             ],
+            'subject' => [
+                'null' => NULL_NOT_ALLOWED,
+                'type' => PARAM_TEXT,
+                'message' => new lang_string('invaliddata', 'competvet', 'subject'),
+            ],
             'body' => [
                 'null' => NULL_NOT_ALLOWED,
                 'type' => PARAM_RAW,
                 'message' => new lang_string('invaliddata', 'competvet', 'body'),
+            ],
+            'status' => [
+                'null' => NULL_NOT_ALLOWED,
+                'type' => PARAM_INT,
+                'message' => new lang_string('invaliddata', 'competvet', 'status'),
             ],
         ];
     }
@@ -84,5 +117,13 @@ class notification extends persistent {
     private function delete_old_notifications() {
         global $DB;
         $DB->delete_records_select(self::TABLE, 'timecreated < :time', ['time' => strtotime('-30 days')]);
+    }
+
+    /**
+     * If this notification can be send.
+     * @return bool
+     */
+    public function can_send(): bool {
+        return $this->get('status') === self::STATUS_PENDING;
     }
 }

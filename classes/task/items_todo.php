@@ -19,7 +19,7 @@ namespace mod_competvet\task;
 use mod_competvet\notifications;
 use mod_competvet\competvet;
 use mod_competvet\local\api\todos;
-use mod_competvet\local\api\plannings;
+use mod_competvet\local\persistent\planning;
 
 /**
  * Class items_todo
@@ -53,26 +53,32 @@ class items_todo extends \core\task\scheduled_task {
 
         foreach ($situations as $situation) {
             $competvet = competvet::get_from_instance_id($situation->competvetid);
+            $situationname = $competvet->get_course_module()->name;
             $modulecontext = $competvet->get_context();
             $observers = get_users_by_capability($modulecontext, 'mod/competvet:canobserve');
 
             foreach ($observers as $observer) {
-                if (array_key_exists($observer->id, $recipients)) {
-                    continue;
-                }
                 $todos = todos::get_todos_for_user($observer->id);
                 if (empty($todos)) {
                     continue;
                 }
-                if (!isset($recipients[$observer->id])) {
-                    $recipients[$observer->id] = [$observer, $situation->competvetid];
+
+                $relevant = array_filter($todos, function ($todo) use ($situation) {
+                    return $todo['planning']['situationid'] === $situation->id;
+                });
+
+                if ($relevant) {
+                    $recipients[$observer->id]['user'] = $observer;
+                    $recipients[$observer->id]['competvetid'][] = $situation->competvetid;
+                    $recipients[$observer->id]['situations'][] = $situationname;
                 }
             }
         }
-
-        foreach ($recipients as $recipient) {
-            notifications::send_email($this->taskname, 0, $recipient[1], [$recipient[0]], []);
-            \core\task\logmanager::add_line('Todos for CID ' . $recipient[1] . ' user ' . $recipient[0]->email);
+        foreach ($recipients as $observer) {
+            $context = [];
+            $context['situations'] = implode(', ', $observer['situations']);
+            $competvetid = $observer['competvetid'][0];
+            notifications::setnotification($this->taskname, 1, $competvetid, [$observer['user']], $context);
         }
     }
 }

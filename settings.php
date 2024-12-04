@@ -236,23 +236,12 @@ if ($hassiteconfig) {
             )
         );
 
-        // Add a setting for the catchall email address.
-        $settings->add(
-            new admin_setting_configtext(
-                'mod_competvet/catchall_email',
-                get_string('catchall_email', 'mod_competvet'),
-                get_string('catchall_email_desc', 'mod_competvet'),
-                '',
-                PARAM_EMAIL
-            )
-        );
-
         // Add a setting for enabling/disabling the redirection to the catchall email address.
         $settings->add(
             new admin_setting_configcheckbox(
-                'mod_competvet/redirect_to_catchall',
-                get_string('redirect_to_catchall', 'mod_competvet'),
-                get_string('redirect_to_catchall_desc', 'mod_competvet'),
+                'mod_competvet/immediate_email',
+                get_string('immediate_email', 'mod_competvet'),
+                get_string('immediate_email_desc', 'mod_competvet'),
                 0
             )
         );

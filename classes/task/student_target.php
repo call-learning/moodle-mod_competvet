@@ -86,7 +86,7 @@ class student_target extends \core\task\scheduled_task {
                 if (empty($studenttargets)) {
                     continue;
                 }
-                notifications::send_email($this->taskname . ':' . $module, $planning->id, $competvet->get_instance_id(),
+                notifications::setnotification($this->taskname . ':' . $module, $planning->id, $competvet->get_instance_id(),
                     $studenttargets, []);
             }
         }
