@@ -97,7 +97,7 @@
                                 {{^cangrade}}disabled{{/cangrade}}
                                 {{#selected}}checked{{/selected}}
                             >
-                            <label class="custom-control-label" for="criterion-{{criterionid}}-option-{{optionid}}">{{{label}}} (<strong>{{#str}}points, mod_competvet, {{grade}}{{/str}}</strong>)</label>
+                            <label class="custom-control-label" for="criterion-{{criterionid}}-option-{{optionid}}">{{{label}}} {{#cangrade}}(<strong>{{#str}}points, mod_competvet, {{grade}}{{/str}}</strong>){{/cangrade}}</label>
                         </div>
                     {{/options}}
                 </div>
@@ -117,7 +117,7 @@
             </section>
         {{/criteria}}
         <hr>
-        <div class="mb-5 mt-3">
+        <div class="mb-5 mt-3 {{^cangrade}}d-none{{/cangrade}}">
             <div class="d-flex justify-content-between mb-2">
                 {{#str}}finalscore, mod_competvet{{/str}}
                 <div class="ml-auto">
