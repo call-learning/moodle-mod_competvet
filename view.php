@@ -49,9 +49,11 @@ $widget->check_access();
 $renderer = $PAGE->get_renderer('mod_competvet');
 $buttons = [];
 $buttonhtml = '';
-$button = $widget->get_button($modulecontext);
-if (!empty($button)) {
-    $buttons[] = $OUTPUT->render($button);
+$buttonswidgets = $widget->get_buttons($modulecontext);
+if (!empty($buttonswidgets)) {
+    foreach ($buttonswidgets as $buttonw) {
+        $buttons[] = $OUTPUT->render($buttonw);
+    }
 }
 $backbutton = $widget->get_back_button();
 if (!empty($backbutton)) {

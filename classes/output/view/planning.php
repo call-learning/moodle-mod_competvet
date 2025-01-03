@@ -147,21 +147,23 @@ class planning extends base {
     /**
      * Adds the grade button to the page.
      * @param object $context The context object.
-     * @return single_button|null
+     * @return single_button[]
      */
-    public function get_button($context): ?single_button {
+    public function get_buttons($context): array {
         if (!has_capability('mod/competvet:cangrade', $context)) {
-            return null;
+            return [];
         }
         $query = [];
         parse_str(parse_url($_SERVER['REQUEST_URI'])['query'], $query);
         $query['returnurl'] = $_SERVER['REQUEST_URI'];
-        return new single_button(
+        $buttons = [];
+        $buttons[] = new single_button(
             new moodle_url(
                 '/mod/competvet/grading.php',
                 $query
             ),
             get_string('gradeverb')
         );
+        return $buttons;
     }
 }

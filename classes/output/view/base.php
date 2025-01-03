@@ -113,10 +113,10 @@ abstract class base implements renderable, named_templatable {
      * Get the widget action button.
      *
      * @param object $context The context object.
-     * @return single_button|null
+     * @return single_button[]
      */
-    public function get_button($context): ?single_button {
-        return null;
+    public function get_buttons($context): array {
+        return [];
     }
 
     /**
