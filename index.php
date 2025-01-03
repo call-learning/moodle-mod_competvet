@@ -39,67 +39,30 @@ if ($id == SITEID) {
 
 $userid = optional_param('userid', $USER->id, PARAM_INT);
 
-$context = context_system::instance();
-$currenttab = optional_param('currenttab', 'situations', PARAM_ALPHA);
-$tabtree = [];
-$tabs = [
-    'situations' => [
-        'url' => new moodle_url('/mod/competvet/index.php', ['id' => $id, 'currenttab' => 'situations']),
-        'label' => get_string('allmysituations', 'mod_competvet'),
-    ],
-    'todo' => [
-        'url' => new moodle_url('/mod/competvet/index.php', ['id' => $id, 'currenttab' => 'todo']),
-        'label' => get_string('todos', 'mod_competvet'),
-    ],
-];
-foreach ($tabs as $id => $tab) {
-    $tabtree[] = new tabobject(
-        $id,
-        $tab['url'],
-        $tab['label'],
-    );
-}
 
-$currenturl = new moodle_url($tabs[$currenttab]['url']);
-$pagetitle = $tabs[$currenttab]['label'];
+$context = context_course::instance($course->id);
+$currenturl = new moodle_url('/mod/competvet/index.php', ['id' => $id]);
 $PAGE->set_url($currenturl);
 $PAGE->set_context($context);
+$pagetitle = get_string('allmysituations', 'mod_competvet', $course->fullname);
 $PAGE->set_title($pagetitle);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($pagetitle);
-echo $OUTPUT->tabtree($tabtree, $currenttab);
-switch ($currenttab) {
-    case 'situations':
-        if ($id != SITEID) {
-            $situationsid = situation::get_all_situations_in_course_id_for($userid, $course->id);
-        } else {
-            $situationsid = situation::get_all_situations_id_for($userid);
-        }
-        $report = \core_reportbuilder\system_report_factory::create(
-            situations::class,
-            $context,
-            '',
-            '',
-            0,
-            [
-                'onlyforsituationsid' => join(",", $situationsid),
-            ],
-        );
-        break;
-    case 'todo':
-        $report = \core_reportbuilder\system_report_factory::create(
-            \mod_competvet\reportbuilder\local\systemreports\todos::class,
-            $context,
-            '',
-            '',
-            0,
-            [
-                'onlyforusersid' => "$userid",
-            ],
-        );
-        $PAGE->requires->js_call_amd('mod_competvet/local/forms/eval_observation_ask', 'initUserAsk', ['mod_competvet']);
-        break;
+if ($id != SITEID) {
+    $situationsid = situation::get_all_situations_in_course_id_for($userid, $course->id);
+} else {
+    $situationsid = situation::get_all_situations_id_for($userid);
 }
+$report = \core_reportbuilder\system_report_factory::create(
+    situations::class,
+    $context,
+    '',
+    '',
+    0,
+    [
+        'onlyforsituationsid' => join(",", $situationsid),
+    ],
+);
 echo $report->output();
 echo $OUTPUT->footer();

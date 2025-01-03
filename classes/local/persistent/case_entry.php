@@ -64,6 +64,9 @@ class case_entry extends persistent {
         global $USER;
         $sameuser = $USER->id == $this->raw_get('studentid');
         $planning = planning::get_record(['id' => $this->raw_get('planningid')]);
+        if (!$planning) {
+            return false;
+        }
         $competvet = competvet::get_from_situation($planning->get_situation());
         $caneditothercase = has_capability('mod/competvet:caneditother', $competvet->get_context());
         return $caneditothercase || $sameuser;
