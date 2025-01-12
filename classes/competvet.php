@@ -130,6 +130,13 @@ class competvet {
     private $course;
 
     /**
+     * Context instance
+     *
+     * @var context_module
+     */
+    private $context;
+
+    /**
      * Constructor for the competVet class
      *
      * @param int $cmid
