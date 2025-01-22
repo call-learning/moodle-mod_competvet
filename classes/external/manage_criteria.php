@@ -30,7 +30,6 @@ use external_multiple_structure;
 use external_warnings;
 use mod_competvet\local\api\criteria;
 use mod_competvet\local\persistent\grid;
-use mod_competvet\local\persistent\criterion;
 
 define('COMPETVET_CRITERIA_EVALUATION', 1);
 define('COMPETVET_CRITERIA_CERTIFICATION', 2);
