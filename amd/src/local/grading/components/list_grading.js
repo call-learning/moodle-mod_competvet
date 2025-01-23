@@ -119,6 +119,7 @@ const formEvents = () => {
         const result = await Repository.saveFormData(args);
         context.isvalid = result.result;
         context.isinvalid = !result.result;
+        context.cangrade = true; // This is because the form is saved.
         CompetState.setValue('list-grading', context);
 
         // Now set the sub grade that will be used for the suggested grade.

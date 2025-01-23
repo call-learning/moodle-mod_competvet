@@ -30,6 +30,7 @@ use external_warnings;
 use mod_competvet\external\get_json;
 use mod_competvet\local\api\formdata;
 use mod_competvet\competvet;
+use mod_competvet\local\persistent\planning;
 
 /**
  * Class formdata_handler
@@ -88,7 +89,10 @@ class formdata_handler extends external_api {
         $graderid = $USER->id;
         $formname = $params['formname'];
         $json = $params['json'];
-
+        $fixedjson = static::fix_json($params['json']);
+        if ($fixedjson) {
+            $json = $fixedjson;
+        }
         $result = formdata::store($userid, $planningid, $graderid, $formname, $json);
 
         return [
@@ -138,6 +142,13 @@ class formdata_handler extends external_api {
         $formname = $params['formname'];
 
         $userdata = formdata::get($userid, $planningid, $formname);
+        // Fix issue with cangrade that has been inserted by mistake in the database.
+        $newjson = static::fix_json($userdata['json']);
+        if ($newjson) {
+            $userdata['json'] = $newjson;
+            formdata::store($userid, $planningid, $userid, $formname, $userdata['json']);
+        }
+
         $returndata = $userdata['json'];
         $timemodified = $userdata['timemodified'];
         $result = true;
@@ -171,5 +182,20 @@ class formdata_handler extends external_api {
             'data' => new external_value(PARAM_TEXT, 'The JSON data'),
             'timemodified' => new external_value(PARAM_INT, 'The time created'),
         ]);
+    }
+
+    /**
+     * Fix json 'cangrade' issue
+     *
+     * @param $json
+     * @return string if json has cangrade, if not return null (no change)
+     */
+    private static function fix_json($json): ?string {
+        $userdataparsed = json_decode($json, true);
+        if (isset($userdataparsed['cangrade'])) {
+            unset($userdataparsed['cangrade']);
+            return json_encode($userdataparsed);
+        }
+        return null;
     }
 }
