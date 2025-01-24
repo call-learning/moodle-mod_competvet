@@ -58,12 +58,18 @@ class plannings extends base {
     protected bool $isgrader;
 
     /**
+     * @var int $cmid The course module id.
+     */
+    protected $cmid;
+
+    /**
      * Export this data so it can be used in a mustache template.
      *
      * @param renderer_base $output
      * @return array|array[]|stdClass
      */
     public function export_for_template(renderer_base $output) {
+        global $FULLME;
         $data = parent::export_for_template($output);
 
         $planningids = array_map(function($planning) {
@@ -75,6 +81,7 @@ class plannings extends base {
             return $carry;
         }, []);
         $data['categories'] = [];
+        $returnurl = new moodle_url($FULLME);
 
         foreach ($planningstatsbycategory as $categorytext => $planningstats) {
             $category = new stdClass();
@@ -92,7 +99,16 @@ class plannings extends base {
                 $planningresult->groupname = $planning['groupname'];
                 $planningresult->session = $planning['session'];
                 $planningresult->nbstudents = $planningstat['stats']['nbstudents'];
-                $planningresult->students = $planningstat['stats']['students'];
+                $studentswithreporturl = [];
+                foreach ($planningstat['stats']['students'] as $student) {
+                    $student->caselogreporturl = (new moodle_url(
+                        '/mod/competvet/reports.php',
+                        ['report' => 'caselogentries', 'id' => $this->cmid, 'planningid' => $planningstat['id'],
+                            'studentid' => $student->id, 'returnurl' => $returnurl]
+                    ))->out(false);
+                    $studentswithreporturl[] = $student;
+                }
+                $planningresult->students = $studentswithreporturl;
                 $planningresult->viewurl = (new moodle_url(
                     $this->viewplanning,
                     ['planningid' => $planningstat['id']]
@@ -133,9 +149,9 @@ class plannings extends base {
             $viewplanning =
                 new moodle_url($this->baseurl, ['pagetype' => 'planning', 'id' => $competvet->get_course_module_id()]);
             $isgrader = has_capability('mod/competvet:cangrade', $context);
-            $data = [$currentplannings, $planningstats, $viewplanning, $situationname, $isgrader];
+            $data = [$currentplannings, $planningstats, $viewplanning, $situationname, $isgrader, $competvet->get_course_module_id()];
         }
-        [$this->plannings, $this->planningstats, $this->viewplanning, $this->situationname, $this->isgrader] = $data;
+        [$this->plannings, $this->planningstats, $this->viewplanning, $this->situationname, $this->isgrader, $this->cmid] = $data;
     }
 
     /**

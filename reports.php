@@ -48,7 +48,10 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading($pagetitle);
 if ($reportid == 'caselogentries') {
     $planningid = required_param('planningid', PARAM_INT);
-    $studentid = optional_param('studentid', $USER->id, PARAM_INT);
+    $studentid = $USER->id;
+    if (has_capability('mod/competvet:viewother', $context, $USER->id)) {
+        $studentid = optional_param('studentid', $USER->id, PARAM_INT);
+    }
     $report = \core_reportbuilder\system_report_factory::create(
         \mod_competvet\reportbuilder\local\systemreports\case_entries::class,
         $context,
@@ -61,6 +64,7 @@ if ($reportid == 'caselogentries') {
         ]
     );
 }
+$report->require_can_view();
 if (!empty($report)) {
     echo $report->output();
 }

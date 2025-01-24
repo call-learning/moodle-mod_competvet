@@ -149,13 +149,6 @@ class student_list extends base {
             ),
             get_string('gradeverb')
         );
-        $buttons[] = new single_button(
-            new moodle_url(
-                '/mod/competvet/reports.php',
-                ['report' => 'caselogentries',...$query]
-            ),
-            get_string('report:caselogentries', 'mod_competvet')
-        );
         return $buttons;
     }
 }

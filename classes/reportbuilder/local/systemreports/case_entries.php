@@ -51,6 +51,7 @@ class case_entries extends system_report {
      * Initialise the report
      */
     protected function initialise(): void {
+        global $USER;
         $caseentry = new case_entry();
 
         $casentryalias = $caseentry->get_table_alias('competvet_case_entry');
@@ -64,14 +65,12 @@ class case_entries extends system_report {
                 [$paramplanningid => $planningid]
             );
         }
-        $studentid = $this->get_parameter('studentid', 0, PARAM_INT);
-        if (!empty($studentid)) {
-            $paramstudentid = database::generate_param_name();
-            $this->add_base_condition_sql(
-                "{$casentryalias}.studentid = :{$paramstudentid}",
-                [$paramstudentid => $studentid]
-            );
-        }
+        $studentid = $this->get_parameter('studentid', $USER->id, PARAM_INT);
+        $paramstudentid = database::generate_param_name();
+        $this->add_base_condition_sql(
+            "{$casentryalias}.studentid = :{$paramstudentid}",
+            [$paramstudentid => $studentid]
+        );
         // Join case entry to planning.
         $planningentity = new planning();
         $planningalias = $planningentity->get_table_alias('competvet_planning');
@@ -153,6 +152,17 @@ class case_entries extends system_report {
      * @return bool
      */
     protected function can_view(): bool {
-        return isloggedin();
+        global $USER;
+        $studentid = $this->get_parameter('studentid', 0, PARAM_INT);
+        $planningid = $this->get_parameter('planningid', 0, PARAM_INT);
+        $planning = \mod_competvet\local\persistent\planning::get_record(['id' => $planningid]);
+        $competvet = \mod_competvet\competvet::get_from_situation_id($planning->get('situationid'));
+        if (!isloggedin()) {
+            return false;
+        }
+        if (!empty($studentid) && $studentid != $USER->id) {
+            return has_capability('mod/competvet:viewother', $competvet->get_context());
+        }
+        return true;
     }
 }
