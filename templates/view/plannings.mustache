@@ -241,18 +241,16 @@
                     </td>
                     <td class="t-grade comments">
                         {{#grader}}
+                            {{#timegraded}}
+                                <div class="tex-sm text-muted float-right" data-region="timegraded">
+                                    {{timegraded}}
+                                </div>
+                            {{/timegraded}}
                             <div class="media small align-items-end">
                                 <img class="userpicturesmall mr-1" src="{{userpictureurl}}">
                                 <div class="media-body" data-region="grader">
                                     {{fullname}}
                                 </div>
-                            </div>
-                            <div>
-                                {{#timegraded}}
-                                    <div class="tex-sm text-muted float-right" data-region="timegraded">
-                                        {{timegraded}}
-                                    </div>
-                                {{/timegraded}}
                             </div>
                         {{/grader}}
                         <div data-region="comments">
