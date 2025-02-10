@@ -53,20 +53,22 @@ class end_of_planning extends \core\task\scheduled_task {
     public function execute() {
         global $DB;
 
+        $lastinterval = strtotime('-7 day');
+
         // Get plannings that are near the end, not fully evaluated, and have no sent notification.
         $plannings = $DB->get_records_sql("
             SELECT p.*
             FROM {competvet_planning} p
             LEFT JOIN {competvet_notification} n
             ON p.id = n.notifid AND n.notification = :notification
-            WHERE p.enddate > :now AND p.enddate < :tomorrow
+            WHERE p.enddate > :lastinterval AND p.enddate < :now
             AND n.id IS NULL
         ", [
-            'tomorrow' => strtotime('+1 days'),  // Plannings ending in the next 24 hours.
+            'lastinterval' => $lastinterval,  // Plannings ending in the last time we checked.
             'now' => time(),
             'notification' => $this->taskname,
         ]);
-
+        $evaluatorrole = $DB->get_record('role', ['shortname' => competvet::ROLE_EVALUATOR]);
         // Send a reminder email for each planning that does not have a notification.
         foreach ($plannings as $planning) {
             $ungradedstudents = $this->get_ungraded_students($planning->id);
@@ -75,8 +77,10 @@ class end_of_planning extends \core\task\scheduled_task {
             }
             $competvet = competvet::get_from_situation_id($planning->situationid);
             $modulecontext = $competvet->get_context();
-            $recipients = get_users_by_capability($modulecontext, 'mod/competvet:canobserve');
-
+            $recipients = get_role_users($evaluatorrole->id, $modulecontext, true);
+            if (empty($recipients)) {
+                continue;
+            }
             $context = [];
             $context['enddate'] = userdate($planning->enddate);
             $context['students'] = implode('', array_map(function($student) {

@@ -50,6 +50,23 @@ class competvet {
     const FULL_MODULE_NAME = 'mod/competvet';
 
     /**
+     * Roles shortnames
+     */
+    const ROLE_ADMIN_COMPETVET = 'admincompetvet';
+    /**
+     * Roles shortnames
+     */
+    const ROLE_RESPONSIBLE_UCUE = 'responsibleucue';
+    /**
+     * Roles shortnames
+     */
+    const ROLE_EVALUATOR = 'evaluator';
+    /**
+     * Roles shortnames
+     */
+    const ROLE_OBSERVER = 'observer';
+
+    /**
      * CompetVet roles
      *
      * This gives the definition of every roles in competvet

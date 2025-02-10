@@ -702,5 +702,64 @@ trait test_data_definition {
             ],
         ];
     }
+
+    /**
+     * Data definition
+     * @param int $startdate
+     * @return array $datadefinition
+     */
+    private function get_data_definition_set_5(int $startdate): array {
+        $oneweek = 60 * 60 * 24 * 7; // 1 week in seconds.
+        return [
+            'course 1' => [
+                'users' => [
+                    'student' => ['student1', 'student2'],
+                    'observer' => ['observer1', 'observer2'],
+                    'evaluator' => ['evaluator1', 'evaluator2'],
+                    'teacher' => ['teacher1'],
+                    'editingteacher' => ['editingteacher1'],
+                    'manager' => ['manager'],
+                ],
+                'groups' => [
+                    'group 8.1' => [
+                        'users' => ['student1'],
+                    ],
+                    'group 8.2' => [
+                        'users' => ['student2'],
+                    ],
+                    'group 8.3' => [
+                        'users' => [],
+                    ],
+                    'group 8.4' => [
+                        'users' => [],
+                    ],
+                ],
+                'activities' => [
+                    'SIT1' => [
+                        'category' => 'Y1',
+                        'plannings' => [
+                            [
+                                'startdate' => $startdate,
+                                'enddate' => $startdate + $oneweek,
+                                'groupname' => 'group 8.1',
+                                'session' => '2023',
+                            ],
+                        ],
+                    ],
+                    'SIT2' => [
+                        'category' => 'Y1',
+                        'plannings' => [
+                            [
+                                'startdate' => $startdate + $oneweek / 2,
+                                'enddate' => $startdate + $oneweek + $oneweek / 2,
+                                'groupname' => 'group 8.2',
+                                'session' => '2023',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
 }
 

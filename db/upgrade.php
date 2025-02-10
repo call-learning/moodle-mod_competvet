@@ -268,5 +268,16 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2024120401, 'competvet');
     }
 
+    if ($oldversion < 2025021001) {
+        $tasks = \core\task\manager::load_default_scheduled_tasks_for_component('mod_competvet');
+        foreach ($tasks as $taskid => $task) {
+            $classname = \core\task\manager::get_canonical_class_name($task);
+            if ($classname == '\mod_competvet\task\end_of_planning' && \core\task\manager::get_scheduled_task($classname)) {
+                // Update the record from the default task data.
+                \core\task\manager::configure_scheduled_task($task);
+            }
+        }
+        upgrade_mod_savepoint(true, 2025021001, 'competvet');
+    }
     return true;
 }
