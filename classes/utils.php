@@ -16,6 +16,8 @@
 
 namespace mod_competvet;
 
+use cache;
+use cache_store;
 use context_module;
 use core_user;
 use user_picture;
@@ -198,5 +200,31 @@ Y3|fr:Troisième année|en:Third year\nY4|fr:Quatrième année|en:Fourth year\nY
             $criteria['deleted'] = false;
         }
         return $DB->record_exists('user', $criteria);
+    }
+
+    /**
+     * Get users with role
+     *
+     * @param string $rolename
+     * @param int $situationid
+     *
+     * @return array
+     */
+    public static function get_users_with_role(string $rolename, int $situationid): array {
+        global $DB;
+        $roleids = cache::make_from_params(cache_store::MODE_APPLICATION, 'mod_competvet', 'rolesid');
+        $roleid = $roleids->get($rolename);
+        if ($roleid === false) {
+            $role = $DB->get_record('role', ['shortname' => $rolename]);
+            $roleid = $role->id;
+            $roleids->set($rolename, $role->id);
+        }
+        if (empty($roleid)) {
+            return [];
+        }
+        $competvet = competvet::get_from_situation_id($situationid);
+        $modulecontext = $competvet->get_context();
+        $recipients = get_role_users($roleid, $modulecontext, true);
+        return $recipients;
     }
 }

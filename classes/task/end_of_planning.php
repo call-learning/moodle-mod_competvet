@@ -20,6 +20,7 @@ use mod_competvet\notifications;
 use mod_competvet\competvet;
 use mod_competvet\local\api\grading as grading_api;
 use core_user;
+use mod_competvet\utils;
 
 /**
  * Class end_of_planning
@@ -68,16 +69,13 @@ class end_of_planning extends \core\task\scheduled_task {
             'now' => time(),
             'notification' => $this->taskname,
         ]);
-        $evaluatorrole = $DB->get_record('role', ['shortname' => competvet::ROLE_EVALUATOR]);
         // Send a reminder email for each planning that does not have a notification.
         foreach ($plannings as $planning) {
             $ungradedstudents = $this->get_ungraded_students($planning->id);
             if (empty($ungradedstudents)) {
                 continue;
             }
-            $competvet = competvet::get_from_situation_id($planning->situationid);
-            $modulecontext = $competvet->get_context();
-            $recipients = get_role_users($evaluatorrole->id, $modulecontext, true);
+            $recipients = utils::get_users_with_role(competvet::ROLE_EVALUATOR, $planning->situationid);
             if (empty($recipients)) {
                 continue;
             }
@@ -87,6 +85,7 @@ class end_of_planning extends \core\task\scheduled_task {
                 return '<li>' . fullname($student) . '</li>';
             }, $ungradedstudents));
 
+            $competvet = competvet::get_from_situation_id($planning->situationid);
             notifications::setnotification($this->taskname, $planning->id, $competvet->get_instance_id(), $recipients, $context);
         }
     }

@@ -19,7 +19,7 @@ namespace mod_competvet\task;
 use mod_competvet\notifications;
 use mod_competvet\competvet;
 use mod_competvet\local\api\todos;
-use mod_competvet\local\persistent\planning;
+use mod_competvet\utils;
 
 /**
  * Class items_todo
@@ -54,8 +54,7 @@ class items_todo extends \core\task\scheduled_task {
         foreach ($situations as $situation) {
             $competvet = competvet::get_from_instance_id($situation->competvetid);
             $situationname = $competvet->get_course_module()->name;
-            $modulecontext = $competvet->get_context();
-            $observers = get_users_by_capability($modulecontext, 'mod/competvet:canobserve');
+            $observers = utils::get_users_with_role(competvet::ROLE_OBSERVER, $situation->id);
 
             foreach ($observers as $observer) {
                 $todos = todos::get_todos_for_user($observer->id);

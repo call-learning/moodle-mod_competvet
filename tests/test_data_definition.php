@@ -95,8 +95,8 @@ trait test_data_definition {
                     if (!empty($planningdef['todos'])) {
                         foreach ($planningdef['todos'] as $tododef) {
                             $tododef['planningid'] = $planning->id;
-                            $tododef['studentid'] = $users[$tododef['observername']]->id;
-                            $tododef['targetuserid'] = $users[$tododef['targetusername']]->id;
+                            $tododef['studentid'] = $users[$tododef['studentname']]->id;
+                            $tododef['targetuserid'] = $users[$tododef['observername']]->id;
                             $todorecord = $competvetevalgenerator->create_todo($tododef);
 
                             $dbrecord = $DB->get_record('competvet_todo', ['id' => $todorecord->id]);
@@ -674,7 +674,7 @@ trait test_data_definition {
                                         'action' => todo::ACTION_EVAL_OBSERVATION_ASKED,
                                         'data' => (object) ['context' => 'context1'],
                                         'planningid' => 1,
-                                        'targetusername' => 'student1',
+                                        'studentname' => 'student1',
                                         'observername' => 'observer1',
                                         'timecreated' => strtotime('-40 days'),
                                     ],
@@ -682,7 +682,7 @@ trait test_data_definition {
                                         'action' => todo::ACTION_EVAL_OBSERVATION_ASKED,
                                         'data' => (object) ['context' => 'context2'],
                                         'planningid' => 1,
-                                        'targetusername' => 'student1',
+                                        'studentname' => 'student1',
                                         'observername' => 'observer2',
                                         'timecreated' => strtotime('-20 days'),
                                     ],
@@ -690,7 +690,7 @@ trait test_data_definition {
                                         'action' => todo::ACTION_EVAL_OBSERVATION_ASKED,
                                         'data' => (object) ['context' => 'context3'],
                                         'planningid' => 1,
-                                        'targetusername' => 'student2',
+                                        'studentname' => 'student2',
                                         'observername' => 'observer2',
                                         'timecreated' => strtotime('-10 days'),
                                     ],
@@ -743,6 +743,35 @@ trait test_data_definition {
                                 'enddate' => $startdate + $oneweek,
                                 'groupname' => 'group 8.1',
                                 'session' => '2023',
+                                'todos' => [
+                                    [
+                                        'action' => todo::ACTION_EVAL_OBSERVATION_ASKED,
+                                        'data' => (object) ['context' => 'context1'],
+                                        'planningid' => 1,
+                                        'studentname' => 'student1',
+                                        'observername' => 'observer1',
+                                        'timecreated' => strtotime('-8 days'),
+                                        'status' => todo::STATUS_PENDING,
+                                    ],
+                                    [
+                                        'action' => todo::ACTION_EVAL_OBSERVATION_ASKED,
+                                        'data' => (object) ['context' => 'context2'],
+                                        'planningid' => 1,
+                                        'studentname' => 'student1',
+                                        'observername' => 'observer2',
+                                        'timecreated' => strtotime('-5 days'),
+                                        'status' => todo::STATUS_PENDING,
+                                    ],
+                                    [
+                                        'action' => todo::ACTION_EVAL_OBSERVATION_ASKED,
+                                        'data' => (object) ['context' => 'context3'],
+                                        'planningid' => 1,
+                                        'studentname' => 'student2',
+                                        'observername' => 'observer2',
+                                        'timecreated' => strtotime('-8 days'),
+                                        'status' => todo::STATUS_DONE,
+                                    ],
+                                ],
                             ],
                         ],
                     ],

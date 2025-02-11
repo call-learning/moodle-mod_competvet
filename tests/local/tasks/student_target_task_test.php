@@ -47,9 +47,9 @@ final class student_target_task_test extends advanced_testcase {
         $this->setAdminUser();
         $generator = $this->getDataGenerator();
         $competvetgenerator = $generator->get_plugin_generator('mod_competvet');
-        $startdate = new DateTime('12 days ago');
+        $startdate = new DateTime('-6 days');
         $this->generates_definition(
-            $this->{'get_data_definition_set_2'}($startdate->getTimestamp()),
+            $this->{'get_data_definition_set_5'}($startdate->getTimestamp()),
             $generator,
             $competvetgenerator
         );
@@ -62,11 +62,25 @@ final class student_target_task_test extends advanced_testcase {
      * @return void
      */
     public function test_student_target_task(): void {
+        set_config('immediate_email', 1, 'mod_competvet');
         $emailsink = $this->redirectEmails();
         $task = new student_target();
         $task->execute();
         $emails = $emailsink->get_messages();
+        $expectedemails = [
+            ['[CompetVet] You have not yet completed your self-evaluation in the rotation SIT1', 'student1@example.com'],
+            ['[CompetVet] You have not yet finalized your case log for the rotation SIT1', 'student1@example.com'],
+            ['[CompetVet] You have not yet had all your essentials certified in the rotation SIT1', 'student1@example.com'],
+            ['[CompetVet] You have not yet obtained the required number of evaluations in the rotation SIT1',
+                'student1@example.com'],
+        ];
         $this->assertCount(4, $emails);
+        usort($emails, function($a, $b) {
+            return $a->to === $b->to ? ($a->subject <=> $b->subject) : ($a->to < $b->to ? -1 : 1);
+        });
+        foreach ($emails as $index => $email) {
+            $this->assertEquals($expectedemails[$index], [$email->subject, $email->to]);
+        }
         // Run the task again to check if the emails are not sent twice.
         $emailsink = $this->redirectEmails();
         $task->execute();

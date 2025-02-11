@@ -234,7 +234,7 @@ $string['email:student_target:eval'] = <<<'EOF'
 
 <p>Best regards,</p>
 EOF;
-$string['email:student_target:eval:subject'] = '[CompetVet] You have students to grade in the rotation {$a->competvetname}';
+$string['email:student_target:eval:subject'] = '[CompetVet] You have not yet obtained the required number of evaluations in the rotation {$a->competvetname}';
 $string['email:student_target:list'] = <<<'EOF'
 
 <p>Hello,</p>

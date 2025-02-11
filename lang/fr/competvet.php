@@ -234,7 +234,7 @@ Si vous avez déjà sollicité des encadrants pour le faire, il faut le leur rap
 
 <p>Bien cordialement</p>
 EOF;
-$string['email:student_target:eval:subject'] = '[CompetVet] Vous avez des étudiants à noter dans la rotation {$a->competvetname}';
+$string['email:student_target:eval:subject'] = '[CompetVet]Vous n\'avez pas encore obtenu le nombre requis d\'évaluations dans la rotation {$a->competvetname}';
 $string['email:student_target:list'] = <<<'EOF'
 
 <p>Bonjour,
