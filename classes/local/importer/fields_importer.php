@@ -40,7 +40,7 @@ class fields_importer extends base_persistent_importer {
      */
     protected function to_persistent_data(array $row, csv_iterator $reader): object {
         $categoryname = $row[0];
-        if (!isset($this->categoryCache[$categoryname])) {
+        if (!isset($this->categorycache[$categoryname])) {
             $category = case_cat::get_record(['name' => $categoryname]);
             $sortorder = case_cat::count_records() + 1;
             if (!$category) {
@@ -52,10 +52,10 @@ class fields_importer extends base_persistent_importer {
                 ]);
                 $category->save();
             }
-            $this->categoryCache[$categoryname] = $category->get('id');
+            $this->categorycache[$categoryname] = $category->get('id');
         }
         $fielddata = parent::to_persistent_data($row, $reader);
-        $fielddata->categoryid = $this->categoryCache[$categoryname];
+        $fielddata->categoryid = $this->categorycache[$categoryname];
         $fielddata->idnumber = $row[1];
         $fielddata->name = $row[2];
         $fielddata->sortorder = $row[3];
