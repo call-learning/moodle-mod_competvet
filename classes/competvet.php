@@ -235,7 +235,9 @@ class competvet {
      */
     public function has_view_access(int $userid): bool {
         $context = $this->get_context();
-        $canview = has_capability('mod/competvet:view', $context, $userid) || is_siteadmin($userid);
+        $cminfo = get_fast_modinfo($this->cminfo->course);
+        $cm = $cminfo->get_cm($this->cminfo->id);
+        $canview = ($cm->uservisible && has_capability('mod/competvet:view', $context, $userid)) || is_siteadmin($userid);
         if (!$canview) {
             return false;
         }

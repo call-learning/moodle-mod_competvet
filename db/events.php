@@ -61,4 +61,8 @@ $observers = [
         'eventname'   => '\core\event\course_module_deleted',
         'callback'    => \mod_competvet\local\observers\course_module_observer::class . '::module_deleted',
     ],
+    [
+        'eventname'   => '\core\event\course_module_updated',
+        'callback'    => \mod_competvet\local\observers\course_module_observer::class . '::module_updated',
+    ],
 ];

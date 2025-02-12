@@ -69,4 +69,14 @@ class course_module_observer {
     public static function module_deleted(\core\event\course_module_deleted $event) {
         self::reset_user_cache_from_event($event->get_data());
     }
+
+    /**
+     * Make sure to invalidate the cache when a module is deleted.
+     *
+     * @param \core\event\course_module_updated $event
+     * @return void
+     */
+    public static function module_updated(\core\event\course_module_updated $event) {
+        self::reset_user_cache_from_event($event->get_data());
+    }
 }
