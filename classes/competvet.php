@@ -408,19 +408,47 @@ class competvet {
     }
 
     /**
+     * Get the grade item for this module
+     * @return \grade_item
+     */
+    public function get_grade_item(): \grade_item {
+        return \grade_item::fetch([
+            'itemtype' => 'mod',
+            'itemmodule' => self::MODULE_NAME,
+            'iteminstance' => $this->get_instance_id(),
+            'courseid' => $this->get_course_id(),
+        ]);
+    }
+
+    /**
      * Get the final grade for a student
      *
      * @param int $userid
      * @return \grade_grade The grade object
      */
     public function get_final_grade_for_student($userid): \grade_grade {
-        $item = \grade_item::fetch([
-            'itemtype' => 'mod',
-            'itemmodule' => 'competvet',
-            'iteminstance' => $this->get_instance_id(),
-            'courseid' => $this->get_course_id(),
-        ]);
+        $item = $this->get_grade_item();
         return $item->get_grade($userid);
+    }
+
+    /**
+     * Get the letter grades for a planning
+     * @param int $cmid The planning id
+     * @return array
+     */
+    public function get_lettergrade_scale() {
+        $scale = grade_get_letters($this->context);
+        return $scale;
+    }
+
+    /**
+     * Get the letter grade based on the numeric grade
+     * @param float $grade The grade
+     * @return string
+     */
+    public function get_letter_grade(float $grade): string {
+        $item = $this->get_grade_item();
+        return grade_format_gradevalue_letter($grade, $item);
     }
 
     /**

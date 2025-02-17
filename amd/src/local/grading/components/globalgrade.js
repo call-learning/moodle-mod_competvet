@@ -52,7 +52,7 @@ const formCalculation = () => {
     const form = document.querySelector('[data-region="globalgrade"]');
     const formData = new FormData(form);
     const formObject = Object.fromEntries(formData);
-    const {globalgrade, user} = CompetState.getData();
+    const {globalgrade, user, scale} = CompetState.getData();
     globalgrade.userid = user.id;
     globalgrade.finalgrade = formObject.finalgrade;
     globalgrade.hideaccept = true;
@@ -76,6 +76,23 @@ const formEvents = () => {
     if (form.dataset.events) {
         return;
     }
+    const scale = CompetState.getValue('scale');
+    // Example scale:
+    // {"93":"A","90":"A-","87":"B+","83":"B","80":"B-","77":"C+","73":"C","70":"C-","67":"D+","60":"D","0":"F"}
+    form.addEventListener('change', (e) => {
+        if (e.target.name === 'finalgrade') {
+            const grade = e.target.value;
+            const scaleArray = JSON.parse(scale.scale);
+            const lettergrade = Object.keys(scaleArray).reduce((acc, key) => {
+                if (grade >= key) {
+                    acc.label = scaleArray[key];
+                    acc.value = key;
+                }
+                return acc;
+            }, {label: 'F', value: 0});
+            form.querySelector('[data-region="lettergrade"]').innerHTML = lettergrade.label;
+        }
+    });
     form.addEventListener('submit', async(e) => {
         e.preventDefault();
         const globalgrade = formCalculation();
@@ -93,6 +110,7 @@ const formEvents = () => {
         globalgrade.gradeerror = !result.result;
         globalgrade.commentsuccess = result.result;
         globalgrade.commenterror = !result.result;
+        globalgrade.lettergrade = result.lettergrade;
 
         CompetState.setValue('globalgrade', globalgrade);
     });

@@ -224,4 +224,12 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/competvet:editplanning',
     ],
+    'mod_competvet_get_lettergrade_scale' => [
+        'classname' => \mod_competvet\external\get_lettergrade_scale::class,
+        'methodname' => 'execute',
+        'description' => 'Get the letter grade scale',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:view',
+    ],
 ];
