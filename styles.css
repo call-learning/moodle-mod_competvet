@@ -1,4 +1,3 @@
-/* stylelint-disable */
 .gradingapp {
     display: flex;
     flex-direction: column;
@@ -28,6 +27,35 @@
     flex: 1 0 auto;
     display: flex;
     flex-direction: column;
+}
+
+.gradingapp .lettergrade {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    margin-left: 1rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border: 5px solid #ccc;
+    border-radius: 100%;
+    padding: 0.5rem;
+}
+
+.gradingapp .lettergrade.sm {
+    width: 30px;
+    height: 30px;
+    padding: 0.25rem;
+    font-size: 0.8rem;
+    border-width: 1px;
+    margin-left: 0.5rem;
+}
+
+.gradingapp .lettergrade.sm:empty {
+    border: none;
+    width: 0;
+    height: 0;
 }
 
 .gradingapp .grade-header {
@@ -812,4 +840,9 @@
     height: 20px;
     border-radius: 10px;
     justify-content: center;
+}
+
+.competvet-view-todos .btn-sort:hover, .competvet-view-todos .btn-sort:focus {
+    background: var(--light);
+    text-decoration: none;
 }

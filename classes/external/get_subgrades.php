@@ -19,6 +19,7 @@ namespace mod_competvet\external;
 defined('MOODLE_INTERNAL') || die;
 global $CFG;
 require_once("$CFG->libdir/externallib.php");
+require_once("$CFG->libdir/gradelib.php");
 
 use external_api;
 use external_function_parameters;
@@ -45,8 +46,11 @@ class get_subgrades extends external_api {
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'EVALUATION_GRADE' => new external_value(PARAM_FLOAT, 'The suggested grade', VALUE_OPTIONAL),
+            'EVALUATION_GRADE_LETTER' => new external_value(PARAM_TEXT, 'The suggested grade Letter', VALUE_OPTIONAL),
             'CERTIFICATION_GRADE' => new external_value(PARAM_FLOAT, 'The suggested grade', VALUE_OPTIONAL),
+            'CERTIFICATION_GRADE_LETTER' => new external_value(PARAM_TEXT, 'The suggested grade Letter', VALUE_OPTIONAL),
             'LIST_GRADE' => new external_value(PARAM_FLOAT, 'The suggested grade', VALUE_OPTIONAL),
+            'LIST_GRADE_LETTER' => new external_value(PARAM_TEXT, 'The suggested grade Letter', VALUE_OPTIONAL),
         ]);
     }
 
@@ -68,10 +72,17 @@ class get_subgrades extends external_api {
         self::validate_context($competvet->get_context());
 
         $allgrades = grades::get_all_grades($studentid, $planningid);
+        $gradeitem = $competvet->get_grade_item();
         $subgrades = [];
         foreach ($allgrades as $grade) {
             $gradename = grade::DEFAULT_GRADE_SHORTNAME[$grade->get('type')];
+            $gradenameletter = $gradename . '_LETTER';
             $subgrades[$gradename] = $grade->get('grade');
+            if ($gradename == 'CERTIFICATION_GRADE') {
+                $subgrades[$gradenameletter] = $competvet->get_letter_grade($grade->get('grade') * 100);
+            } else {
+                $subgrades[$gradenameletter] = $competvet->get_letter_grade($grade->get('grade'));
+            }
         }
         return $subgrades;
     }

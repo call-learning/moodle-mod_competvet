@@ -104,6 +104,8 @@ class Competvet {
         await this.setCertifResults();
         await this.setListResults();
 
+        await this.getScale();
+
         await this.setListGrading();
         await this.setSubGrades();
         await this.setGlobalGrade();
@@ -139,6 +141,18 @@ class Competvet {
         };
         const response = await Repository.getListResults(args);
         CompetState.setValue('list-results', response);
+    }
+
+    /**
+     * Get the scale.
+     * @return {Promise} The promise.
+     */
+    async getScale() {
+        const args = {
+            cmid: this.cmId,
+        };
+        const response = await Repository.getLetterGradeScale(args);
+        CompetState.setValue('scale', response);
     }
 
     /**

@@ -218,6 +218,15 @@ class Repository {
     async deleteTodos(args) {
         return Ajax.call([{methodname: 'mod_competvet_delete_todos', args: args}])[0];
     }
+
+    /**
+     * Get the lettergrade schale.
+     * @param {Object} args The arguments.
+     * @return {Promise} The promise.
+     */
+    async getLetterGradeScale(args) {
+        return Ajax.call([{methodname: 'mod_competvet_get_lettergrade_scale', args: args}])[0];
+    }
 }
 
 const RepositoryInstance = new Repository();

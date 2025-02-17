@@ -31,6 +31,7 @@
                 {{> mod_competvet/grading/svg/chat}}
                 {{#str}}evaluate, mod_competvet{{/str}}
             <div class="grade-tab-indicator" data-region="grade-tab-eval"></div>
+            <div class="grade-tab-indicator-letter lettergrade sm" data-region="grade-tab-eval-letter"></div>
             </button>
         </li>
         {{/haseval}}
@@ -40,6 +41,7 @@
                 {{> mod_competvet/grading/svg/certif}}
                 {{#str}}certify, mod_competvet{{/str}}
                 <div class="grade-tab-indicator" data-region="grade-tab-certif"></div>
+                <div class="grade-tab-indicator-letter lettergrade sm" data-region="grade-tab-certif-letter"></div>
             </button>
         </li>
         {{/hascertif}}
@@ -49,6 +51,7 @@
                 {{> mod_competvet/grading/svg/list}}
                 {{#str}}list, mod_competvet{{/str}}
                 <div class="grade-tab-indicator" data-region="grade-tab-list"></div>
+                <div class="grade-tab-indicator-letter lettergrade sm" data-region="grade-tab-list-letter"></div>
             </button>
         </li>
         {{/hascase}}
