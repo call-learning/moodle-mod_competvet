@@ -437,7 +437,16 @@ class competvet {
      * @return array
      */
     public function get_lettergrade_scale() {
-        $scale = grade_get_letters($this->context);
+        // $scale = grade_get_letters($this->context);
+        $scale = [
+            0 => 'F',
+            41 => 'FX',
+            51 => 'E',
+            61 => 'D',
+            71 => 'C',
+            81 => 'B',
+            91 => 'A',
+        ];
         return $scale;
     }
 
@@ -447,8 +456,16 @@ class competvet {
      * @return string
      */
     public function get_letter_grade(float $grade): string {
-        $item = $this->get_grade_item();
-        return grade_format_gradevalue_letter($grade, $item);
+        // $item = $this->get_grade_item();
+        // return grade_format_gradevalue_letter($grade, $item);
+        $scale = $this->get_lettergrade_scale();
+        $letter = 'F';
+        foreach ($scale as $min => $gradeletter) {
+            if ($grade >= $min) {
+                $letter = $gradeletter;
+            }
+        }
+        return $letter;
     }
 
     /**

@@ -91,9 +91,11 @@ class grading {
                 continue;
             }
             $studentgrade = '';
+            $lettergrade = '';
             $grade = $competvet->get_final_grade_for_student($student->id);
             if ($grade->finalgrade) {
                 $studentgrade = round($grade->finalgrade, 2);
+                $lettergrade = $competvet->get_letter_grade($studentgrade);
             }
             $groupmember = clone $student;
             $groupmember->userinfo = utils::get_user_info($student->id);
@@ -101,6 +103,7 @@ class grading {
             // We need the stats per type (so we can display them in the UI).
             $groupmember->planninginfo = plannings::get_planning_stats_for_student($planningid, $student->id, true);
             $groupmember->grade = $studentgrade;
+            $groupmember->lettergrade = $lettergrade;
             $groupmember->feedback = content_to_text($grade->feedback, FORMAT_HTML);
             if ($grade->usermodified) {
                 $groupmember->grader = utils::get_user_info($grade->usermodified);
