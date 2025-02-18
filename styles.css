@@ -29,35 +29,6 @@
     flex-direction: column;
 }
 
-.gradingapp .lettergrade {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 60px;
-    height: 60px;
-    margin-left: 1rem;
-    font-size: 1.5rem;
-    font-weight: 700;
-    border: 5px solid #ccc;
-    border-radius: 100%;
-    padding: 0.5rem;
-}
-
-.gradingapp .lettergrade.sm {
-    width: 30px;
-    height: 30px;
-    padding: 0.25rem;
-    font-size: 0.8rem;
-    border-width: 1px;
-    margin-left: 0.5rem;
-}
-
-.gradingapp .lettergrade.sm:empty {
-    border: none;
-    width: 0;
-    height: 0;
-}
-
 .gradingapp .grade-header {
     background-color: #f5f5f5;
     box-shadow: 2px 4px 9px rgba(0, 0, 0, 0.2);
@@ -650,6 +621,34 @@
     overflow-x: auto;
 }
 
+.path-mod-competvet .lettergrade {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border: 5px solid #ccc;
+    border-radius: 100%;
+    padding: 0.5rem;
+}
+
+.path-mod-competvet .lettergrade.sm {
+    width: 30px;
+    height: 30px;
+    padding: 0.25rem;
+    font-size: 0.8rem;
+    border-width: 1px;
+    margin-left: 0.5rem;
+}
+
+.path-mod-competvet .lettergrade.sm:empty {
+    border: none;
+    width: 0;
+    height: 0;
+}
+
 .path-mod-competvet .student-info {
     display: flex;
     justify-content: left;
@@ -784,7 +783,7 @@
     border-radius: 5%;
     background-color: #f8f9fa;
     padding: 1rem;
-    width: 7rem;
+    width: 6rem;
     height: 2rem;
     border: 1px solid #dee2e6;
     text-align: center;
@@ -797,6 +796,11 @@
 .competvet-grade-table .globalgrade .circle.fail {
     background-color: #f8d7da;
     border-color: #f5c6cb;
+}
+
+.competvet-grade-table .lettergrade {
+    font-size: 1.5rem;
+    font-weight: bold;
 }
 
 .competvet-grade-table svg {

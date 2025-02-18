@@ -52,7 +52,7 @@
         border-radius: 5%;
         background-color: #f8f9fa;
         padding: 1rem;
-        width: 7rem;
+        width: 6rem;
         height: 2rem;
         border: 1px solid #dee2e6;
         text-align: center;
@@ -64,6 +64,10 @@
             background-color: #f8d7da;
             border-color: #f5c6cb;
         }
+    }
+    .lettergrade {
+        font-size: 1.5rem;
+        font-weight: bold;
     }
     svg {
         width: 1.5rem;

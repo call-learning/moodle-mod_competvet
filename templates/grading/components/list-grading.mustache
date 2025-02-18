@@ -151,7 +151,7 @@
                         data-field="scoreevaluator"
                         class="form-control{{!
                             }}{{#isvalid}} is-valid{{/isvalid}}{{!
-                            }}{{#isinvalid}} is-invalid{{/isinvalid}}"
+                            }}{{#isinvalid}} is-invalid{{/isinvalid}}{{^cangrade}} d-none{{/cangrade}}"
                         id="scoreevaluator"
                         name="scoreevaluator"
                         value="{{scoreevaluator}}"
@@ -159,9 +159,8 @@
                         max="{{maxfinalscore}}"
                         step="1"
                         {{^cangrade}}disabled{{/cangrade}}
-                        {{^cangrade}}disabled{{/cangrade}}
                     >
-                    <div class="lettergrade sm mx-auto mt-1" data-region="lettergrade">{{{lettergrade}}}</div>
+                    <div class="lettergrade sm ml-auto mt-1" data-region="lettergrade">{{{lettergrade}}}</div>
                 </div>
             </div>
         </div>
