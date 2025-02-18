@@ -59,7 +59,8 @@ const stateWatcher = () => {
         }
         if (gradeTabCertif && (subgrades.CERTIFICATION_GRADE || subgrades.CERTIFICATION_GRADE === 0)) {
             gradeTabCertif.innerHTML = subgrades.CERTIFICATION_GRADE;
-            gradeTabCertifLetter.innerHTML = subgrades.CERTIFICATION_GRADE_LETTER;
+            gradeTabCertifLetter.innerHTML = subgrades.CERTIFICATION_GRADE_LETTER ===
+                'A' ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>';
         }
         if (gradeTabList && (subgrades.LIST_GRADE || subgrades.LIST_GRADE === 0)) {
             gradeTabList.innerHTML = subgrades.LIST_GRADE;

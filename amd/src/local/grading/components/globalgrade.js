@@ -25,6 +25,7 @@ import CompetState from '../../competstate';
 import Notification from 'core/notification';
 import Templates from 'core/templates';
 import Repository from '../../new-repository';
+import {getLetterGrade} from '../../helpers';
 
 const gradingApp = document.querySelector('[data-region="grading-app"]');
 
@@ -52,7 +53,7 @@ const formCalculation = () => {
     const form = document.querySelector('[data-region="globalgrade"]');
     const formData = new FormData(form);
     const formObject = Object.fromEntries(formData);
-    const {globalgrade, user, scale} = CompetState.getData();
+    const {globalgrade, user} = CompetState.getData();
     globalgrade.userid = user.id;
     globalgrade.finalgrade = formObject.finalgrade;
     globalgrade.hideaccept = true;
@@ -76,23 +77,13 @@ const formEvents = () => {
     if (form.dataset.events) {
         return;
     }
-    const scale = CompetState.getValue('scale');
-    // Example scale:
-    // {"93":"A","90":"A-","87":"B+","83":"B","80":"B-","77":"C+","73":"C","70":"C-","67":"D+","60":"D","0":"F"}
+
     form.addEventListener('change', (e) => {
         if (e.target.name === 'finalgrade') {
-            const grade = e.target.value;
-            const scaleArray = JSON.parse(scale.scale);
-            const lettergrade = Object.keys(scaleArray).reduce((acc, key) => {
-                if (grade >= key) {
-                    acc.label = scaleArray[key];
-                    acc.value = key;
-                }
-                return acc;
-            }, {label: 'F', value: 0});
-            form.querySelector('[data-region="lettergrade"]').innerHTML = lettergrade.label;
+            form.querySelector('[data-region="lettergrade"]').innerHTML = getLetterGrade(e.target.value);
         }
     });
+
     form.addEventListener('submit', async(e) => {
         e.preventDefault();
         const globalgrade = formCalculation();

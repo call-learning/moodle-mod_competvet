@@ -26,6 +26,7 @@ import CompetState from '../../competstate';
 import Notification from 'core/notification';
 import Templates from 'core/templates';
 import Repository from '../../new-repository';
+import {getLetterGrade} from '../../helpers';
 
 const gradingApp = document.querySelector('[data-region="grading-app"]');
 
@@ -78,6 +79,7 @@ const formCalculation = () => {
     grading.finalscore = Math.round(grading.subgrade);
     grading.maxfinalscore = 100;
     grading.scoreevaluator = formObject.scoreevaluator;
+    grading.lettergrade = getLetterGrade(grading.scoreevaluator);
     if (grading.scoreevaluator) {
         grading.subgrade = grading.scoreevaluator;
     }
@@ -149,7 +151,9 @@ const formEvents = () => {
                 finalscore.innerHTML = Math.ceil(sumvalues);
             }
         }
-
+        if (e.target.name === 'scoreevaluator') {
+            form.querySelector('[data-region="lettergrade"]').innerHTML = getLetterGrade(e.target.value);
+        }
     });
     form.dataset.events = true;
 };
