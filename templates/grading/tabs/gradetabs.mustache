@@ -30,7 +30,7 @@
             <button class="nav-link certifheading w-100 active" id="eval-tab" data-toggle="tab" data-target="#evaluate" type="button" role="tab" aria-controls="evaluate" aria-selected="true">
                 {{> mod_competvet/grading/svg/chat}}
                 {{#str}}evaluate, mod_competvet{{/str}}
-            <div class="grade-tab-indicator" data-region="grade-tab-eval"></div>
+            <div class="grade-tab-indicator {{^cangrade}}d-none{{/cangrade}}" data-region="grade-tab-eval"></div>
             <div class="grade-tab-indicator-letter lettergrade sm" data-region="grade-tab-eval-letter"></div>
             </button>
         </li>
@@ -40,7 +40,7 @@
             <button class="nav-link certifheading w-100 {{^haseval}}active{{/haseval}}" id="certify-tab" data-toggle="tab" data-target="#certify" type="button" role="tab" aria-controls="certify" aria-selected="false">
                 {{> mod_competvet/grading/svg/certif}}
                 {{#str}}certify, mod_competvet{{/str}}
-                <div class="grade-tab-indicator" data-region="grade-tab-certif"></div>
+                <div class="grade-tab-indicator {{^cangrade}}d-none{{/cangrade}}" data-region="grade-tab-certif"></div>
                 <div class="grade-tab-indicator-letter lettergrade sm" data-region="grade-tab-certif-letter"></div>
             </button>
         </li>
@@ -50,7 +50,7 @@
             <button class="nav-link certifheading w-100 {{^haseval}}{{^hascertif}}active{{/hascertif}}{{/haseval}}" id="list-tab" data-toggle="tab" data-target="#list" type="button" role="tab" aria-controls="list" aria-selected="false">
                 {{> mod_competvet/grading/svg/list}}
                 {{#str}}list, mod_competvet{{/str}}
-                <div class="grade-tab-indicator" data-region="grade-tab-list"></div>
+                <div class="grade-tab-indicator {{^cangrade}}d-none{{/cangrade}}" data-region="grade-tab-list"></div>
                 <div class="grade-tab-indicator-letter lettergrade sm" data-region="grade-tab-list-letter"></div>
             </button>
         </li>
