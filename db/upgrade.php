@@ -279,5 +279,29 @@ function xmldb_competvet_upgrade($oldversion) {
         }
         upgrade_mod_savepoint(true, 2025021001, 'competvet');
     }
+
+    if ($oldversion < 2025021004) {
+
+        // Define field textvalue to be added to competvet_case_data.
+        $table = new xmldb_table('competvet_case_data');
+        $field = new xmldb_field('textvalue', XMLDB_TYPE_TEXT, null, null, null, null, null, 'charvalue');
+
+        // Conditionally launch add field textvalue.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Intentionally leaving charvalue as it is for safety.
+        $fields = $DB->get_records('competvet_case_field', ['type' => 'textarea']);
+        foreach ($fields as $field) {
+            $DB->execute(
+                "UPDATE {competvet_case_data} SET textvalue = charvalue WHERE fieldid = :fieldid",
+                ['fieldid' => $field->id]
+            );
+        }
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2025021004, 'competvet');
+    }
+
     return true;
 }
