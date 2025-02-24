@@ -25,6 +25,7 @@ import CompetState from '../../competstate';
 import Notification from 'core/notification';
 import Templates from 'core/templates';
 import Repository from '../../new-repository';
+import {getLetterGrade} from '../../helpers';
 
 const gradingApp = document.querySelector('[data-region="grading-app"]');
 
@@ -76,6 +77,13 @@ const formEvents = () => {
     if (form.dataset.events) {
         return;
     }
+
+    form.addEventListener('change', (e) => {
+        if (e.target.name === 'finalgrade') {
+            form.querySelector('[data-region="lettergrade"]').innerHTML = getLetterGrade(e.target.value);
+        }
+    });
+
     form.addEventListener('submit', async(e) => {
         e.preventDefault();
         const globalgrade = formCalculation();
@@ -93,6 +101,7 @@ const formEvents = () => {
         globalgrade.gradeerror = !result.result;
         globalgrade.commentsuccess = result.result;
         globalgrade.commenterror = !result.result;
+        globalgrade.lettergrade = result.lettergrade;
 
         CompetState.setValue('globalgrade', globalgrade);
     });

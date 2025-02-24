@@ -28,17 +28,23 @@ const gradingApp = document.querySelector('[data-region="grading-app"]');
 const stateWatcher = () => {
     const stateVar = 'subgrades';
     const gradeTabEval = gradingApp.querySelector('[data-region="grade-tab-eval"]');
+    const gradeTabEvalLetter = gradingApp.querySelector('[data-region="grade-tab-eval-letter"]');
     const gradeTabCertif = gradingApp.querySelector('[data-region="grade-tab-certif"]');
+    const gradeTabCertifLetter = gradingApp.querySelector('[data-region="grade-tab-certif-letter"]');
     const gradeTabList = gradingApp.querySelector('[data-region="grade-tab-list"]');
+    const gradeTabListLetter = gradingApp.querySelector('[data-region="grade-tab-list-letter"]');
     const regionRenderer = (context) => {
         if (gradeTabEval) {
             gradeTabEval.innerHTML = '';
+            gradeTabEvalLetter.innerHTML = '';
         }
         if (gradeTabCertif) {
             gradeTabCertif.innerHTML = '';
+            gradeTabCertifLetter.innerHTML = '';
         }
         if (gradeTabList) {
             gradeTabList.innerHTML = '';
+            gradeTabListLetter.innerHTML = '';
         }
         if (context[stateVar] === undefined) {
             return;
@@ -49,12 +55,16 @@ const stateWatcher = () => {
         }
         if (gradeTabEval && (subgrades.EVALUATION_GRADE || subgrades.EVALUATION_GRADE === 0)) {
             gradeTabEval.innerHTML = subgrades.EVALUATION_GRADE;
+            gradeTabEvalLetter.innerHTML = subgrades.EVALUATION_GRADE_LETTER;
         }
         if (gradeTabCertif && (subgrades.CERTIFICATION_GRADE || subgrades.CERTIFICATION_GRADE === 0)) {
             gradeTabCertif.innerHTML = subgrades.CERTIFICATION_GRADE;
+            gradeTabCertifLetter.innerHTML = subgrades.CERTIFICATION_GRADE_LETTER ===
+                'A' ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>';
         }
         if (gradeTabList && (subgrades.LIST_GRADE || subgrades.LIST_GRADE === 0)) {
             gradeTabList.innerHTML = subgrades.LIST_GRADE;
+            gradeTabListLetter.innerHTML = subgrades.LIST_GRADE_LETTER;
         }
         return;
     };

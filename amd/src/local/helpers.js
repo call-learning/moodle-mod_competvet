@@ -21,6 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import CompetState from './competstate';
 const gradingApp = document.querySelector('[data-region="grading-app"]');
 import {get_string as getString} from 'core/str';
 /**
@@ -77,5 +78,21 @@ const submitLoading = () => {
 submitLoading();
 activateShowMoreLess();
 
-export {activateShowMoreLess, submitLoading};
+/**
+ * Get the letter grade for a given grade.
+ * @param {float} grade The grade to get the letter for.
+ * @return {string} The letter grade.
+ */
+const getLetterGrade = (grade) => {
+    const scale = CompetState.getValue('scale');
+    let letter = '';
+    for (const [key, value] of Object.entries(scale)) {
+        if (grade >= key) {
+            letter = value;
+        }
+    }
+    return letter;
+};
+
+export {activateShowMoreLess, submitLoading, getLetterGrade};
 

@@ -32,6 +32,7 @@ import './components/list_results';
 import './components/evaluation_results';
 import './components/evaluation_chart';
 import './components/subgrades';
+import {getLetterGrade} from '../helpers';
 import {getString} from 'core/str';
 
 /**
@@ -104,6 +105,8 @@ class Competvet {
         await this.setCertifResults();
         await this.setListResults();
 
+        await this.getScale();
+
         await this.setListGrading();
         await this.setSubGrades();
         await this.setGlobalGrade();
@@ -139,6 +142,18 @@ class Competvet {
         };
         const response = await Repository.getListResults(args);
         CompetState.setValue('list-results', response);
+    }
+
+    /**
+     * Get the scale.
+     * @return {Promise} The promise.
+     */
+    async getScale() {
+        const args = {
+            cmid: this.cmId,
+        };
+        const response = await Repository.getLetterGradeScale(args);
+        CompetState.setValue('scale', JSON.parse(response.scale));
     }
 
     /**
@@ -249,6 +264,9 @@ class Competvet {
             // For the list-grading we need to check the timemodified against the stored form timemodified.
             if (formname === 'list-grading') {
                 const listGrading = CompetState.getValue('list-grading');
+                if (context.grading.scoreevaluator) {
+                    context.grading.lettergrade = getLetterGrade(context.grading.scoreevaluator);
+                }
                 if (listGrading.grading.timemodified > response.timemodified) {
                     window.console.log('List grading form is outdated:' + listGrading.grading.timemodified +
                         ' ' + response.timemodified);
@@ -293,6 +311,7 @@ class Competvet {
         const evalResults = CompetState.getValue('evaluation-results');
         // Update the values numberofobservations and maxobservations based on the evaluation-results
         context.grading.evalnum = this.gradingApp.dataset.evalnum;
+        context.grading.lettergrade = getLetterGrade(context.grading.scoreevaluator);
 
         let numberofobservations = evalResults.numberofobservations;
         let numberofselfevaluations = evalResults.autoevals.length;

@@ -222,7 +222,8 @@
                                 <a class="btn btn-secondary btn-nowrap mr-2 btn-sm" href="{{{gradeurl}}}">
                                 {{#isgrader}}{{#str}}changegrade, mod_competvet{{/str}}{{/isgrader}}{{^isgrader}}{{#str}}viewgrade, mod_competvet{{/str}}{{/isgrader}}
                                 </a>
-                                <span class="circle" data-region="usergrade" data-rawgrade="{{grade}}">{{grade}}  / 100</span>
+                                {{#isgrader}}<span class="circle" data-region="usergrade" data-rawgrade="{{grade}}">{{grade}} / 100</span>{{/isgrader}}
+                                <div class="lettergrade sm" data-region="lettergrade">{{{lettergrade}}}</div>
                             </div>
                         {{/grade}}
                         {{^grade}}
@@ -242,7 +243,7 @@
                     <td class="t-grade comments">
                         {{#grader}}
                             {{#timegraded}}
-                                <div class="tex-sm text-muted float-right" data-region="timegraded">
+                                <div class="small text-muted float-right" data-region="timegraded">
                                     {{timegraded}}
                                 </div>
                             {{/timegraded}}
