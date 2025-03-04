@@ -37,7 +37,7 @@ class case_data extends persistent {
     const FIELD_TYPE_TO_INTERNAL = [
         'text' => 'charvalue',
         'date' => 'intvalue',
-        'textarea' => 'charvalue',
+        'textarea' => 'textvalue',
         'select' => 'intvalue',
     ];
     /**
@@ -88,6 +88,12 @@ class case_data extends persistent {
                 'type' => PARAM_TEXT,
                 'default' => '',
                 'message' => new lang_string('invaliddata', 'competvet', 'charvalue'),
+            ],
+            'textvalue' => [
+                'null' => NULL_ALLOWED,
+                'type' => PARAM_TEXT,
+                'default' => '',
+                'message' => new lang_string('invaliddata', 'competvet', 'textvalue'),
             ],
         ];
     }
