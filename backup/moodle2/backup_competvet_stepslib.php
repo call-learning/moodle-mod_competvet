@@ -131,7 +131,7 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
         $casedatas = new backup_nested_element('casedatas');
         $casedata = new backup_nested_element('casedata', ['id'], [
             'fieldid', 'entryid', 'intvalue', 'decvalue', 'shortcharvalue',
-            'charvalue', 'value', 'valueformat', 'usermodified', 'timecreated', 'timemodified',
+            'charvalue', 'textvalue', 'value', 'valueformat', 'usermodified', 'timecreated', 'timemodified',
         ]);
 
         $formdatas = new backup_nested_element('formdatas');
