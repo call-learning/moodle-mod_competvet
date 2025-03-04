@@ -51,15 +51,15 @@
             </div>
             <div class="form-group">
                 <label class="h5" for="moodlegrade">
-                    {{#str}}finalgrade, mod_competvet{{/str}} : / 100
+                    {{#str}}finalgrade, mod_competvet{{/str}}{{#cangrade}} : / 100{{/cangrade}}
                 </label>
-                <div>
+                <div class="d-flex align-items-center">
                     <input
                         id="moodlegrade"
                         type="number"
-                        class="form-control form-control-lg w-auto{{!
+                        class="form-control form-control-lg w-auto mr-3{{!
                         }}{{#gradesuccess}} is-valid{{/gradesuccess}}{{!
-                        }}{{#gradeerror}} is-invalid{{/gradeerror}}"
+                        }}{{#gradeerror}} is-invalid{{/gradeerror}} {{^cangrade}}d-none{{/cangrade}}"
                         name="finalgrade"
                         data-field="finalgrade"
                         value="{{finalgrade}}"
@@ -68,6 +68,7 @@
                         step="1"
                         {{^cangrade}}disabled{{/cangrade}}
                     >
+                    <div class="lettergrade" data-region="lettergrade">{{{lettergrade}}}</div>
                 </div>
             </div>
             <div class="form-group">

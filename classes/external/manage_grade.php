@@ -126,15 +126,17 @@ class manage_grade extends external_api {
             ]);
             \core\task\manager::queue_adhoc_task($task);
         }
-
+        $lettergrade = $competvet->get_letter_grade($grade);
         if ($result) {
             return [
                 'result' => true,
+                'lettergrade' => $lettergrade,
                 'warnings' => [],
             ];
         } else {
             return [
                 'result' => false,
+                'lettergrade' => '',
                 'warnings' => [],
             ];
         }
@@ -148,6 +150,7 @@ class manage_grade extends external_api {
     public static function update_returns(): external_single_structure {
         return new external_single_structure([
             'result' => new external_value(PARAM_BOOL, 'The processing result'),
+            'lettergrade' => new external_value(PARAM_TEXT, 'The letter grade'),
             'warnings' => new external_warnings(),
         ]);
     }
@@ -185,9 +188,12 @@ class manage_grade extends external_api {
         self::validate_context($competvet->get_context());
 
         $usergrade = $competvet->get_final_grade_for_student($userid);
+        $lettergrade = $competvet->get_letter_grade($usergrade->finalgrade);
+
         $grade = new stdClass();
         $grade->suggestedgrade = '';
         $grade->finalgrade = intval($usergrade->finalgrade);
+        $grade->lettergrade = $lettergrade;
         $grade->comment = $usergrade->feedback;
         $grade->cangrade = has_capability('mod/competvet:cangrade', $competvet->get_context());
 
@@ -210,6 +216,7 @@ class manage_grade extends external_api {
                     'comment' => new external_value(PARAM_TEXT, 'The comment'),
                     'suggestedgrade' => new external_value(PARAM_TEXT, 'The suggested grade'),
                     'finalgrade' => new external_value(PARAM_INT, 'The final grade'),
+                    'lettergrade' => new external_value(PARAM_TEXT, 'The letter grade'),
                     'cangrade' => new external_value(PARAM_BOOL, 'Can grade'),
                 ]
             ),

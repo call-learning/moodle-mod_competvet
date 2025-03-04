@@ -25,6 +25,7 @@ import CompetState from '../../competstate';
 import Notification from 'core/notification';
 import Templates from 'core/templates';
 import Repository from '../../new-repository';
+import {getLetterGrade} from '../../helpers';
 
 const gradingApp = document.querySelector('[data-region="grading-app"]');
 
@@ -72,6 +73,7 @@ const formCalculation = () => {
     });
     grading.finalscore = grading.evalscore + (grading.penalty * penalty) + Number(grading.selfevaluation);
     grading.scoreevaluator = Number(formObject.scoreevaluator);
+    grading.lettergrade = getLetterGrade(grading.scoreevaluator);
     grading.comment = formObject.comment;
     grading.hideaccept = true;
     if (grading.scoreevaluator !== grading.finalscore) {

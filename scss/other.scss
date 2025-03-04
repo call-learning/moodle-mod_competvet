@@ -1,4 +1,29 @@
 .path-mod-competvet {
+    .lettergrade {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+        font-weight: 700;
+        border: 5px solid #ccc;
+        border-radius: 100%;
+        padding: 0.5rem;
+        &.sm {
+            width: 30px;
+            height: 30px;
+            padding: 0.25rem;
+            font-size: 0.8rem;
+            border-width: 1px;
+            margin-left: 0.5rem;
+            &:empty {
+                border: none;
+                width: 0;
+                height: 0;
+            }
+        }
+    }
     .student-info {
         display: flex;
         justify-content: left;
