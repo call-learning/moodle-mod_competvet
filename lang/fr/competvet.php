@@ -493,6 +493,8 @@ $string['situation:hascertif_help'] = 'En sélectionnant cette case vous activez
 Il faudra vérifier que la liste des incontournables cliniques est bien remplie dans l\'onglet critères et sélectionnée ci-dessous';
 $string['situation:haseval'] = 'Activer le module "Eval" pour l\'évaluation des compétences générales';
 $string['situation:haseval_help'] = 'En sélectionnant cette case vous activez le module "Eval" dans cette activité';
+$string['situation:haslettergrades'] = 'Activer les notes sous forme de lettres';
+$string['situation:haslettergrades_help'] = 'En sélectionnant un barème lettré, les étudiants n\'ont pas accès à leur score sur 100 mais à des lettres utilisant le barème suivant : F : entre 0 et 40; FX : entre 41 et 50; E : entre 51 et 60; D : entre 61 et 70; C : entre 71 et 80; B : entre 81 et 90; A : entre 91 et 100';
 $string['situation:idnumber'] = 'ID unique de la situation';
 $string['situation:intro'] = 'Introduction de la situation';
 $string['situation:listgrid'] = 'Grille  d\'évaluation du journal de cas (List)';

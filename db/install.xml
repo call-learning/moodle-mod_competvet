@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/competvet/db" VERSION="20250224" COMMENT="XMLDB file for Moodle mod_competvet"
+
+<XMLDB PATH="mod/competvet/db" VERSION="20250310" COMMENT="XMLDB file for Moodle mod_competvet"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -34,6 +35,7 @@
         <FIELD NAME="haseval" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="Is the eval module activated"/>
         <FIELD NAME="hascertif" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="Is certif module activated?"/>
         <FIELD NAME="hascase" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="Is case module activated ?"/>
+        <FIELD NAME="haslettergrades" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="1" SEQUENCE="false"/>
         <FIELD NAME="evalgrid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The id evaluation grid for the eval component."/>
         <FIELD NAME="certifgrid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The id evaluation grid for the certif component."/>
         <FIELD NAME="listgrid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The id evaluation grid for the list component."/>

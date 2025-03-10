@@ -22,6 +22,7 @@
  */
 
 import CompetState from '../../competstate';
+import {getLetterGrade} from '../../helpers';
 
 const gradingApp = document.querySelector('[data-region="grading-app"]');
 
@@ -58,9 +59,13 @@ const stateWatcher = () => {
             gradeTabEvalLetter.innerHTML = subgrades.EVALUATION_GRADE_LETTER;
         }
         if (gradeTabCertif && (subgrades.CERTIFICATION_GRADE || subgrades.CERTIFICATION_GRADE === 0)) {
-            gradeTabCertif.innerHTML = subgrades.CERTIFICATION_GRADE;
-            gradeTabCertifLetter.innerHTML = subgrades.CERTIFICATION_GRADE_LETTER ===
-                'A' ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>';
+            // Test if Lettergrades are enabled.
+            const letterGrades = getLetterGrade(10);
+            if (letterGrades) {
+                gradeTabCertif.innerHTML = subgrades.CERTIFICATION_GRADE;
+                gradeTabCertifLetter.innerHTML = subgrades.CERTIFICATION_GRADE_LETTER ===
+                    'A' ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>';
+            }
         }
         if (gradeTabList && (subgrades.LIST_GRADE || subgrades.LIST_GRADE === 0)) {
             gradeTabList.innerHTML = subgrades.LIST_GRADE;

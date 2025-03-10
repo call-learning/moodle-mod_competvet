@@ -68,6 +68,7 @@ class situations {
                     'certifpnum' => $situation->get('certifpnum'),
                     'casenum' => $situation->get('casenum'),
                     'haseval' => $situation->get('haseval'),
+                    'haslettergrades' => $situation->get('haslettergrades'),
                     'hascertif' => $situation->get('hascertif'),
                     'hascase' => $situation->get('hascase'),
                     'intro' => content_to_text($competvetinstance->intro, $competvetinstance->introformat),

@@ -634,6 +634,12 @@
     padding: 0.5rem;
 }
 
+.path-mod-competvet .lettergrade:empty {
+    border: none;
+    width: 0;
+    height: 0;
+}
+
 .path-mod-competvet .lettergrade.sm {
     width: 30px;
     height: 30px;

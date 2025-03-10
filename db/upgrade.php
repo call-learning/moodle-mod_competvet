@@ -303,5 +303,20 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2025021004, 'competvet');
     }
 
+    if ($oldversion < 2025031000) {
+
+        // Define field haslettergrades to be added to competvet_situation.
+        $table = new xmldb_table('competvet_situation');
+        $field = new xmldb_field('haslettergrades', XMLDB_TYPE_INTEGER, '1', null, null, null, '1', 'hascase');
+
+        // Conditionally launch add field haslettergrades.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2025031000, 'competvet');
+    }
+
     return true;
 }
