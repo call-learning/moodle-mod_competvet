@@ -215,6 +215,11 @@ class situation extends persistent {
                 'default' => true,
                 'formtype' => 'advcheckbox',
             ],
+            'haslettergrades' => [
+                'type' => PARAM_BOOL,
+                'default' => true,
+                'formtype' => 'advcheckbox',
+            ],
             'evalgrid' => [
                 'type' => PARAM_INT,
                 'default' => 0,

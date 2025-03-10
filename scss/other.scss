@@ -10,6 +10,11 @@
         border: 5px solid #ccc;
         border-radius: 100%;
         padding: 0.5rem;
+        &:empty {
+            border: none;
+            width: 0;
+            height: 0;
+        }
         &.sm {
             width: 30px;
             height: 30px;

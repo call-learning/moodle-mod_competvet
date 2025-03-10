@@ -96,8 +96,9 @@ const formEvents = () => {
     if (acceptGradeButton) {
         acceptGradeButton.addEventListener('click', async(e) => {
             e.preventDefault();
-            form.querySelector(acceptGradeButton.dataset.target).value =
-                form.querySelector(acceptGradeButton.dataset.source).innerHTML;
+            const newGrade = form.querySelector(acceptGradeButton.dataset.source).innerHTML;
+            form.querySelector(acceptGradeButton.dataset.target).value = newGrade;
+            form.querySelector('[data-region="lettergrade"]').innerHTML = getLetterGrade(newGrade);
         });
     }
     if (form.dataset.events) {

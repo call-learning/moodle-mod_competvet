@@ -87,7 +87,7 @@ const getLetterGrade = (grade) => {
     const scale = CompetState.getValue('scale');
     let letter = '';
     for (const [key, value] of Object.entries(scale)) {
-        if (grade >= key) {
+        if (parseFloat(grade) >= key) {
             letter = value;
         }
     }
