@@ -65,4 +65,12 @@ $observers = [
         'eventname'   => '\core\event\course_module_updated',
         'callback'    => \mod_competvet\local\observers\course_module_observer::class . '::module_updated',
     ],
+    [
+        'eventname'   => '\core\event\group_member_added',
+        'callback'    => \mod_competvet\local\observers\user_group_observer::class . '::group_member_added',
+    ],
+    [
+        'eventname'   => '\core\event\group_member_removed',
+        'callback'    => \mod_competvet\local\observers\user_group_observer::class . '::group_member_removed',
+    ],
 ];
