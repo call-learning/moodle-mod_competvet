@@ -232,4 +232,12 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/competvet:view',
     ],
+    'mod_competvet_fix_orphan_user' => [
+        'classname' => \mod_competvet\external\fix_orphan_user::class,
+        'methodname' => 'execute',
+        'description' => 'Fix orphan user',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:editplanning',
+    ],
 ];

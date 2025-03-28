@@ -227,6 +227,15 @@ class Repository {
     async getLetterGradeScale(args) {
         return Ajax.call([{methodname: 'mod_competvet_get_lettergrade_scale', args: args}])[0];
     }
+
+    /**
+     * Fix an orphan user.
+     * @param {Object} args The arguments.
+     * @return {Promise} The promise.
+     */
+    async fixOrphanUser(args) {
+        return Ajax.call([{methodname: 'mod_competvet_fix_orphan_user', args: args}])[0];
+    }
 }
 
 const RepositoryInstance = new Repository();

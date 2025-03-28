@@ -23,6 +23,8 @@
 
 import {get_strings as getStrings} from 'core/str';
 import XLSX from 'mod_competvet/local/xlsx.mini.min';
+import Repository from '../new-repository';
+import {add as addToast} from 'core/toast';
 
 /**
  * Initialize the plannings view and add event listeners to the search fields.
@@ -84,6 +86,42 @@ export const init = (situationname) => {
         e.preventDefault();
     });
 
+    // Button action listeners
+    document.addEventListener('click', (e) => {
+        const button = e.target.closest('button[data-action]');
+        if (button) {
+            const action = button.dataset.action;
+            switch (action) {
+                case 'orphanfix:add':
+                    orphanFix(button);
+                    break;
+                case 'orphanfix:move':
+                    orphanFix(button);
+                    break;
+                default:
+                    break;
+            }
+        }
+    });
+};
+
+const orphanFix = async(btn) => {
+    const args = {
+        planningid: btn.dataset.planningid,
+        oldplanningid: btn.dataset.oldplanningid,
+        userid: btn.dataset.userid,
+        groupid: btn.dataset.groupid,
+        action: btn.dataset.action,
+    };
+    const result = await Repository.fixOrphanUser(args);
+    if (result.result == '') {
+        addToast('Fixing orphan user failed');
+        return;
+    }
+    addToast(result.result);
+    setTimeout(() => {
+        window.location.reload();
+    }, 1500);
 };
 
 /**

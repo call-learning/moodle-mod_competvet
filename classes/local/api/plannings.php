@@ -19,15 +19,20 @@ namespace mod_competvet\local\api;
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\case_entry;
 use mod_competvet\local\persistent\cert_decl;
+use mod_competvet\local\persistent\form;
 use mod_competvet\local\persistent\observation;
+use mod_competvet\local\persistent\grade;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\planning_pause;
+use mod_competvet\local\persistent\situation;
+use mod_competvet\local\persistent\todo;
 use mod_competvet\utils;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->libdir . '/gradelib.php');
+require_once($CFG->dirroot . '/group/lib.php');
 
 /**
  * Plannings API
@@ -164,9 +169,152 @@ class plannings {
             // Check if this user is a student or not.
             if (!utils::is_student($groupmember->id, $situationcontext->id)) {
                 unset($groupmembers[$index]);
+            } else {
+                $groupmembers[$index]->type = 'groupmember';
+            }
+        }
+        $orphanes = self::check_orphaned_users($planningid, $groupmembers);
+        // Add orphanes to the groupmembers.
+        foreach ($orphanes as $orphan) {
+            if (!isset($groupmembers[$orphan])) {
+                $groupmembers[$orphan] = new \stdClass();
+                $groupmembers[$orphan]->id = $orphan;
+                $groupmembers[$orphan]->type = 'orphan';
+                $groupmembers[$orphan]->solution = self::find_fixes_for_orphan($orphan, $planningid);
             }
         }
         return $groupmembers;
+    }
+
+    /**
+     * Check if there are orphaned users in the planning.
+     * Orphaned users are users who are not in the group of the planning.
+     * But have data in observations, certifications or case entries.
+     * @param int $planningid
+     * @param array $groupmembers
+     * @return array
+     */
+    private static function check_orphaned_users(int $planningid, array $groupmembers): array {
+        $orphanes = [];
+        if (!is_siteadmin()) {
+            return $orphanes;
+        }
+        $students = array_map(fn($user) => $user->id, $groupmembers);
+        $allobservations = observation::get_records(['planningid' => $planningid]);
+        foreach ($allobservations as $observation) {
+            if (!in_array($observation->get('studentid'), $students)) {
+                $orphanes[] = $observation->get('studentid');
+            }
+        }
+        $grades = grade::get_records(['planningid' => $planningid]);
+        foreach ($grades as $grade) {
+            if (!in_array($grade->get('studentid'), $students)) {
+                $orphanes[] = $grade->get('studentid');
+            }
+        }
+        $caseentries = case_entry::get_records(['planningid' => $planningid]);
+        foreach ($caseentries as $caseentry) {
+            if (!in_array($caseentry->get('studentid'), $students)) {
+                $orphanes[] = $caseentry->get('studentid');
+            }
+        }
+        // Make sure we have unique values.
+        $orphanes = array_unique($orphanes);
+        return $orphanes;
+    }
+
+    /**
+     * Find a fix for an orphaned user.
+     * Finds if the user is in 1 other group in the same situation, then allows to move the user to this group.
+     * Finds if the user is not in any group in the same situation, then allows to add the user back to the original group from this
+     * planning.
+     * If user is in multiple groups, then we need to ask to update the user manually in the course group settings.
+     * @param int $userid
+     * @param int $planningid
+     */
+    private static function find_fixes_for_orphan(int $userid, int $planningid): array {
+        $planning = planning::get_record(['id' => $planningid]);
+        $plannings = planning::get_records(['situationid' => $planning->get('situationid')]);
+        foreach($plannings as $p) {
+            if ($p->get('id') == $planningid) {
+                continue;
+            }
+            $groupmembers = groups_get_members($p->get('groupid'), 'u.id');
+            foreach ($groupmembers as $groupmember) {
+                if ($groupmember->id == $userid) {
+                    $groupname = groups_get_group_name($p->get('groupid'));
+                    return [
+                        'action' => 'orphanfix:move',
+                        'fixstring' => get_string('orphanfix:move', 'mod_competvet', $groupname),
+                        'userid' => $userid,
+                        'groupid' => $p->get('groupid'),
+                        'groupname' => $groupname,
+                        'oldplanningid' => $planningid,
+                        'planningid' => $p->get('id'),
+                    ];
+                }
+            }
+        }
+        $groupname = groups_get_group_name($planning->get('groupid'));
+        return [
+            'action' => 'orphanfix:add',
+            'fixstring' => get_string('orphanfix:add', 'mod_competvet', $groupname),
+            'userid' => $userid,
+            'groupid' => $planning->get('groupid'),
+            'groupname' => $groupname,
+            'oldplanningid' => $planningid,
+            'planningid' => $planning->get('id'),
+        ];
+    }
+
+    /**
+     * Fix orphaned user in the planning.
+     * @param int $userid
+     * @param int $planningid
+     * @param int $groupid
+     * @param string $action
+     * @return string
+     */
+    public static function fix_orphan_user(int $userid, int $groupid, int $planningid, int $oldplanningid, string $action): string {
+        if ($action == 'orphanfix:move') {
+            // Move user cases to the new planning.
+            $cases = case_entry::get_records(['planningid' => $oldplanningid, 'studentid' => $userid]);
+            foreach ($cases as $case) {
+                $case->set('planningid', $planningid);
+                $case->save();
+            }
+            $observations = observation::get_records(['planningid' => $oldplanningid, 'studentid' => $userid]);
+            foreach ($observations as $observation) {
+                $observation->set('planningid', $planningid);
+                $observation->save();
+            }
+            $grades = grade::get_records(['planningid' => $oldplanningid, 'studentid' => $userid]);
+            foreach ($grades as $grade) {
+                $grade->set('planningid', $planningid);
+                $grade->save();
+            }
+            $todos = todo::get_records(['planningid' => $oldplanningid, 'userid' => $userid]);
+            foreach ($todos as $todo) {
+                $todo->set('planningid', $planningid);
+                $todo->save();
+            }
+            $certdecl = cert_decl::get_records(['planningid' => $oldplanningid, 'studentid' => $userid]);
+            foreach ($certdecl as $cert) {
+                $cert->set('planningid', $planningid);
+                $cert->save();
+            }
+            $form = form::get_records(['planningid' => $oldplanningid, 'userid' => $userid]);
+            foreach ($form as $f) {
+                $f->set('planningid', $planningid);
+                $f->save();
+            }
+            return "Orphaned user $userid moved from planning $oldplanningid to planning $planningid";
+        }
+        if ($action == 'orphanfix:add') {
+            groups_add_member($groupid, $userid);
+            return "Orphaned user $userid add to group $groupid";
+        }
+        return '';
     }
 
     /**

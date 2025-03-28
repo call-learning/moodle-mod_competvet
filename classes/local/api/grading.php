@@ -111,6 +111,9 @@ class grading {
             }
             $groupmember->studenturl = $competvet->get_user_planning_url($student->id, $planningid);
             $groupmember->gradeurl = $competvet->get_user_grading_url($groupmember->id, $planningid);
+            if ($student->type == 'orphan') {
+                $groupmember->isorphan = true;
+            }
             $profileparams = [
                 'id' => $student->id,
                 'course' => $competvet->get_course_id(),
