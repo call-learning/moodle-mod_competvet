@@ -834,6 +834,22 @@
     border-radius: 100%;
 }
 
+.competvet-grade-table .student.isorphan .btn-fixorphan {
+    z-index: 1;
+}
+
+.competvet-grade-table .student.isorphan .btn-fixorphan .fix {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #000;
+    border-radius: 50%;
+    color: #fff;
+    margin-right: 0.5rem;
+}
+
 .competvet-view-todos .userpicture {
     width: 3rem;
     height: 3rem;

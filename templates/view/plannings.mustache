@@ -153,7 +153,7 @@
                 </th>
             </tr>
             {{#students}}
-                <tr class="student collapse {{^contentcollapsed}}show{{/contentcollapsed}}" data-studentid="{{userinfo.id}}" data-planningid="{{planninginfo.planningid}}" id="collapse{{planninginfo.planningid}}" data-hasgrade="{{#grade}}1{{/grade}}">
+                <tr class="student collapse {{^contentcollapsed}}show{{/contentcollapsed}}{{#isorphan}} isorphan{{/isorphan}}" data-studentid="{{userinfo.id}}" data-planningid="{{planninginfo.planningid}}" id="collapse{{planninginfo.planningid}}" data-hasgrade="{{#grade}}1{{/grade}}">
                     <th class="user student-name">
                         <div class="d-flex align-items-center position-relative">
                             <img src="{{userinfo.userpictureurl}}" alt="{{userinfo.fullname}}" class="userpicture">
@@ -217,28 +217,48 @@
                         </div>
                     </td>
                     <td class="t-grade globalgrade">
-                        {{#grade}}
-                            <div class="d-flex align-items-center">
-                                <a class="btn btn-secondary btn-nowrap mr-2 btn-sm" href="{{{gradeurl}}}">
-                                {{#isgrader}}{{#str}}changegrade, mod_competvet{{/str}}{{/isgrader}}{{^isgrader}}{{#str}}viewgrade, mod_competvet{{/str}}{{/isgrader}}
-                                </a>
-                                {{#isgrader}}<span class="circle" data-region="usergrade" data-rawgrade="{{grade}}">{{grade}} / 100</span>{{/isgrader}}
-                                <div class="lettergrade sm" data-region="lettergrade">{{{lettergrade}}}</div>
+                        {{#isorphan}}
+                            <div class="position-relative fix-orphan">
+                                <button class="btn btn-danger btn-fixorphan btn-nowrap mr-2 btn-sm" title="Fix Action">
+                                    <span class="fix"><i class="fa fa-exclamation fa-fw"></i></span>
+                                    {{#str}}orphanuserfix, mod_competvet{{/str}}
+                                </button>
+                                <span class="popovertext d-none">
+                                    <div class="label label-info">
+                                        {{#solution}}
+                                            {{#str}}orphanuserfix, mod_competvet{{/str}}
+                                            <button class="btn btn-link p-0" href="#" data-region="fixorphanbutton" data-action="{{action}}" data-userid="{{userid}}" data-groupid="{{groupid}}" data-planningid="{{planningid}}" data-oldplanningid="{{oldplanningid}}">
+                                                {{{fixstring}}}
+                                            </button>
+                                        {{/solution}}
+                                    </div>
+                                </span>
                             </div>
-                        {{/grade}}
-                        {{^grade}}
-                            <div class="d-flex align-items-center">
-                                {{#isgrader}}
-                                    <a class="btn btn-primary btn-nowrap mr-2 btn-sm" href="{{{gradeurl}}}">
-                                        {{#isgrader}}{{#str}}gradestudent, mod_competvet{{/str}}{{/isgrader}}
+                        {{/isorphan}}
+                        {{^isorphan}}
+                            {{#grade}}
+                                <div class="d-flex align-items-center">
+                                    <a class="btn btn-secondary btn-nowrap mr-2 btn-sm" href="{{{gradeurl}}}">
+                                    {{#isgrader}}{{#str}}changegrade, mod_competvet{{/str}}{{/isgrader}}{{^isgrader}}{{#str}}viewgrade, mod_competvet{{/str}}{{/isgrader}}
                                     </a>
-                                {{/isgrader}}
-                                {{^isgrader}}
-                                    <span class="text-dark">{{#str}}notgradedyet, mod_competvet{{/str}}</span>
-                                {{/isgrader}}
-                                <span class="circle bg-white border-0" data-region="usergrade">&nbsp;</span>
-                            </div>
-                        {{/grade}}
+                                    {{#isgrader}}<span class="circle" data-region="usergrade" data-rawgrade="{{grade}}">{{grade}} / 100</span>{{/isgrader}}
+                                    <div class="lettergrade sm" data-region="lettergrade">{{{lettergrade}}}</div>
+                                </div>
+                            {{/grade}}
+                            {{^grade}}
+                                <div class="d-flex align-items-center">
+                                    {{#isgrader}}
+                                        <a class="btn btn-primary btn-nowrap mr-2 btn-sm" href="{{{gradeurl}}}">
+                                            {{#isgrader}}{{#str}}gradestudent, mod_competvet{{/str}}{{/isgrader}}
+                                        </a>
+                                    {{/isgrader}}
+                                    {{^isgrader}}
+                                        <span class="text-dark">{{#str}}notgradedyet, mod_competvet{{/str}}</span>
+                                    {{/isgrader}}
+                                    <span class="circle bg-white border-0" data-region="usergrade">&nbsp;</span>
+                                </div>
+                            {{/grade}}
+                        {{/isorphan}}
                     </td>
                     <td class="t-grade comments">
                         {{#grader}}
@@ -265,7 +285,15 @@
     {{/categories}}
 </table>
 {{#js}}
-    require(['{{modulename}}/local/view/plannings'], function(Plannings) {
+    require(['{{modulename}}/local/view/plannings', 'jquery', 'theme_boost/bootstrap/popover'], function(Plannings, $) {
     Plannings.init("{{situationname}}");
+
+    $('.btn-fixorphan').popover({
+        html: true,
+        sanitize: false,
+        content: function () {
+            return $(this).parent().find('.popovertext').html();
+        }
+    });
     });
 {{/js}}
