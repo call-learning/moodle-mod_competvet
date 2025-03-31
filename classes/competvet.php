@@ -455,10 +455,14 @@ class competvet {
 
     /**
      * Get the letter grade based on the numeric grade
-     * @param float $grade The grade
+     * @param float|null $grade The grade
      * @return string
      */
-    public function get_letter_grade(float $grade): string {
+    public function get_letter_grade(?float $grade): string {
+
+        if (!is_numeric($grade)) {
+            return '';
+        }
 
         $situation = $this->get_situation();
         if ($situation->get('haslettergrades') == 0) {

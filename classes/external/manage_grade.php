@@ -188,7 +188,7 @@ class manage_grade extends external_api {
         self::validate_context($competvet->get_context());
 
         $usergrade = $competvet->get_final_grade_for_student($userid);
-        $lettergrade = $competvet->get_letter_grade($usergrade->finalgrade ?? 0.0);
+        $lettergrade = $competvet->get_letter_grade($usergrade->finalgrade);
 
         $grade = new stdClass();
         $grade->suggestedgrade = '';
