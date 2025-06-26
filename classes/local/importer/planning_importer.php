@@ -172,7 +172,7 @@ class planning_importer extends base_persistent_importer {
             $format = 'd/m/Y';
         }
         $dt = DateTime::createFromFormat($format, $datestring);
-        if ($dt === false || array_sum($dt::getLastErrors()) > 0) {
+        if ($dt === false || !empty($dt::getLastErrors())) {
             throw new \moodle_exception('invaliddate', 'mod_competvet', null, $datestring);
         }
         $year = (int) $dt->format('Y');
