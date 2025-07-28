@@ -98,7 +98,38 @@ class planning_importer extends base_persistent_importer {
         $data->enddate = $this->process_end_date($data->enddate);
         $data->situationid = $this->situationid;
 
+        // Extract pause data from separate columns or legacy format
+        $data->pause_data = $this->extract_pause_data($data);
+
         return $data;
+    }
+
+    /**
+     * Extract pause data from CSV row
+     *
+     * @param stdClass $row
+     * @return array
+     */
+    private function extract_pause_data(\stdClass $row): array {
+        $pauses = [];
+
+        // Check if we have the new format (separate pause columns)
+        $pauseIndex = 1;
+        while (isset($row->{"Pause_start_$pauseIndex"}) && isset($row->{"Pause_end_$pauseIndex"})) {
+            $startDate = trim($row->{"Pause_start_$pauseIndex"});
+            $endDate = trim($row->{"Pause_end_$pauseIndex"});
+
+            // Only add pause if both start and end dates are provided
+            if (!empty($startDate) && !empty($endDate)) {
+                $pauses[] = [
+                    'start' => $startDate,
+                    'end' => $endDate
+                ];
+            }
+            $pauseIndex++;
+        }
+
+        return $pauses;
     }
 
     /**
@@ -107,7 +138,7 @@ class planning_importer extends base_persistent_importer {
      * @param object $data
      * @return void
      */
-    protected function persist_data(object $data) {
+    protected function persist_data(object $data): void {
         $uniquekeys = $this->options['uniquekeys'] ?? [];
         if ($uniquekeys) {
             $existing = planning::get_record(array_intersect_key((array) $data, array_flip($uniquekeys)));
@@ -127,33 +158,39 @@ class planning_importer extends base_persistent_importer {
         }
 
         // Handle pauses after planning data is persisted
-        if (!empty($data->pauses)) {
-            $this->handle_pauses($data->pauses, $planningid);
+        if (!empty($data->pause_data)) {
+            $this->handle_pauses($data->pause_data, $planningid);
         }
     }
 
     /**
      * Handle pauses
      *
-     * @param string $pauses
+     * @param array $pauseData
      * @param int $planningid
      * @return void
      */
-    private function handle_pauses(string $pauses, int $planningid) {
+    private function handle_pauses(array $pauseData, int $planningid): void {
         global $USER;
-        $pauseEntries = explode(',', $pauses);
-        foreach ($pauseEntries as $pauseEntry) {
-            list($pauseStart, $pauseEnd) = explode(' - ', $pauseEntry);
-            $pauseData = [
+
+        // Delete existing pauses for this planning
+        $existingPauses = planning_pause::get_records(['planningid' => $planningid]);
+        foreach ($existingPauses as $existingPause) {
+            $existingPause->delete();
+        }
+
+        // Create new pauses
+        foreach ($pauseData as $pause) {
+            $pauseRecord = [
                 'planningid' => $planningid,
-                'startdate' => $this->process_date($pauseStart),
-                'enddate' => $this->process_date($pauseEnd),
+                'startdate' => $this->process_date($pause['start']),
+                'enddate' => $this->process_date($pause['end']),
                 'usermodified' => $USER->id,
                 'timecreated' => time(),
                 'timemodified' => time(),
             ];
-            $pause = new planning_pause(0, (object) $pauseData);
-            $pause->save();
+            $pauseObj = new planning_pause(0, (object) $pauseRecord);
+            $pauseObj->save();
         }
     }
 
@@ -164,7 +201,7 @@ class planning_importer extends base_persistent_importer {
      * @return int
      * @throws \moodle_exception
      */
-    private function process_date(string $datestring) {
+    private function process_date(string $datestring): int {
         // Check if time is included in the date string.
         if (strpos($datestring, ':') !== false) {
             $format = 'd/m/Y H:i';
@@ -172,7 +209,7 @@ class planning_importer extends base_persistent_importer {
             $format = 'd/m/Y';
         }
         $dt = DateTime::createFromFormat($format, $datestring);
-        if ($dt === false || !empty($dt::getLastErrors())) {
+        if ($dt === false) {
             throw new \moodle_exception('invaliddate', 'mod_competvet', null, $datestring);
         }
         $year = (int) $dt->format('Y');
@@ -189,7 +226,7 @@ class planning_importer extends base_persistent_importer {
      * @return int
      * @throws \moodle_exception
      */
-    private function process_start_date(string $datestring) {
+    private function process_start_date(string $datestring): int {
         $date = $this->process_date($datestring);
         if (!strpos($datestring, ':') !== false) {
             $date = planning::round_start_date($date);
@@ -204,13 +241,14 @@ class planning_importer extends base_persistent_importer {
      * @return int
      * @throws \moodle_exception
      */
-    private function process_end_date(string $datestring) {
+    private function process_end_date(string $datestring): int {
         $date = $this->process_date($datestring);
         if (!strpos($datestring, ':') !== false) {
             $date = planning::round_end_date($date);
         }
         return $date;
     }
+
     /**
      * Get persistent column names from the CSV column names
      *

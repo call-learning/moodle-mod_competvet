@@ -25,9 +25,10 @@
 
 import CompetState from 'mod_competvet/local/competstate';
 import Repository from 'mod_competvet/local/new-repository';
+import Notification from 'core/notification';
 import './plannings';
 import ModalSaveCancel from 'core/modal_save_cancel';
-import {getString} from 'core/str';
+import {getString, getStrings} from 'core/str';
 import ModalEvents from 'core/modal_events';
 
 /*
@@ -92,6 +93,9 @@ class Manager {
         }
         if (btn.dataset.action === 'delete') {
             this.delete(btn);
+        }
+        if (btn.dataset.action === 'deleteall') {
+            this.deleteAll(btn);
         }
     }
 
@@ -162,6 +166,48 @@ class Manager {
             this.save();
         }
     }
+
+    /**
+     * Delete all plannings.
+     */
+    async deleteAll() {
+        const state = CompetState.getData();
+        if (state.plannings.length === 0) {
+            return;
+        }
+        const confirmationStrings = await getStrings([
+            {
+                key: 'confirm',
+                component: 'mod_competvet',
+            },
+            {
+                key: 'deleteallinfo',
+                component: 'mod_competvet',
+            },
+            {
+                key: 'confirmplanningdeleteall',
+                component: 'mod_competvet',
+            },
+            {
+                key: 'cancel',
+                component: 'mod_competvet',
+            },
+        ]);
+        Notification.confirm(
+            ...confirmationStrings,
+            () => {
+                state.plannings.forEach((planning) => {
+                    planning.deleted = true;
+                });
+                CompetState.setData(state);
+                this.save();
+            },
+            () => {
+                // Do nothing, the user cancelled the action.
+            },
+        );
+    }
+
 
     /**
      * Edit a planning or category by manipulating the state, for the state structure see the example data structure.
