@@ -82,7 +82,10 @@ trait test_data_definition {
                 $module = $generator->create_module('competvet', $situationmodule);
                 $competvet = competvet::get_from_instance_id($module->id);
                 $situation = $competvet->get_situation();
-                foreach ($situationinfo['plannings'] as $planningdef) {
+                if (empty($situationinfo['plannings'])) {
+                    continue; // No planning to create.
+                }
+                foreach (($situationinfo['plannings'] ?? []) as $planningdef) {
                     $groupid = groups_get_group_by_name($course->id, $planningdef['groupname']);
                     $planning = $competvetevalgenerator->create_planning([
                         'courseid' => $course->id,
