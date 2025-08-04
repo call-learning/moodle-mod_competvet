@@ -129,6 +129,7 @@ $string['defaultcriteria_help'] = 'Les critères par défaut sont fixes, seul le
 $string['defaultlang_help'] = 'Langue par défaut de l\'activité';
 $string['delete'] = 'Supprimer';
 $string['deleteallplanning'] = 'Supprimer toute la planification';
+$string['deleteexistingroles'] = 'Supprimer les attributions de rôles existantes';
 $string['edit'] = 'Modifier';
 $string['editplanning'] = 'Modifier la planification';
 $string['email:end_of_planning'] = <<<'EOF'
