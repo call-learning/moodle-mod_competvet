@@ -227,6 +227,24 @@ class Repository {
     async getLetterGradeScale(args) {
         return Ajax.call([{methodname: 'mod_competvet_get_lettergrade_scale', args: args}])[0];
     }
+
+    /**
+     * Add or remove roles for a list of users in a course module context.
+     * @param {Object} args The arguments containing user IDs and role ID.
+     * @return {Promise} The promise.
+     */
+    async addRemoveRols(args) {
+        return Ajax.call([{methodname: 'mod_competvet_add_remove_roles', args: args}])[0];
+    }
+
+    /**
+     * Get the list of roles for a course module.
+     * @param {Object} args The arguments containing course module ID.
+     * @return {Promise} The promise.
+     */
+    async getRoles(args) {
+        return Ajax.call([{methodname: 'mod_competvet_get_roles', args: args}])[0];
+    }
 }
 
 const RepositoryInstance = new Repository();

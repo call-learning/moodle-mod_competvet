@@ -232,4 +232,20 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/competvet:view',
     ],
+    'mod_competvet_add_remove_roles' => [
+        'classname' => \mod_competvet\external\assign_roles::class,
+        'methodname' => 'execute',
+        'description' => 'Assign or remove a role for a list of users in a course module context',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'moodle/role:assign',
+    ],
+    'mod_competvet_get_roles' => [
+        'classname' => \mod_competvet\external\get_roles::class,
+        'methodname' => 'execute',
+        'description' => 'Get the list of roles for a course module',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'moodle/role:assign',
+    ],
 ];

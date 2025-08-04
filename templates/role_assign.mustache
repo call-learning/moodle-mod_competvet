@@ -1,0 +1,99 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_competvet/role_assign
+
+    TODO describe template role_assign
+
+    Example context (json):
+    {
+    }
+}}
+{{#showallroles}}
+    <div class="container-fluid" data-region="roleassign" data-cmid="{{{cmid}}}">
+        <div class="row">
+            <div class="col-12 d-flex align-items-center">
+                <h2>{{#str}}assignroles, core_role{{/str}}</h2>
+                <div class="ml-auto">
+                    <button data-action="exportcsv" class="btn btn-secondary text-nowrap">
+                        {{#str}}exportroles, mod_competvet{{/str}}
+                    </button>
+                    <button data-action="role-upload-form" class="btn btn-secondary text-nowrap" data-cmid="{{{cmid}}}">
+                        {{#str}}uploadroles, mod_competvet{{/str}}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="table-responsive mt-4">
+        <table class="table table-striped table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">{{#str}}role{{/str}}</th>
+                    <th scope="col">{{#str}}description{{/str}}</th>
+                    <th scope="col">{{#str}}userswiththisrole, core_role{{/str}}</th>
+                </tr>
+            </thead>
+            <tbody>
+            {{#assignableroles}}
+                <tr>
+                    <td><a href="{{{editlink}}}">{{name}}</a></td>
+                    <td>{{description}}</td>
+                    <td>
+                        {{#users}}
+                            <a class="d-block"href="{{profileurl}}">{{fullname}}</a>
+                        {{/users}}
+                        {{^users}}
+                            <span class="text-muted">{{#str}}none{{/str}}</span>
+                        {{/users}}
+                    </td>
+                </tr>
+            {{/assignableroles}}
+            </tbody>
+        </table>
+    </div>
+{{/showallroles}}
+
+{{#showroleassign}}
+    <div class="container-fluid" data-region="roleassign" data-cmid="{{{cmid}}}" data-roleid="{{{roleid}}}">
+        <div class="row">
+            <div class="col-12 d-flex align-items-center">
+                <a class="btn btn-sm btn-secondary mr-2" href="{{{backurl}}}">{{#str}}back, core{{/str}}</a>
+                <h2>{{#str}}assignroles, core_role{{/str}}</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-5">
+                {{{currentuserselector}}}
+            </div>
+            <div class="col-12 col-md-1 text-center d-flex flex-column justify-content-center">
+                <button class="btn btn-sm btn-secondary mb-2" type="submit" data-action="add">{{#str}}add{{/str}}</button>
+                <button class="btn btn-sm btn-secondary" type="remove" data-action="remove">{{#str}}remove{{/str}}</button>
+            </div>
+            <div class="col-12 col-md-6">
+                {{{potentialuserselector}}}
+            </div>
+        </div>
+    </div>
+{{/showroleassign}}
+{{#js}}
+require(['mod_competvet/local/view/roleassign'], function(RoleAssign) {
+    RoleAssign.init({
+        cmid: {{{cmid}}},
+    });
+});
+{{/js}}
