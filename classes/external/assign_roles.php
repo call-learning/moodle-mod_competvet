@@ -27,6 +27,7 @@ use core_external\external_function_parameters;
 use core_external\external_value;
 use core_external\external_single_structure;
 use core_external\external_multiple_structure;
+use core_user;
 
 /**
  * Class assign_roles
@@ -36,7 +37,7 @@ use core_external\external_multiple_structure;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class assign_roles extends external_api {
-        /**
+    /**
      * Assign or remove a role for a list of users in a course module context.
      *
      * @param array $userids Array of user IDs
@@ -46,12 +47,20 @@ class assign_roles extends external_api {
      * @return array Result array
      */
     public static function execute($userids, $cmid, $action, $roleid): array {
+        global $DB;
         self::validate_context(context_system::instance());
         $results = [];
         $cm = get_coursemodule_from_id(null, $cmid, 0, false, MUST_EXIST);
         $context = \context_module::instance($cm->id);
         require_capability('moodle/role:assign', $context);
+        if (!$DB->record_exists('role', ['id' => $roleid])) {
+            throw new \moodle_exception('invalidroleid', 'error', '', $roleid);
+        }
         foreach ($userids as $userid) {
+            if (!core_user::is_real_user($userid, true)) {
+                $results[] = ['userid' => $userid, 'action' => 'invaliduser'];
+                continue; // Skip if the user ID is not valid.
+            }
             if ($action === 'add') {
                 role_assign($roleid, $userid, $context->id);
                 $results[] = ['userid' => $userid, 'action' => 'added'];

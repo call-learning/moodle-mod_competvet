@@ -23,11 +23,10 @@ require_once("$CFG->libdir/externallib.php");
 
 use context_system;
 use core_external\external_api;
-use core_external\external_description;
 use core_external\external_function_parameters;
-use core_external\external_value;
-use core_external\external_single_structure;
 use core_external\external_multiple_structure;
+use core_external\external_single_structure;
+use core_external\external_value;
 
 /**
  * Class get_roles
@@ -48,12 +47,14 @@ class get_roles extends external_api {
         self::validate_context(context_system::instance());
         $cm = get_coursemodule_from_id(null, $cmid, 0, false, MUST_EXIST);
         $context = \context_module::instance($cm->id);
+        require_capability('moodle/role:review', $context); // This capability is needed to review
+        // roles (teachers and managers).
         $roles = get_assignable_roles($context, ROLENAME_SHORT);
         $result = [];
         foreach ($roles as $roleid => $roleshortname) {
             $roleentry = [
                 'roleshortname' => $roleshortname,
-                'users' => []
+                'users' => [],
             ];
             $userfieldsapi = \core_user\fields::for_name();
             $userfields = 'u.id, u.username' . $userfieldsapi->get_sql('u')->selects;
@@ -70,6 +71,7 @@ class get_roles extends external_api {
 
     /**
      * Parameters for execute webservice.
+     *
      * @return external_function_parameters
      */
     public static function execute_parameters(): external_function_parameters {
@@ -80,18 +82,24 @@ class get_roles extends external_api {
 
     /**
      * Returns for execute webservice.
+     *
      * @return external_multiple_structure
      */
     public static function execute_returns(): external_multiple_structure {
         return new external_multiple_structure(
-            new external_single_structure([
-                'roleshortname' => new external_value(PARAM_ALPHANUMEXT, 'Role shortname'),
-                'users' => new external_multiple_structure(
-                    new external_single_structure([
-                        'username' => new external_value(PARAM_ALPHANUMEXT, 'Username'),
-                    ])
-                )
-            ])
+            new external_single_structure(
+                [
+                    'roleshortname' => new external_value(PARAM_ALPHANUMEXT, 'Role shortname'),
+                    'users' => new external_multiple_structure(
+                        new external_single_structure([
+                            'username' => new external_value(PARAM_USERNAME, 'Username'),
+                        ]),
+                        'List of users assigned to the role',
+                        VALUE_DEFAULT,
+                        [],
+                    ),
+                ]
+            )
         );
     }
 }
