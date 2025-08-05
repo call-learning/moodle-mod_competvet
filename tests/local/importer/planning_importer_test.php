@@ -83,6 +83,9 @@ final class planning_importer_test extends advanced_testcase {
                     'Group4' => [
                         'users' => [],
                     ],
+                    'Group5' => [
+                        'users' => [],
+                    ],
                 ],
                 'activities' => [
                     'SIT1' => [
@@ -99,11 +102,37 @@ final class planning_importer_test extends advanced_testcase {
         $importer = new planning_importer(planning::class, $competvet->get_course_id(), $situation->get('id'));
         $importer->import($CFG->dirroot . self::SAMPLE_FILE_PATH);
         $plannings = planning::get_records(['situationid' => $situation->get('id')]);
-        $this->assertEquals(4, count($plannings), 'Number of plannings should be 4 after import.');
-        $this->assertEquals(8, planning_pause::count_records());
+        $this->assertEquals(5, count($plannings), 'Number of plannings should be 4 after import.');
+        $this->assertEquals(10, planning_pause::count_records());
         $this->assertEquals(2, planning_pause::count_records(['planningid' => $plannings[0]->get('id')]));
         $this->assertEquals(2, planning_pause::count_records(['planningid' => $plannings[1]->get('id')]));
         $this->assertEquals(4, planning_pause::count_records(['planningid' => $plannings[3]->get('id')]));
+
+        // Now check that we round the start and end date correctly, even for the pauses.
+        $planning5 = planning::get_record(['situationid' => $situation->get('id'), 'session' => 'session-5']);
+
+        $this->assertEquals(
+            '00:00', \core_date::strftime('%H:%M', $planning5->get('startdate')),
+        );
+        $this->assertEquals(
+            '23:59', \core_date::strftime('%H:%M', $planning5->get('enddate')),
+        );
+
+        $expected = [
+            ['00:00', '23:59'],
+            ['00:00', '23:00'],
+        ];
+        $pauses = planning_pause::get_records(['planningid' => $planning5->get('id')]);
+        $this->assertCount(count($expected), $pauses, 'There should be 2 pauses for planning 5.');
+        foreach ($pauses as $pause) {
+            [$expectedstart, $expectedend] = array_shift($expected);
+            $this->assertEquals(
+                $expectedstart, \core_date::strftime('%H:%M', $pause->get('startdate')),
+            );
+            $this->assertEquals(
+                $expectedend, \core_date::strftime('%H:%M', $pause->get('enddate')),
+            );
+        }
     }
 
     /**
@@ -113,7 +142,8 @@ final class planning_importer_test extends advanced_testcase {
     public function test_import_planning_with_existing(): void {
         global $CFG;
         $this->resetAfterTest();
-        $startdate = time();
+        $clock = $this->mock_clock_with_frozen();
+        $startdate = $clock->time();
         $oneweek = 7 * DAYSECS;
         $onemonth = 30 * DAYSECS;
         $data = [
@@ -133,6 +163,9 @@ final class planning_importer_test extends advanced_testcase {
                         'users' => ['student2'],
                     ],
                     'Group4' => [
+                        'users' => [],
+                    ],
+                    'Group5' => [
                         'users' => [],
                     ],
                 ],
@@ -170,7 +203,7 @@ final class planning_importer_test extends advanced_testcase {
         $importer = new planning_importer(planning::class, $competvet->get_course_id(), $situation->get('id'));
         $importer->import($CFG->dirroot . self::SAMPLE_FILE_PATH);
         $firstimport = planning::get_records(['situationid' => $situation->get('id')]);
-        $this->assertEquals(7, count($firstimport));
+        $this->assertEquals(8, count($firstimport));
         // Second import (même fichier, doit mettre à jour ou ignorer les doublons).
         $importer->import($CFG->dirroot . self::SAMPLE_FILE_PATH);
         $secondimport = planning::get_records(['situationid' => $situation->get('id')]);

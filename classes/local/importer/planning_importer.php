@@ -183,8 +183,8 @@ class planning_importer extends base_persistent_importer {
         foreach ($pauseData as $pause) {
             $pauseRecord = [
                 'planningid' => $planningid,
-                'startdate' => $this->process_date($pause['start']),
-                'enddate' => $this->process_date($pause['end']),
+                'startdate' => $this->process_start_date($pause['start']),
+                'enddate' => $this->process_end_date($pause['end']),
                 'usermodified' => $USER->id,
                 'timecreated' => time(),
                 'timemodified' => time(),
