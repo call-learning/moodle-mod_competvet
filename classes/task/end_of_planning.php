@@ -53,7 +53,7 @@ class end_of_planning extends \core\task\scheduled_task {
      */
     public function execute() {
         global $DB;
-
+        $clock = \core\di::get(\core\clock::class);
         $lastinterval = strtotime('-7 day');
 
         // Get plannings that are near the end, not fully evaluated, and have no sent notification.
@@ -66,7 +66,7 @@ class end_of_planning extends \core\task\scheduled_task {
             AND n.id IS NULL
         ", [
             'lastinterval' => $lastinterval,  // Plannings ending in the last time we checked.
-            'now' => time(),
+            'now' => $clock->time(),
             'notification' => $this->taskname,
         ]);
         // Send a reminder email for each planning that does not have a notification.

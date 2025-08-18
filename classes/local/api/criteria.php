@@ -44,11 +44,12 @@ class criteria {
      */
     public static function update_grid(int $gridid, string $gridname, int $sortorder, int $situationid, int $type): int {
         $grid = grid::get_record(['id' => $gridid]);
+        $clock = \core\di::get(\core\clock::class);
         if (!$grid) {
             $grid = new grid(0);
             $grid->set('name', $gridname);
             // Generate a unique idnumber.
-            $idnumber = time();
+            $idnumber = $clock->time();
             $grid->set('idnumber', $idnumber);
             $grid->set('situationid', $situationid);
             $grid->set('sortorder', $sortorder);
@@ -68,9 +69,10 @@ class criteria {
      * @param int $gridid - The grid id
      */
     public static function set_grid_modified(int $gridid): void {
+        $clock = \core\di::get(\core\clock::class);
         $grid = grid::get_record(['id' => $gridid]);
         if ($grid) {
-            $grid->set('timemodified', time());
+            $grid->set('timemodified', $clock->time());
             $grid->update();
         }
     }

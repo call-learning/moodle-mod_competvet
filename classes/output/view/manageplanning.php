@@ -42,8 +42,9 @@ class manageplanning extends base {
      */
     public function export_for_template(renderer_base $output) {
         global $CFG;
+        $clock = \core\di::get(\core\clock::class);
         $data = parent::export_for_template($output);
-        $data['version'] = time();
+        $data['version'] = $clock->time();
         $data['cmid'] = $this->competvet->get_course_module_id();
         $data['courseid'] = $this->competvet->get_course_id();
         $data['situationid'] = $this->competvet->get_situation()->get('id');

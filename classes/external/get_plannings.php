@@ -88,11 +88,12 @@ class get_plannings extends external_api {
             $plannings[$key]['hasuserdata'] = plannings_api::has_user_data($planning['id']);
             $plannings[$key]['pauses'] = plannings_api::get_planning_pauses($planning['id']);
         }
+        $clock = \core\di::get(\core\clock::class);
 
         return [
             'plannings' => $plannings,
             'groups' => $groups,
-            'version' => time(),
+            'version' => $clock->time(),
         ];
     }
 

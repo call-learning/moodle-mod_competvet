@@ -82,7 +82,10 @@ class plannings {
             $planningfilters = array_merge($planningfilters, $params);
         }
         if ($nofuture) {
-            $planningfilters['minstartdate'] = (new \DateTime('next Monday'))->getTimestamp();
+            $clock = \core\di::get(\core\clock::class);
+            $nextmonday = $clock->now();
+            $nextmonday = $nextmonday->modify('next Monday');
+            $planningfilters['minstartdate'] = $nextmonday->getTimestamp();
             $planninngssql .= " AND startdate < :minstartdate";
         }
         $allplannings = planning::get_records_select($planninngssql, $planningfilters, 'startdate ASC');
@@ -178,7 +181,8 @@ class plannings {
     public static function get_category_for_planning_id(int $planningid): int {
         $planning = planning::get_record(['id' => $planningid]);
         // First check: is this the current week ?
-        $now = time();
+        $clock = \core\di::get(\core\clock::class);
+        $now = $clock->time();
         if ($now >= $planning->get('startdate') && $now <= $planning->get('enddate')) {
             // Check if the planning is paused.
             if (self::is_planning_paused($planningid)) {
@@ -567,7 +571,8 @@ class plannings {
      * @return bool True if the planning is paused, false otherwise.
      */
     public static function is_planning_paused(int $planningid): bool {
-        $now = time();
+        $clock = \core\di::get(\core\clock::class);
+        $now = $clock->time();
         $pauses = planning_pause::get_records(['planningid' => $planningid]);
         foreach ($pauses as $pause) {
             if ($now >= $pause->get('startdate') && $now <= $pause->get('enddate')) {

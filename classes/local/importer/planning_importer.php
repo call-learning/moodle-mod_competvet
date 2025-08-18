@@ -178,16 +178,16 @@ class planning_importer extends base_persistent_importer {
         foreach ($existingPauses as $existingPause) {
             $existingPause->delete();
         }
-
-        // Create new pauses
+        $clock = \core\di::get(\core\clock::class);
+        // Create new pauses.
         foreach ($pauseData as $pause) {
             $pauseRecord = [
                 'planningid' => $planningid,
                 'startdate' => $this->process_start_date($pause['start']),
                 'enddate' => $this->process_end_date($pause['end']),
                 'usermodified' => $USER->id,
-                'timecreated' => time(),
-                'timemodified' => time(),
+                'timecreated' => $clock->time(),
+                'timemodified' => $clock->time(),
             ];
             $pauseObj = new planning_pause(0, (object) $pauseRecord);
             $pauseObj->save();

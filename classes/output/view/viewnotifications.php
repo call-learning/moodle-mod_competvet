@@ -61,6 +61,7 @@ class viewnotifications extends base {
      */
     public function export_for_template(renderer_base $output) {
         global $CFG;
+        $clock = \core\di::get(\core\clock::class);
         $data = parent::export_for_template($output);
 
         $this->before_render();
@@ -123,7 +124,7 @@ class viewnotifications extends base {
             array_merge($this->get_url_params(), ['deleteall' => 1]));
         }
 
-        $data['version'] = time();
+        $data['version'] = $clock->time();
         $data['debug'] = $CFG->debugdisplay;
 
         return $data;

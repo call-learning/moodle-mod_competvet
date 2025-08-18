@@ -173,10 +173,11 @@ abstract class base implements renderable, named_templatable {
      */
     public function export_for_template(renderer_base $output) {
         global $CFG;
+        $clock = \core\di::get(\core\clock::class);
         return [
             'modulename' => $this->currentmodule,
             'wwwroot' => $CFG->wwwroot,
-            'version' => time(),
+            'version' => $clock->time(),
         ];
     }
 }

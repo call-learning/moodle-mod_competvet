@@ -196,13 +196,14 @@ class grader {
      */
     private function get_user_grades_for_deletion(int $userid = 0): array {
         $grades = [];
+        $clock = \core\di::get(\core\clock::class);
 
         if ($userid) {
             $grades[$userid] = [
                 'userid' => $userid,
                 'rawgrade' => null,
-                'dategraded' => time(),
-                'datesubmitted' => time(),
+                'dategraded' => $clock->time(),
+                'datesubmitted' => $clock->time(),
             ];
         } else {
             $manager = competvet::get_from_instance_id($this->instance->id);
@@ -211,8 +212,8 @@ class grader {
                 $grades[$user->id] = [
                     'userid' => $user->id,
                     'rawgrade' => null,
-                    'dategraded' => time(),
-                    'datesubmitted' => time(),
+                    'dategraded' => $clock->time(),
+                    'datesubmitted' => $clock->time(),
                 ];
             }
         }

@@ -106,8 +106,8 @@ function competvet_add_instance($moduleinstance, $mform = null) {
  */
 function competvet_update_instance($moduleinstance, $mform = null) {
     global $DB;
-
-    $moduleinstance->timemodified = time();
+    $clock = \core\di::get(\core\clock::class);
+    $moduleinstance->timemodified = $clock->time();
     $moduleinstance->id = $moduleinstance->instance;
     competvet_grade_item_update($moduleinstance);
 

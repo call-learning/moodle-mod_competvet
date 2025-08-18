@@ -47,7 +47,7 @@ class student_target extends \core\task\scheduled_task {
      */
     public function execute() {
         global $DB;
-
+        $clock = \core\di::get(\core\clock::class);
         // Get plannings that are near the end, not fully evaluated, and have no sent notification.
         $plannings = $DB->get_records_sql("
             SELECT p.*
@@ -58,8 +58,8 @@ class student_target extends \core\task\scheduled_task {
             WHERE p.enddate > :now AND p.enddate < :in72hours
             AND n.id IS NULL
         ", [
-            'in72hours' => time() + 72 * 3600, // 72 hours from now
-            'now' => time(),
+            'in72hours' => $clock->time() + 72 * 3600, // 72 hours from now
+            'now' => $clock->time(),
             'eval' => $this->taskname . ':eval',
             'autoeval' => $this->taskname . ':autoeval',
             'cert' => $this->taskname . ':cert',

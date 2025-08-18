@@ -37,9 +37,10 @@ trait test_data_definition {
     public function prepare_scenario(string $datasetname): void {
         $generator = $this->getDataGenerator();
         $competvetgenerator = $generator->get_plugin_generator('mod_competvet');
-        $startdate = new DateTime('last Monday');
+        $clock = $this->mock_clock_with_frozen();
+        $lastmonday = $clock->now()->modify('last monday');
         $this->generates_definition(
-            $this->{'get_data_definition_' . $datasetname}($startdate->getTimestamp()),
+            $this->{'get_data_definition_' . $datasetname}($lastmonday->getTimestamp()),
             $generator,
             $competvetgenerator
         );

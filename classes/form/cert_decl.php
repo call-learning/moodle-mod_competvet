@@ -89,7 +89,8 @@ class cert_decl extends dynamic_form {
         $range = $this->get_range_html();
         $mform->addElement('static', 'rangeheader', get_string('level', 'mod_competvet'), $range);
 
-        $userdate = userdate(time(), get_string('strftimedatetime', 'core_langconfig'));
+        $clock = \core\di::get(\core\clock::class);
+        $userdate = userdate($clock->time(), get_string('strftimedatetime', 'core_langconfig'));
         $mform->addElement(
             'radio',
             'status',

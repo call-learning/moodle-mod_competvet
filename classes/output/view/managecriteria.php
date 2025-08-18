@@ -42,10 +42,11 @@ class managecriteria extends base {
      */
     public function export_for_template(renderer_base $output) {
         global $CFG;
+        $clock = \core\di::get(\core\clock::class);
         $data = parent::export_for_template($output);
         $data['cmid'] = $this->competvet ? $this->competvet->get_course_module_id() : null;
         $data['situationid'] = $this->competvet ? $this->competvet->get_situation()->get('id') : 0;
-        $data['version'] = time();
+        $data['version'] = $clock->time();
         $data['debug'] = $CFG->debugdisplay;
         return $data;
     }
