@@ -82,6 +82,44 @@ if ($hassiteconfig) {
             )
         );
 
+        // Role assignment settings.
+        $settings->add(
+            new admin_setting_heading(
+                'mod_competvet/roleassignment_heading',
+                get_string('entity:roles', 'mod_competvet'),
+                get_string('enabledroles_desc', 'mod_competvet'),
+            )
+        );
+
+        // Get all assignable roles for selection.
+        if (!during_initial_install()) {
+            global $DB;
+            // Get only roles that can be assigned at module context level.
+            $sql = "SELECT r.id, r.name, r.shortname
+                    FROM {role} r
+                    JOIN {role_context_levels} rcl ON r.id = rcl.roleid
+                    WHERE rcl.contextlevel = :contextlevel
+                    ORDER BY r.sortorder";
+            $allroles = $DB->get_records_sql($sql, ['contextlevel' => CONTEXT_MODULE]);
+            $roles = [];
+
+            // Default to commonly used roles.
+            $defaultroles = [];
+            foreach ($allroles as $role) {
+                $roles[$role->id] = $role->name ? $role->name : $role->shortname;
+            }
+
+            $settings->add(
+                new admin_setting_configmulticheckbox(
+                    'mod_competvet/enabledroles',
+                    get_string('enabledroles', 'mod_competvet'),
+                    get_string('enabledroles_desc', 'mod_competvet'),
+                    $defaultroles,
+                    $roles
+                )
+            );
+        }
+
         $settings->add(
             new admin_setting_heading(
                 'mod_competvet/notifications_heading',

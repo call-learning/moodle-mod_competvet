@@ -61,8 +61,21 @@ class role_assign implements renderable, templatable {
         $context = \context_module::instance($cm->id);
         // Get assignable roles in this context.
         $roles = get_assignable_roles($context, ROLENAME_BOTH);
+
+        // Get enabled roles from plugin settings.
+        $enabledrolesconfig = get_config('mod_competvet', 'enabledroles');
+        $enabledroles = [];
+        if ($enabledrolesconfig) {
+            $enabledroles = explode(',', $enabledrolesconfig);
+        }
+
         $result = [];
         foreach ($roles as $roleid => $rolename) {
+            if ($enabledrolesconfig) {
+                if (!in_array($roleid, $enabledroles)) {
+                    continue; // Skip roles that are not enabled.
+                }
+            }
             // Get role description.
             $description = $DB->get_field('role', 'description', ['id' => $roleid]);
             // Get users assigned to this role in this context.
@@ -95,6 +108,19 @@ class role_assign implements renderable, templatable {
     }
 
     protected function get_role_selectors(int $roleid): array {
+        // Check if this role is enabled.
+        $enabledroles = get_config('mod_competvet', 'enabledroles');
+        if ($enabledroles) {
+            $enabledroles = json_decode($enabledroles, true);
+            if (!isset($enabledroles[$roleid]) || !$enabledroles[$roleid]) {
+                // Role is not enabled, return empty selectors.
+                return [
+                    'roleid' => $roleid,
+                    'potentialuserselector' => '',
+                    'currentuserselector' => ''
+                ];
+            }
+        }
 
         $cm = get_coursemodule_from_id(null, $this->cmid, 0, false, MUST_EXIST);
         $context = \context_module::instance($cm->id);
