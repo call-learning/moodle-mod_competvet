@@ -317,6 +317,23 @@ function xmldb_competvet_upgrade($oldversion) {
         // Competvet savepoint reached.
         upgrade_mod_savepoint(true, 2025031000, 'competvet');
     }
+    if ($oldversion < 2025081803) {
+        $sql = "SELECT r.id, r.name, r.shortname
+            FROM {role} r
+            JOIN {role_context_levels} rcl ON r.id = rcl.roleid
+            WHERE rcl.contextlevel = :contextlevel
+            ORDER BY r.sortorder";
+        $allroles = $DB->get_records_sql($sql, ['contextlevel' => CONTEXT_MODULE]);
+        $searchroles = ['Evaluator', 'Observer'];
+        $roleids = [];
+        foreach ($allroles as $role) {
+            if (in_array($role->name, $searchroles)) {
+                $roleids[] = $role->id;
+            }
+        }
+        set_config('enabledroles', implode(',', $roleids), 'mod_competvet');
+        upgrade_mod_savepoint(true, 2025081803, 'competvet');
+    }
 
     return true;
 }
