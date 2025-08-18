@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $observers = [
+    // Globally generated events that can trigger a cache refresh for situation.
     [
         'eventname'   => '\core\event\user_enrolment_created',
         'callback'    => \mod_competvet\local\observers\user_enrolment_observer::class . '::user_enrolment_created',
@@ -37,6 +38,35 @@ $observers = [
         'eventname'   => '\core\event\user_enrolment_updated',
         'callback'    => \mod_competvet\local\observers\user_enrolment_observer::class . '::user_enrolment_updated',
     ],
+    [
+        'eventname'   => '\core\event\course_module_created',
+        'callback'    => \mod_competvet\local\observers\course_module_observer::class . '::module_created',
+    ],
+    [
+        'eventname'   => '\core\event\course_module_deleted',
+        'callback'    => \mod_competvet\local\observers\course_module_observer::class . '::module_deleted',
+    ],
+    [
+        'eventname'   => '\core\event\course_module_updated',
+        'callback'    => \mod_competvet\local\observers\course_module_observer::class . '::module_updated',
+    ],
+    [
+        'eventname'   => '\core\event\group_member_added',
+        'callback'    => \mod_competvet\local\observers\group_change_observer::class . '::member_added',
+    ],
+    [
+        'eventname'   => '\core\event\group_member_removed',
+        'callback'    => \mod_competvet\local\observers\group_change_observer::class . '::member_removed',
+    ],
+    [
+        'eventname'   => '\core\event\role_assigned',
+        'callback'    => \mod_competvet\local\observers\role_change_observer::class . '::assigned',
+    ],
+    [
+        'eventname'   => '\core\event\role_unassigned',
+        'callback'    => \mod_competvet\local\observers\role_change_observer::class . '::unassigned',
+    ],
+    // CompetVet generated events.
     [
         'eventname'   => '\mod_competvet\event\observation_requested',
         'callback'    => \mod_competvet\local\observers\observervation_observer::class . '::observation_requested',
@@ -52,17 +82,5 @@ $observers = [
     [
         'eventname'   => '\mod_competvet\event\cert_validation_completed',
         'callback'    => \mod_competvet\local\observers\certification_observer::class . '::remove_validation_certifications_todo',
-    ],
-    [
-        'eventname'   => '\core\event\course_module_created',
-        'callback'    => \mod_competvet\local\observers\course_module_observer::class . '::module_created',
-    ],
-    [
-        'eventname'   => '\core\event\course_module_deleted',
-        'callback'    => \mod_competvet\local\observers\course_module_observer::class . '::module_deleted',
-    ],
-    [
-        'eventname'   => '\core\event\course_module_updated',
-        'callback'    => \mod_competvet\local\observers\course_module_observer::class . '::module_updated',
     ],
 ];
