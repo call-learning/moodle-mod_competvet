@@ -279,7 +279,7 @@ function competvet_extend_settings_navigation($settingsnav, $competvetnode = nul
         );
         $competvetnode->add_node($node, $beforekey);
     }
-    if (has_capability('mod/competvet:candoeverything', $PAGE->cm->context)) {
+    if (has_capability('moodle/role:assign', $PAGE->cm->context)) {
         $url = new moodle_url('/mod/competvet/roleassign.php', ['id' => $PAGE->cm->id]);
         $node = navigation_node::create(
             get_string('entity:roles', 'mod_competvet'),
