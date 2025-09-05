@@ -79,6 +79,7 @@ class competvet {
             'contextlevels' => [CONTEXT_SYSTEM],
             'globalpermissions' => [
                     'mod/competvet:candoeverything' => CAP_ALLOW,
+                    'moodle/role:assign' => CAP_ALLOW,
             ],
         ],
         'responsibleucue' => [
@@ -91,6 +92,7 @@ class competvet {
                 'mod/competvet:canobserve' => CAP_ALLOW,
                 'mod/competvet:editplanning' => CAP_ALLOW,
                 'mod/competvet:view' => CAP_ALLOW,
+                'moodle/role:assign' => CAP_ALLOW,
             ],
         ],
         'evaluator' => [

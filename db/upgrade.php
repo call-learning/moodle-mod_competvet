@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+use mod_competvet\setup;
 
 /**
  * Execute local_cveteval upgrade from the given old version.
@@ -333,6 +334,12 @@ function xmldb_competvet_upgrade($oldversion) {
         }
         set_config('enabledroles', implode(',', $roleids), 'mod_competvet');
         upgrade_mod_savepoint(true, 2025081803, 'competvet');
+    }
+
+    if ($oldversion < 20250090402) {
+        // Reset roles to add role:assign capability.
+        setup::create_update_roles();
+        upgrade_mod_savepoint(true, 20250090402, 'competvet');
     }
 
     return true;
