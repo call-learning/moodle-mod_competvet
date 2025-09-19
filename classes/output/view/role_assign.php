@@ -111,8 +111,8 @@ class role_assign implements renderable, templatable {
         // Check if this role is enabled.
         $enabledroles = get_config('mod_competvet', 'enabledroles');
         if ($enabledroles) {
-            $enabledroles = json_decode($enabledroles, true);
-            if (!isset($enabledroles[$roleid]) || !$enabledroles[$roleid]) {
+            $enabledroles = explode(',', $enabledroles);
+            if (!in_array($roleid, $enabledroles)) {
                 // Role is not enabled, return empty selectors.
                 return [
                     'roleid' => $roleid,
