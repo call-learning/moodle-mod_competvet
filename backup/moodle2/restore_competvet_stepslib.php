@@ -248,6 +248,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         $data->competvet = $this->get_new_parentid('competvet');
         $data->userid = $this->get_mappingid('user', $data->userid);
+        $data->studentid = $this->get_mappingid('user', $data->studentid);
         $data->planningid = $this->get_mappingid('planning', $data->planningid);
         // Insert the grade record.
         $DB->insert_record('competvet_grades', $data);

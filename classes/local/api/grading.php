@@ -105,7 +105,8 @@ class grading {
             $groupmember->grade = $studentgrade;
             $groupmember->lettergrade = $lettergrade;
             $groupmember->feedback = content_to_text($grade->feedback, FORMAT_HTML);
-            if ($grade->usermodified) {
+            if ($grade->usermodified && !empty($studentgrade)) { // It seems that backup restore can set usermodified to the user
+                // who is restoring the data and then it will assume this user has set a grade.
                 $groupmember->grader = utils::get_user_info($grade->usermodified);
                 $groupmember->timegraded = userdate($grade->timemodified);
             }
