@@ -7,7 +7,7 @@
 "L'animal";"num_dossier";"Numéro de dossier";6;"text";"";"{}"
 "Cas clinique";"date_cas";"Date";7;"date";"";"{\"placeholder\": \"[date_du_jour]\"}"
 "Cas clinique";"motif_presentation";"Motif de présentation";8;"text";"";"{\"placeholder\": \"Exemple: vomissements aigus\"}"
-"Cas clinique";"resultats_examens";"Résultats significatifs d'examens complémentaires";9;"textarea";"";"{\"placeholder\": \"Exemple : azotémie rénale, signes échographiques de néphrite aigue, PCR Leptospira + (urines)\", \"rows\": 3}"
+"Cas clinique";"resultats_examens";"Éléments cliniques et paracliniques les plus pertinents";9;"textarea";"";"{\"placeholder\": \"Exemple : azotémie rénale, signes échographiques de néphrite aigue, PCR Leptospira + (urines)\", \"rows\": 3}"
 "Cas clinique";"diag_final";"Diagnostic final";10;"text";"";"{\"placeholder\": \"Exemple : leptospirose\"}"
 "Cas clinique";"traitement";"Traitement";11;"textarea";"";"{\"placeholder\": \"Exemple : fluidothérapie, amoxicilline ac. clavulanique, maropitant\", \"rows\": 2}"
 "Cas clinique";"evolution";"Evolution";12;"textarea";"";"{\"placeholder\": \"Exemple : sortie d'hospitalisation après 48h\", \"rows\": 2}"

@@ -336,11 +336,20 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2025081803, 'competvet');
     }
 
-    if ($oldversion < 20250090402) {
+    if ($oldversion < 2025090402) {
         // Reset roles to add role:assign capability.
         setup::create_update_roles();
-        upgrade_mod_savepoint(true, 20250090402, 'competvet');
+        upgrade_mod_savepoint(true, 2025090402, 'competvet');
     }
-
+    // Watch out: php ../../admin/cli/cfg.php --component=mod_competvet --name=version --set=2025090402 .
+    if ($oldversion < 2025121001) {
+        // Define field ismandatory to be added to competvet_case_field.
+        $casefield = \mod_competvet\local\persistent\case_field::get_record(['idnumber' => 'resultats_examens']);
+        if ($casefield) {
+            $casefield->set('name', 'Éléments cliniques et paracliniques les plus pertinents');
+        }
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2025121001, 'competvet');
+    }
     return true;
 }
