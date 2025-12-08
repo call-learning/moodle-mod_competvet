@@ -32,15 +32,21 @@ trait test_data_definition {
      * Prepare scenario
      *
      * @param string $datasetname
+     * @param int|null $startdate if null set to mocked clock / last monday
      * @return void
      */
-    public function prepare_scenario(string $datasetname): void {
+    public function prepare_scenario(string $datasetname, ?int $startdate = null): void {
         $generator = $this->getDataGenerator();
         $competvetgenerator = $generator->get_plugin_generator('mod_competvet');
-        $clock = $this->mock_clock_with_frozen();
-        $lastmonday = $clock->now()->modify('last monday');
+        if ($startdate === null) {
+            $clock = $this->mock_clock_with_frozen();
+            // Random time, not a Monday (because we want to test the 'last monday' logic).
+            $clock->set_to((new DateTime('2025-12-07'))->getTimestamp());
+            $lastmonday = $clock->now()->modify('last monday');
+            $startdate = $lastmonday->getTimestamp();
+        }
         $this->generates_definition(
-            $this->{'get_data_definition_' . $datasetname}($lastmonday->getTimestamp()),
+            $this->{'get_data_definition_' . $datasetname}($startdate),
             $generator,
             $competvetgenerator
         );
