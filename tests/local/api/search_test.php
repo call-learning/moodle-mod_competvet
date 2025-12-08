@@ -18,15 +18,14 @@ namespace mod_competvet\local\api;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
-require_once($CFG->dirroot . '/search/tests/fixtures/testable_core_search.php');
+//require_once($CFG->dirroot . '/search/tests/fixtures/testable_core_search.php');
 
 use advanced_testcase;
-use mod_competvet\local\api\cases;
-use mod_competvet\local\api\search;
+use mod_competvet\local\persistent\planning;
 use test_data_definition;
 
 /**
- * Case API test
+ * Serch API test
  *
  * @package     mod_competvet
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
@@ -35,33 +34,72 @@ use test_data_definition;
 final class search_test extends advanced_testcase {
     use test_data_definition;
 
+    /** @var int $startdate */
+    protected int $startdate;
+
+    /**
+     * Data provider for search API
+     *
+     * @return array
+     */
+    public static function data_provider_search_situations(): array {
+        $oneweek = 60 * 60 * 24 * 7; // 1 week in seconds.
+        $onemonth = $oneweek * 4; // 1 month in seconds.
+        return [
+            'simple search' => [
+                'SIT1',
+                'student1',
+                [
+                    [
+                        'type' => 'planning',
+                        'description' => 'SIT1',
+                        'identifier' => 'SIT1',
+                        // Relative dates, so we can compare.
+                        'startdate' => 0,
+                        'enddate' => $oneweek,
+                        'groupname' => 'group 8.1',
+                    ],
+                    // No future situations.
+                ],
+            ],
+            'simple search with lowercase' => [
+                'sit1',
+                'student1',
+                [
+                    [
+                        'type' => 'planning',
+                        'description' => 'SIT1',
+                        'identifier' => 'SIT1',
+                        'startdate' => 0,
+                        'enddate' => $oneweek,
+                        'groupname' => 'group 8.1',
+                    ],
+                ],
+            ],
+        ];
+    }
+
+
     /**
      * Data provider for get_query
      *
      * @return array
      */
-    public static function data_provider_get_query(): array {
+    public static function data_provider_search_users(): array {
+        $oneweek = 60 * 60 * 24 * 7; // 1 week in seconds.
+        $onemonth = $oneweek * 4; // 1 month in seconds.
         return [
             'simple search' => [
-                'SIT1',
-                1,
+                'Observer 1',
+                'student1',
                 [
-                    [
-                        'type' => 'situation',
-                        'description' => 'Test competvet 1',
-                        'identifier' => 'SIT1',
-                    ],
+
                 ],
             ],
             'simple search with lowercase' => [
-                'sit1',
-                1,
+                'observer 1',
+                'student1',
                 [
-                    [
-                        'type' => 'situation',
-                        'description' => 'Test competvet 1',
-                        'identifier' => 'SIT1',
-                    ],
                 ],
             ],
         ];
@@ -75,32 +113,92 @@ final class search_test extends advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
+        global $CFG;
+        //require_once($CFG->dirroot . '/search/tests/fixtures/testable_core_search.php');
         $this->setAdminUser(); // Needed for report builder to work.
-        $this->prepare_scenario('set_2');
-        set_config('enableglobalsearch', true);
-        // Index all.
-        $search = \core_search\manager::instance();
-        $search->index();
+        $clock = $this->mock_clock_with_frozen();
+        $lastmonday = $clock->now()->modify('last monday');
+        $this->startdate = $lastmonday->getTimestamp();
+        $this->prepare_scenario('set_2', $this->startdate);
     }
 
     /**
-     * Test get_entry
+     * Test situation search
      *
      * @param string $searchtext
-     * @param int $expectedcount
+     * @param string $username
      * @param array $expectedresults
      * @return void
-     * @covers       \mod_competvet\local\api\cases::get_entries
-     * @dataProvider data_provider_get_query
+     * @covers       \mod_competvet\local\api\search::search_planning
+     * @dataProvider data_provider_search_situations
      */
-    public function test_simple_search(string $searchtext, int $expectedcount, array $expectedresults): void {
+    public function test_planning_search(string $searchtext, string $username, array $expectedresults): void {
+        $user = \core_user::get_user_by_username($username);
+        $this->setUser($user); // User involved in the scenario.
         $returnval = search::search_query($searchtext);
-        $this->assertCount($expectedcount, $returnval);
+        $this->assertCount(count($expectedresults), $returnval);
 
-        foreach ($expectedresults as $result) {
-            foreach ($result as $key => $value) {
-                $this->assertEquals($value, $result[$key]);
-            }
+        $filterout = fn($item) => [
+            'type' => $item['type'],
+            'description' => $item['description'],
+            'identifier' => $item['identifier'],
+            'groupname' => $item['groupname'],
+        ];
+        $this->assertEquals(
+            array_map($filterout, $expectedresults),
+            array_map($filterout, $returnval)
+        );
+
+        // Now check dates separately with relative values.
+        foreach ($expectedresults as $index => $expected) {
+            $this->assertEquals(
+                planning::round_start_date($this->startdate + $expected['startdate']),
+                $returnval[$index]['startdate']
+            );
+            $this->assertEquals(
+                planning::round_end_date($this->startdate + $expected['enddate']),
+                $returnval[$index]['enddate']
+            );
+        }
+    }
+
+    /**
+     * Test user search
+     *
+     * @param string $searchtext
+     * @param string $username
+     * @param array $expectedresults
+     * @return void
+     * @covers       \mod_competvet\local\api\search::search_users_in_situations
+     * @dataProvider data_provider_search_users
+     */
+    public function test_usersearch_search(string $searchtext, string $username, array $expectedresults): void {
+        $user = \core_user::get_user_by_username($username);
+        $this->setUser($user); // User involved in the scenario.
+        $returnval = search::search_query($searchtext);
+        $this->assertCount(count($expectedresults), $returnval);
+
+        $filterout = fn($item) => [
+            'type' => $item['type'],
+            'description' => $item['description'],
+            'identifier' => $item['identifier'],
+            'groupname' => $item['groupname'],
+        ];
+        $this->assertEquals(
+            array_map($filterout, $expectedresults),
+            array_map($filterout, $returnval)
+        );
+
+        // Now check dates separately with relative values.
+        foreach ($expectedresults as $index => $expected) {
+            $this->assertEquals(
+                planning::round_start_date($this->startdate + $expected['startdate']),
+                $returnval[$index]['startdate']
+            );
+            $this->assertEquals(
+                planning::round_end_date($this->startdate + $expected['enddate']),
+                $returnval[$index]['enddate']
+            );
         }
     }
 }
