@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\local\api;
+
 use advanced_testcase;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\tests\test_data_definition;
@@ -36,7 +37,7 @@ final class search_test extends advanced_testcase {
      */
     public static function data_provider_search_situations(): array {
         $oneweek = 60 * 60 * 24 * 7; // 1 week in seconds.
-        $onemonth = $oneweek * 4; // 1 month in seconds.
+        $startdate = self::get_start_date()->getTimestamp();
         return [
             'simple search' => [
                 'SIT1',
@@ -47,8 +48,8 @@ final class search_test extends advanced_testcase {
                         'description' => 'SIT1',
                         'identifier' => 'SIT1',
                         // Relative dates, so we can compare.
-                        'startdate' => 0,
-                        'enddate' => $oneweek,
+                        'startdate' => planning::round_start_date($startdate),
+                        'enddate' => planning::round_end_date($startdate + $oneweek),
                         'groupname' => 'group 8.1',
                     ],
                     // No future situations.
@@ -62,15 +63,28 @@ final class search_test extends advanced_testcase {
                         'type' => 'planning',
                         'description' => 'SIT1',
                         'identifier' => 'SIT1',
-                        'startdate' => 0,
-                        'enddate' => $oneweek,
+                        'startdate' => planning::round_start_date($startdate),
+                        'enddate' => planning::round_end_date($startdate + $oneweek),
                         'groupname' => 'group 8.1',
+                    ],
+                ],
+            ],
+            'simple search with lowercase (student2)' => [
+                'sit1',
+                'student2',
+                [
+                    [
+                        'type' => 'planning',
+                        'description' => 'SIT1',
+                        'identifier' => 'SIT1',
+                        'startdate' => planning::round_start_date($startdate),
+                        'enddate' => planning::round_end_date($startdate + $oneweek * 2),
+                        'groupname' => 'group 8.2',
                     ],
                 ],
             ],
         ];
     }
-
 
     /**
      * Data provider for get_query
@@ -78,20 +92,144 @@ final class search_test extends advanced_testcase {
      * @return array
      */
     public static function data_provider_search_users(): array {
-        $oneweek = 60 * 60 * 24 * 7; // 1 week in seconds.
-        $onemonth = $oneweek * 4; // 1 month in seconds.
         return [
             'simple search' => [
-                'Observer 1',
-                'student1',
-                [
-
+                'searchtext' => 'Observer',
+                'currentuser' => 'student1',
+                'expectedresults' => [
+                    [
+                        'type' => 'user',
+                        'username' => 'observer2',
+                        'fullname' => 'Observer Two OBSevérTWO',
+                        'roles' => ['observer'],
+                        'additionalinfos' => [
+                            'situations' =>
+                                [
+                                    [
+                                        'situation' => 'SIT1',
+                                        'planningcount' => 1,
+                                    ],
+                                ],
+                        ],
+                    ],
+                    [
+                        'type' => 'user',
+                        'username' => 'observer1',
+                        'fullname' => 'Observer One OBSONE',
+                        'roles' => ['observer'],
+                        'additionalinfos' => [
+                            'situations' =>
+                                [
+                                    [
+                                        'situation' => 'SIT1',
+                                        'planningcount' => 1,
+                                    ],
+                                    [
+                                        'situation' => 'SIT2',
+                                        'planningcount' => 1,
+                                    ],
+                                    [
+                                        'situation' => 'SIT3',
+                                        'planningcount' => 1,
+                                    ],
+                                ],
+                        ],
+                    ],
                 ],
             ],
             'simple search with lowercase' => [
-                'observer 1',
-                'student1',
-                [
+                'searchtext' => 'observer',
+                'currentuser' => 'student1',
+                'expectedresults' => [
+                    [
+                        'type' => 'user',
+                        'username' => 'observer2',
+                        'fullname' => 'Observer Two OBSevérTWO',
+                        'roles' => ['observer'],
+                        'additionalinfos' => [
+                            'situations' =>
+                                [
+                                    [
+                                        'situation' => 'SIT1',
+                                        'planningcount' => 1,
+                                    ],
+                                ],
+                        ],
+                    ],
+                    [
+                        'type' => 'user',
+                        'username' => 'observer1',
+                        'fullname' => 'Observer One OBSONE',
+                        'roles' => ['observer'],
+                        'additionalinfos' => [
+                            'situations' =>
+                                [
+                                    [
+                                        'situation' => 'SIT1',
+                                        'planningcount' => 1,
+                                    ],
+                                    [
+                                        'situation' => 'SIT2',
+                                        'planningcount' => 1,
+                                    ],
+                                    [
+                                        'situation' => 'SIT3',
+                                        'planningcount' => 1,
+                                    ],
+                                ],
+                        ],
+                    ],
+                ],
+            ],
+            'simple search with lowercase (student2)' => [
+                'searchtext' => 'observer',
+                'currentuser' => 'student2',
+                'expectedresults' => [
+                    [
+                        'type' => 'user',
+                        'username' => 'observer2',
+                        'fullname' => 'Observer Two OBSevérTWO',
+                        'roles' => ['observer'],
+                        'additionalinfos' => [
+                            'situations' =>
+                                [
+                                    [
+                                        'situation' => 'SIT1',
+                                        'planningcount' => 1,
+                                    ],
+                                ],
+                        ],
+                    ],
+                    [
+                        'type' => 'user',
+                        'username' => 'observer1',
+                        'fullname' => 'Observer One OBSONE',
+                        'roles' => ['observer'],
+                        'additionalinfos' => [
+                            'situations' =>
+                                [
+                                    [
+                                        'situation' => 'SIT1',
+                                        'planningcount' => 1,
+                                    ],
+                                ],
+                        ],
+                    ],
+                    [
+                        'type' => 'user',
+                        'username' => 'observer3',
+                        'fullname' => 'Observer Three OBSe3',
+                        'roles' => ['observer'],
+                        'additionalinfos' => [
+                            'situations' =>
+                                [
+                                    [
+                                        'situation' => 'SIT4',
+                                        'planningcount' => 1,
+                                    ],
+                                ],
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -103,13 +241,48 @@ final class search_test extends advanced_testcase {
      * @return void
      */
     public function setUp(): void {
+        global $DB;
         parent::setUp();
         $this->resetAfterTest();
-        global $CFG;
-        //require_once($CFG->dirroot . '/search/tests/fixtures/testable_core_search.php');
+
         $this->setAdminUser(); // Needed for report builder to work.
-        $this->prepare_scenario('set_2');
+        $generator = $this->getDataGenerator();
+        $competvetgenerator = $generator->get_plugin_generator('mod_competvet');
+        $startdate = $this->get_start_date();
+        $this->generates_definition(
+            $this->get_definition_set_search($startdate->getTimestamp()),
+            $generator,
+            $competvetgenerator
+        );
         $this->set_current_date();
+
+        // We need to make sure that users are set with the right data for search.
+        $userdata = [
+            'student1' => [
+                'firstname' => 'Student One',
+                'lastname' => 'Lastname One',
+            ],
+            'student2' => [
+                'firstname' => 'Student Two',
+                'lastname' => 'Lastname Two',
+            ],
+            'observer1' => [
+                'firstname' => 'Observer One',
+                'lastname' => 'OBSONE',
+            ],
+            'observer2' => [
+                'firstname' => 'Observer Two',
+                'lastname' => 'OBSevérTWO',
+            ],
+            'observer3' => [
+                'firstname' => 'Observer Three',
+                'lastname' => 'OBSe3',
+            ],
+        ];
+        foreach ($userdata as $username => $data) {
+            $user = $DB->get_record('user', ['username' => $username]);
+            $DB->update_record('user', array_merge((array) $user, $data));
+        }
     }
 
     /**
@@ -125,7 +298,7 @@ final class search_test extends advanced_testcase {
     public function test_planning_search(string $searchtext, string $username, array $expectedresults): void {
         $user = \core_user::get_user_by_username($username);
         $this->setUser($user); // User involved in the scenario.
-        $returnval = search::search_query($searchtext);
+        $returnval = search::search_query($searchtext, [search::TYPE_PLANNING]);
         $this->assertCount(count($expectedresults), $returnval);
 
         $filterout = fn($item) => [
@@ -133,62 +306,162 @@ final class search_test extends advanced_testcase {
             'description' => $item['description'],
             'identifier' => $item['identifier'],
             'groupname' => $item['groupname'],
+            'startdate' => $item['startdate'],
+            'enddate' => $item['enddate'],
         ];
         $this->assertEquals(
             array_map($filterout, $expectedresults),
             array_map($filterout, $returnval)
         );
-
-        // Now check dates separately with relative values.
-        foreach ($expectedresults as $index => $expected) {
-            $this->assertEquals(
-                planning::round_start_date($this->startdate + $expected['startdate']),
-                $returnval[$index]['startdate']
-            );
-            $this->assertEquals(
-                planning::round_end_date($this->startdate + $expected['enddate']),
-                $returnval[$index]['enddate']
-            );
-        }
     }
 
     /**
      * Test user search
      *
      * @param string $searchtext
-     * @param string $username
+     * @param string $currentuser
      * @param array $expectedresults
      * @return void
      * @covers       \mod_competvet\local\api\search::search_users_in_situations
      * @dataProvider data_provider_search_users
      */
-    public function test_usersearch_search(string $searchtext, string $username, array $expectedresults): void {
-        $user = \core_user::get_user_by_username($username);
+    public function test_usersearch_search(string $searchtext, string $currentuser, array $expectedresults): void {
+        global $DB;
+        $user = \core_user::get_user_by_username($currentuser);
         $this->setUser($user); // User involved in the scenario.
-        $returnval = search::search_query($searchtext);
+        $returnval = search::search_query($searchtext, [search::TYPE_USER]);
         $this->assertCount(count($expectedresults), $returnval);
 
-        $filterout = fn($item) => [
-            'type' => $item['type'],
-            'description' => $item['description'],
-            'identifier' => $item['identifier'],
-            'groupname' => $item['groupname'],
-        ];
-        $this->assertEquals(
-            array_map($filterout, $expectedresults),
-            array_map($filterout, $returnval)
-        );
-
-        // Now check dates separately with relative values.
-        foreach ($expectedresults as $index => $expected) {
+        foreach ($returnval as $index => $item) {
             $this->assertEquals(
-                planning::round_start_date($this->startdate + $expected['startdate']),
-                $returnval[$index]['startdate']
+                $expectedresults[$index]['type'],
+                $item['type']
             );
             $this->assertEquals(
-                planning::round_end_date($this->startdate + $expected['enddate']),
-                $returnval[$index]['enddate']
+                $expectedresults[$index]['username'],
+                $item['username']
             );
+            $this->assertEquals(
+                $expectedresults[$index]['roles'],
+                $item['roles']
+            );
+            if (isset($expectedresults[$index]['additionalinfos'])) {
+                foreach ($expectedresults[$index]['additionalinfos']['situations'] as $sitindex => $situationinfo) {
+                    $this->assertEquals(
+                        $situationinfo['situation'],
+                        $item['additionalinfos']['situations'][$sitindex]['shortname']
+                    );
+                    $this->assertCount(
+                        $situationinfo['planningcount'],
+                        $item['additionalinfos']['situations'][$sitindex]['plannings']
+                    );
+                }
+            }
         }
+    }
+
+    /**
+     * Get definition set for search tests
+     *
+     * @param int $startdate
+     * @return array
+     */
+    protected function get_definition_set_search(int $startdate) {
+        $oneweek = 60 * 60 * 24 * 7; // 1 week in seconds.
+        $onemonth = $oneweek * 4; // 1 month in seconds.
+        return [
+            'course 1' => [
+                'users' => [
+                    'student' => ['student1', 'student2'],
+                    'observer' => ['observer1', 'observer2'],
+                    'manager' => ['manager'],
+                ],
+                'groups' => [
+                    'group 8.1' => [
+                        'users' => ['student1'],
+                    ],
+                    'group 8.2' => [
+                        'users' => ['student2'],
+                    ],
+                    'group 8.3' => [
+                        'users' => [],
+                    ],
+                    'group 8.4' => [
+                        'users' => [],
+                    ],
+                ],
+                'activities' => [
+                    'SIT1' => [
+                        'category' => 'Y1',
+                        'plannings' => [
+                            [
+                                'startdate' => $startdate,
+                                'enddate' => $startdate + $oneweek,
+                                'groupname' => 'group 8.1',
+                                'session' => '2023',
+                            ],
+                            [
+                                'startdate' => $startdate,
+                                'enddate' => $startdate + $oneweek * 2,
+                                'groupname' => 'group 8.2',
+                                'session' => '2023',
+                            ],
+                            [
+                                'startdate' => $startdate + $onemonth * 12, // Future time.
+                                'enddate' => $startdate + $onemonth * 12 + $oneweek,
+                                'groupname' => 'group 8.1',
+                                'session' => '2030',
+                            ],
+                        ],
+                    ],
+                    'SIT2' => [
+                        'category' => 'Y2',
+                        'plannings' => [
+                            [
+                                'startdate' => $startdate,
+                                'enddate' => $startdate + $oneweek * 2,
+                                'groupname' => 'group 8.1',
+                                'session' => '2023',
+                            ],
+                        ],
+                    ],
+                    'SIT3' => [
+                        'category' => 'Y3',
+                        'plannings' => [
+                            [
+                                'startdate' => $startdate,
+                                'enddate' => $startdate + $oneweek,
+                                'groupname' => 'group 8.1',
+                                'session' => '2023',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'course 2' => [
+                'users' => [
+                    'student' => ['student2'],
+                    'observer' => ['observer3'],
+                ],
+                'groups' => [
+                    'group 8.1' => [
+                        'users' => ['student2'],
+                    ],
+                ],
+                'activities' => [
+                    'SIT4' => [
+                        'category' => 'Y1',
+                        'plannings' => [
+                            [
+                                'startdate' => $startdate,
+                                'enddate' => $startdate + $onemonth * 3 + $oneweek,
+                                'groupname' => 'group 8.1',
+                                'session' => '2023',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 }

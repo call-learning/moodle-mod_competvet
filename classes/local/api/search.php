@@ -16,15 +16,8 @@
 
 namespace mod_competvet\local\api;
 
-use context;
-use core\dml\table;
-use core_table\sql_table;
 use mod_competvet\competvet;
-use mod_competvet\local\persistent\observation;
-use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
-use mod_competvet\local\persistent\case_entry;
-use mod_competvet\utils;
 
 /**
  * Search API
@@ -39,9 +32,9 @@ use mod_competvet\utils;
  */
 class search {
     /** User type */
-    const TYPE_USER = 'user';
+    public const TYPE_USER = 'user';
     /** Planning type */
-    const TYPE_PLANNING = 'planning'; // For now we won't search into plannings.
+    public const TYPE_PLANNING = 'planning'; // For now we won't search into plannings.
     /** Case type */
     const TYPE_CASE = 'case'; // For now we won't search into cases as we don't have a page to go to in the app.
 
@@ -51,13 +44,26 @@ class search {
      * @param string $searchtext
      * @return array
      */
-    public static function search_query($searchtext) {
+    public static function search_query(string $searchtext, array $returnedtypes = [self::TYPE_USER, self::TYPE_PLANNING]) {
         global $USER;
         $situations = situations::get_all_situations_with_planning_for($USER->id, true);
-        $items = array_merge(
-            self::search_planning($searchtext, $situations),
-            self::search_users_in_situations($searchtext, $situations),
-        );
+        $items = [];
+        foreach ($returnedtypes as $type) {
+            switch ($type) {
+                case self::TYPE_USER:
+                    $items = array_merge(
+                        $items,
+                        self::search_users_in_situations($searchtext, $situations)
+                    );
+                case self::TYPE_PLANNING:
+                    $items = array_merge(
+                        $items,
+                        self::search_planning($searchtext, $situations)
+                    );
+                    break;
+                default:
+            }
+        }
         return $items;
     }
 
@@ -108,27 +114,65 @@ class search {
      */
     private static function search_users_in_situations(string $searchtext, array $visiblesituations) {
         $items = [];
+        $searchtext = strtolower($searchtext);
+
         foreach ($visiblesituations as $situation) {
             $competvet = competvet::get_from_situation_id($situation['id']);
             $users = get_enrolled_users($competvet->get_context(), onlyactive: true);
+
             foreach ($users as $user) {
                 $role = user_role::get_top($user->id, $situation['id']);
-                $fullname = fullname($user);
-                if (strpos(strtolower($fullname), $searchtext) !== false) {
-                    $items[] = [
+                if ($role === situation::UNKNOWN_ROLE_TYPE) {
+                    continue;
+                }
+
+                $fullname = strtolower(fullname($user));
+                if (strpos($fullname, $searchtext) === false) {
+                    continue;
+                }
+
+                if (!isset($items[$user->id])) {
+                    $items[$user->id] = [
                         'id' => $user->id,
                         'type' => self::TYPE_USER,
-                        'username' => $fullname,
-                        'role' => $role,
+                        'fullname' => fullname($user),
+                        'username' => $user->username,
+                        'roles' => [$role],
                         'additionalinfos' => [
-                            'situationid' => $situation['id'],
-                            'plannings' => $situation['plannings'],
+                            'situations' => [
+                                $situation['id'] => [
+                                    'id' => $situation['id'],
+                                    'shortname' => $situation['shortname'],
+                                    'name' => $situation['name'],
+                                    'plannings' => $situation['plannings'],
+                                ],
+                            ],
                         ],
                     ];
+                } else {
+                    $userItem = &$items[$user->id];
+                    if (!in_array($role, $userItem['roles'])) {
+                        $userItem['roles'][] = $role;
+                    }
+                    if (!isset($userItem['additionalinfos']['situations'][$situation['id']])) {
+                        $userItem['additionalinfos']['situations'][$situation['id']] = [
+                            'id' => $situation['id'],
+                            'shortname' => $situation['shortname'],
+                            'name' => $situation['name'],
+                            'plannings' => $situation['plannings'],
+                        ];
+                    } else {
+                        $userItem['additionalinfos']['situations'][$situation['id']]['plannings'] = array_merge(
+                            $userItem['additionalinfos']['situations'][$situation['id']]['plannings'],
+                            $situation['plannings']
+                        );
+                    }
                 }
             }
-
         }
-        return $items;
+        foreach ($items as &$item) {
+            $item['additionalinfos']['situations'] = array_values($item['additionalinfos']['situations']);
+        }
+        return array_values($items);
     }
 }
