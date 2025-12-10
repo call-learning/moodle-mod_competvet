@@ -15,13 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\local\persistent;
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
-
 use advanced_testcase;
 use core_user;
-use test_data_definition;
+use mod_competvet\tests\test_data_definition;
 
 /**
  * Situations API persistent test
@@ -42,6 +38,7 @@ final class observation_tests extends advanced_testcase {
         parent::setUp();
         $this->resetAfterTest();
         $this->prepare_scenario('set_3');
+        $this->set_current_date();
     }
 
     /**

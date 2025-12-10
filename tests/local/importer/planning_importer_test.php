@@ -15,18 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace local\importer;
-
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
-
 use advanced_testcase;
 use mod_competvet\competvet;
 use mod_competvet\local\importer\planning_importer;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\planning_pause;
 use mod_competvet\local\persistent\situation;
-use test_data_definition;
+use mod_competvet\tests\test_data_definition;
 
 /**
  * Planning Importer Grid Test

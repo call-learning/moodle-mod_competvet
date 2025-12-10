@@ -15,14 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\local\api;
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
-//require_once($CFG->dirroot . '/search/tests/fixtures/testable_core_search.php');
-
 use advanced_testcase;
 use mod_competvet\local\persistent\planning;
-use test_data_definition;
+use mod_competvet\tests\test_data_definition;
 
 /**
  * Serch API test
@@ -33,9 +28,6 @@ use test_data_definition;
  */
 final class search_test extends advanced_testcase {
     use test_data_definition;
-
-    /** @var int $startdate */
-    protected int $startdate;
 
     /**
      * Data provider for search API
@@ -116,10 +108,8 @@ final class search_test extends advanced_testcase {
         global $CFG;
         //require_once($CFG->dirroot . '/search/tests/fixtures/testable_core_search.php');
         $this->setAdminUser(); // Needed for report builder to work.
-        $clock = $this->mock_clock_with_frozen();
-        $lastmonday = $clock->now()->modify('last monday');
-        $this->startdate = $lastmonday->getTimestamp();
-        $this->prepare_scenario('set_2', $this->startdate);
+        $this->prepare_scenario('set_2');
+        $this->set_current_date();
     }
 
     /**

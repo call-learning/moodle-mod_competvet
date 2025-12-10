@@ -23,14 +23,9 @@
  */
 namespace mod_competvet\local\tasks;
 
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
-
 use advanced_testcase;
-use mod_competvet\local\persistent\todo;
 use mod_competvet\task\clear_pending_todos;
-use test_data_definition;
+use mod_competvet\tests\test_data_definition;
 
 /**
  * Tests for the clear_pending_todos task

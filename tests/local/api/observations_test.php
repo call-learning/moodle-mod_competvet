@@ -15,22 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\local\api;
-
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
-
 use advanced_testcase;
 use core_user;
-use mod_competvet\local\api\observations;
-use mod_competvet\local\api\plannings;
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\observation_comment;
 use mod_competvet\local\persistent\observation_criterion_comment;
 use mod_competvet\local\persistent\observation_criterion_level;
 use mod_competvet\local\persistent\situation;
-use test_data_definition;
+use mod_competvet\tests\test_data_definition;
 
 /**
  * Observations API test
@@ -78,6 +71,7 @@ final class observations_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser(); // Needed for report builder to work.
         $this->prepare_scenario('set_2');
+        $this->set_current_date();
     }
 
     /**

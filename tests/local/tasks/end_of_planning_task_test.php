@@ -15,20 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\local\tasks;
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
 
 use advanced_testcase;
-use core\cron;
 use DateTime;
 use mod_competvet\competvet;
-use mod_competvet\local\api\grades;
 use mod_competvet\local\api\plannings;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\task\end_of_planning;
-use test_data_definition;
+use mod_competvet\tests\test_data_definition;
 
 /**
  * End of planning task

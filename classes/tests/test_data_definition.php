@@ -13,7 +13,9 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+namespace mod_competvet\tests;
 
+use DateTime;
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\observation;
@@ -29,27 +31,46 @@ use mod_competvet\local\persistent\todo;
  */
 trait test_data_definition {
     /**
+     * Get an arbitrary start date for the tests that will be shared between all datasets
+     *
+     * @return DateTime
+     */
+    public static function get_start_date(): DateTime {
+        $date = new DateTime('2025-11-03');
+        $date->setTime(9, 0, 0);
+        return $date;
+    }
+
+    /**
      * Prepare scenario
      *
      * @param string $datasetname
      * @param int|null $startdate if null set to mocked clock / last monday
      * @return void
      */
-    public function prepare_scenario(string $datasetname, ?int $startdate = null): void {
+    public function prepare_scenario(string $datasetname): void {
         $generator = $this->getDataGenerator();
         $competvetgenerator = $generator->get_plugin_generator('mod_competvet');
-        if ($startdate === null) {
-            $clock = $this->mock_clock_with_frozen();
-            // Random time, not a Monday (because we want to test the 'last monday' logic).
-            $clock->set_to((new DateTime('2025-12-07'))->getTimestamp());
-            $lastmonday = $clock->now()->modify('last monday');
-            $startdate = $lastmonday->getTimestamp();
-        }
+        $startdate = $this->get_start_date();
         $this->generates_definition(
-            $this->{'get_data_definition_' . $datasetname}($startdate),
+            $this->{'get_data_definition_' . $datasetname}($startdate->getTimestamp()),
             $generator,
             $competvetgenerator
         );
+    }
+
+
+
+    /**
+     * Set the current date to the start date + 1 day (a Tuesday)
+     *
+     * @return void
+     */
+    public function set_current_date(int $daysoffset = 1): void {
+        $startdate = $this->get_start_date();
+        $clock = $this->mock_clock_with_frozen();
+        // Set the date to the start date.
+        $clock->set_to($startdate->add(new \DateInterval("P{$daysoffset}D"))->getTimestamp()); // A Tuesday.
     }
 
     /**
@@ -62,6 +83,9 @@ trait test_data_definition {
      */
     public function generates_definition(array $datadefinition, object $generator, object $competvetevalgenerator): void {
         global $DB;
+        // Check for existing users (if we want to create them first with specific names).
+        //$users = $DB->get_records('user');
+        //$users = array_combine(array_column($users, 'username'), $users);
         $users = [];
         foreach ($datadefinition as $coursename => $data) {
             $course = $generator->create_course(['shortname' => $coursename]);
@@ -160,6 +184,7 @@ trait test_data_definition {
 
     /**
      * Data definition
+     *
      * @param int $startdate
      * @return array $datadefinition
      */
@@ -553,7 +578,7 @@ trait test_data_definition {
                                         'comments' => [
                                             ['type' => observation_comment::OBSERVATION_COMMENT, 'comment' => 'A comment'],
                                             ['type' => observation_comment::AUTOEVAL_OBSERVER_COMMENT,
-                                                'comment' => 'Another comment', ],
+                                                'comment' => 'Another comment',],
                                         ],
                                         'criteria' => [
                                             ['id' => 'Q001', 'value' => 1],
@@ -569,7 +594,7 @@ trait test_data_definition {
                                         'comments' => [
                                             ['type' => observation_comment::OBSERVATION_COMMENT, 'comment' => 'A comment'],
                                             ['type' => observation_comment::OBSERVATION_PRIVATE_COMMENT,
-                                                'comment' => 'Another comment', ],
+                                                'comment' => 'Another comment',],
                                         ],
                                         'criteria' => [
                                             ['id' => 'Q001', 'value' => 5],
@@ -642,6 +667,7 @@ trait test_data_definition {
 
     /**
      * Data definition
+     *
      * @param int $startdate
      * @return array $datadefinition
      */
@@ -715,6 +741,7 @@ trait test_data_definition {
 
     /**
      * Data definition
+     *
      * @param int $startdate
      * @return array $datadefinition
      */

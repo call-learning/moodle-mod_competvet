@@ -15,14 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet;
-
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
-require_once($CFG->dirroot . '/mod/competvet/lib.php');
-
 use advanced_testcase;
-use test_data_definition;
+use mod_competvet\tests\test_data_definition;
 
 /**
  * Setup Tests
@@ -40,7 +34,9 @@ final class lib_test extends advanced_testcase {
      * @return void
      */
     public function setUp(): void {
+        global $CFG;
         parent::setUp();
+        require_once($CFG->dirroot . '/mod/competvet/lib.php');
         $this->resetAfterTest();
     }
 
@@ -53,6 +49,7 @@ final class lib_test extends advanced_testcase {
     public function test_delete(): void {
         global $DB;
         $this->prepare_scenario('set_2');
+        $this->set_current_date();
         // Test deletion.
 
         $competvets = $DB->get_records('competvet');

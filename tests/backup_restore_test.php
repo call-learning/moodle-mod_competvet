@@ -28,7 +28,7 @@ use mod_competvet\local\persistent\cert_valid;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
-use test_data_definition;
+use mod_competvet\tests\test_data_definition;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -36,7 +36,6 @@ require_once(__DIR__ . '/../../../config.php');
 global $CFG;
 require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
 require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
-require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
 
 /**
  * Test backup and restore of a competvet activity.

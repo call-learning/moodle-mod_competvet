@@ -15,15 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\local\tasks;
-
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
-
-use mod_competvet\task\student_target;
-use test_data_definition;
 use advanced_testcase;
 use DateTime;
+use mod_competvet\task\student_target;
+use mod_competvet\tests\test_data_definition;
 
 /**
  * Tests for CompetVet

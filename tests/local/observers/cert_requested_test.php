@@ -15,26 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\local\observers;
-defined('MOODLE_INTERNAL') || die();
-global $CFG;
-require_once($CFG->dirroot . '/mod/competvet/tests/test_data_definition.php');
+
 use advanced_testcase;
 use core_user;
 use mod_competvet\event\cert_validation_requested;
-use mod_competvet\event\observation_requested;
 use mod_competvet\local\api\certifications;
-use mod_competvet\local\api\observations;
 use mod_competvet\local\api\plannings;
 use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\cert_decl_asso;
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\grid;
-use mod_competvet\local\persistent\observation;
-use mod_competvet\local\persistent\observation_comment;
-use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\local\persistent\todo;
-use test_data_definition;
+use mod_competvet\tests\test_data_definition;
 
 /**
  * Cert request API test
@@ -61,6 +54,7 @@ final class cert_requested_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser(); // Needed for report builder to work.
         $this->prepare_scenario('set_2');
+        $this->set_current_date();
         $student = core_user::get_user_by_username('student1');
         $situation = situation::get_record(['shortname' => 'SIT1']);
         $plannings = plannings::get_plannings_for_situation_id($situation->get('id'), $student->id);
