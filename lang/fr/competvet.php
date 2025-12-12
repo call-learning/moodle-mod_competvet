@@ -406,6 +406,7 @@ $string['observation:status:archived'] = 'Archivé';
 $string['observation:status:completed'] = 'Terminé';
 $string['observation:status:inprogress'] = 'En cours';
 $string['observation:status:notstarted'] = 'Non commencé';
+$string['observation:skip'] = 'Ne pas évaluer';
 $string['observation_comment:comment'] = 'Contenu du commentaire d\'observation {$a}';
 $string['observation_comment:name'] = 'Nom du commentaire d\'observation';
 $string['observation_comment:type'] = 'Type de commentaire  {$a}';

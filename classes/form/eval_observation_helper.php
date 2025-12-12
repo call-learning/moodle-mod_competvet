@@ -40,9 +40,17 @@ class eval_observation_helper {
         foreach ($criteria as $criterion) {
             $mform->addElement('header', 'criterion_header_' . $criterion->id, $criterion->label);
             $gradeelements = [];
-            foreach ([0, 25, 50, 75, 100, 'skip'] as $grade) {
-                $gradeelement = $mform->createElement('radio', "criterion_levels[{$criterion->id}]", '', $grade, $grade);
-                $gradeelement->updateAttributes(['class' => $gradeelement->getAttribute('class') . ' ml-3']);
+            foreach ([0, 10, 20, 30, 40,  50 ,60 ,70, 80, 90, 100, 'skip'] as $grade) {
+                $label = is_numeric($grade) ? $grade : get_string('observation:skip', 'mod_competvet');
+                $gradeelement = $mform->createElement(
+                    'radio', "criterion_levels[{$criterion->id}]",
+                    '',
+                    $label,
+                    $grade
+                );
+                $gradeelement->updateAttributes([
+                    'class' => $gradeelement->getAttribute('class') . ' ml-3' . (is_numeric($grade) ? '' : ' font-italic')
+                ]);
                 $gradeelements[] = $gradeelement;
             }
             $mform->addGroup($gradeelements, "criterion_levels_group", '', [' '], false);

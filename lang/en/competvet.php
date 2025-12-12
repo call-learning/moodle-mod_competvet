@@ -402,6 +402,7 @@ $string['observation:delete'] = 'Delete the observation';
 $string['observation:delete:confirm'] = 'Confirm you want to delete the observation';
 $string['observation:edit'] = 'Edit the observation';
 $string['observation:edit:save'] = 'Save';
+$string['observation:skip'] = 'Do not assess';
 $string['observation:status'] = 'Status';
 $string['observation:status:archived'] = 'Archived';
 $string['observation:status:completed'] = 'Completed';
