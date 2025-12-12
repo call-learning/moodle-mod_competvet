@@ -198,10 +198,10 @@ class criterion extends base {
      *
      * @return array
      */
-    protected function get_default_table_aliases(): array {
+    protected function get_default_tables(): array {
         return [
-            'competvet_criterion' => 'criterion',
-            'competvet_criterion_parent' => 'parentcriterion',
+            'competvet_criterion',
+            'competvet_criterion_parent',
         ];
     }
 

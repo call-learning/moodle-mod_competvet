@@ -101,6 +101,7 @@ $string['competvet:viewother'] = 'Can view other\'s situations and planning';
 $string['competvetname'] = 'CompetVet Activity Name';
 $string['competvetplanning'] = 'Planning';
 $string['competvetsettings'] = 'CompetVet Settings';
+$string['competvetreportlist'] = 'CompetVet Report List';
 $string['confidencelevel'] = 'Confidence level';
 $string['confirmed'] = 'Confirmed';
 $string['confirmplanningdelete'] = 'Are you sure you want to delete this planning (there are user data)?';

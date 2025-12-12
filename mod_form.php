@@ -21,17 +21,13 @@
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-use core_grades\component_gradeitems;
-use mod_competvet\competvet;
 use mod_competvet\local\persistent\grid;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\local\api\plannings as plannings_api;
-use mod_competvet\reportbuilder\local\systemreports\planning_per_situation;
 use mod_competvet\utils;
 
 defined('MOODLE_INTERNAL') || die();
-
+global $CFG;
 require_once($CFG->dirroot . '/course/moodleform_mod.php');
 
 /**

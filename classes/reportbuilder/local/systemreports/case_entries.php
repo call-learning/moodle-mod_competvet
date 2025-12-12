@@ -153,16 +153,16 @@ class case_entries extends system_report {
      */
     protected function can_view(): bool {
         global $USER;
+        $context  = $this->get_report_persistent()->get_context();
         $studentid = $this->get_parameter('studentid', 0, PARAM_INT);
-        $planningid = $this->get_parameter('planningid', 0, PARAM_INT);
-        $planning = \mod_competvet\local\persistent\planning::get_record(['id' => $planningid]);
-        $competvet = \mod_competvet\competvet::get_from_situation_id($planning->get('situationid'));
+        $competvet = \mod_competvet\competvet::get_from_context($context);
         if (!isloggedin()) {
             return false;
         }
+        $canview = has_capability('mod/competvet:view', $competvet->get_context());
         if (!empty($studentid) && $studentid != $USER->id) {
-            return has_capability('mod/competvet:viewother', $competvet->get_context());
+            return $canview && has_capability('mod/competvet:viewother', $competvet->get_context());
         }
-        return true;
+        return $canview;
     }
 }

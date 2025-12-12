@@ -325,13 +325,13 @@ class situation extends base {
      *
      * @return array
      */
-    protected function get_default_table_aliases(): array {
+    protected function get_default_tables(): array {
         return [
-            'competvet' => 'sit_mcompetvet',
-            'competvet_situation' => 'situation',
-            'modules' => 'sit_modules',
-            'course_modules' => 'sit_cmodules',
-            'context' => 'sit_ctxmodule',
+            'competvet',
+            'competvet_situation',
+            'modules',
+            'course_modules',
+            'context',
         ];
     }
 

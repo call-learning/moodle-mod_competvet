@@ -178,9 +178,9 @@ class todo extends base {
      *
      * @return array
      */
-    protected function get_default_table_aliases(): array {
+    protected function get_default_tables(): array {
         return [
-            'competvet_todo' => 'todo',
+            'competvet_todo',
         ];
     }
 

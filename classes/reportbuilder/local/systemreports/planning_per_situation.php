@@ -75,6 +75,12 @@ class planning_per_situation extends system_report {
                 [$paramsituationid => $situationid]
             );
         }
+        // Also join the planning pause.
+        $planningpausealias = $planningentity->get_table_alias('competvet_planning_pause');
+        $this->add_entity($planningentity
+            ->add_join(
+                "LEFT JOIN {competvet_planning_pause} {$planningpausealias} ON {$planningpausealias}.planningid = {$planningalias}.id"
+            ));
         // Now we can call our helper methods to add the content we want to include in the report.
         $this->add_columns();
         $this->add_filters();
@@ -99,6 +105,7 @@ class planning_per_situation extends system_report {
             'planning:enddate',
             'planning:session',
             'planning:groupid',
+            'situation:session',
             'group:name',
 
         ];
