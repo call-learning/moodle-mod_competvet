@@ -119,6 +119,8 @@ $string['criterion:parentid'] = 'Criterion Parent ID';
 $string['criterion:parentidnumber'] = 'Criterion Parent ID Number';
 $string['criterion:parentlabel'] = 'Criterion Parent Label';
 $string['criterion:sort'] = 'Criterion sort';
+$string['csvdelimiter'] = 'CSV or ZIP containing a CSV file';
+$string['csvfile'] = 'CSV or ZIP containing a CSV file';
 $string['deactivatepenalty'] = 'Deactivate penalty';
 $string['decl:notseen'] = 'I have not encountered this situation yet.';
 $string['decl:seendone'] = 'I declare that I have carried out the essential clinic above on {$a} and ask the teachers below who supervised me on this procedure to confirm this.';
@@ -135,6 +137,7 @@ $string['enabledroles'] = 'Enabled roles for assignment';
 $string['enabledroles_desc'] = 'Select which roles can be assigned in the role assignment interface';
 $string['edit'] = 'Edit';
 $string['editplanning'] = 'Edit planning';
+$string['encoding'] = 'Encoding';
 $string['email:end_of_planning'] = <<<'EOF'
 
 <p>Hello,</p>

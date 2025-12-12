@@ -66,13 +66,21 @@ abstract class base_persistent_importer {
      * @return void
      */
     public function import(string $filepath, string $delimiter = 'semicolon', string $encoding = 'utf-8') {
-        $csvreader = new csv_iterator($filepath, $delimiter, $encoding);
-        $this->currentindex = 0;
-        foreach ($csvreader as $row) {
-            $data = $this->to_persistent_data($row, $csvreader);
-            $this->persist_data($data);
-            $this->currentindex++;
+        global $DB;
+        $transaction = $DB->start_delegated_transaction();
+        try {
+            $csvreader = new csv_iterator($filepath, $delimiter, $encoding);
+            $this->currentindex = 0;
+            foreach ($csvreader as $row) {
+                $data = $this->to_persistent_data($row, $csvreader);
+                $this->persist_data($data);
+                $this->currentindex++;
+            }
+        } catch (\Exception $e) {
+            $transaction->rollback($e);
+            throw $e;
         }
+        $transaction->allow_commit();
     }
 
     /**

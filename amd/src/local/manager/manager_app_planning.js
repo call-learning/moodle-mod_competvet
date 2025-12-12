@@ -283,6 +283,7 @@ class Manager {
                     element.groupname = element.groups.find((group) => group.id === parseInt(element.groupid)).name;
                 }
                 element.session = this.getValue('planitem', 'session', element.id);
+                element.error = false;
                 // Set the error flag if startdate, enddate or groupid are empty.
                 if (element.startdate === '') {
                     element.errorstartdate = true;
@@ -292,12 +293,18 @@ class Manager {
                     element.errorenddate = true;
                     element.error = true;
                 }
+                if (!element.error) {
+                    const starttime = new Date(element.startdate).getTime();
+                    const endtime = new Date(element.enddate).getTime();
+                    if (starttime > endtime) {
+                        element.errorenddate = true;
+                        element.errorstartdate = true;
+                        element.error = true;
+                    }
+                }
                 if (element.groupid === '') {
                     element.errorgroupid = true;
                     element.error = true;
-                }
-                if (element.startdate !== '' && element.enddate !== '' && element.groupid !== '') {
-                    element.error = false;
                 }
                 if (!element.session) {
                     element.errorsession = true;
@@ -327,6 +334,7 @@ class Manager {
                 const enddate = new Date(pause.enddate).getTime();
                 const elementstartdate = new Date(element.startdate).getTime();
                 const elementenddate = new Date(element.enddate).getTime();
+                pause.error = false;
                 if (startdate < elementstartdate) {
                     pause.errorstartdate = true;
                     pause.error = true;
@@ -343,8 +351,15 @@ class Manager {
                     pause.errorenddate = true;
                     pause.error = true;
                 }
-                if (pause.startdate !== '' && pause.enddate !== '') {
-                    pause.error = false;
+                if (!pause.error) {
+                    // Check startdate is before enddate.
+                    const starttime = new Date(element.startdate).getTime();
+                    const endtime = new Date(element.enddate).getTime();
+                    if (starttime > endtime) {
+                        element.errorenddate = true;
+                        element.errorstartdate = true;
+                        element.error = true;
+                    }
                 }
             }
         });

@@ -38,10 +38,10 @@ class planning extends base {
      *
      * @return array
      */
-    protected function get_default_table_aliases(): array {
+    protected function get_default_tables(): array {
         return [
-            'competvet_planning' => 'plan',
-            'competvet_situation' => 'situation',
+            'competvet_planning',
+            'competvet_situation',
         ];
     }
 

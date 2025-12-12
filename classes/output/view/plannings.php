@@ -16,13 +16,16 @@
 
 namespace mod_competvet\output\view;
 
+use core_reportbuilder\local\models\report;
+use core_reportbuilder\manager;
 use mod_competvet\competvet;
 use mod_competvet\local\api\grading as grading_api;
 use mod_competvet\local\persistent\planning;
+use mod_competvet\reportbuilder\local\systemreports\case_entries;
 use moodle_url;
 use renderer_base;
-use stdClass;
 use single_button;
+use stdClass;
 
 /**
  * Generic renderable for the view.
@@ -81,7 +84,25 @@ class plannings extends base {
             return $carry;
         }, []);
         $data['categories'] = [];
-        $returnurl = new moodle_url($FULLME);
+        $returnurl = new moodle_url('/mod/competvet/view.php',['id' => $this->cmid]);
+
+        $competvet = competvet::get_from_cmid($this->cmid);
+        $reportdata = [
+            'type' => \core_reportbuilder\local\report\base::TYPE_SYSTEM_REPORT,
+            'source' => case_entries::class,
+            'component' => 'mod_competvet',
+            'contextid' => $competvet->get_context()->id,
+        ];
+
+        if (!($report = report::get_record($reportdata))) {
+            $report = manager::create_report_persistent((object) $reportdata);
+        }
+
+        $reportid = $report->get('id');
+        $caselogreportbaseurl = new moodle_url(
+            '/mod/competvet/reports.php',
+            ['reportid' => $reportid, 'id' => $this->cmid]
+        );
 
         foreach ($planningstatsbycategory as $categorytext => $planningstats) {
             $category = new stdClass();
@@ -101,11 +122,12 @@ class plannings extends base {
                 $planningresult->nbstudents = $planningstat['stats']['nbstudents'];
                 $studentswithreporturl = [];
                 foreach ($planningstat['stats']['students'] as $student) {
-                    $student->caselogreporturl = (new moodle_url(
-                        '/mod/competvet/reports.php',
-                        ['report' => 'caselogentries', 'id' => $this->cmid, 'planningid' => $planningstat['id'],
-                            'studentid' => $student->id, 'returnurl' => $returnurl]
-                    ))->out(false);
+                    // We need to clone the url to avoid modifying the base url for the next students.
+                    $caselogreporturl = clone $caselogreportbaseurl;
+                    $caselogreporturl->param('returnurl', $returnurl);
+                    $caselogreporturl->param('parameters[studentid]', $student->id);
+                    $caselogreporturl->param('parameters[planningid]', $planningstat['id']);
+                    $student->caselogreporturl = ($caselogreporturl)->out(false);
                     $studentswithreporturl[] = $student;
                 }
                 $planningresult->students = $studentswithreporturl;
@@ -149,13 +171,15 @@ class plannings extends base {
             $viewplanning =
                 new moodle_url($this->baseurl, ['pagetype' => 'planning', 'id' => $competvet->get_course_module_id()]);
             $isgrader = has_capability('mod/competvet:cangrade', $context);
-            $data = [$currentplannings, $planningstats, $viewplanning, $situationname, $isgrader, $competvet->get_course_module_id()];
+            $data =
+                [$currentplannings, $planningstats, $viewplanning, $situationname, $isgrader, $competvet->get_course_module_id()];
         }
         [$this->plannings, $this->planningstats, $this->viewplanning, $this->situationname, $this->isgrader, $this->cmid] = $data;
     }
 
     /**
      * Adds the todos button to the page.
+     *
      * @param object $context The context object.
      * @return single_button[]
      */

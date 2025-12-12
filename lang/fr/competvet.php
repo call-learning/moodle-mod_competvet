@@ -118,6 +118,8 @@ $string['criterion:parentid'] = 'ID parent du critère';
 $string['criterion:parentidnumber'] = 'Numéro d\'ID parent du critère';
 $string['criterion:parentlabel'] = 'Libellé parent du critère';
 $string['criterion:sort'] = 'Trier les critères';
+$string['csvdelimiter'] = 'CSV ou ZIP contentant un fichier CSV - Délimiteur';
+$string['csvfile'] = 'Fichier CSV ou ZIP contenant un fichier CSV';
 $string['deactivatepenalty'] = 'Désactiver la pénalité';
 $string['decl:notseen'] = 'Je n\'ai pas encore rencontré cette situation.';
 $string['decl:seendone'] = 'Je déclare avoir réalisé l\'essentiel clinique ci-dessus le {$a} et je demande aux enseignants ci-dessous qui m\'ont supervisé lors de cette procédure de confirmer cela.';
@@ -254,6 +256,9 @@ $string['email:student_target:list'] = <<<'EOF'
 <p>Bien cordialement</p>
 EOF;
 $string['email:student_target:list:subject'] = '[CompetVet] Vous n\'avez pas encore finalisé votre carnet de cas pour la rotation {$a->competvetname}';
+$string['enabledroles'] = 'Rôles activés pour l\'attribution';
+$string['enabledroles_desc'] = 'Sélectionnez les rôles qui peuvent être attribués dans l\'interface d\'attribution de rôles';
+$string['encoding'] = 'Encodage';
 $string['enddate'] = 'Date de fin';
 $string['entercertificationassesment'] = 'entrez vos évaluations d\'incontournables ici';
 $string['enterskillassesment'] = 'entrez vos évaluations de compétences ici';

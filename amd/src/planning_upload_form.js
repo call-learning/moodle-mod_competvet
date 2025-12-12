@@ -22,23 +22,25 @@
  */
 
 import ModalForm from 'core_form/modalform';
+import Notification from 'core/notification';
 import {get_string as getString} from 'core/str';
 
-export const init = () => {
+const SELECTORS = {
+    UPLOAD_BUTTON: '[data-action="section-upload-form"]',
+};
 
-    const submitEventHandler = () => {
-            window.location.reload();
-    };
-    document.addEventListener('click', (event) => {
-        if (!event.target.closest('[data-action="section-upload-form"]')) {
-            return;
-        }
+export const init = () => {
+    const uploadButton = document.querySelector(SELECTORS.UPLOAD_BUTTON);
+    if (!uploadButton) {
+        return;
+    }
+    uploadButton.addEventListener('click', (event) => {
         const button = event.target.closest('[data-action="section-upload-form"]');
         event.preventDefault();
 
         const modalForm = new ModalForm({
             modalConfig: {
-                title: getString('editsection'),
+                title: getString('uploadplanning', 'mod_competvet'),
             },
             formClass: '\\mod_competvet\\form\\planning_upload_form',
             args: {
@@ -47,7 +49,18 @@ export const init = () => {
             },
             saveButtonText: getString('save'),
         });
+        const submitEventHandler = (e) => {
+            if (e.detail.result) {
+                window.location.reload();
+            }
+        };
         modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, submitEventHandler);
+        modalForm.addEventListener(modalForm.events.ERROR, (e) => {
+            e.preventDefault();
+            const error = getString('error');
+            const cancel = getString('cancel');
+            Notification.alert(error, e.detail.message, cancel);
+        });
         modalForm.show();
     });
 };

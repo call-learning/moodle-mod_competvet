@@ -96,3 +96,12 @@ Feature: Manage Plannings
     And I click the button with data-action "save" in row number "2"
     And I am on the "S1" Activity page logged in as "teacher1"
     Then I should see "Paused" in the ".competvet-grade-table" "css_element"
+
+  @javascript @_file_upload
+  Scenario: Upload a planning
+    Given I am on the "S1" Activity page logged in as "teacher1"
+    And I navigate to "Planning" in current page administration
+    And I click the link with data-action "section-upload-form"
+    And I upload "mod/competvet/tests/fixtures/importer/sample_manage_planning_upload.csv" file to "CSV or ZIP containing a CSV file" filemanager
+    When I click on "Save" "button" in the "Upload planning" "dialogue"
+    Then I should see "Planning imported successfully"

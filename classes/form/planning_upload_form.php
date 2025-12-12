@@ -19,9 +19,10 @@ namespace mod_competvet\form;
 use context;
 use context_module;
 use core_form\dynamic_form;
-use mod_competvet\competvet;
-use mod_competvet\local\persistent\planning;
+use core_text;
+use csv_import_reader;
 use mod_competvet\local\importer\planning_importer;
+use mod_competvet\local\persistent\planning;
 use moodle_exception;
 use moodle_url;
 
@@ -41,28 +42,24 @@ class planning_upload_form extends dynamic_form {
      */
     public function process_dynamic_submission(): array {
         global $USER;
-        $context = $this->get_context_for_dynamic_submission();
         $data = $this->get_data();
         // Get the file and create the content based on it.
         $usercontext = \context_user::instance($USER->id);
         $fs = get_file_storage();
         $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $this->get_data()->csvfile, 'itemid, filepath,
             filename', false);
-        if (!empty($files)) {
-            $file = reset($files);
-            $filepath = make_request_directory() . '/' . $file->get_filename();
+        $file = reset($files);
+        $filepath = make_request_directory() . '/' . $file->get_filename();
+        try {
             $file->copy_content_to($filepath);
-            try {
-                $planningimporter = new planning_importer(planning::class, $data->courseid, $data->situationid);
-                $planningimporter->import($filepath);
-            } finally {
-                unlink($filepath);
-            }
+            $planningimporter = new planning_importer(planning::class, $data->courseid, $data->situationid);
+            $planningimporter->import($filepath, $data->delimitername, $data->encoding);
+            return [
+                'result' => true,
+            ];
+        } finally {
+            unlink($filepath);
         }
-        return [
-            'result' => true,
-            'returnurl' => new moodle_url('/mod/competvet/view.php', ['pagetype' => 'manageplanning', 'id' => $data->cmid]),
-        ];
     }
 
     /**
@@ -104,6 +101,8 @@ class planning_upload_form extends dynamic_form {
      * @return void
      */
     protected function definition() {
+        global $CFG;
+        require_once($CFG->libdir . '/csvlib.class.php');
         $mform = $this->_form;
         $cmid = $this->optional_param('cmid', null, PARAM_INT);
         $courseid = $this->optional_param('courseid', null, PARAM_INT);
@@ -112,10 +111,22 @@ class planning_upload_form extends dynamic_form {
         $mform->addElement('hidden', 'courseid', $courseid);
         $mform->addElement('hidden', 'situationid', $situationid);
         // Upload the CSV file.
-        $mform->addElement('filepicker', 'csvfile', get_string('csvfile', 'mod_data'), null, [
+        $mform->addElement('filepicker', 'csvfile', get_string('csvfile', 'mod_competvet'), null, [
             'maxbytes' => 0,
             'accepted_types' => ['.csv'],
         ]);
+        $choices = csv_import_reader::get_delimiter_list();
+        $mform->addElement('select', 'delimitername', get_string('csvdelimiter', 'mod_competvet'), $choices);
+        if (array_key_exists('cfg', $choices)) {
+            $mform->setDefault('delimitername', 'cfg');
+        } else if (get_string('listsep', 'langconfig') == ';') {
+            $mform->setDefault('delimitername', 'semicolon');
+        } else {
+            $mform->setDefault('delimitername', 'comma');
+        }
+        $choices = core_text::get_encodings();
+        $mform->addElement('select', 'encoding', get_string('encoding', 'mod_competvet'), $choices);
+        $mform->setDefault('encoding', 'UTF-8');
     }
 
     /**
@@ -130,5 +141,30 @@ class planning_upload_form extends dynamic_form {
             'situationid' => $this->optional_param('situationid', 0, PARAM_INT),
         ];
         parent::set_data((object) $data);
+    }
+
+    /**
+     * Form validation
+     *
+     * @param array $data
+     * @param array $files
+     * @return array
+     */
+    public function validation($data, $files): array {
+        global $USER;
+        $errors = parent::validation($data, $files);
+        if (empty($data['csvfile'])) {
+            $errors['csvfile'] = get_string('required');
+        }
+
+        // Check if the uploaded file is a valid CSV file.
+        $usercontext = \context_user::instance($USER->id);
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $data['csvfile'], 'itemid, filepath,
+            filename', false);
+        if (empty($files)) {
+            $errors['csvfile'] = get_string('required');
+        }
+        return $errors;
     }
 }

@@ -85,12 +85,19 @@ class manage_plannings extends external_api {
     public static function update($plannings): array {
         $params = self::validate_parameters(self::update_parameters(), ['plannings' => $plannings]);
         self::validate_context(context_system::instance());
+        // TODO : validate we can manage these plannings.
         $plannings = $params['plannings'];
         $result = true;
 
         // Loop through the plannings, if a planning has the haschanged flag set to true,
         // update or insert the planning by calling the correct API.
         foreach ($plannings as $planning) {
+            $situationid = $planning['situationid'];
+            $competvet = \mod_competvet\competvet::get_from_situation_id($situationid);
+            if (!has_capability('mod/competvet:editplanning', $competvet->get_context())) {
+                $result = false;
+                break;
+            }
             if (isset($planning['deleted']) && $planning['deleted']) {
                 plannings::delete_planning($planning['id']);
                 continue;
