@@ -22,7 +22,7 @@
  */
 
 import ModalForm from 'core_form/modalform';
-import Notification from 'core/notification';
+import * as Notification from 'core/notification';
 import {get_string as getString} from 'core/str';
 
 const SELECTORS = {
@@ -49,9 +49,15 @@ export const init = () => {
             },
             saveButtonText: getString('save'),
         });
-        const submitEventHandler = (e) => {
+        const submitEventHandler = async (e) => {
             if (e.detail.result) {
-                window.location.reload();
+                Notification.addNotification(
+                    {
+                        message: await getString('planningimportedsuccess', 'mod_competvet'),
+                        type: 'success',
+                    }
+                );
+                return true;
             }
         };
         modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, submitEventHandler);

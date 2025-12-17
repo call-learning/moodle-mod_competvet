@@ -102,6 +102,6 @@ Feature: Manage Plannings
     Given I am on the "S1" Activity page logged in as "teacher1"
     And I navigate to "Planning" in current page administration
     And I click the link with data-action "section-upload-form"
-    And I upload "mod/competvet/tests/fixtures/importer/sample_manage_planning_upload.csv" file to "CSV or ZIP containing a CSV file" filemanager
+    And I upload "mod/competvet/tests/fixtures/importer/sample_manage_planning_upload_comma.csv" file to "CSV or ZIP containing a CSV file" filemanager
     When I click on "Save" "button" in the "Upload planning" "dialogue"
     Then I should see "Planning imported successfully"

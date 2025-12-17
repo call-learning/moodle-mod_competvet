@@ -90,12 +90,12 @@ class plannings extends base {
         $reportdata = [
             'type' => \core_reportbuilder\local\report\base::TYPE_SYSTEM_REPORT,
             'source' => case_entries::class,
-            'component' => 'mod_competvet',
+            'component' => competvet::COMPONENT_NAME,
             'contextid' => $competvet->get_context()->id,
         ];
 
         if (!($report = report::get_record($reportdata))) {
-            $report = manager::create_report_persistent((object) $reportdata);
+            $report = manager::create_report_persistent((object) $reportdata); // Create it if it does not exist.
         }
 
         $reportid = $report->get('id');

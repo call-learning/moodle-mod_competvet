@@ -83,16 +83,19 @@ trait test_data_definition {
      */
     public function generates_definition(array $datadefinition, object $generator, object $competvetevalgenerator): void {
         global $DB;
-        // Check for existing users (if we want to create them first with specific names).
-        //$users = $DB->get_records('user');
-        //$users = array_combine(array_column($users, 'username'), $users);
         $users = [];
         foreach ($datadefinition as $coursename => $data) {
             $course = $generator->create_course(['shortname' => $coursename]);
             foreach ($data['users'] as $role => $usernames) {
                 foreach ($usernames as $username) {
                     if (empty($users[$username])) {
-                        $users[$username] = $generator->create_user(['username' => $username]);
+                        $users[$username] = $generator->create_user(
+                            [
+                                'username' => $username,
+                                'firstname' => ucfirst($username . 'first'),
+                                'lastname' => ucfirst($username . 'last'),
+                            ]
+                        );
                     }
                     $generator->enrol_user($users[$username]->id, $course->id, $role);
                 }

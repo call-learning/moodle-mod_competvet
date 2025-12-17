@@ -247,6 +247,24 @@ class situation extends base {
     }
 
     /**
+     * Add joins to competvet and context tables
+     *
+     * @return array
+     */
+    public function get_context_joins(): array {
+        $competvetalias = $this->get_table_alias('competvet');
+        $contextalias = $this->get_table_alias('context');
+        $situationalias = $this->get_table_alias('competvet_situation');
+        return
+            [
+                "LEFT JOIN {competvet} {$competvetalias} ON {$competvetalias}.id = {$situationalias}.competvetid",
+                "LEFT JOIN {context} {$contextalias} ON {$contextalias}.instanceid = {$competvetalias}.id
+                    AND {$contextalias}.contextlevel = " .
+                CONTEXT_MODULE,
+            ];
+    }
+
+    /**
      * Return list of all available filters
      *
      * @return filter[]

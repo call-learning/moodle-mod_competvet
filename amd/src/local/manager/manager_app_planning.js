@@ -97,6 +97,23 @@ class Manager {
         if (btn.dataset.action === 'deleteall') {
             this.deleteAll(btn);
         }
+        if (btn.dataset.action === 'download-planning') {
+            this.downloadPlanning(btn);
+        }
+    }
+
+    /**
+     * Download the planning as iCal file.
+     * @param {object} btn The button that was clicked.
+     */
+    downloadPlanning(btn) {
+        const urlWithParams = new URL('/mod/competvet/reports.php', window.location.origin);
+        urlWithParams.searchParams.append('id', this.cmId);
+        urlWithParams.searchParams.append('reportname', 'planning_external_format');
+        urlWithParams.searchParams.append('parameters[situationid]', btn.dataset.situationid);
+        urlWithParams.searchParams.append('download', 'excel');
+        const url = urlWithParams.toString();
+        window.open(url, '_blank');
     }
 
     /**
@@ -464,7 +481,7 @@ class Manager {
             const date = new Date(starttime);
             // Find the next monday.
             date.setDate(date.getDate() + (1 + 7 - date.getDay()) % 7);
-           // Return in format yyyy-mm-ddThh:mm
+           // Return in format yyyy-mm-ddThh:mm.
             return date.toISOString().slice(0, 16);
         }
         if (property === 'enddate') {

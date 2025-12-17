@@ -25,6 +25,7 @@
 use core_reportbuilder\manager;
 use core_reportbuilder\permission;
 use core_reportbuilder\system_report_factory;
+use mod_competvet\competvet;
 use mod_competvet\reportbuilder\local\systemreports\competvet_report_list;
 
 require(__DIR__ . '/../../config.php');
@@ -42,24 +43,44 @@ if ($cmid === null) {
     $urlparams = ['id' => $cmid];
 }
 $reportid = optional_param('reportid', 0, PARAM_INT);
+$reportname = optional_param('reportname', null, PARAM_ALPHANUMEXT);
 $userid = optional_param('userid', $USER->id, PARAM_INT);
 $returnto = optional_param('returnurl', null, PARAM_URL);
+// We restrict parameters to alphanumext for security.
+$parameters = optional_param_array('parameters', [], PARAM_ALPHANUMEXT);
+$download = optional_param('download','', PARAM_ALPHA);
 
 if ($userid) {
     $urlparams += ['userid' => $userid];
 }
 if ($reportid) {
-    // We restrict parameters to alphanumext for security.
-    $parameters = optional_param_array('parameters', [], PARAM_ALPHANUMEXT);
     $report = manager::get_report_from_id($reportid, $parameters);
     permission::require_can_view_report($report->get_report_persistent());
     $urlparams += ['reportid' => $reportid];
     $reportname = $report->get_report_persistent()->get_formatted_name();
 }
+if ($reportname) {
+    $report = system_report_factory::create(
+        "\\mod_competvet\\reportbuilder\\local\\systemreports\\" . $reportname,
+        $context,
+        competvet::COMPONENT_NAME,
+        '',
+        0,
+        $parameters
+    );
+    permission::require_can_view_report($report->get_report_persistent());
+    $urlparams = ['reportid' => $report->get_report_persistent()->get('id')];
+}
 if ($returnto) {
     $urlparams += ['returnurl' => $returnto];
 }
-
+if ($parameters) {
+    foreach ($parameters as $key => $value) {
+        // Clean parameters for security.
+        $parameters[$key] = clean_param($value, PARAM_ALPHANUMEXT);
+        $urlparams += ["parameters[$key]" => $value];
+    }
+}
 $currenturl = new moodle_url('/mod/competvet/index.php', $urlparams);
 $PAGE->set_url($currenturl);
 $PAGE->set_context($context);
@@ -70,6 +91,18 @@ $PAGE->set_title($title);
 if ($returnto) {
     $PAGE->set_button($OUTPUT->single_button(new moodle_url($returnto), get_string('back')));
 }
+if (!empty($download)) {
+    if (!$report->can_be_downloaded()) {
+        throw new \core_reportbuilder\exception\report_access_exception();
+    }
+
+    // Combine original report parameters with 'download' parameter.
+    $parameters['download'] = $download;
+    $outputreport = new \core_reportbuilder\output\system_report($report->get_report_persistent(), $report, $parameters);
+    echo $PAGE->get_renderer('core_reportbuilder')->render($outputreport);
+    die();
+}
+
 echo $OUTPUT->header();
 if (!empty($report)) {
     echo $OUTPUT->heading($title);
@@ -78,7 +111,8 @@ if (!empty($report)) {
     echo $OUTPUT->heading(get_string('customreports', 'core_reportbuilder'));
     $report = system_report_factory::create(
         competvet_report_list::class,
-        context_system::instance()
+        context_system::instance(),
+        competvet::COMPONENT_NAME
     );
     echo $report->output();
 }
