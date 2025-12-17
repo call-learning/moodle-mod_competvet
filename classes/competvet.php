@@ -117,6 +117,7 @@ class competvet {
                 'mod/competvet:editplanning' => CAP_PREVENT,
                 'mod/competvet:view' => CAP_ALLOW,
                 'mod/competvet:viewother' => CAP_ALLOW,
+                'moodle/user:viewdetails' => CAP_ALLOW,
             ],
         ],
     ];

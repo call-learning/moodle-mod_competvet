@@ -22,6 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_competvet\competvet;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\reportbuilder\local\systemreports\situations;
 require(__DIR__ . '/../../config.php');
@@ -57,7 +58,7 @@ if ($id != SITEID) {
 $report = \core_reportbuilder\system_report_factory::create(
     situations::class,
     $context,
-    '',
+    competvet::COMPONENT_NAME,
     '',
     0,
     [

@@ -351,5 +351,12 @@ function xmldb_competvet_upgrade($oldversion) {
         // Competvet savepoint reached.
         upgrade_mod_savepoint(true, 2025121001, 'competvet');
     }
+
+    // Watch out: php ../../admin/cli/cfg.php --component=mod_competvet --name=version --set=2025090402 .
+    if ($oldversion < 2025121003) {
+        setup::create_update_roles(); // Add user:viewdetails to observers.
+        // Competvet savepoint reached.
+        upgrade_mod_savepoint(true, 2025121003, 'competvet');
+    }
     return true;
 }

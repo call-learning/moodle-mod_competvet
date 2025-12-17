@@ -44,13 +44,19 @@ final class search_test extends advanced_testcase {
                 'student1',
                 [
                     [
-                        'type' => 'planning',
+                        'type' => 'situation',
                         'description' => 'SIT1',
                         'identifier' => 'SIT1',
-                        // Relative dates, so we can compare.
-                        'startdate' => planning::round_start_date($startdate),
-                        'enddate' => planning::round_end_date($startdate + $oneweek),
-                        'groupname' => 'group 8.1',
+                        'additionalinfos' => [
+                            'plannings' => [
+                                [
+                                    // Relative dates, so we can compare.
+                                    'startdate' => planning::round_start_date($startdate),
+                                    'enddate' => planning::round_end_date($startdate + $oneweek),
+                                    'groupname' => 'group 8.1',
+                                ],
+                            ],
+                        ],
                     ],
                     // No future situations.
                 ],
@@ -60,12 +66,18 @@ final class search_test extends advanced_testcase {
                 'student1',
                 [
                     [
-                        'type' => 'planning',
+                        'type' => 'situation',
                         'description' => 'SIT1',
                         'identifier' => 'SIT1',
-                        'startdate' => planning::round_start_date($startdate),
-                        'enddate' => planning::round_end_date($startdate + $oneweek),
-                        'groupname' => 'group 8.1',
+                        'additionalinfos' => [
+                            'plannings' => [
+                                [
+                                    'startdate' => planning::round_start_date($startdate),
+                                    'enddate' => planning::round_end_date($startdate + $oneweek),
+                                    'groupname' => 'group 8.1',
+                                ],
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -74,12 +86,19 @@ final class search_test extends advanced_testcase {
                 'student2',
                 [
                     [
-                        'type' => 'planning',
+                        'type' => 'situation',
                         'description' => 'SIT1',
                         'identifier' => 'SIT1',
-                        'startdate' => planning::round_start_date($startdate),
-                        'enddate' => planning::round_end_date($startdate + $oneweek * 2),
-                        'groupname' => 'group 8.2',
+
+                        'additionalinfos' => [
+                            'plannings' => [
+                                [
+                                    'startdate' => planning::round_start_date($startdate),
+                                    'enddate' => planning::round_end_date($startdate + $oneweek * 2),
+                                    'groupname' => 'group 8.2',
+                                ],
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -99,10 +118,10 @@ final class search_test extends advanced_testcase {
                 'expectedresults' => [
                     [
                         'type' => 'user',
-                        'username' => 'observer2',
-                        'fullname' => 'Observer Two OBSevérTWO',
-                        'roles' => ['observer'],
+                        'identifier' => 'observer2',
+                        'description' => 'Observer Two OBSevérTWO',
                         'additionalinfos' => [
+                            'roles' => ['observer'],
                             'situations' =>
                                 [
                                     [
@@ -114,10 +133,10 @@ final class search_test extends advanced_testcase {
                     ],
                     [
                         'type' => 'user',
-                        'username' => 'observer1',
-                        'fullname' => 'Observer One OBSONE',
-                        'roles' => ['observer'],
+                        'identifier' => 'observer1',
+                        'description' => 'Observer One OBSONE',
                         'additionalinfos' => [
+                            'roles' => ['observer'],
                             'situations' =>
                                 [
                                     [
@@ -143,10 +162,10 @@ final class search_test extends advanced_testcase {
                 'expectedresults' => [
                     [
                         'type' => 'user',
-                        'username' => 'observer2',
-                        'fullname' => 'Observer Two OBSevérTWO',
-                        'roles' => ['observer'],
+                        'identifier' => 'observer2',
+                        'description' => 'Observer Two OBSevérTWO',
                         'additionalinfos' => [
+                            'roles' => ['observer'],
                             'situations' =>
                                 [
                                     [
@@ -158,10 +177,10 @@ final class search_test extends advanced_testcase {
                     ],
                     [
                         'type' => 'user',
-                        'username' => 'observer1',
-                        'fullname' => 'Observer One OBSONE',
-                        'roles' => ['observer'],
+                        'identifier' => 'observer1',
+                        'description' => 'Observer One OBSONE',
                         'additionalinfos' => [
+                            'roles' => ['observer'],
                             'situations' =>
                                 [
                                     [
@@ -181,16 +200,16 @@ final class search_test extends advanced_testcase {
                     ],
                 ],
             ],
-            'simple search with lowercase (student2)' => [
+            'simple search student2' => [
                 'searchtext' => 'observer',
                 'currentuser' => 'student2',
                 'expectedresults' => [
                     [
                         'type' => 'user',
-                        'username' => 'observer2',
-                        'fullname' => 'Observer Two OBSevérTWO',
-                        'roles' => ['observer'],
+                        'identifier' => 'observer2',
+                        'description' => 'Observer Two OBSevérTWO',
                         'additionalinfos' => [
+                            'roles' => ['observer'],
                             'situations' =>
                                 [
                                     [
@@ -202,10 +221,10 @@ final class search_test extends advanced_testcase {
                     ],
                     [
                         'type' => 'user',
-                        'username' => 'observer1',
-                        'fullname' => 'Observer One OBSONE',
-                        'roles' => ['observer'],
+                        'identifier' => 'observer1',
+                        'description' => 'Observer One OBSONE',
                         'additionalinfos' => [
+                            'roles' => ['observer'],
                             'situations' =>
                                 [
                                     [
@@ -217,10 +236,11 @@ final class search_test extends advanced_testcase {
                     ],
                     [
                         'type' => 'user',
-                        'username' => 'observer3',
-                        'fullname' => 'Observer Three OBSe3',
+                        'identifier' => 'observer3',
+                        'description' => 'Observer Three OBSe3',
                         'roles' => ['observer'],
                         'additionalinfos' => [
+                            'roles' => ['observer'],
                             'situations' =>
                                 [
                                     [
@@ -231,6 +251,11 @@ final class search_test extends advanced_testcase {
                         ],
                     ],
                 ],
+            ],
+            'simple search student2 for student' => [
+                'searchtext' => 'student',
+                'currentuser' => 'student2',
+                'expectedresults' => [],
             ],
         ];
     }
@@ -298,16 +323,23 @@ final class search_test extends advanced_testcase {
     public function test_planning_search(string $searchtext, string $username, array $expectedresults): void {
         $user = \core_user::get_user_by_username($username);
         $this->setUser($user); // User involved in the scenario.
-        $returnval = search::search_query($searchtext, [search::TYPE_PLANNING]);
+        $returnval = search::search_query($searchtext, [search::TYPE_SITUATION]);
         $this->assertCount(count($expectedresults), $returnval);
 
         $filterout = fn($item) => [
             'type' => $item['type'],
             'description' => $item['description'],
             'identifier' => $item['identifier'],
-            'groupname' => $item['groupname'],
-            'startdate' => $item['startdate'],
-            'enddate' => $item['enddate'],
+            'additionalinfos' => [
+                'plannings' => array_map(
+                    fn($planning) => [
+                        'startdate' => $planning['startdate'],
+                        'enddate' => $planning['enddate'],
+                        'groupname' => $planning['groupname'],
+                    ],
+                    $item['additionalinfos']['plannings']
+                ),
+            ],
         ];
         $this->assertEquals(
             array_map($filterout, $expectedresults),
@@ -338,12 +370,12 @@ final class search_test extends advanced_testcase {
                 $item['type']
             );
             $this->assertEquals(
-                $expectedresults[$index]['username'],
-                $item['username']
+                $expectedresults[$index]['identifier'],
+                $item['identifier']
             );
             $this->assertEquals(
-                $expectedresults[$index]['roles'],
-                $item['roles']
+                $expectedresults[$index]['additionalinfos']['roles'],
+                $item['additionalinfos']['roles']
             );
             if (isset($expectedresults[$index]['additionalinfos'])) {
                 foreach ($expectedresults[$index]['additionalinfos']['situations'] as $sitindex => $situationinfo) {

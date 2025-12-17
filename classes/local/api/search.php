@@ -34,7 +34,7 @@ class search {
     /** User type */
     public const TYPE_USER = 'user';
     /** Planning type */
-    public const TYPE_PLANNING = 'planning'; // For now we won't search into plannings.
+    public const TYPE_SITUATION = 'situation'; // For now we won't search into plannings.
     /** Case type */
     const TYPE_CASE = 'case'; // For now we won't search into cases as we don't have a page to go to in the app.
 
@@ -44,25 +44,25 @@ class search {
      * @param string $searchtext
      * @return array
      */
-    public static function search_query(string $searchtext, array $returnedtypes = [self::TYPE_USER, self::TYPE_PLANNING]) {
+    public static function search_query(string $searchtext, array $returnedtypes = [self::TYPE_USER, self::TYPE_SITUATION]) {
         global $USER;
         $situations = situations::get_all_situations_with_planning_for($USER->id, true);
         $items = [];
         foreach ($returnedtypes as $type) {
+            $founditems = [];
             switch ($type) {
                 case self::TYPE_USER:
-                    $items = array_merge(
-                        $items,
-                        self::search_users_in_situations($searchtext, $situations)
-                    );
-                case self::TYPE_PLANNING:
-                    $items = array_merge(
-                        $items,
-                        self::search_planning($searchtext, $situations)
-                    );
+                    $founditems = self::search_users_in_situations($searchtext, $situations);
+                    break;
+                case self::TYPE_SITUATION:
+                    $founditems = self::search_planning($searchtext, $situations);
                     break;
                 default:
             }
+            $items = array_merge(
+                $items,
+                $founditems
+            );
         }
         return $items;
     }
@@ -82,27 +82,24 @@ class search {
         }
         $items = [];
         foreach ($visiblesituations as $situation) {
-            foreach ($situation['plannings'] as $planning) {
-                // Check if search text is in situation shortname.
-                if (strpos(strtolower($situation['shortname']), $searchtext) !== false) {
-                    $items[] = [
-                        'id' => $planning['id'],
-                        'type' => self::TYPE_PLANNING,
-                        'description' => $situation['name'],
-                        'identifier' => $situation['shortname'],
-                        'startdate' => $planning['startdate'] ?? null,
-                        'enddate' => $planning['enddate'] ?? null,
-                        'groupname' => $planning['groupname'] ?? null,
-                        'additionalinfos' => [
-                            'situationid' => $situation['id'],
-                            'planningid' => $planning['id'],
-                        ],
-                    ];
-                }
+            if (isset($items[$situation['id']])) {
+                continue;
+            }
+            // Check if search text is in situation shortname.
+            if (strpos(strtolower($situation['shortname']), $searchtext) !== false) {
+                $items[$situation['id']] = [
+                    'id' => $situation['id'],
+                    'type' => self::TYPE_SITUATION,
+                    'description' => $situation['name'],
+                    'identifier' => $situation['shortname'],
+                    'additionalinfos' => [
+                        'plannings' => $situation['plannings'],
+                    ],
+                ];
             }
         }
 
-        return $items;
+        return array_values($items);
     }
 
     /**
@@ -113,19 +110,28 @@ class search {
      * @return array
      */
     private static function search_users_in_situations(string $searchtext, array $visiblesituations) {
+        global $USER;
         $items = [];
         $searchtext = strtolower($searchtext);
-
+        $currentrole = user_role::get_top_for_all_situations($USER->id);
         foreach ($visiblesituations as $situation) {
             $competvet = competvet::get_from_situation_id($situation['id']);
             $users = get_enrolled_users($competvet->get_context(), onlyactive: true);
-
             foreach ($users as $user) {
                 $role = user_role::get_top($user->id, $situation['id']);
                 if ($role === situation::UNKNOWN_ROLE_TYPE) {
                     continue;
                 }
-
+                // Student can only see observers.
+                if ($currentrole === 'student' && $role === 'student') {
+                    continue;
+                }
+                if (
+                    $user->id !== $USER->id &&
+                    !has_capability('moodle/user:viewdetails', $competvet->get_context())
+                ) {
+                    continue;
+                }
                 $fullname = strtolower(fullname($user));
                 if (strpos($fullname, $searchtext) === false) {
                     continue;
@@ -135,10 +141,10 @@ class search {
                     $items[$user->id] = [
                         'id' => $user->id,
                         'type' => self::TYPE_USER,
-                        'fullname' => fullname($user),
-                        'username' => $user->username,
-                        'roles' => [$role],
+                        'description' => fullname($user),
+                        'identifier' => $user->username,
                         'additionalinfos' => [
+                            'roles' => [$role],
                             'situations' => [
                                 $situation['id'] => [
                                     'id' => $situation['id'],
@@ -150,20 +156,20 @@ class search {
                         ],
                     ];
                 } else {
-                    $userItem = &$items[$user->id];
-                    if (!in_array($role, $userItem['roles'])) {
-                        $userItem['roles'][] = $role;
+                    $useritem = &$items[$user->id];
+                    if (!in_array($role, $useritem['additionalinfos']['roles'])) {
+                        $useritem['additionalinfos']['roles'][] = $role;
                     }
-                    if (!isset($userItem['additionalinfos']['situations'][$situation['id']])) {
-                        $userItem['additionalinfos']['situations'][$situation['id']] = [
+                    if (!isset($useritem['additionalinfos']['situations'][$situation['id']])) {
+                        $useritem['additionalinfos']['situations'][$situation['id']] = [
                             'id' => $situation['id'],
                             'shortname' => $situation['shortname'],
                             'name' => $situation['name'],
                             'plannings' => $situation['plannings'],
                         ];
                     } else {
-                        $userItem['additionalinfos']['situations'][$situation['id']]['plannings'] = array_merge(
-                            $userItem['additionalinfos']['situations'][$situation['id']]['plannings'],
+                        $useritem['additionalinfos']['situations'][$situation['id']]['plannings'] = array_merge(
+                            $useritem['additionalinfos']['situations'][$situation['id']]['plannings'],
                             $situation['plannings']
                         );
                     }
