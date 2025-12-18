@@ -79,7 +79,12 @@ class student_eval extends base {
             $info['badgetype'] = self::BADGELEVEL[$roundedlevel];
             $info['viewurl'] =
                 (new moodle_url($this->subcriteriaurl, ['criterionid' => $evalcriterion['criterioninfo']['id']]))->out(false);
-            $info['level'] = observation_criterion_level::is_an_empty_level($level) ? '-' : $level;
+            if ($evalcriterion['isactive'] ?? false) {
+                $info['level'] = observation_criterion_level::is_an_empty_level($level) ? '-' : $level;
+            } else {
+                $info['level'] = 'x';
+            }
+
             $data['criteria'][] = $info;
         }
         $data['canedit'] = $this->evaluation['canedit'];

@@ -18,6 +18,7 @@ namespace mod_competvet\form;
 
 use mod_competvet\local\persistent\situation;
 use mod_competvet\local\persistent\observation_comment;
+use html_writer;
 
 /**
  * Observation create form
@@ -39,22 +40,60 @@ class eval_observation_helper {
         $criteria = $situation->get_eval_criteria_tree();
         foreach ($criteria as $criterion) {
             $mform->addElement('header', 'criterion_header_' . $criterion->id, $criterion->label);
-            $gradeelements = [];
-            foreach ([0, 10, 20, 30, 40,  50 ,60 ,70, 80, 90, 100, 'skip'] as $grade) {
-                $label = is_numeric($grade) ? $grade : get_string('observation:skip', 'mod_competvet');
-                $gradeelement = $mform->createElement(
-                    'radio', "criterion_levels[{$criterion->id}]",
-                    '',
-                    $label,
-                    $grade
-                );
-                $gradeelement->updateAttributes([
-                    'class' => $gradeelement->getAttribute('class') . ' ml-3' . (is_numeric($grade) ? '' : ' font-italic')
-                ]);
-                $gradeelements[] = $gradeelement;
-            }
-            $mform->addGroup($gradeelements, "criterion_levels_group", '', [' '], false);
-            $mform->setType("criterion_levels_group[{$criterion->id}]", PARAM_INT);
+            $levelname = "criterion_levels[{$criterion->id}]";
+            $mform->addElement('hidden', $levelname);
+            $mform->setType($levelname, PARAM_TEXT);
+
+            $sliderid = "criterion_level_slider_{$criterion->id}";
+            $currentlevelid = "criterion_level_current_{$criterion->id}";
+
+            $slider = html_writer::empty_tag('input', [
+                'type' => 'range',
+                'min' => 0,
+                'max' => 100,
+                'step' => 10,
+                'value' => 0,
+                'class' => 'form-range criterion-level-slider flex-grow-1',
+                'id' => $sliderid,
+                'data-criterion-id' => $criterion->id,
+                'data-linked-input-name' => $levelname,
+                'aria-describedby' => $currentlevelid,
+            ]);
+            $currentvalue = html_writer::tag('span', '0%', [
+                'class' => 'mx-2 criterion-level-current-value font-weight-semibold',
+                'data-current-level' => $criterion->id,
+                'id' => $currentlevelid,
+                'data-criterion-id' => $criterion->id,
+            ]);
+
+            $sliderelement = $mform->createElement(
+                'static',
+                '',
+                '',
+                html_writer::div($slider . $currentvalue, 'd-flex align-items-center flex-grow-1')
+            );
+            $skiplabel = get_string('observation:skip', 'mod_competvet');
+            $skipelement = $mform->createElement(
+                'advcheckbox',
+                "criterion_levels_skip[{$criterion->id}]",
+                '',
+                $skiplabel,
+                0
+            );
+            $skipelement->updateAttributes([
+                'data-criterion-id' => $criterion->id,
+                'class' => 'criterion-level-skip text-bold',
+            ]);
+            $skipelement->updateAttributes([
+                'class' => $skipelement->getAttribute('class') . ' ml-3 font-italic',
+            ]);
+            $mform->addGroup(
+                [$sliderelement, $skipelement],
+                "criterion_level_group_{$criterion->id}",
+                '',
+                [' '],
+                false
+            );
             $mform->addElement('hidden', "criterion_levels_id[{$criterion->id}]");
             $mform->setType("criterion_levels_id[{$criterion->id}]", PARAM_INT);
             foreach ($criterion->subcriteria as $subcriterion) {
@@ -68,8 +107,8 @@ class eval_observation_helper {
                 $mform->addElement('hidden', "criterion_comments_id[{$subcriterion->id}]");
                 $mform->setType("criterion_comments_id[{$subcriterion->id}]", PARAM_INT);
             }
-
         }
+        // The JavaScript is ran from the generic_form_helper.
     }
 
     /**
@@ -159,9 +198,16 @@ class eval_observation_helper {
     public static function process_form_data_criteria(object $data, situation $situation): array {
         $criteriainfo = [];
         foreach ($situation->get_eval_criteria_tree() as $criterion) {
+            $level = $data->criterion_levels[$criterion->id];
+            if (
+                isset($data->criterion_levels_skip[$criterion->id]) &&
+                $data->criterion_levels_skip[$criterion->id]
+            ) {
+                    $level = 'skip';
+            }
             $criterioninfo = [
                 'criterioninfo' => ['id' => $criterion->id],
-                'level' => $data->criterion_levels[$criterion->id],
+                'level' => $level,
                 'id' => empty($data->criterion_levels_id[$criterion->id]) ? 0 : $data->criterion_levels_id[$criterion->id],
             ];
             $subcriteria = [];

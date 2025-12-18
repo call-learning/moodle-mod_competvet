@@ -24,7 +24,7 @@
 import ModalForm from 'core_form/modalform';
 import {get_string as getString} from 'core/str';
 import Notification from 'core/notification';
-
+import {init as criterionSliderInit} from './criterion_level_slider';
 /**
  * Handle the follow up form.
  * @param {Event} event
@@ -59,9 +59,14 @@ export const genericForm = (action, modulename, formname, submitEventHandler) =>
         element.addEventListener('click', (event) => {
             event.preventDefault();
             const data = event.target.closest('[data-action]').dataset; // Event can be sent by subelements.
-            const modal = genericFormCreate(data, action, modulename, formname);
-            modal.addEventListener(modal.events.FORM_SUBMITTED, submitEventHandler);
-            modal.show();
+            const modalForm = genericFormCreate(data, action, modulename, formname);
+            modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, submitEventHandler);
+            modalForm.addEventListener(modalForm.events.LOADED, () => {
+                modalForm.modal.getRoot().on('modal:bodyRendered', () => {
+                    criterionSliderInit(); // Initialize criterion level sliders when the modal is shown.
+                });
+            });
+            modalForm.show();
         });
     });
 };
