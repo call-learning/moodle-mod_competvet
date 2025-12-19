@@ -2,22 +2,27 @@
     th {
         background-color: #f8f9fa;
         border-bottom: 1px solid #dee2e6;
+
         &.first {
             border-left: 1px solid #dee2e6;
         }
+
         &.last {
             border-right: 1px solid #dee2e6;
         }
+
         &.planning-name {
             padding: 1.5rem 1rem 0.5rem 0;
-            background-color: #ffffff;
+            background-color: #fff;
         }
+
         &.label {
             padding: 0.5rem 1rem;
-            text-align:left;
+            text-align: left;
             border-top: 1px solid #dee2e6;
         }
     }
+
     th.user {
         background-color: #f8f9fa;
         padding: 0.5rem 1rem;
@@ -26,28 +31,34 @@
         border-top: 1px solid #dee2e6;
         border-bottom: 1px solid #dee2e6;
         width: 150px;
+
         .userpicture {
             width: 3rem;
             height: 3rem;
             border-radius: 100%;
         }
     }
+
     .t-grade {
         padding: 0.5rem 1rem;
         text-align: center;
         border-left: 1px solid #dee2e6;
         border-right: 1px solid #dee2e6;
         border-bottom: 1px solid #dee2e6;
+
         &.stats {
             width: 400px;
         }
+
         &.comments {
             text-align: left;
         }
+
         &.globalgrade {
             padding: 0.5rem 1rem;
         }
     }
+
     .globalgrade .circle {
         border-radius: 5%;
         background-color: #f8f9fa;
@@ -60,30 +71,37 @@
         justify-content: center;
         align-items: center;
         margin: 0 auto;
+
         &.fail {
             background-color: #f8d7da;
             border-color: #f5c6cb;
         }
     }
+
     .lettergrade {
         font-size: 1.5rem;
         font-weight: bold;
     }
+
     svg {
         width: 1.5rem;
+
         .svg-stroke {
             stroke: #fff;;
         }
     }
+
     .btn-nowrap {
         white-space: nowrap;
     }
+
     .studentname-d-none,
     .groupname-d-none,
     .ungraded-d-none,
     .startdate-d-none {
         display: none;
     }
+
     .userpicturesmall {
         width: 2rem;
         height: 2rem;

@@ -2,13 +2,16 @@
 .gradingapp {
     display: flex;
     flex-direction: column;
+
     &.full-height {
         height: 100vh;
     }
+
     .usernavigation {
         .userimage img {
             width: 50px;
         }
+
         .userinfo {
             width: 170px;
             min-width: 170px;
@@ -16,27 +19,32 @@
             flex-direction: column;
         }
     }
+
     .userheader {
         .userimage img {
             width: 100px;
             height: 100px;
         }
     }
+
     .grade-panel {
         flex: 1 0 auto;
         display: flex;
         flex-direction: column;
     }
+
     .grade-header {
         background-color: #f5f5f5;
         box-shadow: 2px 4px 9px rgba(0, 0, 0, 0.2);
         display: flex;
         padding: 1rem;
+
         .user-header {
             display: flex;
             flex: 0 1 20%;
             max-width: 20%;
             margin-right: 2rem;
+
             .userinfo {
                 display: flex;
                 flex-direction: column;
@@ -44,6 +52,7 @@
                 flex: 0 0 50%;
                 max-width: 50%;
             }
+
             .userimage {
                 display: flex;
                 align-items: center;
@@ -51,10 +60,13 @@
                 max-width: 50%;
             }
         }
+
         .user-grade {
             flex: 1 1 auto;
+
             form {
                 display: flex;
+
                 .form-group {
                     flex: 1 1 25%;
                     max-width: 25%;
@@ -63,53 +75,66 @@
             }
         }
     }
+
     .tab-content {
         flex: 1 0 auto;
         display: flex;
-        &>.active {
+
+        & > .active {
             display: flex;
             flex-direction: column;
             flex: 1 0 auto;
         }
     }
+
     .globalcomment {
         border-bottom-left-radius: 0;
     }
+
     .commentsubmit {
         border-top-left-radius: 0;
         border-top-right-radius: 0;
     }
+
     .grade-tabs {
         flex: 1 0 auto;
         display: flex;
         flex-direction: column;
+
         .nav-container,
         .tab-inner {
             display: flex;
+
             .nav-tabs {
                 flex: 1 1 100%;
             }
+
             .tab-main {
                 flex: 1 1 65%;
                 max-width: 65%;;
             }
+
             .tab-aside {
                 flex: 1 1 35%;
                 max-width: 35%;
             }
+
             .tab-aside {
                 background-color: #f1f1f1;
             }
         }
+
         .tab-inner {
             display: flex;
             flex: 1 0 auto;
         }
+
         .grade-tab-indicator {
             min-width: 1.7rem;
             height: 1.7rem;
             margin-left: 1rem;
         }
+
         .grade-tab-indicator:not(:empty) {
             color: #fff;
             background-color: var(--primary);
@@ -117,126 +142,157 @@
             padding: 0.25rem 0.5rem;
             font-size: 0.8rem;
         }
+
         .nav-link {
             display: flex;
             align-items: center;
             justify-content: center;
         }
     }
+
     .tab-main {
         padding: 1rem;
     }
+
     svg {
         .svg-fill {
             fill: #1d2125;
         }
+
         .svg-stroke {
             stroke: #1d2125;
         }
     }
+
     .nav-link {
         border-width: 3px;
         font-size: 1.2rem;
+
         &.active,
         &:hover {
             border-color: transparent transparent var(--primary);
+
             svg {
                 .svg-fill {
                     fill: var(--primary);
                 }
+
                 .svg-stroke {
                     stroke: var(--primary);
                 }
             }
         }
     }
+
     .form-control:focus {
         box-shadow: none;
     }
+
     .statusmessage {
         transition: opacity 0.5s ease-in-out;
         background-color: #fff;
     }
+
     .certification {
         .heading,
         .certif {
             display: flex;
             margin-bottom: 1rem;
         }
+
         .col1 {
             flex: 1 1 50%;
             max-width: 50%;
         }
+
         .col2 {
             flex: 1 1 26%;
             max-width: 26%;
         }
+
         .col3 {
             flex: 1 1 12%;
             max-width: 12%;
             text-align: center;
         }
+
         .col4 {
             flex: 1 1 12%;
             max-width: 12%;
             text-align: center;
         }
+
         .progress {
             height: 3px;
         }
     }
+
     .evaltable {
         overflow: auto;
+
         .header {
             font-weight: 700;
+
             .col3 {
                 padding-bottom: 0.5rem;
             }
         }
+
         .eval {
             display: flex;
         }
+
         .col1 {
             flex: 1 0 350px;
             max-width: 350px;
         }
+
         .col3 {
             flex: 1 0 75px;
             max-width: 75px;
             text-align: center;
         }
+
         .cellborder {
             border-bottom: 1px solid #ccc;
             border-left: 1px solid #ccc;
         }
+
         .row:first-child {
             .cellborder {
                 border-top: 1px solid #ccc;
                 background-color: #f5f5f5;
             }
+
             .cellborder:first-child {
                 border-top-left-radius: 0.4rem;
             }
+
             .cellborder:last-child {
                 border-top-right-radius: 0.4rem;
                 min-height: 2.5rem;
             }
         }
+
         .row .cellborder:last-child {
             border-right: 1px solid #ccc;
         }
+
         .row:last-child {
             .cellborder {
                 border-bottom: 1px solid #ccc;
             }
+
             .cellborder:first-child {
                 border-bottom-left-radius: 0.4rem;
             }
+
             .cellborder:last-child {
                 border-bottom-right-radius: 0.4rem;
             }
         }
     }
+
     .opacity-0 {
         opacity: 0;
     }

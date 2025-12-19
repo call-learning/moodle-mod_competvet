@@ -3,38 +3,45 @@
         .svg-fill {
             fill: #1d2125;
         }
+
         .svg-stroke {
             stroke: #1d2125;
         }
     }
+
     .tcell {
         padding: 0.5rem;
         border-bottom: 1px solid #dee2e6;
         border-right: 1px solid #dee2e6;
         display: flex;
         align-items: center;
+
         &.editable {
             padding: 0;
+
             input,
             select {
                 height: 100%;
                 border-radius: 0;
+
                 &:focus {
                     border: 1px solid #007bff;
                     box-shadow: none;
                 }
             }
         }
+
         &.pause {
             background-color: #fffcef;
             padding: 0.25rem 0.5rem;
         }
     }
+
     .pauseicon {
         .icon {
             width: 24px;
             height: 24px;
-            background-color: #ffffff;
+            background-color: #fff;
             border-radius: 50%;
             display: flex;
             justify-content: center;
@@ -43,14 +50,17 @@
             color: #dcdcdc;
         }
     }
+
     .tcell.move {
         width: 3rem;
         display: flex;
         justify-content: center;
     }
+
     .subitem {
         padding-left: 1.5rem;
     }
+
     .questioncolumn {
         border-top: 1px solid #ccc;
         border-left: 1px solid #ccc;
@@ -114,9 +124,10 @@
         flex: 0 0 20%;
         max-width: 20%;
     }
+
     .singlemarker {
-        .inputclick+input {
-            border-width: 0px;
+        .inputclick + input {
+            border-width: 0;
         }
 
         .inputclick {
@@ -152,32 +163,38 @@
         }
     }
 
-    .inputclick::focus {
+    .inputclick:focus {
         border: 1px dotted silver;
     }
 
     .greenbg .grader-cell {
         background-color: #dae8db;
     }
+
     .btn.jsbutton {
         opacity: 0;
     }
+
     .btn .savingicon {
         display: none;
     }
+
     .btn.saved {
         .defaulticon {
             display: none;
         }
+
         .savingicon {
             display: inline-block;
         }
     }
+
     &.jsenabled {
         .btn.jsbutton {
             opacity: 1;
         }
     }
+
     .error::after {
         content: "!";
         color: red;
@@ -190,25 +207,32 @@
         align-items: center;
         z-index: 1;
     }
+
     .editable {
         background-color: aliceblue;
     }
+
     .sortable-list-is-dragged {
         background-color: aliceblue
     }
+
     .scriptchecked {
         opacity: 0;
     }
+
     .scriptchecked.ok {
         opacity: 1;
     }
+
     .scriptname {
         min-width: 10rem;
     }
+
     .nav-tabs button.nav-link {
         padding: 0.25rem;
         border: 1px solid #909090;
     }
+
     .scrollable {
         overflow-y: hidden;
         overflow-x: auto;
