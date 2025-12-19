@@ -36,7 +36,7 @@ final class planning_importer_test extends advanced_testcase {
     /**
      * Sample file path
      */
-    const SAMPLE_FILE_PATH = '/mod/competvet/tests/fixtures/importer/sample_planning_upload.csv';
+    public const SAMPLE_FILE_PATH = '/mod/competvet/tests/fixtures/importer/sample_planning_upload.csv';
 
     /**
      * Setup the test
@@ -97,7 +97,7 @@ final class planning_importer_test extends advanced_testcase {
         $importer = new planning_importer(planning::class, $competvet->get_course_id(), $situation->get('id'));
         $importer->import($CFG->dirroot . self::SAMPLE_FILE_PATH);
         $plannings = planning::get_records(['situationid' => $situation->get('id')]);
-        $this->assertEquals(5, count($plannings), 'Number of plannings should be 4 after import.');
+        $this->assertCount(5, $plannings, 'Number of plannings should be 4 after import.');
         $this->assertEquals(10, planning_pause::count_records());
         $this->assertEquals(2, planning_pause::count_records(['planningid' => $plannings[0]->get('id')]));
         $this->assertEquals(2, planning_pause::count_records(['planningid' => $plannings[1]->get('id')]));
@@ -196,7 +196,6 @@ final class planning_importer_test extends advanced_testcase {
             ],
         ];
         $this->prepare($data);
-        ;
         $situation = situation::get_record(['shortname' => 'SIT1']);
         $competvet = competvet::get_from_situation($situation);
         // First import.
