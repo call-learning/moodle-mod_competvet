@@ -49,7 +49,7 @@ export const init = () => {
             },
             saveButtonText: getString('save'),
         });
-        const submitEventHandler = async (e) => {
+        const submitEventHandler = async(e) => {
             if (e.detail.result) {
                 Notification.addNotification(
                     {
@@ -57,8 +57,8 @@ export const init = () => {
                         type: 'success',
                     }
                 );
-                return true;
             }
+            return true;
         };
         modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, submitEventHandler);
         modalForm.addEventListener(modalForm.events.ERROR, (e) => {
