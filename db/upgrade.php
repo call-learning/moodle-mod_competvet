@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 use mod_competvet\setup;
 
 /**
@@ -211,7 +212,6 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2024101603, 'competvet');
     }
     if ($oldversion < 2024112600) {
-
         // Define table competvet_planning_pause to be created.
         $table = new xmldb_table('competvet_planning_pause');
 
@@ -238,7 +238,6 @@ function xmldb_competvet_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024120401) {
-
         // Define field recipientid to be added to competvet_notification.
         $table = new xmldb_table('competvet_notification');
         $field = new xmldb_field('recipientid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'competvetid');
@@ -282,7 +281,6 @@ function xmldb_competvet_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025021004) {
-
         // Define field textvalue to be added to competvet_case_data.
         $table = new xmldb_table('competvet_case_data');
         $field = new xmldb_field('textvalue', XMLDB_TYPE_TEXT, null, null, null, null, null, 'charvalue');
@@ -305,7 +303,6 @@ function xmldb_competvet_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025031000) {
-
         // Define field haslettergrades to be added to competvet_situation.
         $table = new xmldb_table('competvet_situation');
         $field = new xmldb_field('haslettergrades', XMLDB_TYPE_INTEGER, '1', null, null, null, '1', 'hascase');
@@ -342,21 +339,16 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2025090402, 'competvet');
     }
     // Watch out: php ../../admin/cli/cfg.php --component=mod_competvet --name=version --set=2025090402 .
-    if ($oldversion < 2025121001) {
+    if ($oldversion < 202512100300) {
         // Define field ismandatory to be added to competvet_case_field.
         $casefield = \mod_competvet\local\persistent\case_field::get_record(['idnumber' => 'resultats_examens']);
         if ($casefield) {
             $casefield->set('name', 'Éléments cliniques et paracliniques les plus pertinents');
+            $casefield->update();
         }
         // Competvet savepoint reached.
-        upgrade_mod_savepoint(true, 2025121001, 'competvet');
-    }
-
-    // Watch out: php ../../admin/cli/cfg.php --component=mod_competvet --name=version --set=2025090402 .
-    if ($oldversion < 2025121003) {
         setup::create_update_roles(); // Add user:viewdetails to observers.
-        // Competvet savepoint reached.
-        upgrade_mod_savepoint(true, 2025121003, 'competvet');
+        upgrade_mod_savepoint(true, 202512100300, 'competvet');
     }
     return true;
 }
