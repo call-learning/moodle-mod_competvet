@@ -91,7 +91,7 @@ class situation extends persistent {
         $allroles = $this->get_all_roles($userid);
         $rolespriority = array_keys(competvet::COMPETVET_ROLES);
         // Sort roles according to role priority.
-        uksort($allroles, function($a, $b) use ($rolespriority) {
+        uksort($allroles, function ($a, $b) use ($rolespriority) {
             $apos = array_search($a, $rolespriority);
             $bpos = array_search($b, $rolespriority);
             return $apos <=> $bpos;
@@ -115,10 +115,10 @@ class situation extends persistent {
         }
         $competvet = competvet::get_from_instance_id($this->raw_get('competvetid'));
         $roles = get_user_roles($competvet->get_context(), $userid);
-        $rolessn = array_map(function($role) {
+        $rolessn = array_map(function ($role) {
             return $role->shortname;
         }, $roles);
-        $rolefullname = array_map(function($role) {
+        $rolefullname = array_map(function ($role) {
             return $role->name;
         }, $roles);
         $roles = array_combine($rolessn, $rolefullname);
@@ -294,11 +294,12 @@ class situation extends persistent {
     public static function get_categories_choices_for_display(): array {
         $categories = self::get_categories_choices();
         return array_map(
-            function($category) {
+            function ($category) {
                 $languages = json_decode($category, true);
                 return $languages[current_language()] ?? '';
             },
-            $categories);
+            $categories
+        );
     }
 
     /**

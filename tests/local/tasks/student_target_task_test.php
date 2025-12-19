@@ -70,7 +70,7 @@ final class student_target_task_test extends advanced_testcase {
                 'student1@example.com'],
         ];
         $this->assertCount(4, $emails);
-        usort($emails, function($a, $b) {
+        usort($emails, function ($a, $b) {
             return $a->to === $b->to ? ($a->subject <=> $b->subject) : ($a->to < $b->to ? -1 : 1);
         });
         foreach ($emails as $index => $email) {

@@ -16,7 +16,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 global $CFG;
-require_once($CFG->dirroot.'/mod/competvet/backup/moodle2/backup_competvet_stepslib.php');
+require_once($CFG->dirroot . '/mod/competvet/backup/moodle2/backup_competvet_stepslib.php');
 
 /**
  * Backup task that provides all the settings and steps to perform one complete backup of the activity.

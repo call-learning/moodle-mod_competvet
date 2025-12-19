@@ -26,7 +26,6 @@ use core\persistent;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class form extends persistent {
-
     /**
      * The table this class is going to interact with
      *

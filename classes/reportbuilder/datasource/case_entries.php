@@ -33,7 +33,6 @@ use mod_competvet\reportbuilder\local\entities\situation;
  * @package mod_competvet
  */
 class case_entries extends datasource {
-
     /**
      * Return user-friendly name of the report source.
      */

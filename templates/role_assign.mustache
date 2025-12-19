@@ -20,9 +20,40 @@
     TODO describe template role_assign
 
     Example context (json):
-    {
-    }
+        {
+            "cmid": 42,
+            "showallroles": true,
+            "assignableroles": [
+                {
+                    "editlink": "/mod/competvet/role/edit.php?id=1",
+                    "name": "Enseignant",
+                    "description": "Peut gérer le cours",
+                    "users": [
+                        {
+                            "profileurl": "/user/profile.php?id=10",
+                            "fullname": "Alice Dupont"
+                        },
+                        {
+                            "profileurl": "/user/profile.php?id=11",
+                            "fullname": "Bob Martin"
+                        }
+                    ]
+                },
+                {
+                    "editlink": "/mod/competvet/role/edit.php?id=2",
+                    "name": "Étudiant",
+                    "description": "Participe au cours",
+                    "users": []
+                }
+            ],
+            "showroleassign": false,
+            "roleid": 1,
+            "backurl": "/mod/competvet/view.php?id=42",
+            "currentuserselector": "<select>...</select>",
+            "potentialuserselector": "<select>...</select>"
+        }
 }}
+
 {{#showallroles}}
     <div class="container-fluid" data-region="roleassign" data-cmid="{{{cmid}}}">
         <div class="row">
@@ -42,11 +73,11 @@
     <div class="table-responsive mt-4">
         <table class="table table-striped table-hover">
             <thead class="thead-light">
-                <tr>
-                    <th scope="col">{{#str}}role{{/str}}</th>
-                    <th scope="col">{{#str}}description{{/str}}</th>
-                    <th scope="col">{{#str}}userswiththisrole, core_role{{/str}}</th>
-                </tr>
+            <tr>
+                <th scope="col">{{#str}}role{{/str}}</th>
+                <th scope="col">{{#str}}description{{/str}}</th>
+                <th scope="col">{{#str}}userswiththisrole, core_role{{/str}}</th>
+            </tr>
             </thead>
             <tbody>
             {{#assignableroles}}
@@ -55,7 +86,7 @@
                     <td>{{description}}</td>
                     <td>
                         {{#users}}
-                            <a class="d-block"href="{{profileurl}}">{{fullname}}</a>
+                            <a class="d-block" href="{{profileurl}}">{{fullname}}</a>
                         {{/users}}
                         {{^users}}
                             <span class="text-muted">{{#str}}none{{/str}}</span>
@@ -91,9 +122,9 @@
     </div>
 {{/showroleassign}}
 {{#js}}
-require(['mod_competvet/local/view/roleassign'], function(RoleAssign) {
+    require(['mod_competvet/local/view/roleassign'], function(RoleAssign) {
     RoleAssign.init({
-        cmid: {{{cmid}}},
+    cmid: {{{cmid}}},
     });
-});
+    });
 {{/js}}

@@ -66,7 +66,7 @@ class eval_observation_edit extends dynamic_form {
             $privaterepeat = 0;
             $repeat = 0;
             foreach ($comments as $comment) {
-                if ($comment['type'] == observation_comment::OBSERVATION_PRIVATE_COMMENT ) {
+                if ($comment['type'] == observation_comment::OBSERVATION_PRIVATE_COMMENT) {
                     $data['privatecomments'][] = $comment['comment'];
                     $data['privatecomments_id'][] = $comment['id'];
                     $privaterepeat++;

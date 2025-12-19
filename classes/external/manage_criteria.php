@@ -19,7 +19,6 @@ namespace mod_competvet\external;
 defined('MOODLE_INTERNAL') || die;
 global $CFG;
 require_once("$CFG->libdir/externallib.php");
-
 use context_system;
 use external_api;
 use external_description;
@@ -31,10 +30,6 @@ use external_warnings;
 use mod_competvet\local\api\criteria;
 use mod_competvet\local\persistent\grid;
 use mod_competvet\local\persistent\criterion;
-
-define('COMPETVET_CRITERIA_EVALUATION', 1);
-define('COMPETVET_CRITERIA_CERTIFICATION', 2);
-define('COMPETVET_CRITERIA_LIST', 3);
 
 /**
  * Class manage_criteria
@@ -69,8 +64,11 @@ class manage_criteria extends external_api {
                             'idnumber' => new external_value(PARAM_TEXT, 'The id number of the criterion', VALUE_REQUIRED),
                             'sortorder' => new external_value(PARAM_INT, 'The sort order of the criterion', VALUE_REQUIRED),
                             'haschanged' => new external_value(PARAM_BOOL, 'Has the criterion changed', VALUE_OPTIONAL),
-                            'updatesortorder' => new external_value(PARAM_BOOL, 'Update the sort order of the options',
-                                VALUE_OPTIONAL),
+                            'updatesortorder' => new external_value(
+                                PARAM_BOOL,
+                                'Update the sort order of the options',
+                                VALUE_OPTIONAL
+                            ),
                             'deleted' => new external_value(PARAM_BOOL, 'Is the criterion deleted', VALUE_OPTIONAL),
                             'hasoptions' => new external_value(PARAM_BOOL, 'Does the criterion have options', VALUE_OPTIONAL),
                             'options' => new external_multiple_structure(
@@ -133,8 +131,10 @@ class manage_criteria extends external_api {
                 criteria::update_criteria_sortorder($criteriaorder);
             }
             foreach ($grid['criteria'] as $criterion) {
-                if (($criterion['deleted'] ?? false) || ($criterion['updatesortorder'] ?? false) ||
-                    ($criterion['haschanged'] ?? false)) {
+                if (
+                    ($criterion['deleted'] ?? false) || ($criterion['updatesortorder'] ?? false) ||
+                    ($criterion['haschanged'] ?? false)
+                ) {
                     $setgridmodified = true;
                 }
                 if ($criterion['deleted'] ?? false) {
@@ -309,5 +309,4 @@ class manage_criteria extends external_api {
             ),
         ]);
     }
-
 }

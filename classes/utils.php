@@ -82,11 +82,11 @@ class utils {
      *
      * Note: this will remove the id which is supposed to be the id from another entity.
      *
-     * @param class $persistentclass
+     * @param string $persistentclass
      * @param object $record
-     * @return object [persistent, otherproperties ]
+     * @return array [persistent, otherproperties ]
      */
-    public static function split_properties_from_persistent($persistentclass, $record): array {
+    public static function split_properties_from_persistent(string $persistentclass, object $record): array {
         $persistentfields = static::get_persistent_fields_without_internals(
             $persistentclass
         );
@@ -140,7 +140,7 @@ class utils {
         static $studentrolesid = null;
         if (is_null($studentrolesid)) {
             $roles = get_all_roles(\context_system::instance());
-            $studentrolesid = array_filter(array_column($roles, 'shortname', 'id'), function($shortname) {
+            $studentrolesid = array_filter(array_column($roles, 'shortname', 'id'), function ($shortname) {
                 return $shortname === 'student';
             });
         }

@@ -171,7 +171,7 @@ class certifications {
      * @return array The supervisor ids
      */
     public static function get_declaration_supervisors($declid) {
-        $certsdecl = cert_decl_asso::get_records(['declid' => $declid],  'timecreated');
+        $certsdecl = cert_decl_asso::get_records(['declid' => $declid], 'timecreated');
         $supervisors = [];
         foreach ($certsdecl as $cert) {
             $supervisors[] = $cert->get('supervisorid');
@@ -193,7 +193,6 @@ class certifications {
             $event->trigger();
         } catch (invalid_persistent_exception $e) {
             debugging($e->getMessage());
-
         }
     }
 
@@ -311,7 +310,6 @@ class certifications {
                     $certsbystatus[self::GLOBAL_CERT_STATUS_VALIDATED][] = $cert;
                 }
             }
-
         }
         return $certsbystatus;
     }
@@ -338,7 +336,7 @@ class certifications {
             if (!empty($studentid)) {
                 $certfilter['studentid'] = $studentid;
             }
-            $certdecls = cert_decl::get_records($certfilter,  'timecreated');
+            $certdecls = cert_decl::get_records($certfilter, 'timecreated');
             if ($certdecls) {
                 foreach ($certdecls as $certdecl) {
                     $certrecord = self::get_empty_cert_from_criterion($criterion);

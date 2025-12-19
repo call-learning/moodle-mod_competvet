@@ -61,8 +61,10 @@ class observation extends base {
      */
     protected function get_all_columns(): array {
         $obsalias = $this->get_table_alias('competvet_observation');
-        $statusstring = array_map(fn($status) => get_string("observation:status:{$status}", 'mod_competvet'),
-                observation_entity::STATUS);
+        $statusstring = array_map(
+            fn($status) => get_string("observation:status:{$status}", 'mod_competvet'),
+            observation_entity::STATUS
+        );
 
         $columns[] = (new column(
             'status',

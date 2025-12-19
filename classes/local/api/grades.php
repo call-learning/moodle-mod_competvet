@@ -104,8 +104,10 @@ class grades {
         $hascertif = $situation->get('hascertif');
         $haslist = $situation->get('hascase');
 
-        if ((empty($evaluationgrade) && $haseval) || (empty($certificationgrade) && $hascertif) ||
-            (empty($listgrade) && $haslist)) {
+        if (
+            (empty($evaluationgrade) && $haseval) || (empty($certificationgrade) && $hascertif) ||
+            (empty($listgrade) && $haslist)
+        ) {
             return [
                 'suggestedgrade' => 0,
                 'gradecalculation' => get_string('notenoughgrades', 'mod_competvet'),

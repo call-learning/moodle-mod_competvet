@@ -55,7 +55,8 @@ class get_json extends external_api {
      */
     public static function execute(string $filename): array {
         global $CFG;
-        $params = self::validate_parameters(self::execute_parameters(),
+        $params = self::validate_parameters(
+            self::execute_parameters(),
             [
                 'filename' => $filename,
             ]

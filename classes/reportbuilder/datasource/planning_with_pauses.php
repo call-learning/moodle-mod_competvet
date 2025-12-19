@@ -35,7 +35,6 @@ use mod_competvet\reportbuilder\local\entities\situation;
  * @package mod_competvet
  */
 class planning_with_pauses extends datasource {
-
     /**
      * Return user-friendly name of the report source.
      */
@@ -92,7 +91,8 @@ class planning_with_pauses extends datasource {
         $planningpausealias = $planningpauseentity->get_table_alias('competvet_planning_pause');
         $this->add_entity($planningpauseentity
             ->add_join(
-                "LEFT JOIN {competvet_planning_pause} {$planningpausealias} ON {$planningalias}.id = {$planningpausealias}.planningid"
+                "LEFT JOIN {competvet_planning_pause}
+                 {$planningpausealias} ON {$planningalias}.id = {$planningpausealias}.planningid"
             ));
         // Join planning entity to situation.
         $situationentity = new situation();
@@ -109,8 +109,7 @@ class planning_with_pauses extends datasource {
             ->add_join("LEFT JOIN {groups} {$groupsalias} ON {$groupsalias}.id = {$planningalias}.groupid")
             ->add_join("LEFT JOIN {context} {$groupscontextalias}
             ON {$groupscontextalias}.contextlevel = " . CONTEXT_COURSE . "
-           AND {$groupscontextalias}.instanceid = {$groupsalias}.courseid")
-        );
+           AND {$groupscontextalias}.instanceid = {$groupsalias}.courseid"));
         $this->add_all_from_entities();
     }
 }

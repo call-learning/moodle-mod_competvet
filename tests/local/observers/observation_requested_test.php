@@ -125,6 +125,4 @@ final class observation_requested_test extends advanced_testcase {
         $todo->read();
         $this->assertEquals(todo::STATUS_DONE, $todo->get('status'));
     }
-
-
 }

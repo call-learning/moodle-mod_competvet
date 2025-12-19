@@ -36,7 +36,6 @@ use mod_competvet\local\persistent\todo;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_todos extends external_api {
-
     /**
      * Returns description of method parameters
      * @return external_function_parameters

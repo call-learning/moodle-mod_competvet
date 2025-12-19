@@ -80,8 +80,7 @@ final class grid_test extends advanced_testcase {
             'name' => 'Test grid',
             'idnumber' => 'TESTGRID',
             'type' => grid::COMPETVET_CRITERIA_EVALUATION,
-        ]
-        );
+        ]);
         $evalgrid->create();
         $criterionimporter = new criterion_importer(criterion::class);
         $criterionimporter->import($CFG->dirroot . self::SAMPLE_FILE_PATH);

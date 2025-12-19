@@ -144,7 +144,7 @@ class mod_competvet_mod_form extends moodleform_mod {
                 $evalgrids = $systemgrids;
             }
 
-            $evalgridscolumns = array_map(function($evalgrid) {
+            $evalgridscolumns = array_map(function ($evalgrid) {
                 return [
                     'id' => $evalgrid->get('id'),
                     'name' => $evalgrid->get('name'),
@@ -157,7 +157,8 @@ class mod_competvet_mod_form extends moodleform_mod {
                 $fieldname,
                 get_string('situation:' . $gridtypename . 'grid', 'competvet'),
                 $evalgridchoices,
-                !empty($defaultgrid) ? $defaultgrid->get('id') : null);
+                !empty($defaultgrid) ? $defaultgrid->get('id') : null
+            );
             $mform->setType($fieldname, PARAM_INT);
             $mform->disabledIf($fieldname, 'hasactivity', 'eq', 1);
         }

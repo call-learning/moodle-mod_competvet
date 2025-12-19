@@ -114,8 +114,7 @@ class competvet_report_list extends reports_list {
                 "{$tablealias}.type",
                 "{$tablealias}.usercreated",
             ]))
-            ->set_is_sortable(true, ["{$tablealias}.name"])
-        );
+            ->set_is_sortable(true, ["{$tablealias}.name"]));
 
         // Report source column.
         $this->add_column((new column(
@@ -126,10 +125,9 @@ class competvet_report_list extends reports_list {
             ->set_type(column::TYPE_TEXT)
             ->add_fields("{$tablealias}.source")
             ->set_is_sortable(true)
-            ->add_callback(function(string $value, stdClass $row) {
+            ->add_callback(function (string $value, stdClass $row) {
                 return call_user_func([$value, 'get_name']);
-            })
-        );
+            }));
 
         // Tags column.
         $this->add_column_from_entity('tag:name')
@@ -146,8 +144,7 @@ class competvet_report_list extends reports_list {
             ->set_type(column::TYPE_TIMESTAMP)
             ->add_fields("{$tablealias}.timecreated")
             ->set_is_sortable(true)
-            ->add_callback([format::class, 'userdate'])
-        );
+            ->add_callback([format::class, 'userdate']));
 
         // Time modified column.
         $this->add_column((new column(
@@ -158,8 +155,7 @@ class competvet_report_list extends reports_list {
             ->set_type(column::TYPE_TIMESTAMP)
             ->add_fields("{$tablealias}.timemodified")
             ->set_is_sortable(true)
-            ->add_callback([format::class, 'userdate'])
-        );
+            ->add_callback([format::class, 'userdate']));
 
         // The user who modified the report.
         $this->add_column_from_entity('user:fullname')
@@ -192,10 +188,9 @@ class competvet_report_list extends reports_list {
             $this->get_report_entity_name(),
             "{$tablealias}.source"
         ))
-            ->set_options_callback(static function(): array {
+            ->set_options_callback(static function (): array {
                 return manager::get_report_datasources();
-            })
-        );
+            }));
 
         // Tags filter.
         $this->add_filter((new filter(
@@ -209,8 +204,7 @@ class competvet_report_list extends reports_list {
                 'component' => 'core_reportbuilder',
                 'itemtype' => 'reportbuilder_report',
             ])
-            ->set_is_available(core_tag_tag::is_enabled('core_reportbuilder', 'reportbuilder_report') === true)
-        );
+            ->set_is_available(core_tag_tag::is_enabled('core_reportbuilder', 'reportbuilder_report') === true));
 
         // Time created filter.
         $this->add_filter((new filter(
@@ -223,8 +217,7 @@ class competvet_report_list extends reports_list {
             ->set_limited_operators([
                 date::DATE_ANY,
                 date::DATE_RANGE,
-            ])
-        );
+            ]));
     }
 
     /**
@@ -236,5 +229,4 @@ class competvet_report_list extends reports_list {
     private function report_source_valid(string $source): bool {
         return manager::report_source_exists($source, datasource::class) && manager::report_source_available($source);
     }
-
 }

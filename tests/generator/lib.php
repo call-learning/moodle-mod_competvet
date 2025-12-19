@@ -106,7 +106,7 @@ class mod_competvet_generator extends testing_module_generator {
             global $CFG;
             // Load possible situations names by loading data/samples/sample_situations_names.csv CSV file.
             $situationnames = fopen($CFG->dirroot . '/mod/competvet/data/samples/sample_situations_names.csv', 'r');
-            while (($data = fgetcsv($situationnames, null, ';')) !== false) {
+            while (($data = fgetcsv($situationnames, null, ';', '"', '\\')) !== false) {
                 $data = array_map('trim', $data);
                 $possiblesituationnames[] = $data;
             }
@@ -155,10 +155,12 @@ class mod_competvet_generator extends testing_module_generator {
                 );
         } else {
             $comments = [];
-            foreach ([
+            foreach (
+                [
                     observation_comment::OBSERVATION_COMMENT => 'comment',
                     observation_comment::OBSERVATION_PRIVATE_COMMENT => 'privatecomment',
-                ] as $key => $value) {
+                ] as $key => $value
+            ) {
                 if ($record->{$value}) {
                     $comments[$key] = $record->{$value};
                 }
@@ -551,8 +553,12 @@ class mod_competvet_generator extends testing_module_generator {
         $todo = null;
         switch ($record->action) {
             case todo::ACTION_EVAL_OBSERVATION_ASKED:
-                $todo = todos::ask_for_observation($record->data->context, $record->planningid, $record->targetuserid,
-                    $record->studentid);
+                $todo = todos::ask_for_observation(
+                    $record->data->context,
+                    $record->planningid,
+                    $record->targetuserid,
+                    $record->studentid
+                );
                 break;
             case todo::ACTION_EVAL_CERTIFICATION_VALIDATION_ASKED:
                 $decl = cert_decl::get_record(

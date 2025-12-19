@@ -39,7 +39,6 @@ require_once($CFG->libdir . '/gradelib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class grading {
-
     /**
      * Get all observations statistics for a given set of planning and for userid
      *
@@ -136,5 +135,4 @@ class grading {
         $stats['students'] = $students;
         return $stats;
     }
-
 }

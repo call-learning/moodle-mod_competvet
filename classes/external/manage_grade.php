@@ -19,7 +19,7 @@ namespace mod_competvet\external;
 defined('MOODLE_INTERNAL') || die;
 global $CFG;
 require_once("$CFG->libdir/externallib.php");
-require_once($CFG->libdir.'/gradelib.php');
+require_once($CFG->libdir . '/gradelib.php');
 
 use external_api;
 use external_description;
@@ -109,7 +109,8 @@ class manage_grade extends external_api {
             'cmid' => $competvet->get_course_module_id(),
             'planningid' => $planningid,
         ]);
-        $existing = $DB->record_exists_select('task_adhoc',
+        $existing = $DB->record_exists_select(
+            'task_adhoc',
             "classname = :classname AND " . $DB->sql_compare_text('customdata') . " = " . $DB->sql_compare_text(':customdata'),
             [
                 'classname' => '\mod_competvet\task\student_graded',
@@ -201,7 +202,6 @@ class manage_grade extends external_api {
             'result' => $grade,
             'warnings' => [],
         ];
-
     }
 
     /**

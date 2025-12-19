@@ -34,7 +34,6 @@ use mod_competvet\utils;
  * Task to send reminder emails to evaluators at the end of a situation.
  */
 class end_of_planning extends \core\task\scheduled_task {
-
     /** @var string Task name */
     private $taskname = 'end_of_planning';
 
@@ -65,7 +64,7 @@ class end_of_planning extends \core\task\scheduled_task {
             WHERE p.enddate > :lastinterval AND p.enddate < :now
             AND n.id IS NULL
         ", [
-            'lastinterval' => $lastinterval,  // Plannings ending in the last time we checked.
+            'lastinterval' => $lastinterval, // Plannings ending in the last time we checked.
             'now' => $clock->time(),
             'notification' => $this->taskname,
         ]);
@@ -81,7 +80,7 @@ class end_of_planning extends \core\task\scheduled_task {
             }
             $context = [];
             $context['enddate'] = userdate($planning->enddate);
-            $context['students'] = implode('', array_map(function($student) {
+            $context['students'] = implode('', array_map(function ($student) {
                 return '<li>' . fullname($student) . '</li>';
             }, $ungradedstudents));
 

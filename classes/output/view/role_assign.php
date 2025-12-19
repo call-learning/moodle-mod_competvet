@@ -18,6 +18,8 @@ namespace mod_competvet\output\view;
 use renderable;
 use templatable;
 use renderer_base;
+defined('MOODLE_INTERNAL') || die();
+global $CFG;
 require_once($CFG->dirroot . '/admin/roles/lib.php');
 
 /**
@@ -89,7 +91,7 @@ class role_assign implements renderable, templatable {
                         'id' => $user->id,
                         'fullname' => fullname($user),
                         'username' => $user->username,
-                        'profileurl' => $CFG->wwwroot . '/user/profile.php?id=' . $user->id
+                        'profileurl' => $CFG->wwwroot . '/user/profile.php?id=' . $user->id,
                     ];
                 }
             }
@@ -98,15 +100,22 @@ class role_assign implements renderable, templatable {
                 'name' => $rolename,
                 'editlink' => new \moodle_url('/mod/competvet/roleassign.php', [
                     'id' => $this->cmid,
-                    'roleid' => $roleid
+                    'roleid' => $roleid,
                 ]),
                 'description' => format_string($description),
-                'users' => $users
+                'users' => $users,
             ];
         }
         return $result;
     }
 
+    /**
+     * Get the user selectors for a given role.
+     *
+     * @param int $roleid The role id.
+     * @return array
+     * @throws \moodle_exception
+     */
     protected function get_role_selectors(int $roleid): array {
         // Check if this role is enabled.
         $enabledroles = get_config('mod_competvet', 'enabledroles');
@@ -117,26 +126,26 @@ class role_assign implements renderable, templatable {
                 return [
                     'roleid' => $roleid,
                     'potentialuserselector' => '',
-                    'currentuserselector' => ''
+                    'currentuserselector' => '',
                 ];
             }
         }
 
         $cm = get_coursemodule_from_id(null, $this->cmid, 0, false, MUST_EXIST);
         $context = \context_module::instance($cm->id);
-        $options = array('context' => $context, 'roleid' => $roleid);
+        $options = ['context' => $context, 'roleid' => $roleid];
         $potentialuserselector = core_role_get_potential_user_selector($context, 'addselect', $options);
         $currentuserselector = new \core_role_existing_role_holders('removeselect', $options);
         ob_start();
         $potentialuserselector->display();
-        $potentialuserselector_html = ob_get_clean();
+        $potentialuserselectorhtml = ob_get_clean();
         ob_start();
         $currentuserselector->display();
-        $currentuserselector_html = ob_get_clean();
+        $currentuserselectorhtml = ob_get_clean();
         return [
             'roleid' => $roleid,
-            'potentialuserselector' => $potentialuserselector_html,
-            'currentuserselector' => $currentuserselector_html
+            'potentialuserselector' => $potentialuserselectorhtml,
+            'currentuserselector' => $currentuserselectorhtml,
         ];
     }
 
@@ -155,7 +164,7 @@ class role_assign implements renderable, templatable {
         if ($roleid) {
             $data->showroleassign = true;
             $data->backurl = new \moodle_url('/mod/competvet/roleassign.php', [
-                'id' => $this->cmid
+                'id' => $this->cmid,
             ]);
             $selectors = $this->get_role_selectors($roleid);
             $data->roleid = $roleid;

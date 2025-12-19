@@ -43,7 +43,7 @@ class planning_importer extends base_persistent_importer {
     /**
      * CSV to persistent
      */
-    const CSV_TO_PERSISTENT = [
+    protected const CSV_TO_PERSISTENT = [
         'Group Name' => 'groupid',
         'Start Date' => 'startdate',
         'End Date' => 'enddate',
@@ -98,7 +98,7 @@ class planning_importer extends base_persistent_importer {
         $data->enddate = $this->process_end_date($data->enddate);
         $data->situationid = $this->situationid;
 
-        // Extract pause data from separate columns or legacy format
+        // Extract pause data from separate columns or legacy format.
         $data->pause_data = $this->extract_pause_data($data);
 
         return $data;
@@ -113,20 +113,20 @@ class planning_importer extends base_persistent_importer {
     private function extract_pause_data(\stdClass $row): array {
         $pauses = [];
 
-        // Check if we have the new format (separate pause columns)
-        $pauseIndex = 1;
-        while (isset($row->{"Pause_start_$pauseIndex"}) && isset($row->{"Pause_end_$pauseIndex"})) {
-            $startDate = trim($row->{"Pause_start_$pauseIndex"});
-            $endDate = trim($row->{"Pause_end_$pauseIndex"});
+        // Check if we have the new format (separate pause columns).
+        $pauseindex = 1;
+        while (isset($row->{"Pause_start_$pauseindex"}) && isset($row->{"Pause_end_$pauseindex"})) {
+            $startdate = trim($row->{"Pause_start_$pauseindex"});
+            $enddate = trim($row->{"Pause_end_$pauseindex"});
 
-            // Only add pause if both start and end dates are provided
-            if (!empty($startDate) && !empty($endDate)) {
+            // Only add pause if both start and end dates are provided.
+            if (!empty($startdate) && !empty($enddate)) {
                 $pauses[] = [
-                    'start' => $startDate,
-                    'end' => $endDate
+                    'start' => $startdate,
+                    'end' => $enddate,
                 ];
             }
-            $pauseIndex++;
+            $pauseindex++;
         }
 
         return $pauses;
@@ -157,7 +157,7 @@ class planning_importer extends base_persistent_importer {
             $planningid = $planning->get('id');
         }
 
-        // Handle pauses after planning data is persisted
+        // Handle pauses after planning data is persisted.
         if (!empty($data->pause_data)) {
             $this->handle_pauses($data->pause_data, $planningid);
         }
@@ -166,22 +166,22 @@ class planning_importer extends base_persistent_importer {
     /**
      * Handle pauses
      *
-     * @param array $pauseData
+     * @param array $pausedata
      * @param int $planningid
      * @return void
      */
-    private function handle_pauses(array $pauseData, int $planningid): void {
+    private function handle_pauses(array $pausedata, int $planningid): void {
         global $USER;
 
-        // Delete existing pauses for this planning
-        $existingPauses = planning_pause::get_records(['planningid' => $planningid]);
-        foreach ($existingPauses as $existingPause) {
-            $existingPause->delete();
+        // Delete existing pauses for this planning.
+        $existingpauses = planning_pause::get_records(['planningid' => $planningid]);
+        foreach ($existingpauses as $existingpause) {
+            $existingpause->delete();
         }
         $clock = \core\di::get(\core\clock::class);
         // Create new pauses.
-        foreach ($pauseData as $pause) {
-            $pauseRecord = [
+        foreach ($pausedata as $pause) {
+            $pauserecord = [
                 'planningid' => $planningid,
                 'startdate' => $this->process_start_date($pause['start']),
                 'enddate' => $this->process_end_date($pause['end']),
@@ -189,8 +189,8 @@ class planning_importer extends base_persistent_importer {
                 'timecreated' => $clock->time(),
                 'timemodified' => $clock->time(),
             ];
-            $pauseObj = new planning_pause(0, (object) $pauseRecord);
-            $pauseObj->save();
+            $pauseobj = new planning_pause(0, (object) $pauserecord);
+            $pauseobj->save();
         }
     }
 

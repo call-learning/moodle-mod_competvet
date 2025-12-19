@@ -101,11 +101,8 @@ class plannings extends datasource {
             ->add_join("LEFT JOIN {groups} {$groupsalias} ON {$groupsalias}.id = {$planningalias}.groupid")
             ->add_join("LEFT JOIN {context} {$groupscontextalias}
             ON {$groupscontextalias}.contextlevel = " . CONTEXT_COURSE . "
-           AND {$groupscontextalias}.instanceid = {$groupsalias}.courseid")
-        );
+           AND {$groupscontextalias}.instanceid = {$groupsalias}.courseid"));
 
         $this->add_all_from_entities();
     }
-
-
 }

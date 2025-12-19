@@ -29,7 +29,6 @@ use mod_competvet\local\persistent\todo;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class student_graded extends \core\task\adhoc_task {
-
     /** @var string Task name */
     private $taskname = 'student_graded';
 

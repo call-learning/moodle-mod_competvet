@@ -67,6 +67,5 @@ final class planning_test extends advanced_testcase {
         $this->assertEquals(0, cert_decl_asso::count_records());
         $this->assertEquals(0, cert_valid::count_records());
         $this->assertEquals(0, case_entry::count_records());
-
     }
 }

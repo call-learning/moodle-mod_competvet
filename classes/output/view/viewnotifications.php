@@ -34,22 +34,22 @@ use moodle_url;
  */
 class viewnotifications extends base {
     /**
-     * @var $competvet The competvet object.
+     * @var int Identifiant de l'activité competvet.
      */
     protected $competvetid;
 
     /**
-     * @var $cmid The course module id.
+     * @var int Identifiant du module de cours.
      */
     protected $cmid;
 
     /**
-     * @var $tasks The tasks to display.
+     * @var string|null Tâche à afficher.
      */
     protected $task;
 
     /**
-     * @var $status The status to display.
+     * @var int|null Statut à afficher.
      */
     protected $status;
 
@@ -92,17 +92,23 @@ class viewnotifications extends base {
             if ($status === notification::STATUS_PENDING) {
                 $numpending++;
             };
-            $delete = new moodle_url('/mod/competvet/view.php', array_merge($this->get_url_params(),
-                ['delete' => $notification->get('id')]));
+            $delete = new moodle_url('/mod/competvet/view.php', array_merge(
+                $this->get_url_params(),
+                ['delete' => $notification->get('id')]
+            ));
 
-            $send = new moodle_url('/mod/competvet/view.php', array_merge($this->get_url_params(),
-                ['send' => $notification->get('id')]));
+            $send = new moodle_url('/mod/competvet/view.php', array_merge(
+                $this->get_url_params(),
+                ['send' => $notification->get('id')]
+            ));
 
             $data['notifications'][] = [
                 'id' => $notification->get('id'),
                 'timecreated' => $notification->get('timecreated'),
-                'notification' => get_string('notification:' . $notification->get('notification'),
-                    'mod_competvet'),
+                'notification' => get_string(
+                    'notification:' . $notification->get('notification'),
+                    'mod_competvet'
+                ),
                 'shortmessage' => $shortmessage,
                 'recipient' => fullname($user),
                 'subject' => $notification->get('subject'),
@@ -115,13 +121,17 @@ class viewnotifications extends base {
         }
         if ($numpending) {
             $data['numpending'] = $numpending;
-            $data['sendallurl'] = new moodle_url('/mod/competvet/view.php',
-            array_merge($this->get_url_params(), ['sendall' => 1]));
+            $data['sendallurl'] = new moodle_url(
+                '/mod/competvet/view.php',
+                array_merge($this->get_url_params(), ['sendall' => 1])
+            );
         }
         $data['numnotifications'] = count($notifications);
         if (count($notifications) > 0) {
-            $data['deleteallurl'] = new moodle_url('/mod/competvet/view.php',
-            array_merge($this->get_url_params(), ['deleteall' => 1]));
+            $data['deleteallurl'] = new moodle_url(
+                '/mod/competvet/view.php',
+                array_merge($this->get_url_params(), ['deleteall' => 1])
+            );
         }
 
         $data['version'] = $clock->time();
@@ -132,6 +142,7 @@ class viewnotifications extends base {
 
     /**
      * Get the competvet selector
+     *
      * @return array
      */
     public function get_competvet_select(): array {
@@ -151,6 +162,7 @@ class viewnotifications extends base {
 
     /**
      * Get task selector
+     *
      * @return array
      */
     public function get_task_select(): array {
@@ -166,8 +178,10 @@ class viewnotifications extends base {
             $data[] = [
                 'key' => $key,
                 'name' => $task,
-                'url' => new moodle_url('/mod/competvet/view.php',
-                    ['pagetype' => 'viewnotifications', 'id' => $this->cmid, 'task' => $key]),
+                'url' => new moodle_url(
+                    '/mod/competvet/view.php',
+                    ['pagetype' => 'viewnotifications', 'id' => $this->cmid, 'task' => $key]
+                ),
                 'selected' => $key == $this->task,
             ];
         }
@@ -176,6 +190,7 @@ class viewnotifications extends base {
 
     /**
      * Get the status selector
+     *
      * @return array
      */
     public function get_status_select(): array {
@@ -183,15 +198,24 @@ class viewnotifications extends base {
         $data[] = [
             'key' => '',
             'name' => get_string('all'),
-            'url' => new moodle_url('/mod/competvet/view.php', ['pagetype' => 'viewnotifications', 'id' => $this->cmid, 'task' => $this->task]),
+            'url' => new moodle_url(
+                '/mod/competvet/view.php',
+                [
+                    'pagetype' => 'viewnotifications',
+                    'id' => $this->cmid,
+                    'task' => $this->task,
+                ]
+            ),
             'selected' => empty($this->status),
         ];
         foreach (notification::STATUS_TYPES as $key => $status) {
             $data[] = [
                 'key' => $key,
                 'name' => get_string('notification:status:' . $status, 'mod_competvet'),
-                'url' => new moodle_url('/mod/competvet/view.php',
-                    ['pagetype' => 'viewnotifications', 'id' => $this->cmid, 'task' => $this->task, 'status' => $key]),
+                'url' => new moodle_url(
+                    '/mod/competvet/view.php',
+                    ['pagetype' => 'viewnotifications', 'id' => $this->cmid, 'task' => $this->task, 'status' => $key]
+                ),
                 'selected' => $key == $this->status,
             ];
         }
@@ -200,6 +224,7 @@ class viewnotifications extends base {
 
     /**
      * Get the url parameters for this renderable.
+     *
      * @return array
      */
     public function get_url_params(): array {
@@ -213,6 +238,7 @@ class viewnotifications extends base {
 
     /**
      * Perform actions before rendering.
+     *
      * @return void
      */
     public function before_render(): void {
@@ -323,6 +349,7 @@ class viewnotifications extends base {
 
     /**
      * Get the available tasks for the notifications.
+     *
      * @return array
      */
     private function get_tasks(): array {

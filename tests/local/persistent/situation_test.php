@@ -41,7 +41,7 @@ final class situation_test extends advanced_testcase {
             'observer1 situations' => ['observer1', ['SIT1', 'SIT2', 'SIT3']],
             'observer2 situations' => ['observer2', ['SIT4', 'SIT5', 'SIT6', 'SIT7', 'SIT8', 'SIT9']],
             'teacher1 situations' => ['teacher1', []],
-            'observer and teacher situation' => ['observerandteacher',  ['SIT7', 'SIT8', 'SIT9']],
+            'observer and teacher situation' => ['observerandteacher', ['SIT7', 'SIT8', 'SIT9']],
         ];
     }
 

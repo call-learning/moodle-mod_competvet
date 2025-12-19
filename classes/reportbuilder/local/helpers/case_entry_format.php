@@ -28,9 +28,12 @@ use mod_competvet\local\persistent\case_data;
  * @package mod_competvet
  */
 class case_entry_format {
-
     /**
      * Format the todo data.
+     * @param mixed $value The raw value.
+     * @param \stdClass $row The data row.
+     * @param \stdClass $field The field definition.
+     * @return string The formatted value.
      */
     public static function format_field(mixed $value, \stdClass $row, \stdClass $field): string {
         if (null === $value || empty($row->entryid)) {

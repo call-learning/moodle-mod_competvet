@@ -32,7 +32,7 @@ global $CFG;
 require_once($CFG->libdir . '/clilib.php');
 
 // Get the cli options.
-list($options, $unrecognised) = cli_get_params([
+[$options, $unrecognised] = cli_get_params([
     'help' => false,
 ], [
     'h' => 'help',

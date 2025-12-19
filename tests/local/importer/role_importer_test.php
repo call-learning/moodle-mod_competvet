@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local\importer;
+namespace mod_competvet\local\importer;
 
 use advanced_testcase;
 use cm_info;
@@ -57,15 +57,17 @@ final class role_importer_test extends advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
-
     }
 
     /**
      * Test import criterion.
      *
+     * @param string $filepath
+     * @param array $userdata
+     * @param array $expectedroles
      * @return void
      * @covers ::import
-     * @covers \mod_competvet\local\importer\role_importer::import
+     * @covers       \mod_competvet\local\importer\role_importer::import
      * @dataProvider import_data
      */
     public function test_simple_import(string $filepath, array $userdata, array $expectedroles): void {

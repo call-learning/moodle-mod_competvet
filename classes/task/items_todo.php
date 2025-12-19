@@ -29,7 +29,6 @@ use mod_competvet\utils;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class items_todo extends \core\task\scheduled_task {
-
     /** @var string Task name */
     private $taskname = 'items_todo';
 

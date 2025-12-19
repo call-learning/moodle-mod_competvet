@@ -35,7 +35,6 @@ use moodle_url;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class eval_observation_ask extends dynamic_form {
-
     /**
      * Get the data for the dynamic submission
      *

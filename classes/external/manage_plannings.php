@@ -29,10 +29,6 @@ use core_external\external_single_structure;
 use core_external\external_multiple_structure;
 use mod_competvet\local\api\plannings;
 
-define('COMPETVET_CRITERIA_EVALUATION', 1);
-define('COMPETVET_CRITERIA_CERTIFICATION', 2);
-define('COMPETVET_CRITERIA_LIST', 3);
-
 /**
  * Class manage_plannings
  * Webservice class for managing criteria
@@ -71,8 +67,8 @@ class manage_plannings extends external_api {
                             'deleted' => new external_value(PARAM_BOOL, 'Is the pause deleted', VALUE_OPTIONAL),
                         ])
                     ),
-                ]
-            )),
+                ])
+            ),
         ]);
     }
 
@@ -85,7 +81,7 @@ class manage_plannings extends external_api {
     public static function update($plannings): array {
         $params = self::validate_parameters(self::update_parameters(), ['plannings' => $plannings]);
         self::validate_context(context_system::instance());
-        // TODO : validate we can manage these plannings.
+        // TODO : MDL-00000 validate we can manage these plannings.
         $plannings = $params['plannings'];
         $result = true;
 
@@ -113,7 +109,7 @@ class manage_plannings extends external_api {
                 );
             }
 
-            // Handle pauses
+            // Handle pauses.
             foreach ($planning['pauses'] as $pause) {
                 if (isset($pause['deleted']) && $pause['deleted']) {
                     plannings::delete_pause($pause['id']);
@@ -145,5 +141,4 @@ class manage_plannings extends external_api {
             'result' => new external_value(PARAM_BOOL, 'The processing result'),
         ]);
     }
-
 }

@@ -81,7 +81,7 @@ final class end_of_planning_task_test extends advanced_testcase {
         $endofplanningtasks->execute();
         $emails = $emailsink->get_messages();
         $this->assertCount(count($expectedemails), $emails);
-        usort($emails, function($a, $b) {
+        usort($emails, function ($a, $b) {
             return $a->to === $b->to ? ($a->subject <=> $b->subject) : ($a->to < $b->to ? -1 : 1);
         });
         foreach ($emails as $index => $email) {
@@ -130,6 +130,8 @@ final class end_of_planning_task_test extends advanced_testcase {
 
     /**
      * Prepare data
+     *
+     * @param int $timestart
      *
      * @return void
      */

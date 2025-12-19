@@ -66,8 +66,8 @@ class cert_validation_requested extends \core\event\base {
      * @return base
      */
     public static function create_from_decl_and_supervisor(
-       int $declid,
-       int $supervisorid,
+        int $declid,
+        int $supervisorid,
         int $studentid
     ): \core\event\base {
         $declaration = cert_decl::get_record(['id' => $declid]);

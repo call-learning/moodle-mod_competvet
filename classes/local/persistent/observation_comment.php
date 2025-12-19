@@ -93,8 +93,13 @@ class observation_comment extends persistent {
      * @param int $commentformat
      * @return void
      */
-    public static function create_comment(int $observationid, int $usercreated, string $comment,
-        string $type = self::OBSERVATION_COMMENT, int $commentformat = 2): self {
+    public static function create_comment(
+        int $observationid,
+        int $usercreated,
+        string $comment,
+        string $type = self::OBSERVATION_COMMENT,
+        int $commentformat = 2
+    ): self {
         $comment = new self();
         $comment->observationid = $observationid;
         $comment->usercreated = $usercreated;
@@ -138,5 +143,4 @@ class observation_comment extends persistent {
             ],
         ];
     }
-
 }

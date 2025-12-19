@@ -18,7 +18,7 @@ namespace mod_competvet;
 use mod_competvet\competvet;
 use core_user;
 use moodle_url;
-use mod_competvet\local\persistent\notification as notification;
+use mod_competvet\local\persistent\notification;
 
 /**
  * Class notifications
@@ -28,7 +28,6 @@ use mod_competvet\local\persistent\notification as notification;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class notifications {
-
     /**
      * Set the notification for the given planning.
      *
@@ -163,8 +162,9 @@ class notifications {
      * @return notification
      */
     public static function create($type, $id, $competvetid, $recipientid, $subject, $body, $status) {
-        $nf = new notification(0,
-        (object) [
+        $nf = new notification(
+            0,
+            (object) [
             'notification' => $type,
             'notifid' => $id,
             'competvetid' => $competvetid,
@@ -172,7 +172,8 @@ class notifications {
             'subject' => $subject,
             'body' => $body,
             'status' => $status,
-        ]);
+            ]
+        );
         $nf->save();
         return $nf;
     }

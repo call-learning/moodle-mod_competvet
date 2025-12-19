@@ -447,7 +447,7 @@ class generator_course_backend extends tool_generator_course_backend {
             $observers = array_values($this->userswithroles['observer']);
             $observerscount = count($observers);
             $plannings = planning::get_records(['situationid' => $situation->get('id')], 'groupid');
-            $count = array_reduce($plannings, function($carry, $item) use ($groups) {
+            $count = array_reduce($plannings, function ($carry, $item) use ($groups) {
                 return $carry + count($groups[$item->get('groupid')]->members);
             }, 0);
             $count = $count - $count / self::SKIPPED_OBSERVATIONS;
@@ -473,19 +473,28 @@ class generator_course_backend extends tool_generator_course_backend {
                             $this->fixeddataset ? min($observationcount, $observerscount - 1) :
                                 random_int(0, $observerscount - 1);
                         $observerid = $observers[$observerindex];
-                        $this->create_observation(observation::CATEGORY_EVAL_OBSERVATION, $situation, $planning, $studentid,
-                            $observerid);
+                        $this->create_observation(
+                            observation::CATEGORY_EVAL_OBSERVATION,
+                            $situation,
+                            $planning,
+                            $studentid,
+                            $observerid
+                        );
                     }
                     // Autoevaluations.
                     $maxcount = $situation->get('autoevalnum');
                     $observationcount = $this->fixeddataset ? $maxcount : random_int(1, $maxcount + 1 ?? 2);
                     for (; $observationcount > 0; $observationcount--) {
-                        $this->create_observation(observation::CATEGORY_EVAL_AUTOEVAL, $situation, $planning, $studentid,
-                            $studentid);
+                        $this->create_observation(
+                            observation::CATEGORY_EVAL_AUTOEVAL,
+                            $situation,
+                            $planning,
+                            $studentid,
+                            $studentid
+                        );
                     }
                     $this->dot($done++, $count);
                 }
-
             }
             $this->end_log();
         }

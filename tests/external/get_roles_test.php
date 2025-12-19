@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local\external;
+namespace mod_competvet\external;
 
 use cm_info;
 use context_course;
@@ -119,6 +119,9 @@ final class get_roles_test extends \advanced_testcase {
      *
      * @covers       \mod_competvet\external\assign_role::execute
      * @dataProvider get_role_data
+     * @param string $currentuser
+     * @param array $expected
+     *
      * @runInSeparateProcess
      */
     public function test_get_role_basic(
@@ -185,5 +188,4 @@ final class get_roles_test extends \advanced_testcase {
             ],
         ];
     }
-
 }

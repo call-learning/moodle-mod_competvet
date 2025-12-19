@@ -33,7 +33,6 @@ use mod_competvet\utils;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cert_decl_student extends dynamic_form {
-
     /**
      * Define form
      */
@@ -74,13 +73,17 @@ class cert_decl_student extends dynamic_form {
         $mform->addElement('static', 'rangeheader', get_string('level', 'mod_competvet'), $range);
 
         $userdate = userdate(time(), get_string('strftimedatetime', 'core_langconfig'));
-        $mform->addElement('radio', 'status',
+        $mform->addElement(
+            'radio',
+            'status',
             get_string('status', 'competvet'),
             get_string('seendone', 'competvet', $userdate),
             \mod_competvet\local\persistent\cert_decl::STATUS_DECL_SEENDONE
         );
 
-        $mform->addElement('radio', 'status',
+        $mform->addElement(
+            'radio',
+            'status',
             '',
             get_string('notseen', 'competvet'),
             \mod_competvet\local\persistent\cert_decl::STATUS_STUDENT_NOTSEEN

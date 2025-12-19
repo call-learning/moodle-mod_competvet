@@ -36,7 +36,6 @@ use mod_competvet\local\persistent\planning;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class add_certification extends external_api {
-
     /**
      * Returns description of method return value
      *
@@ -61,8 +60,16 @@ class add_certification extends external_api {
      * @param int $status The status
      * @return array
      */
-    public static function execute($declid, $criterionid, $studentid, $planningid, $level, $comment, $commentformat,
-        $status): array {
+    public static function execute(
+        $declid,
+        $criterionid,
+        $studentid,
+        $planningid,
+        $level,
+        $comment,
+        $commentformat,
+        $status
+    ): array {
         self::validate_parameters(self::execute_parameters(), [
             'criterionid' => $criterionid,
             'studentid' => $studentid,

@@ -125,7 +125,6 @@ class eval_observation_auto extends dynamic_form {
         $planning = planning::get_record(['id' => $planningid]);
         $situation = $planning->get_situation();
         eval_observation_helper::add_criteria_to_form($situation, $this, $mform);
-
     }
 
     /**

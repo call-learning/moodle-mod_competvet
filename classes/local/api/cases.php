@@ -180,7 +180,7 @@ class cases {
             throw new \moodle_exception('cannoteditcaselog', 'competvet');
         }
         foreach ($fields as $fieldid => $value) {
-            $records = case_data::get_records(['entryid' => $entryid, 'fieldid' => $fieldid],  'timecreated');
+            $records = case_data::get_records(['entryid' => $entryid, 'fieldid' => $fieldid], 'timecreated');
             if (empty($records)) {
                 $data = new case_data();
                 $data->set('fieldid', $fieldid);
@@ -211,7 +211,6 @@ class cases {
             throw new \moodle_exception('cannotdeletecaselog', 'competvet');
         }
         try {
-
             $case->delete();
             $data = case_data::get_records(['entryid' => $entryid]);
             foreach ($data as $d) {

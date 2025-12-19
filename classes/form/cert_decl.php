@@ -34,7 +34,6 @@ use mod_competvet\utils;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cert_decl extends dynamic_form {
-
     /**
      * Define form
      */
@@ -75,7 +74,6 @@ class cert_decl extends dynamic_form {
         } else {
             $this->add_supervisor_fields();
         }
-
     }
 
     /**
@@ -148,17 +146,23 @@ class cert_decl extends dynamic_form {
             return;
         }
 
-        $mform->addElement('radio', 'statussuper',
+        $mform->addElement(
+            'radio',
+            'statussuper',
             '',
             get_string('valid:confirmed', 'mod_competvet'),
             cert_valid::STATUS_CONFIRMED
         );
-        $mform->addElement('radio', 'statussuper',
+        $mform->addElement(
+            'radio',
+            'statussuper',
             '',
             get_string('valid:notseen', 'mod_competvet'),
             cert_valid::STATUS_OBSERVER_NOTSEEN
         );
-        $mform->addElement('radio', 'statussuper',
+        $mform->addElement(
+            'radio',
+            'statussuper',
             '',
             get_string('valid:levelnotreached', 'mod_competvet'),
             cert_valid::STATUS_LEVEL_NOT_REACHED

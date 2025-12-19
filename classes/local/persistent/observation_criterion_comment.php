@@ -62,4 +62,3 @@ class observation_criterion_comment extends persistent {
         ];
     }
 }
-

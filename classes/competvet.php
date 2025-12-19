@@ -436,8 +436,9 @@ class competvet {
 
     /**
      * Get the letter grades for a planning
-     * @param int $cmid The planning id
+     *
      * @return array
+     * @throws \coding_exception
      */
     public function get_lettergrade_scale() {
         $situation = $this->get_situation();
@@ -497,7 +498,8 @@ class competvet {
         if (!$situation->get('hascertif') && !$situation->get('haseval')) {
             $pagetype = 'student_list';
         }
-        return new moodle_url($baseurl,
+        return new moodle_url(
+            $baseurl,
             ['pagetype' => $pagetype, 'id' => $this->get_course_module_id(), 'planningid' => $planningid, 'studentid' => $userid]
         );
     }

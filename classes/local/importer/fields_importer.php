@@ -26,7 +26,6 @@ use mod_competvet\local\persistent\case_cat;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class fields_importer extends base_persistent_importer {
-
     /**
      * @var array $categorycache Cache for the category id.
      */
@@ -46,7 +45,7 @@ class fields_importer extends base_persistent_importer {
             if (!$category) {
                 $category = new case_cat(null, (object) [
                     'name' => $categoryname,
-                    'idnumber' => 'c'.$sortorder,
+                    'idnumber' => 'c' . $sortorder,
                     'sortorder' => $sortorder,
                     'description' => "",
                 ]);

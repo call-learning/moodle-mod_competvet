@@ -69,8 +69,10 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
             '/activity/competvet/situations/situation/plannings/planning/caseentries/caseentry'
         );
         $casedata =
-            new restore_path_element('casedata',
-                '/activity/competvet/situations/situation/plannings/planning/caseentries/caseentry/casedatas/casedata');
+            new restore_path_element(
+                'casedata',
+                '/activity/competvet/situations/situation/plannings/planning/caseentries/caseentry/casedatas/casedata'
+            );
         $formdata =
             new restore_path_element('formdata', '/activity/competvet/situations/situation/plannings/planning/formdatas/formdata');
         $casefieldmap = new restore_path_element(

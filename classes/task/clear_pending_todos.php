@@ -26,7 +26,6 @@ use mod_competvet\local\persistent\todo;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class clear_pending_todos extends \core\task\scheduled_task {
-
     /** @var string Task name */
     private $taskname = 'clear_pending_todos';
 

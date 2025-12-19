@@ -58,7 +58,14 @@ class role_upload_form extends dynamic_form {
         // Get the file and create the content based on it.
         $usercontext = \context_user::instance($USER->id);
         $fs = get_file_storage();
-        $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $this->get_data()->csvfile, 'itemid, filepath, filename', false);
+        $files = $fs->get_area_files(
+            $usercontext->id,
+            'user',
+            'draft',
+            $this->get_data()->csvfile,
+            'itemid, filepath, filename',
+            false
+        );
         if (!empty($files)) {
             $file = reset($files);
             $filepath = make_request_directory() . '/' . $file->get_filename();

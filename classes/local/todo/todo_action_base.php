@@ -29,7 +29,6 @@ use mod_competvet\local\persistent\todo;
  *
  */
 abstract class todo_action_base {
-
     /**
      * @var todo $todo current todo
      */

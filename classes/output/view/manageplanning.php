@@ -96,5 +96,4 @@ class manageplanning extends base {
             throw new \moodle_exception('noaccess', 'mod_competvet');
         }
     }
-
 }

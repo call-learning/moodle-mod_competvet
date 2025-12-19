@@ -33,7 +33,6 @@ use single_button;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class student_list extends base {
-
     /**
      * @var array $planninginfo The planning information.
      */

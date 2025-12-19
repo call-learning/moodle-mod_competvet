@@ -28,7 +28,6 @@ use core_user;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class student_target extends \core\task\scheduled_task {
-
     /** @var string Task name */
     private $taskname = 'student_target';
 
@@ -86,8 +85,13 @@ class student_target extends \core\task\scheduled_task {
                 if (empty($studenttargets)) {
                     continue;
                 }
-                notifications::setnotification($this->taskname . ':' . $module, $planning->id, $competvet->get_instance_id(),
-                    $studenttargets, []);
+                notifications::setnotification(
+                    $this->taskname . ':' . $module,
+                    $planning->id,
+                    $competvet->get_instance_id(),
+                    $studenttargets,
+                    []
+                );
             }
         }
     }

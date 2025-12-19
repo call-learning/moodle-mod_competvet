@@ -29,7 +29,6 @@ use mod_competvet\local\persistent\cert_valid;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cert_decl_evaluator extends cert_decl_student {
-
     /**
      * Define form
      */
@@ -86,17 +85,23 @@ class cert_decl_evaluator extends cert_decl_student {
             return;
         }
 
-        $mform->addElement('radio', 'statussuper',
+        $mform->addElement(
+            'radio',
+            'statussuper',
             '',
             get_string('valid:confirmed', 'mod_competvet'),
             cert_valid::STATUS_CONFIRMED
         );
-        $mform->addElement('radio', 'statussuper',
+        $mform->addElement(
+            'radio',
+            'statussuper',
             '',
             get_string('valid:notseen', 'mod_competvet'),
             cert_valid::STATUS_OBSERVER_NOTSEEN
         );
-        $mform->addElement('radio', 'statussuper',
+        $mform->addElement(
+            'radio',
+            'statussuper',
             '',
             get_string('valid:levelnotreached', 'mod_competvet'),
             cert_valid::STATUS_LEVEL_NOT_REACHED
@@ -146,5 +151,4 @@ class cert_decl_evaluator extends cert_decl_student {
         $context = $this->get_context_for_dynamic_submission();
         require_capability('mod/competvet:view', $context);
     }
-
 }

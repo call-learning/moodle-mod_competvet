@@ -42,6 +42,7 @@ class search {
      * Search for a situation or other elements within the competvet module
      *
      * @param string $searchtext
+     * @param array $returnedtypes
      * @return array
      */
     public static function search_query(string $searchtext, array $returnedtypes = [self::TYPE_USER, self::TYPE_SITUATION]) {
@@ -71,6 +72,7 @@ class search {
      * Search into planning elements
      *
      * @param string $searchtext
+     * @param array $visiblesituations
      * @return array
      */
     private static function search_planning(string $searchtext, array $visiblesituations) {

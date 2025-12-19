@@ -101,10 +101,10 @@ final class situations_test extends advanced_testcase {
     public function test_get_all_situations_with_planning_for(string $username, array $expected): void {
         $user = core_user::get_user_by_username($username);
         $situations = situations::get_all_situations_with_planning_for($user->id);
-        usort($situations, function($sit1, $sit2) {
+        usort($situations, function ($sit1, $sit2) {
             return $sit1['shortname'] <=> $sit2['shortname'];
         });
-        usort($expected, function($sit1, $sit2) {
+        usort($expected, function ($sit1, $sit2) {
             return $sit1['shortname'] <=> $sit2['shortname'];
         });
         test_helpers::remove_elements_for_assertions($situations, ['id', 'intro', 'roles']);

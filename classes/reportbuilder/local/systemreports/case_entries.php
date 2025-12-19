@@ -31,6 +31,7 @@ use mod_competvet\reportbuilder\local\entities\situation;
  * Criteria for a given situation (or all criteria if situationid is not provided)
  *
  * Used in the situations API:
+ *
  * @see \mod_competvet\local\api\situations::get_all_criteria()
  *
  * @package   mod_competvet
@@ -77,8 +78,7 @@ class case_entries extends system_report {
         $this->add_entity($planningentity
             ->add_join(
                 "LEFT JOIN {competvet_planning} {$planningalias} ON {$planningalias}.id = {$casentryalias}.planningid"
-            )
-        );
+            ));
         $this->add_conditions_from_entities(['planning:startdate', 'planning:enddate']);
         // We use a special condition to filter out entries with no planning.
         $this->set_condition_values(
@@ -101,7 +101,9 @@ class case_entries extends system_report {
         $this->add_entity($studententity->add_join("
             LEFT JOIN {user} {$studentalias}
                    ON {$studentalias}.id = {$casentryalias}.studentid"));
-        $studententity->get_column('fullname')->set_title(new lang_string('student:fullname', 'mod_competvet'));
+        $studententity->get_column('fullname')->set_title(
+            new lang_string('student:fullname', 'mod_competvet')
+        );
         // Now we can call our helper methods to add the content we want to include in the report.
         $this->add_columns();
         $this->add_filters();
@@ -129,7 +131,11 @@ class case_entries extends system_report {
             'case_entry:timemodified',
         ];
 
-        $columns = array_merge($columns, \mod_competvet\reportbuilder\datasource\case_entries::get_additional_columns_from_case_def());
+        $columns =
+            array_merge(
+                $columns,
+                \mod_competvet\reportbuilder\datasource\case_entries::get_additional_columns_from_case_def()
+            );
         $this->add_columns_from_entities($columns);
 
         // Default sorting.
@@ -149,11 +155,12 @@ class case_entries extends system_report {
 
     /**
      * Check if the user can view this report
+     *
      * @return bool
      */
     protected function can_view(): bool {
         global $USER;
-        $context  = $this->get_report_persistent()->get_context();
+        $context = $this->get_report_persistent()->get_context();
         $studentid = $this->get_parameter('studentid', 0, PARAM_INT);
         $competvet = \mod_competvet\competvet::get_from_context($context);
         if (!isloggedin()) {

@@ -31,6 +31,7 @@ use mod_competvet\reportbuilder\local\helpers\todos_helper;
  */
 class todos extends datasource {
     use todos_helper;
+
     /**
      * Return user friendly name of the report source
      *

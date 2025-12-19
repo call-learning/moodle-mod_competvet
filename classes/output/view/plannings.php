@@ -75,16 +75,16 @@ class plannings extends base {
         global $FULLME;
         $data = parent::export_for_template($output);
 
-        $planningids = array_map(function($planning) {
+        $planningids = array_map(function ($planning) {
             return $planning['id'];
         }, $this->plannings);
         $planningwithids = array_combine($planningids, $this->plannings);
-        $planningstatsbycategory = array_reduce($this->planningstats, function($carry, $item) {
+        $planningstatsbycategory = array_reduce($this->planningstats, function ($carry, $item) {
             $carry[$item['categorytext']][] = $item;
             return $carry;
         }, []);
         $data['categories'] = [];
-        $returnurl = new moodle_url('/mod/competvet/view.php',['id' => $this->cmid]);
+        $returnurl = new moodle_url('/mod/competvet/view.php', ['id' => $this->cmid]);
 
         $competvet = competvet::get_from_cmid($this->cmid);
         $reportdata = [
@@ -162,9 +162,11 @@ class plannings extends base {
             $competvet = competvet::get_from_context($context);
             $situationname = $competvet->get_instance()->name;
             $currentplannings =
-                \mod_competvet\local\api\plannings::get_plannings_for_situation_id($competvet->get_situation()->get('id'),
-                    $USER->id);
-            $planningids = array_map(function($planning) {
+                \mod_competvet\local\api\plannings::get_plannings_for_situation_id(
+                    $competvet->get_situation()->get('id'),
+                    $USER->id
+                );
+            $planningids = array_map(function ($planning) {
                 return $planning['id'];
             }, $currentplannings);
             $planningstats = grading_api::get_planning_infos_for_grading($planningids, $USER->id);

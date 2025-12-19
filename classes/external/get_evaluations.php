@@ -266,8 +266,12 @@ class get_evaluations extends external_api {
      * @param array $gradedautoevals
      * @return void
      */
-    private static function collect_grades(array $userobservation, array $criteria,
-        array &$gradedobservations, &$gradedautoevals): void {
+    private static function collect_grades(
+        array $userobservation,
+        array $criteria,
+        array &$gradedobservations,
+        &$gradedautoevals
+    ): void {
         $observedcriteriaid = array_map(
             function ($observedcriterion) {
                 return $observedcriterion['criterioninfo']['id'];

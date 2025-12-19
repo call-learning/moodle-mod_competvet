@@ -21,7 +21,7 @@ use core_form\dynamic_form;
 use mod_competvet\competvet;
 use mod_competvet\local\api\observations;
 use mod_competvet\local\api\todos;
-use mod_competvet\local\persistent\todo as todo;
+use mod_competvet\local\persistent\todo;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
@@ -166,7 +166,6 @@ class eval_observation_add extends dynamic_form {
         $planning = planning::get_record(['id' => $planningid]);
         $situation = $planning->get_situation();
         eval_observation_helper::add_criteria_to_form($situation, $this, $mform);
-
     }
 
     /**

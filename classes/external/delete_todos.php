@@ -34,7 +34,6 @@ use mod_competvet\local\api\todos as todos_api;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class delete_todos extends external_api {
-
     /**
      * Returns description of method parameters
      * @return external_function_parameters

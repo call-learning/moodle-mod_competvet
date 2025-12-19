@@ -27,7 +27,6 @@ use stdClass;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class grader {
-
     /** @var stdClass course_module record. */
     private $instance;
 
@@ -152,7 +151,7 @@ class grader {
         $grades = [];
 
         // In case of using manual grading this update must delete previous automatic gradings.
-        if ( !$this->instance->enabletracking) {
+        if (!$this->instance->enabletracking) {
             return $this->get_user_grades_for_deletion($userid);
         }
 

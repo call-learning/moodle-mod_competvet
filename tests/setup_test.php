@@ -40,7 +40,7 @@ final class setup_test extends advanced_testcase {
      */
     public function test_roles_setup(): void {
         $existingroles = get_all_roles();
-        $existingrolesshortnames = array_map(function($role) {
+        $existingrolesshortnames = array_map(function ($role) {
             return $role->shortname;
         }, $existingroles); // Shortname to ID.
         foreach (competvet::COMPETVET_ROLES as $rolename => $roledef) {

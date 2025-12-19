@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local\tasks;
+namespace mod_competvet\local\tasks;
 use advanced_testcase;
 use DateTime;
 use mod_competvet\task\items_todo;
@@ -66,7 +66,7 @@ final class items_todo_test extends advanced_testcase {
         $endofplanningtasks->execute();
         $emails = $emailsink->get_messages();
         $this->assertCount(count($expectedemails), $emails);
-        usort($emails, function($a, $b) {
+        usort($emails, function ($a, $b) {
             return $a->to === $b->to ? ($a->subject <=> $b->subject) : ($a->to < $b->to ? -1 : 1);
         });
         foreach ($emails as $index => $email) {
@@ -77,6 +77,7 @@ final class items_todo_test extends advanced_testcase {
     /**
      * Prepare data
      *
+     * @param int $timestart
      * @return void
      */
     private function prepare_data(int $timestart) {

@@ -100,7 +100,7 @@ class assign_roles extends external_api {
                     'userid' => new external_value(PARAM_INT, 'User ID'),
                     'action' => new external_value(PARAM_ALPHA, 'Result action'),
                 ])
-            )
+            ),
         ]);
     }
 }

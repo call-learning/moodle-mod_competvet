@@ -30,6 +30,7 @@ use mod_competvet\reportbuilder\local\helpers\observations_helper;
  */
 class observations extends datasource {
     use observations_helper;
+
     /**
      * Return user-friendly name of the report source
      *

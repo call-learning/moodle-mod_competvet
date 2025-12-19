@@ -137,7 +137,7 @@ class criterion extends base {
             ->set_type(column::TYPE_INTEGER)
             ->add_fields("{$criterionalias}.gridid")
             ->set_is_sortable(true)
-            ->set_callback(function($gridid) {
+            ->set_callback(function ($gridid) {
                 static $evalgrids = [];
                 if (!isset($evalgrids[$gridid])) {
                     $evalgrids[$gridid] = grid::get_record([

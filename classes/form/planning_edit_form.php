@@ -31,7 +31,6 @@ use moodle_url;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class planning_edit_form extends dynamic_form {
-
     /**
      * Process the form submission
      *
@@ -139,10 +138,10 @@ class planning_edit_form extends dynamic_form {
     private function get_groups() {
         $context = $this->get_context_for_dynamic_submission();
         $groups = groups_get_all_groups($context->get_course_context()->instanceid);
-        $groupsnames = array_map(function($group) {
+        $groupsnames = array_map(function ($group) {
             return $group->name;
         }, $groups);
-        $groupsid = array_map(function($group) {
+        $groupsid = array_map(function ($group) {
             return $group->id;
         }, $groups);
         $indexedgroups = array_combine($groupsid, $groupsnames);

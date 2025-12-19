@@ -41,7 +41,6 @@ use mod_competvet\local\persistent\planning;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class formdata_handler extends external_api {
-
     /**
      * Returns description of method parameters. This will be used to validate the JSON data sent to the external function.
      *
@@ -130,7 +129,7 @@ class formdata_handler extends external_api {
      * @param string $formname - The form name
      * @return array
      */
-    public static function get($userid, $planningid, $formname): array {
+    public static function get(int $userid, int $planningid, string $formname): array {
         $params = self::validate_parameters(self::get_parameters(), [
             'userid' => $userid,
             'planningid' => $planningid,
@@ -187,10 +186,10 @@ class formdata_handler extends external_api {
     /**
      * Fix json 'cangrade' issue
      *
-     * @param $json
+     * @param string $json
      * @return string if json has cangrade, if not return null (no change)
      */
-    private static function fix_json($json): ?string {
+    private static function fix_json(string $json): ?string {
         $userdataparsed = json_decode($json, true);
         if (isset($userdataparsed['cangrade'])) {
             unset($userdataparsed['cangrade']);

@@ -23,7 +23,7 @@
 import CompetState from 'mod_competvet/local/competstate';
 import Notification from 'core/notification';
 import Templates from 'core/templates';
-
+import Pending from "core/pending";
 const App = document.querySelector('[data-region="planning"]');
 
 /**
@@ -34,11 +34,13 @@ const stateTemplate = () => {
     const region = App.querySelector(`[data-region="${regionName}"]`);
     const template = `mod_competvet/manager/planning/${regionName}`;
     const regionRenderer = (context) => {
+        const pendingRender = new Pending(`moc_competvet/planning:render`);
         if (context[regionName] === undefined) {
             return;
         }
         Templates.render(template, context).then((html) => {
             region.innerHTML = html;
+            pendingRender.resolve();
             return;
         }).catch(Notification.exception);
     };

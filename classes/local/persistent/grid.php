@@ -27,7 +27,6 @@ use lang_string;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class grid extends persistent {
-
     /**
      * TABLE
      */
@@ -137,5 +136,4 @@ class grid extends persistent {
         }
         return true;
     }
-
 }

@@ -81,4 +81,3 @@ class observation_criterion_level extends persistent {
         return is_null($grade) || $grade == self::NO_GRADE_LEVEL;
     }
 }
-

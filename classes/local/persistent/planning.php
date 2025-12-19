@@ -190,12 +190,10 @@ class planning extends persistent {
         }
         $observations = observation::get_records(['planningid' => $this->raw_get('id')]);
         foreach ($observations as $observation) {
-
             $observation->delete();
         }
         $certdecl = cert_decl::get_records(['planningid' => $this->raw_get('id')]);
         foreach ($certdecl as $cert) {
-
             $cert->delete();
         }
         $caselogs = case_entry::get_records(['planningid' => $this->raw_get('id')]);

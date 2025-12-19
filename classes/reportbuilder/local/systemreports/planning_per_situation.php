@@ -33,13 +33,13 @@ use pix_icon;
  * Planning per situation
  *
  * Used in the situations API
+ *
  * @see \mod_competvet\local\api\situations::get_all_situations_with_planning_for
  * @package   mod_competvet
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class planning_per_situation extends system_report {
-
     /**
      * Initialise the report
      */
@@ -79,7 +79,8 @@ class planning_per_situation extends system_report {
         $planningpausealias = $planningentity->get_table_alias('competvet_planning_pause');
         $this->add_entity($planningentity
             ->add_join(
-                "LEFT JOIN {competvet_planning_pause} {$planningpausealias} ON {$planningpausealias}.planningid = {$planningalias}.id"
+                "LEFT JOIN {competvet_planning_pause}
+                  {$planningpausealias} ON {$planningpausealias}.planningid = {$planningalias}.id"
             ));
         // Now we can call our helper methods to add the content we want to include in the report.
         $this->add_columns();
@@ -134,6 +135,7 @@ class planning_per_situation extends system_report {
 
     /**
      * Check if the user can view this report
+     *
      * @return bool
      */
     protected function can_view(): bool {

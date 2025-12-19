@@ -37,7 +37,6 @@ use mod_competvet\local\api\certifications;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_certification_supervisors extends external_api {
-
     /**
      * Returns description of method parameters
      *

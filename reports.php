@@ -48,7 +48,7 @@ $userid = optional_param('userid', $USER->id, PARAM_INT);
 $returnto = optional_param('returnurl', null, PARAM_URL);
 // We restrict parameters to alphanumext for security.
 $parameters = optional_param_array('parameters', [], PARAM_ALPHANUMEXT);
-$download = optional_param('download','', PARAM_ALPHA);
+$download = optional_param('download', '', PARAM_ALPHA);
 
 if ($userid) {
     $urlparams += ['userid' => $userid];

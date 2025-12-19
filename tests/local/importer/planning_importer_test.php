@@ -14,10 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local\importer;
+namespace mod_competvet\local\importer;
 use advanced_testcase;
 use mod_competvet\competvet;
-use mod_competvet\local\importer\planning_importer;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\planning_pause;
 use mod_competvet\local\persistent\situation;
@@ -42,6 +41,7 @@ final class planning_importer_test extends advanced_testcase {
     /**
      * Setup the test
      *
+     * @param array $data
      * @return void
      */
     public function prepare(array $data): void {
@@ -107,10 +107,12 @@ final class planning_importer_test extends advanced_testcase {
         $planning5 = planning::get_record(['situationid' => $situation->get('id'), 'session' => 'session-5']);
 
         $this->assertEquals(
-            '00:00', \core_date::strftime('%H:%M', $planning5->get('startdate')),
+            '00:00',
+            \core_date::strftime('%H:%M', $planning5->get('startdate')),
         );
         $this->assertEquals(
-            '23:59', \core_date::strftime('%H:%M', $planning5->get('enddate')),
+            '23:59',
+            \core_date::strftime('%H:%M', $planning5->get('enddate')),
         );
 
         $expected = [
@@ -122,10 +124,12 @@ final class planning_importer_test extends advanced_testcase {
         foreach ($pauses as $pause) {
             [$expectedstart, $expectedend] = array_shift($expected);
             $this->assertEquals(
-                $expectedstart, \core_date::strftime('%H:%M', $pause->get('startdate')),
+                $expectedstart,
+                \core_date::strftime('%H:%M', $pause->get('startdate')),
             );
             $this->assertEquals(
-                $expectedend, \core_date::strftime('%H:%M', $pause->get('enddate')),
+                $expectedend,
+                \core_date::strftime('%H:%M', $pause->get('enddate')),
             );
         }
     }
@@ -191,7 +195,8 @@ final class planning_importer_test extends advanced_testcase {
                 ],
             ],
         ];
-        $this->prepare($data);;
+        $this->prepare($data);
+        ;
         $situation = situation::get_record(['shortname' => 'SIT1']);
         $competvet = competvet::get_from_situation($situation);
         // First import.

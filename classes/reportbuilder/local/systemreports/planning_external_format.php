@@ -18,6 +18,7 @@ declare(strict_types=1);
 
 namespace mod_competvet\reportbuilder\local\systemreports;
 
+use core\exception\coding_exception;
 use core\lang_string;
 use core_group\reportbuilder\local\entities\group;
 use core_reportbuilder\local\aggregation\groupconcat;
@@ -40,7 +41,6 @@ use mod_competvet\reportbuilder\local\entities\situation;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class planning_external_format extends system_report {
-
     /**
      * Initialise the report
      */
@@ -65,21 +65,17 @@ class planning_external_format extends system_report {
         $this->add_entity($situationentity
             ->add_join(
                 "LEFT JOIN {competvet_situation} {$situationalias} ON {$situationalias}.id = {$planningalias}.situationid"
-            )
-        );
+            ));
         // Group entity.
         // Re-use the context table alias/join from the course entity in subsequent entities.
         $context = $situationentity->get_table_alias('context');
         $groupentity = (new group())
-            ->set_table_alias('context', $context)
-        ;
+            ->set_table_alias('context', $context);
         $groupsalias = $groupentity->get_table_alias('groups');
         $this->add_entity($groupentity
             ->add_join("LEFT JOIN {groups} {$groupsalias} ON {$groupsalias}.id = {$planningalias}.groupid")
             ->add_joins($situationentity->get_joins())
-            ->add_joins($situationentity->get_context_joins())
-        );
-
+            ->add_joins($situationentity->get_context_joins()));
 
         // Now also join the
         // Now we can call our helper methods to add the content we want to include in the report.
@@ -101,7 +97,6 @@ class planning_external_format extends system_report {
      * unique identifier
      */
     protected function add_columns(): void {
-        global $DB;
         $columns = [
             'planning:startdate',
             'planning:enddate',
@@ -122,9 +117,9 @@ class planning_external_format extends system_report {
      * Adds pause columns (we have as many column as the max of pauses for a planning).
      *
      * @param planning $planningentity
-     * @param planning_pause $planningpauseentity
      * @return void
      * @throws \coding_exception
+     * @throws coding_exception
      * @throws \dml_exception
      */
     protected function add_pauses_columns(planning $planningentity): void {
@@ -142,11 +137,11 @@ class planning_external_format extends system_report {
         $internalpausealias = database::generate_alias('');
         $pausesalias = database::generate_alias('');
         $planningalias = $planningentity->get_table_alias('competvet_planning');
-        $sqlstartgroupconcat =  $DB->sql_group_concat("{$internalpausealias}.startdate", '|', 'id');
-        $sqlendgroupconcat =  $DB->sql_group_concat("{$internalpausealias}.enddate", '|', 'id');
+        $sqlstartgroupconcat = $DB->sql_group_concat("{$internalpausealias}.startdate", '|', 'id');
+        $sqlendgroupconcat = $DB->sql_group_concat("{$internalpausealias}.enddate", '|', 'id');
         $this->add_join(
-            "LEFT JOIN (SELECT 
-                    {$internalpausealias}.planningid, 
+            "LEFT JOIN (SELECT
+                    {$internalpausealias}.planningid,
                     {$sqlstartgroupconcat} AS startdates,
                     {$sqlendgroupconcat} AS enddates
                     FROM {competvet_planning_pause} AS {$internalpausealias}
@@ -159,36 +154,40 @@ class planning_external_format extends system_report {
                     "pause_{$i}_startdate",
                     new lang_string('planning_pause_export:startdate', 'mod_competvet', $i),
                     $planningentity->get_entity_name()
-                ))
+                )
+            )
                 ->set_type(column::TYPE_TIMESTAMP)
                 ->add_fields("{$pausesalias}.startdates")
                 ->set_is_sortable(true)
                 ->set_callback(
-                    function($value, $row) use ($i) {
+                    function ($value, $row) use ($i) {
                         if (empty($row) || empty($row->startdates)) {
                             return '';
                         }
                         $dates = explode('|', $row->startdates);
                         return isset($dates[$i - 1]) ? format::userdate(intval($dates[$i - 1]), $row) : '';
-                    });
+                    }
+                );
 
             $this->add_column(
                 new column(
                     "pause_{$i}_enddate",
                     new lang_string('planning_pause_export:enddate', 'mod_competvet', $i),
                     $planningentity->get_entity_name()
-                ))
+                )
+            )
                 ->set_type(column::TYPE_TIMESTAMP)
                 ->add_fields("{$pausesalias}.enddates")
                 ->set_is_sortable(true)
                 ->set_callback(
-                    function($value, $row) use ($i) {
+                    function ($value, $row) use ($i) {
                         if (empty($row) || empty($row->enddates)) {
                             return '';
                         }
                         $dates = explode('|', $row->enddates);
                         return isset($dates[$i - 1]) ? format::userdate(intval($dates[$i - 1]), $row) : '';
-                    });
+                    }
+                );
         }
     }
     /**

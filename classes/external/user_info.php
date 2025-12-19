@@ -87,4 +87,3 @@ class user_info extends external_api {
         );
     }
 }
-

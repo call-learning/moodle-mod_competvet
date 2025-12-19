@@ -114,7 +114,7 @@ class observations {
             }
             $result['comments'] =
                 array_values(
-                    array_map(function($obscomment) {
+                    array_map(function ($obscomment) {
                         $return = (array) $obscomment->to_record();
                         $userinfo = utils::get_user_info($return['usercreated']);
                         $return['userinfo'] = $userinfo;
@@ -129,7 +129,7 @@ class observations {
                 );
 
             $result['criteria'] = array_values(
-                array_map(function($obscrit) use ($criteria) {
+                array_map(function ($obscrit) use ($criteria) {
                     $criterioninfo = (array) $criteria[$obscrit->get('criterionid')]->to_record();
                     unset($criterioninfo['timecreated']);
                     unset($criterioninfo['timemodified']);
@@ -155,7 +155,7 @@ class observations {
                         $allcomments,
                         fn($comment) => in_array($comment->get('criterionid'), $allchildrencriteriaid)
                     ));
-                $criterion['subcriteria'] = array_map(function($obscrit) use ($criteria) {
+                $criterion['subcriteria'] = array_map(function ($obscrit) use ($criteria) {
                     $criterioninfo = (array) $criteria[$obscrit->get('criterionid')]->to_record();
                     $return = [
                         'criterioninfo' => $criterioninfo,
