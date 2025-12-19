@@ -30,6 +30,7 @@ import './plannings';
 import ModalSaveCancel from 'core/modal_save_cancel';
 import {getString, getStrings} from 'core/str';
 import ModalEvents from 'core/modal_events';
+import Pending from "core/pending";
 
 /*
 * A CRUD manager for data.
@@ -154,6 +155,7 @@ class Manager {
      * @param {object} btn The button that was clicked.
      */
     async delete(btn) {
+        const pendingDeleteReady = new Pending(`moc_competvet/planning:delete`);
         let state = CompetState.getData();
         if (btn.dataset.type === 'planning') {
             const planning = state.plannings.find((element) => element.id === parseInt(btn.dataset.id));
@@ -182,12 +184,14 @@ class Manager {
             CompetState.setData(state);
             this.save();
         }
+        pendingDeleteReady.resolve();
     }
 
     /**
      * Delete all plannings.
      */
     async deleteAll() {
+        const pendingDeleteAllReady = new Pending(`moc_competvet/planning:deleteall`);
         const state = CompetState.getData();
         if (state.plannings.length === 0) {
             return;
@@ -218,9 +222,11 @@ class Manager {
                 });
                 CompetState.setData(state);
                 this.save();
+                pendingDeleteAllReady.resolve();
             },
             () => {
                 // Do nothing, the user cancelled the action.
+                pendingDeleteAllReady.resolve();
             },
         );
     }
@@ -275,6 +281,7 @@ class Manager {
      * Stop editing, remove the edit flag from the state elements.
      */
     stopEdit() {
+        const stopEditPending = new Pending(`moc_competvet/planning:stopedit`);
         const state = CompetState.getData();
         // Remove edit from all fields.
         state.plannings.forEach((element) => {
@@ -284,9 +291,11 @@ class Manager {
             });
         });
         CompetState.setData(state);
+        stopEditPending.resolve();
     }
 
     update() {
+        const pendingUpdateReady = new Pending(`moc_competvet/planning:update`);
         const state = CompetState.getData();
         state.plannings.forEach((element) => {
             element.haschanged = false;
@@ -331,6 +340,7 @@ class Manager {
             this.updatePauses(element);
         });
         CompetState.setData(state);
+        pendingUpdateReady.resolve();
     }
 
     /**
@@ -403,6 +413,7 @@ class Manager {
      * @return {Bool} True if the state was saved.
      */
     async save() {
+        const pendingSaveReady = new Pending(`moc_competvet/planning:save`);
         this.update();
         const state = CompetState.getData();
         // If any element has an error, do not save.
@@ -436,6 +447,7 @@ class Manager {
         });
         const result = await Repository.savePlannings(saveState);
         this.getData();
+        pendingSaveReady.resolve();
         return result;
     }
 

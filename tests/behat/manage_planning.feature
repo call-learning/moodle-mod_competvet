@@ -40,13 +40,11 @@ Feature: Manage Plannings
     And I update date "startdate" to "2024-08-24T16:00" in row number "1"
     And I update date "enddate" to "2025-12-25T11:00" in row number "1"
     And I select "Group1" in the "groupid" field in row number "1"
-    And I wait "20" seconds
     And I update "session" to "Session1" in row number "1"
     And I click the button with data-action "save" in row number "1"
     And I should see "Session1" in the planning table
     And I am on the "S1" Activity page logged in as "teacher1"
     Then I should see "Group1" in the ".competvet-grade-table" "css_element"
-    And I wait "5" seconds
 
   Scenario: Update a planning
     Given I am on the "S1" Activity page logged in as "teacher1"
@@ -62,7 +60,6 @@ Feature: Manage Plannings
     And I update date "startdate" to "2024-08-24T16:00" in row number "1"
     And I select "Group2" in the "groupid" field in row number "1"
     When I click the button with data-action "save" in row number "1"
-    And I wait "5" seconds
     And I am on the "S1" Activity page logged in as "teacher1"
     Then I should see "Group2" in the ".competvet-grade-table" "css_element"
 
