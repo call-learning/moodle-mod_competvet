@@ -19,7 +19,14 @@ namespace mod_competvet;
 use cache;
 use cache_store;
 use context_module;
+use core\dml\table;
 use core_user;
+use mod_competvet\local\persistent\cert_decl;
+use mod_competvet\local\persistent\criterion;
+use mod_competvet\local\persistent\grid;
+use mod_competvet\local\persistent\observation_criterion_comment;
+use mod_competvet\local\persistent\observation_criterion_level;
+use mod_competvet\local\persistent\situation;
 use user_picture;
 
 /**
@@ -216,6 +223,9 @@ Y3|fr:Troisième année|en:Third year\nY4|fr:Quatrième année|en:Fourth year\nY
         $roleid = $roleids->get($rolename);
         if ($roleid === false) {
             $role = $DB->get_record('role', ['shortname' => $rolename]);
+            if (!$role) {
+                return [];
+            }
             $roleid = $role->id;
             $roleids->set($rolename, $role->id);
         }
@@ -226,5 +236,76 @@ Y3|fr:Troisième année|en:Third year\nY4|fr:Quatrième année|en:Fourth year\nY
         $modulecontext = $competvet->get_context();
         $recipients = get_role_users($roleid, $modulecontext, true);
         return $recipients;
+    }
+
+    /**
+     * Check if a grid is used in situations and criteria.
+     *
+     * @param grid $grid The grid id.
+     * @return bool
+     */
+    public static function is_grid_used(grid $grid): bool {
+        $gridid = $grid->get('id');
+        $typetofield = [
+            grid::COMPETVET_CRITERIA_EVALUATION => 'evalgrid',
+            grid::COMPETVET_CRITERIA_CERTIFICATION => 'certifgrid',
+            grid::COMPETVET_CRITERIA_LIST => 'listgrid',
+        ];
+        $fieldname = $typetofield[$grid->get('type')];
+        $count = situation::count_records_select("$fieldname = :gridid", ['gridid' => $gridid]);
+        $fn = fn($alias) => [
+            "LEFT JOIN {" . criterion::TABLE . "} {$alias}crit ON {$alias}crit.id= {$alias}.criterionid",
+            "{$alias}crit.gridid = :{$alias}gridval",
+            ["{$alias}gridval" => $gridid],
+        ];
+        $arecriterionused = self::is_any_criteria_used($fn);
+
+        return $count > 0 || $arecriterionused;
+    }
+
+    /**
+     * Get the count of usage of a criterion in situations for evaluation and certification.
+     *
+     * @param criterion $criterion The criterion id.
+     * @return bool True if the criterion is used in any situation for evaluation or certification, false otherwise.
+     */
+    public static function is_criterion_used(criterion $criterion): bool {
+        $criterion = $criterion->get('id');
+        $fn = fn($alias) => [
+            "",
+            "{$alias}.criterionid = :{$alias}value",
+            ["{$alias}value" => $criterion],
+        ];
+        return self::is_any_criteria_used($fn);
+    }
+
+    /**
+     * Check if any of the given criteria are used in situations for evaluation and certification.
+     *
+     * @param callable $selectbuilder A callable that takes an alias and returns an array
+     *   with three elements: the JOIN clause, the WHERE clause, and the parameters for the SQL query.
+     * @throws \dml_exception
+     */
+    private static function is_any_criteria_used($selectbuilder): bool {
+        global $DB;
+        $selects = [];
+        $tables = [
+            'oc' => observation_criterion_level::TABLE,
+            'occ' => observation_criterion_comment::TABLE,
+            'cd' => cert_decl::TABLE,
+        ];
+        $params = [];
+        foreach ($tables as $alias => $table) {
+            $select = "SELECT 1 FROM {" . $table . "} {$alias}";
+            [$joins, $where, $sqlparams] = call_user_func($selectbuilder, $alias);
+
+            $selects[] = "$select $joins WHERE $where";
+            $params = array_merge($params, $sqlparams);
+        }
+        $selectsql = join(' UNION ALL ', $selects);
+        $sql = "SELECT COUNT(*) FROM ({$selectsql}) AS subquery";
+        $count = $DB->count_records_sql($sql, $params);
+
+        return $count > 0;
     }
 }

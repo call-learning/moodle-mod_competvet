@@ -18,6 +18,7 @@ namespace mod_competvet\local\persistent;
 
 use core\persistent;
 use lang_string;
+use mod_competvet\utils;
 
 /**
  * Grid entity
@@ -132,6 +133,24 @@ class grid extends persistent {
      */
     public function canedit() {
         if ($this->get('idnumber') == self::DEFAULT_GRID_SHORTNAME[$this->get('type')]) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Whether the grid can be deleted (either because the use cannot edit it or because it is used in a situation or it
+     * is the default grid).
+     * @return bool
+     */
+    public function can_delete(): bool {
+        if ($this->get('idnumber') == self::DEFAULT_GRID_SHORTNAME[$this->get('type')]) {
+            return false;
+        }
+        if (!has_capability('mod/competvet:editcriteria', \context_system::instance())) {
+            return false;
+        }
+        if (utils::is_grid_used($this)) {
             return false;
         }
         return true;

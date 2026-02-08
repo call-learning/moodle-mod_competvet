@@ -572,6 +572,7 @@ $string['todo:user:fullname'] = 'Nom complet de l\'utilisateur';
 $string['todos'] = 'À faire';
 $string['uploadplanning'] = 'Téléverser planning';
 $string['uploadroles'] = 'Téléverser roles';
+$string['usernotfound'] = 'Utilisateur non trouvé';
 $string['valid:confirmed'] = 'Je confirme que cet essentiel a été réalisé';
 $string['valid:levelnotreached'] = 'Je ne valide pas car le niveau n\'est pas atteint';
 $string['valid:notseen'] = 'Je ne valide pas car je n\'ai pas vu cet essentiel';

@@ -573,6 +573,7 @@ $string['todo:user:fullname'] = 'User full name';
 $string['todos'] = 'ToDos';
 $string['uploadplanning'] = 'Upload planning';
 $string['uploadroles'] = 'Upload roles';
+$string['usernotfound'] = 'User not found';
 $string['valid:confirmed'] = 'I confirm that this essential has been achieved';
 $string['valid:levelnotreached'] = 'I do not validate because the level is not reached';
 $string['valid:notseen'] = 'I do not validate because I did not see this essential';

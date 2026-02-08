@@ -18,6 +18,7 @@ namespace mod_competvet\local\persistent;
 
 use core\persistent;
 use lang_string;
+use mod_competvet\utils;
 
 /**
  * Criterion template entity
@@ -72,5 +73,21 @@ class criterion extends persistent {
                 'message' => new lang_string('invaliddata', 'competvet', 'grade'),
             ],
         ];
+    }
+
+    /**
+     * Whether the grid can be deleted (either because the use cannot edit it or because it is used in a situation or it
+     * is the default grid).
+     * @return bool
+     */
+    public function can_delete(): bool {
+        if (!has_capability('mod/competvet:editcriteria', \context_system::instance())) {
+            return false;
+        }
+        $isused = utils::is_criterion_used($this);
+        if ($isused) {
+            return false;
+        }
+        return true;
     }
 }

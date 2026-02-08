@@ -1,0 +1,375 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+namespace mod_competvet\external;
+
+use mod_competvet\competvet;
+
+/**
+ * Manage criteria tests
+ *
+ * @package     mod_competvet
+ * @copyright   2023 CALL Learning <contact@call-learning.fr>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers \mod_competvet\external\manage_criteria
+ */
+final class manage_criteria_test extends \advanced_testcase {
+    /**
+     * Test creation and retrieval of grid and criteria
+     * @runInSeparateProcess
+     */
+    public function test_create_and_get_grid_and_criteria(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $competvetgenerator = $this->getDataGenerator()->get_plugin_generator('mod_competvet');
+        $competvet = $competvetgenerator->create_instance(['course' => $course->id]);
+        $grid = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Test Grid',
+            'idnumber' => 'GRID001',
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+        ]);
+        $grid->create();
+        $criterion = new \mod_competvet\local\persistent\criterion(0, (object) [
+            'gridid' => $grid->get('id'),
+            'label' => 'Test Criterion',
+            'idnumber' => 'CRIT001',
+            'parentid' => 0,
+            'sort' => 1,
+        ]);
+        $criterion->create();
+        $result = $this->manage_criteria_get(
+            \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+            $grid->get('id'),
+        );
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('grids', $result);
+        $this->assertCount(1, $result['grids']);
+        $this->assertEquals('Test Grid', $result['grids'][0]['gridname']);
+        $this->assertCount(1, $result['grids'][0]['criteria']);
+        $this->assertEquals('Test Criterion', $result['grids'][0]['criteria'][0]['label']);
+    }
+
+    /**
+     * Test update of grid and criterion
+     * @runInSeparateProcess
+     */
+    public function test_update_grid_and_criterion(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $competvetgenerator = $this->getDataGenerator()->get_plugin_generator('mod_competvet');
+        $competvet = $competvetgenerator->create_instance(['course' => $course->id]);
+        $grid = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Grid to Update',
+            'idnumber' => 'GRID002',
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+        ]);
+        $grid->create();
+        $criterion = new \mod_competvet\local\persistent\criterion(0, (object) [
+            'gridid' => $grid->get('id'),
+            'label' => 'Criterion to Update',
+            'idnumber' => 'CRIT002',
+            'parentid' => 0,
+            'sort' => 1,
+        ]);
+        $criterion->create();
+        $updateparams = [
+            [
+                'gridid' => $grid->get('id'),
+                'gridname' => 'Grid Updated',
+                'type' => $grid->get('type'),
+                'haschanged' => true,
+                'criteria' => [
+                    [
+                        'criterionid' => $criterion->get('id'),
+                        'label' => 'Criterion Updated',
+                        'idnumber' => 'CRIT002',
+                        'sortorder' => 1,
+                        'haschanged' => true,
+                        'hasoptions' => false,
+                        'options' => [],
+                    ],
+                ],
+            ],
+        ];
+        $this->setAdminUser();
+        $result = $this->manage_criteria_update($updateparams, $grid->get('type'));
+        $this->assertTrue($result['result']);
+        $getresult = $this->manage_criteria_get($grid->get('type'), $grid->get('id'), null);
+        $this->assertEquals('Grid Updated', $getresult['grids'][0]['gridname']);
+        $this->assertEquals('Criterion Updated', $getresult['grids'][0]['criteria'][0]['label']);
+    }
+
+    /**
+     * Test deletion of grid using deleted field
+     * @runInSeparateProcess
+     */
+    public function test_delete_grid(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $competvetgenerator = $this->getDataGenerator()->get_plugin_generator('mod_competvet');
+        $competvet = $competvetgenerator->create_instance(['course' => $course->id]);
+        $grid = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Grid to Delete',
+            'idnumber' => 'GRID003',
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+        ]);
+        $grid->create();
+        $deleteparams = [
+            [
+                'gridid' => $grid->get('id'),
+                'type' => $grid->get('type'),
+                'deleted' => true,
+                'criteria' => [],
+            ],
+        ];
+        $this->setAdminUser();
+        $result = $this->manage_criteria_update($deleteparams, $grid->get('type'));
+        $this->assertTrue($result['result']);
+        $getresult = $this->manage_criteria_get($grid->get('type'), $grid->get('id'), null);
+        $this->assertCount(0, $getresult['grids']);
+    }
+
+    /**
+     * Test deletion of criterion using deleted field
+     * @runInSeparateProcess
+     */
+    public function test_delete_criterion(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $competvetgenerator = $this->getDataGenerator()->get_plugin_generator('mod_competvet');
+        $competvet = $competvetgenerator->create_instance(['course' => $course->id]);
+        $grid = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Grid for Criterion Delete',
+            'idnumber' => 'GRID004',
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+        ]);
+        $grid->create();
+        $criterion = new \mod_competvet\local\persistent\criterion(0, (object) [
+            'gridid' => $grid->get('id'),
+            'label' => 'Criterion to Delete',
+            'idnumber' => 'CRIT004',
+            'parentid' => 0,
+            'sort' => 1,
+        ]);
+        $criterion->create();
+        $deleteparams = [
+            [
+                'gridid' => $grid->get('id'),
+                'type' => $grid->get('type'),
+                'criteria' => [
+                    [
+                        'criterionid' => $criterion->get('id'),
+                        'label' => 'Criterion to Delete',
+                        'idnumber' => 'CRIT004',
+                        'sortorder' => 1,
+                        'deleted' => true,
+                        'hasoptions' => false,
+                        'options' => [],
+                    ],
+                ],
+            ],
+        ];
+        $this->setAdminUser();
+        $result = $this->manage_criteria_update($deleteparams, $grid->get('type'));
+        $this->assertTrue($result['result']);
+        $getresult = $this->manage_criteria_get($grid->get('type'), $grid->get('id'), null);
+        $this->assertCount(0, $getresult['grids'][0]['criteria']);
+    }
+
+    /**
+     * Test deletion of option using deleted field
+     * @runInSeparateProcess
+     */
+    public function test_delete_option(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $competvetgenerator = $this->getDataGenerator()->get_plugin_generator('mod_competvet');
+        $competvet = $competvetgenerator->create_instance(['course' => $course->id]);
+        $grid = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Grid for Option Delete',
+            'idnumber' => 'GRID005',
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+        ]);
+        $grid->create();
+        $criterion = new \mod_competvet\local\persistent\criterion(0, (object) [
+            'gridid' => $grid->get('id'),
+            'label' => 'Criterion with Option',
+            'idnumber' => 'CRIT005',
+            'parentid' => 0,
+            'sort' => 1,
+        ]);
+        $criterion->create();
+        $option1 = new \mod_competvet\local\persistent\criterion(0, (object) [
+            'gridid' => $grid->get('id'),
+            'label' => 'Option to Delete',
+            'idnumber' => 'OPT005',
+            'parentid' => $criterion->get('id'),
+            'sort' => 1,
+        ]);
+        $option1->create();
+        $option2 = new \mod_competvet\local\persistent\criterion(0, (object) [
+            'gridid' => $grid->get('id'),
+            'label' => 'Option that we cannot delete because it used',
+            'idnumber' => 'OPT006',
+            'parentid' => $criterion->get('id'),
+            'sort' => 2,
+        ]);
+        $option2->create();
+
+        // Fake usage of the option in a situation to test that it cannot be deleted.
+        $competvetinstance = competvet::get_from_cmid($competvet->cmid);
+        $observation = new \mod_competvet\local\persistent\observation_criterion_level(
+            0,
+            (object) [
+                'situationid' => $competvetinstance->get_situation()->get('id'),
+                'criterionid' => $option2->get('id'),
+                'observationid' => 0, // Fake one.
+                'level' => 1,
+            ]
+        );
+        $observation->create();
+        $deleteparams = [
+            [
+                'gridid' => $grid->get('id'),
+                'type' => $grid->get('type'),
+                'criteria' => [
+                    [
+                        'criterionid' => $criterion->get('id'),
+                        'label' => 'Criterion with Option',
+                        'idnumber' => 'CRIT005',
+                        'sortorder' => 1,
+                        'hasoptions' => true,
+                        'haschanged' => true,
+                        'options' => [
+                            [
+                                'optionid' => $option1->get('id'),
+                                'idnumber' => 'OPT005',
+                                'label' => 'Option to Delete',
+                                'sortorder' => 1,
+                                'deleted' => true,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        // Run the test. First try to delete the option that is not used in a situation, it should be deleted without warning.
+        $this->setAdminUser();
+        $grids = $this->manage_criteria_get($grid->get('type'), $grid->get('id'), null);
+        $this->assertCount(2, $grids['grids'][0]['criteria'][0]['options']);
+        $result = $this->manage_criteria_update($deleteparams, $grid->get('type'));
+        $this->assertTrue($result['result']);
+        $this->assertEmpty($result['warnings']);
+        $grids = $this->manage_criteria_get($grid->get('type'), $grid->get('id'), null);
+        $this->assertCount(1, $grids['grids'][0]['criteria'][0]['options']);
+        // Now try to delete the option that is used in a situation, it should not be deleted and we should get a warning.
+        $deleteparams[0]['criteria'][0]['options'][0]['optionid'] = $option2->get('id');
+        $deleteparams[0]['criteria'][0]['options'][0]['deleted'] = true;
+        $result = $this->manage_criteria_update($deleteparams, $grid->get('type'));
+        $this->assertTrue($result['result']);
+        $this->assertNotEmpty($result['warnings']);
+        $grids = $this->manage_criteria_get($grid->get('type'), $grid->get('id'), null);
+        $this->assertCount(1, $grids['grids'][0]['criteria']);
+    }
+
+    /**
+     * Test error handling for deleting non-existent criterion
+     * @runInSeparateProcess
+     */
+    public function test_delete_nonexistent_criterion(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $competvetgenerator = $this->getDataGenerator()->get_plugin_generator('mod_competvet');
+        $competvet = $competvetgenerator->create_instance(['course' => $course->id]);
+        $grid = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Grid for Error Test',
+            'idnumber' => 'GRID006',
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+        ]);
+        $grid->create();
+        $deleteparams = [
+            [
+                'gridid' => $grid->get('id'),
+                'type' => $grid->get('type'),
+                'criteria' => [
+                    [
+                        'criterionid' => 999999,
+                        'label' => 'Nonexistent Criterion',
+                        'idnumber' => 'CRIT999',
+                        'sortorder' => 1,
+                        'deleted' => true,
+                        'hasoptions' => false,
+                        'options' => [],
+                    ],
+                ],
+            ],
+        ];
+        $this->setAdminUser();
+        $result = $this->manage_criteria_update($deleteparams, $grid->get('type'));
+        $this->assertTrue($result['result']);
+        $this->assertNotEmpty($result['warnings']);
+
+        // Test with non-admin user.
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+        $result = $this->manage_criteria_update($deleteparams, $grid->get('type'));
+        $this->assertTrue($result['result']);
+        $this->assertNotEmpty($result['warnings']);
+    }
+
+    /**
+     * Helper for manage_criteria::update
+     *
+     * @param array $grids
+     * @param int $type
+     * @return array
+     */
+    protected function manage_criteria_update(array $grids, int $type) {
+        $validate = [manage_criteria::class, 'validate_parameters'];
+        $params = call_user_func(
+            $validate,
+            manage_criteria::update_parameters(),
+            ['grids' => $grids, 'type' => $type]
+        );
+        $params = array_values($params);
+        $returnvalue = manage_criteria::update(...$params);
+        return \external_api::clean_returnvalue(manage_criteria::update_returns(), $returnvalue);
+    }
+
+    /**
+     * Helper for manage_criteria::get
+     *
+     * @param int $type
+     * @param int $gridid
+     * @param int|null $situationid
+     * @return array
+     */
+    protected function manage_criteria_get(int $type, int $gridid, ?int $situationid = null) {
+        $validate = [manage_criteria::class, 'validate_parameters'];
+        $callparams = ['type' => $type, 'gridid' => $gridid];
+        if ($situationid !== null) {
+            $callparams['situationid'] = $situationid;
+        }
+        $params = call_user_func(
+            $validate,
+            manage_criteria::get_parameters(),
+            $callparams
+        );
+        $params = array_values($params);
+        $returnvalue = manage_criteria::get(...$params);
+        return \external_api::clean_returnvalue(manage_criteria::get_returns(), $returnvalue);
+    }
+}

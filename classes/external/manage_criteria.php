@@ -29,7 +29,6 @@ use external_multiple_structure;
 use external_warnings;
 use mod_competvet\local\api\criteria;
 use mod_competvet\local\persistent\grid;
-use mod_competvet\local\persistent\criterion;
 
 /**
  * Class manage_criteria
@@ -106,9 +105,7 @@ class manage_criteria extends external_api {
         $warnings = [];
         $results = [];
         $setgridmodified = false;
-
-        // Loop through the grids, if a grid has the haschanged flag set to true,
-        // update or insert the grid by calling the correct API.
+        // Update or insert the grid by calling the correct API.
         foreach ($grids as $grid) {
             if ($grid['deleted'] ?? false) {
                 criteria::delete_grid($grid['gridid']);
@@ -138,7 +135,14 @@ class manage_criteria extends external_api {
                     $setgridmodified = true;
                 }
                 if ($criterion['deleted'] ?? false) {
-                    criteria::delete_criterion($criterion['criterionid']);
+                    if (!criteria::delete_criterion($criterion['criterionid'])) {
+                        $warnings[] = [
+                            'item' => 'criterion',
+                            'itemid' => $criterion['criterionid'],
+                            'warningcode' => 'deletionfailed',
+                            'message' => 'Criterion could not be deleted',
+                        ];
+                    }
                     continue;
                 }
                 if ($criterion['updatesortorder'] ?? false) {
@@ -160,7 +164,15 @@ class manage_criteria extends external_api {
                     if ($criterion['hasoptions'] ?? false) {
                         foreach ($criterion['options'] as $option) {
                             if ($option['deleted'] ?? false) {
-                                criteria::delete_criterion($option['optionid']);
+                                if (!criteria::delete_criterion($option['optionid'])) {
+                                    $warnings[] = [
+                                        'item' => 'option',
+                                        'itemid' => $option['optionid'],
+                                        'warningcode' => 'deletionfailed',
+                                        'message' => 'Option could not be deleted',
+                                    ];
+                                }
+                                continue;
                             }
                             $grade = $option['grade'] ?? null;
                             criteria::update_criterion(
@@ -186,14 +198,6 @@ class manage_criteria extends external_api {
         } else {
             $result = false;
         }
-        $warnings = array_map(function ($warning) {
-            return [
-                'item' => $warning,
-                'warningcode' => 'exception',
-                'message' => 'An exception occurred',
-            ];
-        }, $warnings);
-
         return [
             'result' => $result,
             'warnings' => $warnings,
@@ -220,8 +224,8 @@ class manage_criteria extends external_api {
     public static function get_parameters(): external_function_parameters {
         return new external_function_parameters([
             'type' => new external_value(PARAM_INT, 'The type of criteria to manage', VALUE_REQUIRED),
-            'gridid' => new external_value(PARAM_INT, 'The grid id', VALUE_OPTIONAL),
-            'situationid' => new external_value(PARAM_INT, 'The situation id', VALUE_OPTIONAL),
+            'gridid' => new external_value(PARAM_INT, 'The grid id', VALUE_REQUIRED),
+            'situationid' => new external_value(PARAM_INT, 'The situation id', VALUE_DEFAULT, null),
         ]);
     }
 
@@ -230,10 +234,10 @@ class manage_criteria extends external_api {
      *
      * @param int $type - The type of criteria to manage
      * @param int $gridid - The grid id
-     * @param int $situationid - The situation id
+     * @param int|null $situationid - The situation id
      * @return array
      */
-    public static function get($type, $gridid, $situationid = null): array {
+    public static function get(int $type, int $gridid, ?int $situationid = null): array {
         $params = self::validate_parameters(self::get_parameters(), [
             'type' => $type,
             'gridid' => $gridid,
@@ -245,7 +249,7 @@ class manage_criteria extends external_api {
         $situationid = $params['situationid'];
 
         $queryparams = ['type' => $type];
-        if ($situationid || $situationid === 0) {
+        if (!empty($situationid)) {
             $queryparams['situationid'] = $situationid;
         }
         if ($gridid) {
@@ -262,6 +266,7 @@ class manage_criteria extends external_api {
                 'haschanged' => false,
                 'timemodified' => $grid->get('timemodified'),
                 'canedit' => $grid->canedit(),
+                'candelete' => $grid->can_delete(),
                 'criteria' => criteria::get_sorted_criteria($grid->get('id')),
             ];
             return $newgrid;
@@ -285,6 +290,7 @@ class manage_criteria extends external_api {
                     'type' => new external_value(PARAM_INT, 'The type of grid'),
                     'timemodified' => new external_value(PARAM_INT, 'The time modified'),
                     'canedit' => new external_value(PARAM_BOOL, 'Can the grid be edited'),
+                    'candelete' => new external_value(PARAM_BOOL, 'Can the grid be deleted'),
                     'sortorder' => new external_value(PARAM_INT, 'The sort order of the grid'),
                     'criteria' => new external_multiple_structure(
                         new external_single_structure([
@@ -293,6 +299,7 @@ class manage_criteria extends external_api {
                             'idnumber' => new external_value(PARAM_TEXT, 'The id number of the criterion'),
                             'sortorder' => new external_value(PARAM_INT, 'The sort order of the criterion'),
                             'hasoptions' => new external_value(PARAM_BOOL, 'Does the criterion have options'),
+                            'candelete' => new external_value(PARAM_BOOL, 'Can the criterion be deleted'),
                             'options' => new external_multiple_structure(
                                 new external_single_structure([
                                     'optionid' => new external_value(PARAM_INT, 'The option id'),
@@ -301,6 +308,7 @@ class manage_criteria extends external_api {
                                     'sortorder' => new external_value(PARAM_INT, 'The sort order of the option'),
                                     'hasgrade' => new external_value(PARAM_BOOL, 'Does the option have a grade'),
                                     'grade' => new external_value(PARAM_FLOAT, 'The grade of the option'),
+                                    'candelete' => new external_value(PARAM_BOOL, 'Can the criterion be deleted'),
                                 ])
                             ),
                         ])

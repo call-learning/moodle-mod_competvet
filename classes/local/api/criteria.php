@@ -80,16 +80,23 @@ class criteria {
     /**
      * Delete the grid
      * @param int $gridid - The grid id
+     * return bool - True if the grid was deleted, false otherwise
      */
-    public static function delete_grid(int $gridid): void {
+    public static function delete_grid(int $gridid): bool {
         $grid = grid::get_record(['id' => $gridid]);
+        if (!$grid || !$grid->can_delete()) {
+            return false;
+        }
         if ($grid) {
             $grid->delete();
         }
         $criteria = criterion::get_records(['gridid' => $gridid]);
         foreach ($criteria as $criterion) {
-            $criterion->delete();
+            if ($criterion->can_delete()) {
+                $criterion->delete();
+            }
         }
+        return true;
     }
 
     /**
@@ -144,6 +151,7 @@ class criteria {
                     'hasgrade' => true,
                     'parentid' => $option->get('parentid'),
                     'sortorder' => $option->get('sort'),
+                    'candelete' => $option->can_delete(),
                 ];
             }
             $criteria[] = [
@@ -153,6 +161,7 @@ class criteria {
                 'grade' => $criterion->get('grade'),
                 'parentid' => $criterion->get('parentid'),
                 'sortorder' => $criterion->get('sort'),
+                'candelete' => $criterion->can_delete(),
                 'hasoptions' => !empty($subcriteria),
                 'options' => $subcriteria,
             ];
@@ -176,6 +185,7 @@ class criteria {
                 'grade' => $criterion->get('grade'),
                 'parentid' => $criterion->get('parentid'),
                 'sortorder' => $criterion->get('sort'),
+                'candelete' => $criterion->can_delete(),
             ];
         }
         return $criteria;
@@ -223,16 +233,24 @@ class criteria {
     /**
      * Delete the criterion
      * @param int $criterionid - The criterion id
+     * @return bool True if deleted, false if not found or not deletable
      */
-    public static function delete_criterion(int $criterionid): void {
+    public static function delete_criterion(int $criterionid): bool {
         $criterion = criterion::get_record(['id' => $criterionid]);
-        if ($criterion) {
-            $criterion->delete();
+        if (!$criterion) {
+            return false;
         }
+        if (!$criterion->can_delete()) {
+            return false;
+        }
+        $criterion->delete();
         $options = criterion::get_records(['parentid' => $criterionid]);
         foreach ($options as $option) {
-            $option->delete();
+            if ($option->can_delete()) {
+                $option->delete();
+            }
         }
+        return true;
     }
 
     /**
@@ -243,6 +261,9 @@ class criteria {
         $sortorder = 1;
         foreach ($criteria as $criterionid) {
             $criterion = criterion::get_record(['id' => $criterionid]);
+            if (!$criterion) {
+                continue;
+            }
             $criterion->set('sort', $sortorder);
             $criterion->update();
             $sortorder++;
