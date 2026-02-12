@@ -274,6 +274,9 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
         $casefieldmap->annotate_ids('situation', 'situationid');
         $grid->annotate_ids('user', 'usermodified');
         $grid->annotate_ids('situation', 'situationid');
+        $situation->annotate_ids('grid', 'evalgrid');
+        $situation->annotate_ids('grid', 'certifgrid');
+        $situation->annotate_ids('grid', 'listgrid');
 
         // Define file annotations.
         $competvet->annotate_files('mod_competvet', 'intro', null);

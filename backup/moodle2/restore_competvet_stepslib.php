@@ -121,6 +121,11 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         // Get the parent module id.
         $data->competvetid = $this->get_new_parentid('competvet');
 
+        // Map grid references.
+        $data->evalgrid = $this->get_mappingid('grid', $data->evalgrid);
+        $data->certifgrid = $this->get_mappingid('grid', $data->certifgrid);
+        $data->listgrid = $this->get_mappingid('grid', $data->listgrid);
+
         while ($DB->record_exists('competvet_situation', ['shortname' => $data->shortname])) {
             $data->shortname = $data->shortname . '-restored';
         }
@@ -249,7 +254,6 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $oldid = $data->id;
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         $data->competvet = $this->get_new_parentid('competvet');
-        $data->userid = $this->get_mappingid('user', $data->userid);
         $data->studentid = $this->get_mappingid('user', $data->studentid);
         $data->planningid = $this->get_mappingid('planning', $data->planningid);
         // Insert the grade record.
@@ -401,6 +405,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $data = (object) $data;
         $oldid = $data->id;
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
+        $data->categoryid = $this->get_mappingid('casecat', $data->categoryid);
         if (!$DB->record_exists('competvet_case_field', ['idnumber' => $data->idnumber])) {
             // Insert the field record.
             $casefieldid = $DB->insert_record('competvet_case_field', $data);
@@ -478,6 +483,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $oldid = $data->id;
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         $data->situationid = $this->get_mappingid('situation', $data->situationid);
+        $data->fieldid = $this->get_mappingid('casefield', $data->fieldid);
 
         // Insert the case field map record.
         $DB->insert_record('competvet_case_fields', $data);
