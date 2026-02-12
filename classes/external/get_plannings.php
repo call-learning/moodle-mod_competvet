@@ -80,6 +80,8 @@ class get_plannings extends external_api {
                     'selected' => $group['id'] === $planning['groupid'],
                 ];
             }, $groups);
+            // Make sure that the format of the date is compatible with the HTML input type datetime-local
+            // and that it is displayed in the user's timezone.
             $plannings[$key]['startdate'] = userdate($planning['startdate'], '%Y-%m-%dT%H:%M', $timezone, false);
             $plannings[$key]['enddate'] = userdate($planning['enddate'], '%Y-%m-%dT%H:%M', $timezone, false);
             $plannings[$key]['startdatets'] = $planning['startdate'];
