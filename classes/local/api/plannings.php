@@ -16,6 +16,7 @@
 
 namespace mod_competvet\local\api;
 
+use core_date;
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\case_entry;
 use mod_competvet\local\persistent\cert_decl;
@@ -506,13 +507,16 @@ class plannings {
     public static function get_planning_pauses(int $planningid): array {
         $pauses = planning_pause::get_records(['planningid' => $planningid]);
         $pauseinfo = [];
+        $timezone = core_date::get_user_timezone_object();
         foreach ($pauses as $pause) {
             $pauseinfo[] = [
                 'id' => $pause->get('id'),
                 'planningid' => $pause->get('planningid'),
-                'startdate' => userdate($pause->get('startdate'), '%Y-%m-%dT%H:%M'),
+                // Make sure that the format of the date is compatible with the HTML input type datetime-local
+                // and that it is displayed in the user's timezone.
+                'startdate' => userdate($pause->get('startdate'), '%Y-%m-%dT%H:%M', $timezone, false),
                 'startdatets' => $pause->get('startdate'),
-                'enddate' => userdate($pause->get('enddate'), '%Y-%m-%dT%H:%M'),
+                'enddate' => userdate($pause->get('enddate'), '%Y-%m-%dT%H:%M', $timezone, false),
                 'enddatets' => $pause->get('enddate'),
                 'usermodified' => $pause->get('usermodified'),
                 'timecreated' => $pause->get('timecreated'),

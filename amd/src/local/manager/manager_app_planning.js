@@ -122,6 +122,7 @@ class Manager {
      * @param {object} btn The button that was clicked.
      */
     add(btn) {
+        const pendingAddReady = new Pending(`moc_competvet/planning:add`);
         let state = CompetState.getData();
         if (btn.dataset.type === 'planning') {
             state.plannings.push({
@@ -148,6 +149,7 @@ class Manager {
             });
         }
         CompetState.setData(state);
+        pendingAddReady.resolve();
     }
 
     /**
@@ -238,6 +240,7 @@ class Manager {
      * @param {object} btn The button that was clicked.
      */
     edit(btn) {
+        const pendingEditReady = new Pending(`moc_competvet/planning:edit`);
         let state = CompetState.getData();
         // Remove edit from all fields.
         state.plannings.forEach((element) => {
@@ -257,6 +260,7 @@ class Manager {
             }
         }
         CompetState.setData(state);
+        pendingEditReady.resolve();
     }
 
     /**

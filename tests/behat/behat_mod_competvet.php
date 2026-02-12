@@ -288,7 +288,7 @@ class behat_mod_competvet extends behat_base {
      *
      * @Given /^I update date "(?P<field>[^"]*)" to "(?P<value>[^"]*)" in row number "(?P<row_number>\d+)"$/
      * @param string $field The data-field attribute of the input
-     * @param string $value The value to set in the input, in "YYYY-MM-DDThh:mm" format
+     * @param string $value The value to set in the input, in "YYYY-MM-DDThh:mm" format but it can also be last week or next week.
      * @param int $rownumber The 1-based index of the row in the planning table
      * @throws Exception
      */
@@ -315,7 +315,8 @@ class behat_mod_competvet extends behat_base {
         if (!$input) {
             throw new Exception('Input field for "' . $field . '" not found in row number "' . $rownumber . '"');
         }
-
+        $time = strtotime($value);
+        $timevalue = date('Y-m-d\TH:i', $time);
         // Ensure that the input is a datetime-local field.
         if ($input->getAttribute('type') === 'datetime-local') {
             // Clear any existing value.
@@ -323,7 +324,7 @@ class behat_mod_competvet extends behat_base {
 
             // Use JavaScript to set the datetime value directly, bypassing potential locale issues.
             $script = "document.querySelectorAll('div[data-region=\"planning\"] .plannings > .row')" .
-            "[$rowindex].querySelector('input[data-field=\"$field\"]').value = '$value';";
+            "[$rowindex].querySelector('input[data-field=\"$field\"]').value = '$timevalue';";
             $this->getSession()->executeScript($script);
         } else {
             throw new Exception('Field "' . $field . '" in row number "' . $rownumber . '" is not a datetime-local input');
