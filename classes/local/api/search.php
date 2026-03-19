@@ -87,8 +87,9 @@ class search {
             if (isset($items[$situation['id']])) {
                 continue;
             }
-            // Check if search text is in situation shortname.
-            if (strpos(strtolower($situation['shortname']), $searchtext) !== false) {
+            // Match both the situation shortname and display name.
+            if (strpos(strtolower($situation['shortname']), $searchtext) !== false ||
+                strpos(strtolower($situation['name']), $searchtext) !== false) {
                 $items[$situation['id']] = [
                     'id' => $situation['id'],
                     'type' => self::TYPE_SITUATION,
