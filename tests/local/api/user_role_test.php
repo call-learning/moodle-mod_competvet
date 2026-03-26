@@ -16,6 +16,8 @@
 
 namespace mod_competvet\local\api;
 use advanced_testcase;
+use context_course;
+use context_module;
 use core_user;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\tests\test_data_definition;
@@ -219,5 +221,31 @@ final class user_role_test extends advanced_testcase {
             }
         }
         $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test that inherited course roles do not affect activity role classification.
+     *
+     * @return void
+     * @covers \mod_competvet\local\persistent\situation::get_all_roles
+     * @covers \mod_competvet\local\api\user_role::get_top
+     */
+    public function test_get_top_ignores_parent_context_roles(): void {
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(['fullname' => 'Role Scope Course', 'shortname' => 'RSC']);
+        $instance = $generator->create_module('competvet', ['course' => $course->id, 'name' => 'Scoped Competvet']);
+        $modinfo = \course_modinfo::instance($course->id);
+        $cm = $modinfo->get_cm($instance->cmid);
+        $modulecontext = context_module::instance($cm->id);
+
+        $user = $generator->create_user(['username' => 'scopedobserver']);
+        $roles = array_column(get_all_roles(context_course::instance($course->id)), 'id', 'shortname');
+        role_assign($roles['student'], $user->id, context_course::instance($course->id)->id);
+        role_assign($roles['observer'], $user->id, $modulecontext->id);
+
+        $situation = situation::get_record(['competvetid' => $instance->id], MUST_EXIST);
+
+        $this->assertSame(['observer'], user_role::get_all($user->id, $situation->get('id')));
+        $this->assertSame('observer', user_role::get_top($user->id, $situation->get('id')));
     }
 }

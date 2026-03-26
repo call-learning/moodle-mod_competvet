@@ -88,8 +88,10 @@ class search {
                 continue;
             }
             // Match both the situation shortname and display name.
-            if (strpos(strtolower($situation['shortname']), $searchtext) !== false ||
-                strpos(strtolower($situation['name']), $searchtext) !== false) {
+            if (
+                strpos(strtolower($situation['shortname']), $searchtext) !== false ||
+                strpos(strtolower($situation['name']), $searchtext) !== false
+            ) {
                 $items[$situation['id']] = [
                     'id' => $situation['id'],
                     'type' => self::TYPE_SITUATION,

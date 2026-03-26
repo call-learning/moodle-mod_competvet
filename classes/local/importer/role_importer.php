@@ -16,6 +16,7 @@
 
 namespace mod_competvet\local\importer;
 
+use mod_competvet\competvet;
 use moodle_exception;
 use context_module;
 
@@ -69,6 +70,8 @@ class role_importer {
         // Get all role shortnames for this context.
         $roles = $DB->get_records('role', null, '', 'id,shortname');
         $roleshortname2id = array_column($roles, 'id', 'shortname');
+        $managedroles = array_keys(competvet::COMPETVET_ROLES + ['student' => null, 'teacher' => null, 'editingteacher' => null]);
+        $managedroleids = array_intersect_key($roleshortname2id, array_flip($managedroles));
 
         foreach ($csvreader as $row) {
             $username = $row[0];
@@ -76,6 +79,10 @@ class role_importer {
             if (!$user) {
                 // Optionally log or skip unknown users.
                 continue;
+            }
+            // Keep the module context aligned with the CSV row to avoid stale duplicate roles.
+            foreach ($managedroleids as $managedroleid) {
+                role_unassign($managedroleid, $user->id, $context->id, '');
             }
             // Assign each role in the columns to the user.
             for ($i = 1; $i < count($columns); $i++) {

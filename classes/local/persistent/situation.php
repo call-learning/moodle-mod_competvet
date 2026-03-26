@@ -114,17 +114,11 @@ class situation extends persistent {
             return $allrolescache->get($cachekey);
         }
         $competvet = competvet::get_from_instance_id($this->raw_get('competvetid'));
-        $roles = get_user_roles($competvet->get_context(), $userid);
-        $rolessn = array_map(function ($role) {
-            return $role->shortname;
-        }, $roles);
-        $rolefullname = array_map(function ($role) {
-            return $role->name;
-        }, $roles);
-        $roles = array_combine($rolessn, $rolefullname);
-        // Remove roles which are not in the competvet roles.
-        $possibleroles = competvet::COMPETVET_ROLES + ['student' => null];
-        $roles = array_intersect_key($roles, $possibleroles);
+        // Direct activity assignments should win over inherited course/category/system roles.
+        $roles = $this->get_filtered_roles($competvet, $userid, false);
+        if (empty($roles)) {
+            $roles = $this->get_filtered_roles($competvet, $userid, true);
+        }
         $roles = array_unique($roles);
         if (empty($roles)) {
             $roles = [self::UNKNOWN_ROLE_TYPE => null];
@@ -132,6 +126,27 @@ class situation extends persistent {
         $returnedroles = array_keys($roles);
         $allrolescache->set($cachekey, $returnedroles);
         return $returnedroles;
+    }
+
+    /**
+     * Get roles relevant for CompetVet in the requested context scope.
+     *
+     * @param competvet $competvet
+     * @param int $userid
+     * @param bool $checkparentcontexts
+     * @return array
+     */
+    private function get_filtered_roles(competvet $competvet, int $userid, bool $checkparentcontexts): array {
+        $roles = get_user_roles($competvet->get_context(), $userid, $checkparentcontexts);
+        $rolessn = array_map(function ($role) {
+            return $role->shortname;
+        }, $roles);
+        $rolefullname = array_map(function ($role) {
+            return $role->name;
+        }, $roles);
+        $roles = array_combine($rolessn, $rolefullname);
+        $possibleroles = competvet::COMPETVET_ROLES + ['student' => null];
+        return array_intersect_key($roles, $possibleroles);
     }
 
     /**

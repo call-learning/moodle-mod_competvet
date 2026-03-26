@@ -105,8 +105,8 @@ final class role_importer_test extends advanced_testcase {
                         'o2' => 'student',
                  ],
                 'expectedroles' => [
-                    'student' => ['s1', 's2', 't1', 'o1', 'o2'],
-                    'teacher' => ['t2'],
+                    'student' => [],
+                    'teacher' => [],
                     'editingteacher' => [],
                     'observer' => ['s1', 's2', 'o1', 'o2', 't1'],
                     'evaluator' => ['s1', 't2'],
@@ -124,8 +124,8 @@ final class role_importer_test extends advanced_testcase {
                     'o2' => 'observer',
                 ],
                 'expectedroles' => [
-                    'student' => ['s1', 's2'],
-                    'teacher' => ['t1', 't2'],
+                    'student' => [],
+                    'teacher' => [],
                     'editingteacher' => ['et1'],
                     'observer' => ['s1', 's2', 'o1', 'o2', 't1'],
                     'evaluator' => ['s1', 't2'],
