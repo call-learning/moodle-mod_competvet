@@ -52,21 +52,21 @@
             <span class="drag-handle">{{#pix}}i/move_2d, core, {{#str}}move{{/str}}{{/pix}}</span>
             {{/canedit}}
         </div>
-        <div class="span9 col-9 tcell font-weight-bold{{#edit}} editable{{/edit}}">
+        <div class="span9 col-9 tcell fw-bold{{#edit}} editable{{/edit}}">
             {{#edit}}<input type="text" class="form-control" value="{{{label}}}" placeholder="{{{placeholder}}}" data-field="label">{{/edit}}{{^edit}}{{{label}}}{{/edit}}
         </div>
         <div class="span2 col-2 tcell">
             {{^edit}}
-            <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-grid-id="{{gridid}}" data-id="{{criterionid}}" data-action="edit" data-type="criterion">{{#pix}}i/edit, core, {{#str}}edit{{/str}}{{/pix}}</button>
+            <button class="btn btn-icon icon-no-margin me-1 jsbutton" data-grid-id="{{gridid}}" data-id="{{criterionid}}" data-action="edit" data-type="criterion">{{#pix}}i/edit, core, {{#str}}edit{{/str}}{{/pix}}</button>
             {{/edit}}
             {{#edit}}
-            <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-grid-id="{{gridid}}" data-id="{{criterionid}}" data-action="save" data-type="criterion">
+            <button class="btn btn-icon icon-no-margin me-1 jsbutton" data-grid-id="{{gridid}}" data-id="{{criterionid}}" data-action="save" data-type="criterion">
                 <span class="defaulticon">{{#pix}}e/save, core, {{#str}}save{{/str}}{{/pix}}</span>
                 <span class="savingicon">{{#pix}}i/loading, core, {{#str}}saving, mod_competvet{{/str}}{{/pix}}</span>
             </button>
             {{/edit}}
             {{#candelete}}
-            <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-grid-id="{{gridid}}" data-id="{{criterionid}}" data-action="delete" data-type="criterion">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
+            <button class="btn btn-icon icon-no-margin ms-1 jsbutton" data-grid-id="{{gridid}}" data-id="{{criterionid}}" data-action="delete" data-type="criterion">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
             {{/candelete}}
         </div>
     </div>
@@ -91,7 +91,7 @@
                     <div class="span2 col-2 tcell">
                         {{#canedit}}
                             {{#edit}}
-                            <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-grid-id="{{gridid}}" data-criterion-id="{{criterionid}}" data-id="{{optionid}}" data-action="delete" data-type="option">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
+                            <button class="btn btn-icon icon-no-margin me-1 jsbutton" data-grid-id="{{gridid}}" data-criterion-id="{{criterionid}}" data-id="{{optionid}}" data-action="delete" data-type="option">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
                             {{/edit}}
                         {{/canedit}}
                     </div>

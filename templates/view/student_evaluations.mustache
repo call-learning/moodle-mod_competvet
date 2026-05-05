@@ -32,13 +32,13 @@
         {{/isstudent}}
     </div>
     <div class="evaltable">
-        <div class="row no-gutters flex-nowrap">
+        <div class="row g-0 flex-nowrap">
             <div class="px-2 py-1 col-6 criterionlabel cellborder">
             </div>
             {{#userevals.0}}
                 {{#grades}}
-                    <div class="px-2 py-1 cellborder col-2 evaluator font-weight-bold text-center d-flex align-items-center">
-                        <div class="text-truncate mr-2" data-toggle="tooltip" title="{{graderinfo.fullname}} {{#timemodified}}{{#userdate}}{{timemodified}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}}{{/userdate}}{{/timemodified}}">
+                    <div class="px-2 py-1 cellborder col-2 evaluator fw-bold text-center d-flex align-items-center">
+                        <div class="text-truncate me-2" data-bs-toggle="tooltip" title="{{graderinfo.fullname}} {{#timemodified}}{{#userdate}}{{timemodified}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}}{{/userdate}}{{/timemodified}}">
                             {{graderinfo.fullname}}
                         </div>
                         <a href="{{{viewurl}}}" class="btn btn-icon icon-no-margin d-flex align-items-center justify-content-center">
@@ -49,14 +49,14 @@
             {{/userevals.0}}
         </div>
         {{#userevals}}
-            <div class="row no-gutters flex-nowrap">
-                <div class="p-2 cellborder col-6 criterionlabel font-weight-bold">
+            <div class="row g-0 flex-nowrap">
+                <div class="p-2 cellborder col-6 criterionlabel fw-bold">
                     {{criterion.label}}
                 </div>
                 {{#grades}}
                     <div class="p-2 cellborder col-2 grade text-center">
                         {{level}}
-                        <div class="sr-only">
+                        <div class="visually-hidden">
                             {{graderinfo.fullname}}
                         </div>
                     </div>

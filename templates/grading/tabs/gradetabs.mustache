@@ -26,8 +26,8 @@
 <div class="nav-container">
     <ul class="nav nav-tabs nav-fill mt-4" id="myTab" role="tablist">
         {{#haseval}}
-        <li class="nav-item ml-3" role="presentation">
-            <button class="nav-link certifheading w-100 active" id="eval-tab" data-toggle="tab" data-target="#evaluate" type="button" role="tab" aria-controls="evaluate" aria-selected="true">
+        <li class="nav-item ms-3" role="presentation">
+            <button class="nav-link certifheading w-100 active" id="eval-tab" data-bs-toggle="tab" data-bs-target="#evaluate" type="button" role="tab" aria-controls="evaluate" aria-selected="true">
                 {{> mod_competvet/grading/svg/chat}}
                 {{#str}}evaluate, mod_competvet{{/str}}
             <div class="grade-tab-indicator {{^cangrade}}d-none{{/cangrade}}" data-region="grade-tab-eval"></div>
@@ -37,7 +37,7 @@
         {{/haseval}}
         {{#hascertif}}
         <li class="nav-item" role="presentation">
-            <button class="nav-link certifheading w-100 {{^haseval}}active{{/haseval}}" id="certify-tab" data-toggle="tab" data-target="#certify" type="button" role="tab" aria-controls="certify" aria-selected="false">
+            <button class="nav-link certifheading w-100 {{^haseval}}active{{/haseval}}" id="certify-tab" data-bs-toggle="tab" data-bs-target="#certify" type="button" role="tab" aria-controls="certify" aria-selected="false">
                 {{> mod_competvet/grading/svg/certif}}
                 {{#str}}certify, mod_competvet{{/str}}
                 <div class="grade-tab-indicator {{^cangrade}}d-none{{/cangrade}}" data-region="grade-tab-certif"></div>
@@ -46,8 +46,8 @@
         </li>
         {{/hascertif}}
         {{#hascase}}
-        <li class="nav-item mr-3" role="presentation">
-            <button class="nav-link certifheading w-100 {{^haseval}}{{^hascertif}}active{{/hascertif}}{{/haseval}}" id="list-tab" data-toggle="tab" data-target="#list" type="button" role="tab" aria-controls="list" aria-selected="false">
+        <li class="nav-item me-3" role="presentation">
+            <button class="nav-link certifheading w-100 {{^haseval}}{{^hascertif}}active{{/hascertif}}{{/haseval}}" id="list-tab" data-bs-toggle="tab" data-bs-target="#list" type="button" role="tab" aria-controls="list" aria-selected="false">
                 {{> mod_competvet/grading/svg/list}}
                 {{#str}}list, mod_competvet{{/str}}
                 <div class="grade-tab-indicator {{^cangrade}}d-none{{/cangrade}}" data-region="grade-tab-list"></div>

@@ -45,17 +45,17 @@
                 <span>{{fullname}}</span>
             {{/viewurl}}
             {{#rolename}}
-                <span class="badge badge-secondary">{{.}}</span>
+                <span class="badge text-bg-secondary">{{.}}</span>
             {{/rolename}}
         </div>
-        <div class="d-none asked icon-no-margin ml-3">
+        <div class="d-none asked icon-no-margin ms-3">
             {{#pix}}i/grade_correct, core{{/pix}}
             {{#str}}observation:asked, mod_competvet{{/str}}
         </div>
     </div>
     <div>
         {{#stats}}
-            <span><span class="badge badge-primary badge-pill">{{nbdone}}/{{nbrequired}}</span></span> <span class="small">{{label}}</span>
+            <span><span class="badge text-bg-primary rounded-pill">{{nbdone}}/{{nbrequired}}</span></span> <span class="small">{{label}}</span>
         {{/stats}}
     </div>
 </div>

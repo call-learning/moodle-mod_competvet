@@ -81,17 +81,17 @@
                         {{/declid}}
                         <strong>{{label}}</strong>
                     </div>
-                    <div class="collapse pl-5 ml-2 show" id="collapse{{declid}}">
+                    <div class="collapse ps-5 ms-2 show" id="collapse{{declid}}">
                         <div>
                             {{#feedback}}
                                 {{< mod_competvet/comment}}
                                     {{$info}}
                                         <div class="d-flex justify-content-between">
-                                            <div class="small d-flex font-weight-bold">
+                                            <div class="small d-flex fw-bold">
                                                 {{#seendone}}{{#str}}seendone, mod_competvet{{/str}}{{/seendone}}
                                                 {{#notseen}}{{#str}}notseen, mod_competvet{{/str}}{{/notseen}}
                                                 {{#isstudent}}
-                                                    <a href="#" class="ml-2" data-action="cert-decl-student" data-id="{{criterionid}}" data-decl-id="{{declid}}">
+                                                    <a href="#" class="ms-2" data-action="cert-decl-student" data-id="{{criterionid}}" data-decl-id="{{declid}}">
                                                         {{#str}}edit, competvet{{/str}}
                                                     </a>
                                                 {{/isstudent}}
@@ -112,7 +112,7 @@
                                     {{< mod_competvet/comment}}
                                         {{$info}}
                                             <div class="d-flex justify-content-between">
-                                                <div class="small d-flex font-weight-bold">
+                                                <div class="small d-flex fw-bold">
                                                     {{#confirmed}}{{#str}}confirmed, mod_competvet{{/str}}{{/confirmed}}
                                                     {{#observernotseen}}{{#str}}notseen, mod_competvet{{/str}}{{/observernotseen}}
                                                     {{#levelnotreached}}{{#str}}notreached, mod_competvet{{/str}}{{/levelnotreached}}
@@ -143,30 +143,30 @@
                     </div>
                 </div>
                 <div class="col2 d-flex justify-content-center">
-                    {{#total}}<span class="font-weight-bold">{{level}}</span><span class="mx-2">/</span><span>{{total}}</span>{{/total}}
+                    {{#total}}<span class="fw-bold">{{level}}</span><span class="mx-2">/</span><span>{{total}}</span>{{/total}}
                 </div>
                 <div class="col3">
                     {{#seendone}}
                         <i class="fa fa-check text-success" aria-hidden="true"></i>
-                        <span class="sr-only">{{#str}}seendone, competvet{{/str}}</span>
+                        <span class="visually-hidden">{{#str}}seendone, competvet{{/str}}</span>
                     {{/seendone}}
                     {{#notseen}}
                         <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                        <span class="sr-only">{{#str}}notseen, competvet{{/str}}</span>
+                        <span class="visually-hidden">{{#str}}notseen, competvet{{/str}}</span>
                     {{/notseen}}
                 </div>
                 <div class="col4">
                     {{#confirmed}}
                         <i class="fa fa-check text-success" aria-hidden="true"></i>
-                        <span class="sr-only">{{#str}}valid:confirmed, competvet{{/str}}</span>
+                        <span class="visually-hidden">{{#str}}valid:confirmed, competvet{{/str}}</span>
                     {{/confirmed}}
                     {{#observernotseen}}
                         <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i>
-                        <span class="sr-only">{{#str}}valid:observernotseen, competvet{{/str}}</span>
+                        <span class="visually-hidden">{{#str}}valid:observernotseen, competvet{{/str}}</span>
                     {{/observernotseen}}
                     {{#levelnotreached}}
                         <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                        <span class="sr-only">{{#str}}valid:levelnotreached, competvet{{/str}}</span>
+                        <span class="visually-hidden">{{#str}}valid:levelnotreached, competvet{{/str}}</span>
                     {{/levelnotreached}}
                 </div>
             </div>

@@ -95,7 +95,7 @@
     <div class="row">
         <div class="col-12 d-flex justify-content-center">
             {{#hasanyobservations}}
-                <a class="btn btn-link mb-3" data-toggle="collapse" href="#evaluations-table" role="button" aria-expanded="false" aria-controls="evaluations-table">
+                <a class="btn btn-link mb-3" data-bs-toggle="collapse" href="#evaluations-table" role="button" aria-expanded="false" aria-controls="evaluations-table">
                     {{#str}} showastable, mod_competvet {{/str}}
                 </a>
             {{/hasanyobservations}}
@@ -104,17 +104,17 @@
     <div class="collapse" id="evaluations-table">
         {{#hasobserverevaluations}}
             <div class="evaltable mb-3">
-                <div class="row no-gutters flex-nowrap">
-                    <div class="p-2 col-6 criterionlabel cellborder font-weight-bold text-center d-flex align-items-center">{{#str}}tabletitle:evals, mod_competvet{{/str}}</div>
+                <div class="row g-0 flex-nowrap">
+                    <div class="p-2 col-6 criterionlabel cellborder fw-bold text-center d-flex align-items-center">{{#str}}tabletitle:evals, mod_competvet{{/str}}</div>
                     {{#observations.0}}
-                        <div class="p-2 cellborder col-2 evaluator font-weight-bold text-center d-flex align-items-center">
+                        <div class="p-2 cellborder col-2 evaluator fw-bold text-center d-flex align-items-center">
                             <div class="averagecolumn">
                                 {{#str}}average, mod_competvet{{/str}}
                             </div>
                         </div>
                         {{#grades}}
-                            <div class="p-2 cellborder col-2 evaluator font-weight-bold text-center d-flex align-items-center">
-                                <div class="text-truncate" data-toggle="tooltip"
+                            <div class="p-2 cellborder col-2 evaluator fw-bold text-center d-flex align-items-center">
+                                <div class="text-truncate" data-bs-toggle="tooltip"
                                      title="{{graderinfo.fullname}}  {{#timemodified}}{{#userdate}}{{timemodified}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}}{{/userdate}}{{/timemodified}}">
                                     {{graderinfo.fullname}}
                                 </div>
@@ -123,8 +123,8 @@
                     {{/observations.0}}
                 </div>
                 {{#observations}}
-                    <div class="row no-gutters flex-nowrap">
-                        <div class="p-2 cellborder col-6 criterionlabel font-weight-bold">
+                    <div class="row g-0 flex-nowrap">
+                        <div class="p-2 cellborder col-6 criterionlabel fw-bold">
                             {{criterion.label}}
                         </div>
                         <div class="p-2 cellborder col-2 grade text-center" data-region="averagerow">
@@ -135,7 +135,7 @@
                             {{^nograde}}
                                 <div class="p-2 cellborder col-2 grade text-center">
                                     {{level}}
-                                    <div class="sr-only">
+                                    <div class="visually-hidden">
                                         {{graderinfo.fullname}}
                                     </div>
                                 </div>
@@ -148,7 +148,7 @@
                         {{/grades}}
                     </div>
                 {{/observations}}
-                <div class="row no-gutters flex-nowrap">
+                <div class="row g-0 flex-nowrap">
                     <div class="p-2 cellborder col-6 averages">
                         {{#str}}average, mod_competvet{{/str}}
                     </div>
@@ -167,13 +167,13 @@
         {{/hasobserverevaluations}}
         {{#hasautoevaluations}}
             <div class="evaltable mb-3">
-                <div class="row no-gutters flex-nowrap">
-                    <div class="p-2 col-6 criterionlabel cellborder font-weight-bold text-center d-flex align-items-center">{{#str}}
+                <div class="row g-0 flex-nowrap">
+                    <div class="p-2 col-6 criterionlabel cellborder fw-bold text-center d-flex align-items-center">{{#str}}
                         tabletitle:autoevalstudent, mod_competvet{{/str}}</div>
                     {{#autoevals.0}}
                         {{#grades}}
-                            <div class="p-2 cellborder col-2 evaluator font-weight-bold text-center d-flex align-items-center">
-                                <div class="text-truncate" data-toggle="tooltip"
+                            <div class="p-2 cellborder col-2 evaluator fw-bold text-center d-flex align-items-center">
+                                <div class="text-truncate" data-bs-toggle="tooltip"
                                      title="{{graderinfo.fullname}}  {{#timemodified}}{{#userdate}}{{timemodified}}, {{#str}} strftimedatefullshort, core_langconfig {{/str}}{{/userdate}}{{/timemodified}}">
                                     {{graderinfo.fullname}}
                                 </div>
@@ -182,15 +182,15 @@
                     {{/autoevals.0}}
                 </div>
                 {{#autoevals}}
-                    <div class="row no-gutters flex-nowrap">
-                        <div class="p-2 cellborder col-6 criterionlabel font-weight-bold">
+                    <div class="row g-0 flex-nowrap">
+                        <div class="p-2 cellborder col-6 criterionlabel fw-bold">
                             {{criterion.label}}
                         </div>
                         {{#grades}}
                             {{^nograde}}
                                 <div class="p-2 cellborder col-2 grade text-center">
                                     {{level}}
-                                    <div class="sr-only">
+                                    <div class="visually-hidden">
                                         {{graderinfo.fullname}}
                                     </div>
                                 </div>
@@ -215,7 +215,7 @@
                         {{$classes}}{{#private}}text-muted{{/private}}{{/classes}}
                         {{$info}}
                             <div class="d-flex justify-content-between">
-                                <div class="small d-flex font-weight-bold">
+                                <div class="small d-flex fw-bold">
                                     {{categorytext}}
                                 </div>
                                 {{#timecreated}}
@@ -236,7 +236,7 @@
                     {{< mod_competvet/comments}}
                         {{$info}}
                             <div class="d-flex justify-content-between">
-                                <div class="small d-flex font-weight-bold">
+                                <div class="small d-flex fw-bold">
                                     {{categorytext}}
                                 </div>
                                 {{#timecreated}}

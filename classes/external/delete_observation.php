@@ -15,15 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\external;
-// This is for 4.4 compatibility.
-defined('MOODLE_INTERNAL') || die;
-global $CFG;
-require_once("$CFG->libdir/externallib.php");
 
-use external_api;
-use external_description;
-use external_function_parameters;
-use external_value;
+use core_external\external_api;
+use core_external\external_description;
+use core_external\external_function_parameters;
+use core_external\external_value;
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\case_entry;
 use mod_competvet\local\persistent\observation;

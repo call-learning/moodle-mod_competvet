@@ -35,7 +35,7 @@ use lang_string;
  */
 class grid extends base {
     /**
-     * Database tables that this entity uses and their default aliases
+     * Database tables that this entity uses
      *
      * @return array
      */

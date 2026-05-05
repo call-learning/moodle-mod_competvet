@@ -29,13 +29,13 @@
     <div class="user-grade {{#validated}}was-validated{{/validated}}">
         <div class="h4 text-center border-bottom pb-2">{{#str}}evaluation, mod_competvet{{/str}}</div>
         <div class="d-flex">
-            <div class="form-group {{^cangrade}}d-none{{/cangrade}}">
+            <div class="grade-group {{^cangrade}}d-none{{/cangrade}}">
                 <label >
                     {{#str}}suggestedgrade, mod_competvet{{/str}} : / 100
                 </label>
                 <div class="d-flex align-items-center w-100">
-                    <div id="suggestedgrade" class="font-weight-bold">{{suggestedgrade}}</div>
-                    <button type="button" class="btn btn-icon border-info icon-no-margin ml-5" data-toggle="popover" data-placement="bottom" data-html="true" data-content="{{{gradecalculation}}}">
+                    <div id="suggestedgrade" class="fw-bold">{{suggestedgrade}}</div>
+                    <button type="button" class="btn btn-icon border-info icon-no-margin ms-5" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-html="true" data-bs-content="{{{gradecalculation}}}">
                         {{#pix}}i/info{{/pix}}
                     </button>
                 </div>
@@ -49,7 +49,7 @@
                     {{#str}}acceptgrade, mod_competvet{{/str}}
                 </a>
             </div>
-            <div class="form-group">
+            <div class="grade-group">
                 <label class="h5" for="moodlegrade">
                     {{#str}}finalgrade, mod_competvet{{/str}}{{#cangrade}} : / 100{{/cangrade}}
                 </label>
@@ -57,7 +57,7 @@
                     <input
                         id="moodlegrade"
                         type="number"
-                        class="form-control form-control-lg w-auto mr-3{{!
+                        class="form-control form-control-lg w-auto me-3{{!
                         }}{{#gradesuccess}} is-valid{{/gradesuccess}}{{!
                         }}{{#gradeerror}} is-invalid{{/gradeerror}} {{^cangrade}}d-none{{/cangrade}}"
                         name="finalgrade"
@@ -71,7 +71,7 @@
                     <div class="lettergrade" data-region="lettergrade">{{{lettergrade}}}</div>
                 </div>
             </div>
-            <div class="form-group">
+            <div class="grade-group">
                 <label>
                     {{#str}}comment, mod_competvet{{/str}} :
                 </label>
@@ -87,7 +87,7 @@
                     {{^cangrade}}disabled{{/cangrade}}
                     data-criterion-id="4">{{comment}}</textarea>
             </div>
-            <div class="form-group">
+            <div class="grade-group">
                 <label>&nbsp;</label>
                 <div>
                     <button type="submit" class="btn btn-primary {{^cangrade}}d-none{{/cangrade}}" data-action="save">

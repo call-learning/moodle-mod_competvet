@@ -103,7 +103,7 @@ class eval_observation_helper {
                     get_string('commentfor', 'mod_competvet', $subcriterion->label)
                 );
                 $mform->setType("criterion_comments[{$subcriterion->id}]", PARAM_TEXT);
-                $element->updateAttributes(['class' => $element->getAttribute('class') . ' ml-3']);
+                $element->updateAttributes(['class' => $element->getAttribute('class') . ' ms-3']);
                 $mform->addElement('hidden', "criterion_comments_id[{$subcriterion->id}]");
                 $mform->setType("criterion_comments_id[{$subcriterion->id}]", PARAM_INT);
             }

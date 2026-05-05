@@ -31,9 +31,9 @@
             <h4 class="criterion-title h6">{{name}}</h4>
             <div class="criterion-options">
                 {{#options}}
-                    <div class="custom-control custom-checkbox">
-                        <input type="radio" class="custom-control-input" id="option-{{optionid}}" name="criterion-{{id}}" value="{{value}}" {{#selected}}checked{{/selected}}>
-                        <label class="custom-control-label" for="option-{{optionid}}">{{name}} (<strong>{{#str}}points, mod_competvet, {{value}}{{/str}}</strong>)</label>
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" id="option-{{optionid}}" name="criterion-{{id}}" value="{{value}}" {{#selected}}checked{{/selected}}>
+                        <label class="form-check-label" for="option-{{optionid}}">{{name}} (<strong>{{#str}}points, mod_competvet, {{value}}{{/str}}</strong>)</label>
                     </div>
                 {{/options}}
             </div>

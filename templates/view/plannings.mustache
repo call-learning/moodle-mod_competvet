@@ -74,7 +74,7 @@
         <div class="d-flex align-items-center w-100 flex-column flex-lg-row">
             <div class="input-group mb-2 mb-lg-0 ">
                 <label for="studentsearch-{{uniqid}}">
-                    <span class="sr-only">{{#str}}search:student, mod_competvet{{/str}}</span>
+                    <span class="visually-hidden">{{#str}}search:student, mod_competvet{{/str}}</span>
                 </label>
                 <input type="text"
                        id="studentsearch-{{uniqid}}"
@@ -87,9 +87,9 @@
                        value="{{studentsearch}}"
                 >
             </div>
-            <div class="input-group mb-2 mb-lg-0 ml-lg-3">
+            <div class="input-group mb-2 mb-lg-0 ms-lg-3">
                 <label for="groupsearch-{{uniqid}}">
-                    <span class="sr-only">{{#str}}search:group, mod_competvet{{/str}}</span>
+                    <span class="visually-hidden">{{#str}}search:group, mod_competvet{{/str}}</span>
                 </label>
                 <input type="text"
                        id="groupsearch-{{uniqid}}"
@@ -102,25 +102,23 @@
                        value="{{groupsearch}}"
                 >
             </div>
-            <div class="input-group mb-2 mb-lg-0  ml-lg-3">
+            <div class="input-group mb-2 mb-lg-0  ms-lg-3">
                 <label for="startdate">
-                    <span class="sr-only">{{#str}}search:startdate, mod_competvet{{/str}}</span>
+                    <span class="visually-hidden">{{#str}}search:startdate, mod_competvet{{/str}}</span>
                 </label>
                 <input type="date" id="startdate" name="startdate" value="{{startdate}}" data-field="startdate" class="form-control {{#errorenddate}}error{{/errorenddate}}">
-                <div class="input-group-append">
-                    <button id="clearstartdate" class="btn btn-outline-secondary">
-                       <i class="icon fa fa-times"></i>
-                       <span class="sr-only">{{#str}}search:clearstartdate, mod_competvet{{/str}}</span>
-                    </button>
+                <button id="clearstartdate" class="btn btn-outline-secondary">
+                    <i class="icon fa fa-times"></i>
+                    <span class="visually-hidden">{{#str}}search:clearstartdate, mod_competvet{{/str}}</span>
+                </button>
+            </div>
+            <div class="input-group mb-2 mb-lg-0  ms-lg-3">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="searchungraded">
+                    <label class="form-check-label" for="searchungraded">{{#str}}search:ungraded, mod_competvet{{/str}}</label>
                 </div>
             </div>
-            <div class="input-group mb-2 mb-lg-0  ml-lg-3">
-                <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="searchungraded">
-                    <label class="custom-control-label" for="searchungraded">{{#str}}search:ungraded, mod_competvet{{/str}}</label>
-                </div>
-            </div>
-            <div class="ml-lg-auto mb-2 mb-lg-0 ">
+            <div class="ms-lg-auto mb-2 mb-lg-0 ">
                 <!-- Export CSV button: displayed when the onclick event is enabled -->
                 <button data-action="exportcsv" class="btn btn-primary text-nowrap d-none">
                     {{#str}}exportxls, mod_competvet{{/str}}
@@ -129,7 +127,7 @@
         </div>
     </div>
 </form>
-<table class="competvet-grade-table w-100">
+<table class="competvet-grade-table table-reboot w-100">
     <tr class="legend">
         <th class="label first"></th>
         <th class="label">{{#str}}stats, mod_competvet{{/str}}</th>
@@ -145,9 +143,9 @@
                             {{$id}}{{id}}{{/id}}
                         {{/ mod_competvet/expandcollapse}}
                         <div class="d-flex w-100 align-items-center">
-                            <div class="h3 mb-0 ml-2" data-region="groupname">{{groupname}}</div>
-                            <div class="ml-1 mb-2"><span class="badge badge-info">{{categorytext}}</span></div>
-                            <div class="ml-auto">{{startdate}} / {{enddate}}</div>
+                            <div class="h3 mb-0 ms-2" data-region="groupname">{{groupname}}</div>
+                            <div class="ms-1 mb-2"><span class="badge text-bg-info">{{categorytext}}</span></div>
+                            <div class="ms-auto">{{startdate}} / {{enddate}}</div>
                         </div>
                     </div>
                 </th>
@@ -165,7 +163,7 @@
                             {{#planninginfo}}
                                 {{#stats.eval}}
                                     <div class="evaluations p-l-1">
-                                    <span class="badge {{#pass}}badge-success{{/pass}}{{^pass}}badge-secondary{{/pass}} badge-pill" data-toggle="tooltip"
+                                    <span class="badge {{#pass}}text-bg-success{{/pass}}{{^pass}}text-bg-secondary{{/pass}} rounded-pill" data-bs-toggle="tooltip"
                                           title="{{#str}}planning:page:badge:eval, mod_competvet{{/str}}">
                                         {{nbdone}}/{{nbrequired}}
                                         {{> mod_competvet/grading/svg/chat}}
@@ -174,7 +172,7 @@
                                 {{/stats.eval}}
                                 {{#stats.autoeval}}
                                     <div class="autoevaluations p-l-1">
-                                        <span class="badge {{#pass}}badge-success{{/pass}}{{^pass}}badge-secondary{{/pass}} badge-pill" data-toggle="tooltip"
+                                        <span class="badge {{#pass}}text-bg-success{{/pass}}{{^pass}}text-bg-secondary{{/pass}} rounded-pill" data-bs-toggle="tooltip"
                                               title="{{#str}}planning:page:badge:autoeval, mod_competvet{{/str}}">
                                             {{nbdone}}/{{nbrequired}}
                                             {{> mod_competvet/grading/svg/chat}}
@@ -183,7 +181,7 @@
                                 {{/stats.autoeval}}
                                 {{#stats.cert}}
                                     <div class="certications p-l-1">
-                                        <span class="badge {{#pass}}badge-success{{/pass}}{{^pass}}badge-secondary{{/pass}} badge-pill" data-toggle="tooltip"
+                                        <span class="badge {{#pass}}text-bg-success{{/pass}}{{^pass}}text-bg-secondary{{/pass}} rounded-pill" data-bs-toggle="tooltip"
                                               title="{{#str}}planning:page:badge:cert, mod_competvet{{/str}}">
                                             {{nbdone}}/{{nbrequired}}
                                             {{> mod_competvet/grading/svg/certif}}
@@ -192,7 +190,7 @@
                                 {{/stats.cert}}
                                 {{#stats.list}}
                                     <div class="cases p-l-1">
-                                        <span class="badge {{#pass}}badge-success{{/pass}}{{^pass}}badge-secondary{{/pass}} badge-pill" data-toggle="tooltip"
+                                        <span class="badge {{#pass}}text-bg-success{{/pass}}{{^pass}}text-bg-secondary{{/pass}} rounded-pill" data-bs-toggle="tooltip"
                                               title="{{#str}}planning:page:badge:list, mod_competvet{{/str}}">
                                             {{nbdone}}/{{nbrequired}}
                                             {{> mod_competvet/grading/svg/list}}
@@ -200,14 +198,14 @@
                                     </div>
                                 {{/stats.list}}
                                 <div class="info-competvet p-l-1">
-                                <span class="badge badge-info icon-no-margin ml-4 badge-pill" data-toggle="tooltip" title="{{#str}}studentprogress, mod_competvet{{/str}}">
+                                <span class="badge text-bg-info icon-no-margin ms-4 rounded-pill" data-bs-toggle="tooltip" title="{{#str}}studentprogress, mod_competvet{{/str}}">
                                     <a class="text-white" href="{{{studenturl}}}">
                                         {{#pix}}i/info, core{{/pix}}
                                     </a>
                                 </span>
                                 </div>
                                 <div class="info-competvet p-l-1">
-                                <span class="badge badge-info icon-no-margin ml-4 badge-pill" data-toggle="tooltip" title="{{#str}}report:caselogentries, mod_competvet{{/str}}">
+                                <span class="badge text-bg-info icon-no-margin ms-4 rounded-pill" data-bs-toggle="tooltip" title="{{#str}}report:caselogentries, mod_competvet{{/str}}">
                                     <a class="text-white" href="{{{caselogreporturl}}}">
                                         {{#pix}}i/report, core{{/pix}}
                                     </a>
@@ -219,7 +217,7 @@
                     <td class="t-grade globalgrade">
                         {{#grade}}
                             <div class="d-flex align-items-center">
-                                <a class="btn btn-secondary btn-nowrap mr-2 btn-sm" href="{{{gradeurl}}}">
+                                <a class="btn btn-secondary btn-nowrap me-2 btn-sm" href="{{{gradeurl}}}">
                                 {{#isgrader}}{{#str}}changegrade, mod_competvet{{/str}}{{/isgrader}}{{^isgrader}}{{#str}}viewgrade, mod_competvet{{/str}}{{/isgrader}}
                                 </a>
                                 {{#isgrader}}<span class="circle" data-region="usergrade" data-rawgrade="{{grade}}">{{grade}} / 100</span>{{/isgrader}}
@@ -229,7 +227,7 @@
                         {{^grade}}
                             <div class="d-flex align-items-center">
                                 {{#isgrader}}
-                                    <a class="btn btn-primary btn-nowrap mr-2 btn-sm" href="{{{gradeurl}}}">
+                                    <a class="btn btn-primary btn-nowrap me-2 btn-sm" href="{{{gradeurl}}}">
                                         {{#isgrader}}{{#str}}gradestudent, mod_competvet{{/str}}{{/isgrader}}
                                     </a>
                                 {{/isgrader}}
@@ -243,13 +241,13 @@
                     <td class="t-grade comments">
                         {{#grader}}
                             {{#timegraded}}
-                                <div class="small text-muted float-right" data-region="timegraded">
+                                <div class="small text-muted float-end" data-region="timegraded">
                                     {{timegraded}}
                                 </div>
                             {{/timegraded}}
-                            <div class="media small align-items-end">
-                                <img class="userpicturesmall mr-1" src="{{userpictureurl}}">
-                                <div class="media-body" data-region="grader">
+                            <div class="d-flex small align-items-end">
+                                <img class="flex-shrink-0 userpicturesmall me-1" src="{{userpictureurl}}">
+                                <div class="flex-grow-1" data-region="grader">
                                     {{fullname}}
                                 </div>
                             </div>

@@ -346,7 +346,7 @@ final class manage_criteria_test extends \advanced_testcase {
         );
         $params = array_values($params);
         $returnvalue = manage_criteria::update(...$params);
-        return \external_api::clean_returnvalue(manage_criteria::update_returns(), $returnvalue);
+        return \core_external\external_api::clean_returnvalue(manage_criteria::update_returns(), $returnvalue);
     }
 
     /**
@@ -370,6 +370,6 @@ final class manage_criteria_test extends \advanced_testcase {
         );
         $params = array_values($params);
         $returnvalue = manage_criteria::get(...$params);
-        return \external_api::clean_returnvalue(manage_criteria::get_returns(), $returnvalue);
+        return \core_external\external_api::clean_returnvalue(manage_criteria::get_returns(), $returnvalue);
     }
 }

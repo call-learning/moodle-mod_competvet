@@ -15,14 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\external;
-// This is for 4.4 compatibility.
-defined('MOODLE_INTERNAL') || die;
-global $CFG;
-require_once("$CFG->libdir/externallib.php");
 
-use external_api;
-use external_function_parameters;
-use external_value;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_value;
 use mod_competvet\competvet;
 use mod_competvet\event\observation_requested;
 use mod_competvet\local\persistent\planning;
@@ -79,7 +75,6 @@ class ask_eval_observation extends external_api {
         $event->trigger();
         return ['success' => true];
     }
-
 
     /**
      * Returns description of method parameters

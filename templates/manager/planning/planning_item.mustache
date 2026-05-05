@@ -66,16 +66,16 @@
     </div>
     <div class="col-2 tcell">
         {{^edit}}
-        <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-id="{{id}}" data-action="edit" data-type="planning">{{#pix}}i/edit, core, {{#str}}edit{{/str}}{{/pix}}</button>
+        <button class="btn btn-icon icon-no-margin me-1 jsbutton" data-id="{{id}}" data-action="edit" data-type="planning">{{#pix}}i/edit, core, {{#str}}edit{{/str}}{{/pix}}</button>
         {{/edit}}
         {{#edit}}
-        <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-id="{{id}}" data-action="save" data-type="planning">
+        <button class="btn btn-icon icon-no-margin me-1 jsbutton" data-id="{{id}}" data-action="save" data-type="planning">
             <span class="defaulticon">{{#pix}}e/save, core, {{#str}}save{{/str}}{{/pix}}</span>
             <span class="savingicon">{{#pix}}i/loading, core, {{#str}}saving, mod_competvet{{/str}}{{/pix}}</span>
         </button>
         {{/edit}}
-        <button class="btn btn-icon icon-no-margin mr-1 jsbutton {{#hasuserdata}}btn-warning{{/hasuserdata}}" data-id="{{id}}" data-action="delete" data-type="planning">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
-        <button class="btn btn-icon icon-no-margin mr-1 ml-auto jsbutton" data-id="{{id}}" data-action="add" data-type="pause">{{#pix}}e/insert, core, {{#str}}pauseplanningadd, mod_competvet{{/str}}{{/pix}}</button>
+        <button class="btn btn-icon icon-no-margin me-1 jsbutton {{#hasuserdata}}btn-warning{{/hasuserdata}}" data-id="{{id}}" data-action="delete" data-type="planning">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
+        <button class="btn btn-icon icon-no-margin me-1 ms-auto jsbutton" data-id="{{id}}" data-action="add" data-type="pause">{{#pix}}e/insert, core, {{#str}}pauseplanningadd, mod_competvet{{/str}}{{/pix}}</button>
     </div>
 </div>
 {{#pauses}}

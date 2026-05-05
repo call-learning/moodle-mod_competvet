@@ -60,13 +60,13 @@
             <div class="card">
                 <div class="card-header" id="competvet-view-users-heading-{{usertype}}">
                     <h2 class="mb-0">
-                        <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#competvet-view-users-{{usertype}}"
+                        <button class="btn btn-link w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#competvet-view-users-{{usertype}}"
                                 aria-expanded="true" aria-controls="competvet-view-users-{{usertype}}">
                             {{label}}
                         </button>
                     </h2>
                 </div>
-                <div id="competvet-view-users-{{usertype}}" class="collapse show" aria-labelledby="competvet-view-users-heading-{{usertype}}" data-parent="#users-accordion">
+                <div id="competvet-view-users-{{usertype}}" class="collapse show" aria-labelledby="competvet-view-users-heading-{{usertype}}" data-bs-parent="#users-accordion">
                     <div class="card-body p-1">
                         {{#users}}
                             {{> mod_competvet/view/user_info}}

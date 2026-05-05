@@ -15,18 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\external;
-// This is for 4.4 compatibility.
-defined('MOODLE_INTERNAL') || die;
-global $CFG;
-require_once("$CFG->libdir/externallib.php");
 
 use context_system;
-use external_api;
-use external_function_parameters;
-use external_value;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_value;
 use stdClass;
-use external_single_structure;
-use external_multiple_structure;
+use core_external\external_single_structure;
+use core_external\external_multiple_structure;
 use mod_competvet\competvet;
 use mod_competvet\local\api\plannings as plannings_api;
 

@@ -16,15 +16,11 @@
 
 namespace mod_competvet\external;
 
-defined('MOODLE_INTERNAL') || die;
-
-require_once("$CFG->libdir/externallib.php");
-
-use external_api;
-use external_function_parameters;
-use external_value;
-use external_single_structure;
-use external_multiple_structure;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_value;
+use core_external\external_single_structure;
+use core_external\external_multiple_structure;
 use mod_competvet\local\api\todos as todos_api;
 use mod_competvet\local\persistent\todo;
 

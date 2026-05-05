@@ -69,7 +69,7 @@ const submitLoading = () => {
         const submit = e.target;
         submit.classList.add('disabled');
         submit.dataset.originalText = submit.innerHTML;
-        const loadingIcon = '<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span>';
+        const loadingIcon = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>';
         submit.innerHTML = loadingIcon;
         submit.innerHTML += await getString('processing', 'mod_competvet');
     });
@@ -95,4 +95,3 @@ const getLetterGrade = (grade) => {
 };
 
 export {activateShowMoreLess, submitLoading, getLetterGrade};
-

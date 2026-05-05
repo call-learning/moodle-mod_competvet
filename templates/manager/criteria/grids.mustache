@@ -46,13 +46,13 @@
 {{#grids}}
 {{^deleted}}
 <div class="p-2 border mb-3" data-region="grid" data-id="{{gridid}}" data-sortorder="{{sortorder}}">
-    <div class="position-relative d-flex ftoggler align-items-center position-relative mr-2 pb-2" data-region="scripts-item" data-script-id="{{gridid}}">
-        <a data-toggle="collapse"
+    <div class="position-relative d-flex ftoggler align-items-center position-relative me-2 pb-2" data-region="scripts-item" data-script-id="{{gridid}}">
+        <a data-bs-toggle="collapse"
         href="#grid{{gridid}}"
         role="button"
         aria-expanded="{{#collapsed}}false{{/collapsed}}{{^collapsed}}true{{/collapsed}}"
         aria-controls="#grid{{gridid}}"
-        class="btn btn-icon icon-no-margin mr-1 mr-3 ml-4 icons-collapse-expand fheader {{#collapsed}}collapsed{{/collapsed}}">
+        class="btn btn-icon icon-no-margin me-1 me-3 ms-4 icons-collapse-expand fheader {{#collapsed}}collapsed{{/collapsed}}">
             <span class="expanded-icon icon-no-margin p-2" title="{{#str}} collapse, core {{/str}}">
                 {{#pix}} t/expandedchevron, core {{/pix}}
             </span>
@@ -60,7 +60,7 @@
                 <span class="dir-rtl-hide">{{#pix}} t/collapsedchevron, core {{/pix}}</span>
                 <span class="dir-ltr-hide">{{#pix}} t/collapsedchevron_rtl, core {{/pix}}</span>
             </span>
-            <span class="sr-only">{{{gridtext}}}</span>
+            <span class="visually-hidden">{{{gridtext}}}</span>
         </a>
         <h3 class="gridname">
             {{#edit}}<input type="text" class="form-control" value="{{{gridname}}}" data-field="gridname">{{/edit}}{{^edit}}{{{gridname}}}{{/edit}}
@@ -68,14 +68,15 @@
         <div class="span2 col-2 p-3 d-flex">
             {{#canedit}}
                 {{^edit}}
-                    <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-action="edit" data-id="{{gridid}}" data-type="grid">{{#pix}}i/edit, core, {{#str}}edit{{/str}}{{/pix}}</button>
+                    <button class="btn btn-icon icon-no-margin me-1 jsbutton" data-action="edit" data-id="{{gridid}}" data-type="grid">{{#pix}}i/edit, core, {{#str}}edit{{/str}}{{/pix}}</button>
                 {{/edit}}
                 {{#edit}}
-                    <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-action="save" data-id="{{gridid}}" data-type="grid">
+                    <button class="btn btn-icon icon-no-margin me-1 jsbutton" data-action="save" data-id="{{gridid}}" data-type="grid">
                         <span class="defaulticon">{{#pix}}e/save, core, {{#str}}save{{/str}}{{/pix}}</span>
                         <span class="savingicon">{{#pix}}i/loading, core, {{#str}}saving, mod_competvet{{/str}}{{/pix}}</span>
                     </button>
                 {{/edit}}
+                <button class="btn btn-icon icon-no-margin me-1 jsbutton" data-action="delete" data-id="{{gridid}}" data-type="grid">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
             {{/canedit}}
             {{#candelete}}
                 <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-action="delete" data-id="{{gridid}}" data-type="grid">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
@@ -83,7 +84,7 @@
         </div>
     </div>
     <div class="collapse show" id="grid{{gridid}}">
-        <div class="pl-4">
+        <div class="ps-4">
             <div class="criteria container-fluid sortable" data-type="criterion" data-grid-id="{{gridid}}">
                 {{#criteria}}
                     {{^deleted}}
