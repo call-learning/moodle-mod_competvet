@@ -41,7 +41,6 @@ final class planning_importer_test extends advanced_testcase {
     /**
      * Setup the test
      *
-     * @param array $data
      * @return void
      */
     public function prepare(array $data): void {

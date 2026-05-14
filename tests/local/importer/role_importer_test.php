@@ -62,9 +62,9 @@ final class role_importer_test extends advanced_testcase {
     /**
      * Test import criterion.
      *
-     * @param string $filepath
-     * @param array $userdata
-     * @param array $expectedroles
+     * @param string $filepath Path to the CSV file.
+     * @param array $userdata Seed users keyed by username.
+     * @param array $expectedroles Expected role memberships.
      * @return void
      * @covers ::import
      * @covers       \mod_competvet\local\importer\role_importer::import

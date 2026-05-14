@@ -30,10 +30,10 @@ use mod_competvet\local\persistent\case_data;
 class case_entry_format {
     /**
      * Format the todo data.
-     * @param mixed $value The raw value.
-     * @param \stdClass $row The data row.
-     * @param \stdClass $field The field definition.
-     * @return string The formatted value.
+     * @param mixed $value The value to format (not used in this case).
+     * @param \stdClass $row The row data, containing at least an 'entry
+     * @param \stdClass $field The field definition, containing at least an 'id'.
+     * @return string The formatted value to display in the report.
      */
     public static function format_field(mixed $value, \stdClass $row, \stdClass $field): string {
         if (null === $value || empty($row->entryid)) {

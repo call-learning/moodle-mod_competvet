@@ -15,6 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\external;
+
+defined('MOODLE_INTERNAL') || die();
+
 require_once("$CFG->libdir/gradelib.php");
 
 use core_external\external_api;

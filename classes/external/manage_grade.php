@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\external;
-// This is for 4.4 compatibility.
-defined('MOODLE_INTERNAL') || die;
-global $CFG;
+
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->libdir . '/gradelib.php');
 
 use core_external\external_api;
@@ -201,6 +201,7 @@ class manage_grade extends external_api {
             'result' => $grade,
             'warnings' => [],
         ];
+
     }
 
     /**

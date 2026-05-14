@@ -173,8 +173,14 @@ class plannings extends base {
             $viewplanning =
                 new moodle_url($this->baseurl, ['pagetype' => 'planning', 'id' => $competvet->get_course_module_id()]);
             $isgrader = has_capability('mod/competvet:cangrade', $context);
-            $data =
-                [$currentplannings, $planningstats, $viewplanning, $situationname, $isgrader, $competvet->get_course_module_id()];
+            $data = [
+                $currentplannings,
+                $planningstats,
+                $viewplanning,
+                $situationname,
+                $isgrader,
+                $competvet->get_course_module_id(),
+            ];
         }
         [$this->plannings, $this->planningstats, $this->viewplanning, $this->situationname, $this->isgrader, $this->cmid] = $data;
     }

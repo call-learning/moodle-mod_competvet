@@ -19,7 +19,7 @@ namespace mod_competvet\external;
 use cm_info;
 use context_course;
 use dml_missing_record_exception;
-use external_api;
+use core_external\external_api;
 use stdClass;
 
 /**
@@ -117,6 +117,8 @@ final class get_roles_test extends \advanced_testcase {
     /**
      * Call assign_role with valid parameters and check the result.
      *
+     * @param string $currentuser Current user key.
+     * @param array $expected Expected result payload.
      * @covers       \mod_competvet\external\assign_role::execute
      * @dataProvider get_role_data
      * @param string $currentuser

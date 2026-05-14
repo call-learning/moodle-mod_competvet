@@ -18,8 +18,8 @@ namespace mod_competvet\external;
 
 use cm_info;
 use context_course;
+use core_external\external_api;
 use dml_missing_record_exception;
-use external_api;
 use stdClass;
 
 /**

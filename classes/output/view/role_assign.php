@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\output\view;
+
 use renderable;
 use templatable;
 use renderer_base;
@@ -112,9 +113,8 @@ class role_assign implements renderable, templatable {
     /**
      * Get the user selectors for a given role.
      *
-     * @param int $roleid The role id.
+     * @param int $roleid
      * @return array
-     * @throws \moodle_exception
      */
     protected function get_role_selectors(int $roleid): array {
         // Check if this role is enabled.

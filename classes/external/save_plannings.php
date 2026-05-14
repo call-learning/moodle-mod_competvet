@@ -16,6 +16,8 @@
 
 namespace mod_competvet\external;
 
+defined('MOODLE_INTERNAL') || die();
+
 use context_system;
 use core_external\external_api;
 use core_external\external_function_parameters;
