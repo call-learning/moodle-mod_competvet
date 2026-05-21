@@ -22,7 +22,7 @@
  */
 
 import {get_strings as getStrings} from 'core/str';
-import XLSX from 'mod_competvet/local/xlsx.mini.min';
+import XLSX from 'mod_competvet/local/xlsx.mini';
 
 /**
  * Initialize the plannings view and add event listeners to the search fields.
@@ -277,5 +277,3 @@ const exportToCsv = async(situationname) => {
     XLSX.utils.book_append_sheet(wb, ws, 'Plannings');
     XLSX.writeFile(wb, filename);
 };
-
-
