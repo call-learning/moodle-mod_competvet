@@ -32,16 +32,17 @@ use mod_competvet\tests\test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\task\end_of_planning::class)]
 final class end_of_planning_task_test extends advanced_testcase {
     use test_data_definition;
 
     /**
      * Data provider for end of planning task tests.
      *
-     * @return array
+     * @return \Generator
      */
-    public static function end_of_planning_data_provider(): array {
-        return [
+    public static function end_of_planning_data_provider(): \Generator {
+        yield from [
             'planning ending yesterday' => [
                 'startdate' => new DateTime('-8 days'),
                 'expectedsubjects' => [
@@ -65,10 +66,10 @@ final class end_of_planning_task_test extends advanced_testcase {
     /**
      * Data provider for end of planning task tests.
      *
-     * @return array
+     * @return \Generator
      */
-    public static function end_of_planning_data_provider_with_grade(): array {
-        return [
+    public static function end_of_planning_data_provider_with_grade(): \Generator {
+        yield from [
             'planning ending yesterday' => [
                 'startdate' => new DateTime('-8 days'),
             ],
@@ -85,9 +86,8 @@ final class end_of_planning_task_test extends advanced_testcase {
      * @param DateTime $startdate
      * @param array $expectedsubjects
      * @return void
-     * @covers       \mod_competvet\task\end_of_planning::execute
-     * @dataProvider end_of_planning_data_provider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('end_of_planning_data_provider')]
     public function test_end_of_planning_without_grade(DateTime $startdate, array $expectedsubjects): void {
         $this->resetAfterTest();
         set_config('immediate_email', 1, 'mod_competvet');
@@ -111,9 +111,8 @@ final class end_of_planning_task_test extends advanced_testcase {
      *
      * @param DateTime $startdate
      * @return void
-     * @covers       \mod_competvet\task\end_of_planning::execute
-     * @dataProvider end_of_planning_data_provider_with_grade
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('end_of_planning_data_provider_with_grade')]
     public function test_end_of_planning_with_grade(DateTime $startdate): void {
         $this->resetAfterTest();
         set_config('immediate_email', 1, 'mod_competvet');

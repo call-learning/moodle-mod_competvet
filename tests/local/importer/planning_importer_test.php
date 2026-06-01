@@ -28,8 +28,8 @@ use mod_competvet\tests\test_data_definition;
  * @package     mod_competvet
  * @copyright   2025 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @coversDefaultClass \mod_competvet\local\importer\planning_importer
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\local\importer\planning_importer::class)]
 final class planning_importer_test extends advanced_testcase {
     use test_data_definition;
 
@@ -41,6 +41,7 @@ final class planning_importer_test extends advanced_testcase {
     /**
      * Setup the test
      *
+     * @param array $data The data definition to prepare for the test.
      * @return void
      */
     public function prepare(array $data): void {
@@ -53,7 +54,6 @@ final class planning_importer_test extends advanced_testcase {
 
     /**
      * Test import planning sans planning existant.
-     * @covers ::import
      */
     public function test_import_planning_no_existing(): void {
         global $CFG;
@@ -135,7 +135,6 @@ final class planning_importer_test extends advanced_testcase {
 
     /**
      * Test import planning avec planning existant (mise à jour).
-     * @covers ::import
      */
     public function test_import_planning_with_existing(): void {
         global $CFG;

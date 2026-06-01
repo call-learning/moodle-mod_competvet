@@ -25,6 +25,7 @@ use mod_competvet\tests\test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversFunction('competvet_delete_instance')]
 final class lib_test extends advanced_testcase {
     use test_data_definition;
 
@@ -44,7 +45,6 @@ final class lib_test extends advanced_testcase {
      * Test the deletion of a competvet instance
      *
      * @return void
-     * @covers ::competvet_delete_instance
      */
     public function test_delete(): void {
         global $DB;

@@ -25,6 +25,7 @@ use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\local\persistent\todo;
 use mod_competvet\tests\test_data_definition;
+use PHPUnit\Framework\Attributes\CoversMethod;
 
 /**
  * Observation request API test
@@ -33,6 +34,8 @@ use mod_competvet\tests\test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[CoversMethod(observation_requested::class, 'create_from_planning')]
+#[CoversMethod(observervation_observer::class, 'observation_requested')]
 final class observation_requested_test extends advanced_testcase {
     use test_data_definition;
 
@@ -53,7 +56,6 @@ final class observation_requested_test extends advanced_testcase {
      * Test that sending an observation request event will actually create a todo.
      *
      * @return void
-     * @covers       \mod_competvet\event\observation_requested::create_from_planning
      */
     public function test_request_observation_trigger_event(): void {
         $student = core_user::get_user_by_username('student1');
@@ -78,7 +80,6 @@ final class observation_requested_test extends advanced_testcase {
      * Test that sending an observation request event will actually create a todo.
      *
      * @return void
-     * @covers       \mod_competvet\local\observers\observervation_observer::observation_requested
      */
     public function test_request_observation_create_todo(): void {
         $student = core_user::get_user_by_username('student1');
@@ -99,7 +100,6 @@ final class observation_requested_test extends advanced_testcase {
      * Test that completing an observation that is marked as todo will complete the todo.
      *
      * @return void
-     * @covers       \mod_competvet\local\observers\observervation_observer::observation_requested
      */
     public function test_request_observation_complete_todo_status(): void {
         $student = core_user::get_user_by_username('student1');

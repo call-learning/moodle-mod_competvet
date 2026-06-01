@@ -30,13 +30,13 @@ use mod_competvet\local\persistent\grid;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\setup::class)]
 final class setup_test extends advanced_testcase {
     /**
      * Test roles creation at install.
      *
      * @return void
      *
-     * @covers \mod_competvet\setup::create_update_roles
      */
     public function test_roles_setup(): void {
         $existingroles = get_all_roles();
@@ -53,7 +53,6 @@ final class setup_test extends advanced_testcase {
      *
      * @return void
      *
-     * @covers \mod_competvet\setup::crerate_default_grid
      */
     public function test_default_grid_setup(): void {
         $evalgrid = grid::get_default_grid(grid::COMPETVET_CRITERIA_EVALUATION);
@@ -75,7 +74,6 @@ final class setup_test extends advanced_testcase {
      *
      * @return void
      *
-     * @covers \mod_competvet\setup::create_update_roles
      */
     public function test_roles_access(): void {
         $this->resetAfterTest();
@@ -130,7 +128,6 @@ final class setup_test extends advanced_testcase {
      *
      * @return void
      *
-     * @covers \mod_competvet\setup::create_update_roles
      */
     public function test_roles_access_with_update(): void {
         $this->resetAfterTest();

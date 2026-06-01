@@ -30,6 +30,7 @@ use stdClass;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\local\api\plannings::class)]
 final class plannings_test extends advanced_testcase {
     use test_data_definition;
 
@@ -41,14 +42,14 @@ final class plannings_test extends advanced_testcase {
     /**
      * All for user provider with planning
      *
-     * @return array[]
+     * @return \Generator
      */
-    public static function all_situations_with_planning(): array {
+    public static function all_situations_with_planning(): \Generator {
         global $CFG;
         $results = [];
         $startdate = self::get_start_date()->getTimestamp();
         include_once($CFG->dirroot . '/mod/competvet/tests/fixtures/plannings_tests_results.php');
-        return [
+        yield from [
             'student1 situations with no future' => [
                 'student1',
                 true, // No future.
@@ -92,9 +93,8 @@ final class plannings_test extends advanced_testcase {
      * @param bool $nofuture
      * @param array $expected
      * @return void
-     * @dataProvider all_situations_with_planning
-     * @covers       \mod_competvet\local\api\situations::get_all_situations_for
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('all_situations_with_planning')]
     public function test_get_plannings_for_situation_id(string $username, bool $nofuture, array $expected): void {
         $user = core_user::get_user_by_username($username);
         $situations = situation::get_all_situations_id_for($user->id);

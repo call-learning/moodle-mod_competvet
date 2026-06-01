@@ -33,6 +33,7 @@ use mod_competvet\tests\test_data_definition;
  * @copyright   2026 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\utils::class)]
 final class utils_test extends advanced_testcase {
     use test_data_definition;
 
@@ -52,7 +53,6 @@ final class utils_test extends advanced_testcase {
      * Test get_groups_with_members method
      *
      * @return void
-     * @covers \mod_competvet\utils::get_groups_with_members
      */
     public function test_get_groups_with_members(): void {
         $this->prepare_scenario('set_2');
@@ -79,7 +79,6 @@ final class utils_test extends advanced_testcase {
      * Test get_groups_with_members returns false when no groups exist
      *
      * @return void
-     * @covers \mod_competvet\utils::get_groups_with_members
      */
     public function test_get_groups_with_members_no_groups(): void {
         // Create a fresh course without using prepare_scenario to avoid pre-created groups.
@@ -97,7 +96,6 @@ final class utils_test extends advanced_testcase {
      * Test page_requirements method
      *
      * @return void
-     * @covers \mod_competvet\utils::page_requirements
      */
     public function test_page_requirements(): void {
         global $PAGE;
@@ -127,7 +125,6 @@ final class utils_test extends advanced_testcase {
      * Test split_properties_from_persistent method
      *
      * @return void
-     * @covers \mod_competvet\utils::split_properties_from_persistent
      */
     public function test_split_properties_from_persistent(): void {
         $record = (object) [
@@ -162,7 +159,6 @@ final class utils_test extends advanced_testcase {
      * Test get_persistent_fields_without_internals method
      *
      * @return void
-     * @covers \mod_competvet\utils::get_persistent_fields_without_internals
      */
     public function test_get_persistent_fields_without_internals(): void {
         $fields = utils::get_persistent_fields_without_internals(grid::class);
@@ -184,7 +180,6 @@ final class utils_test extends advanced_testcase {
      * Test get_persistent_fields_without_internals with custom fields to remove
      *
      * @return void
-     * @covers \mod_competvet\utils::get_persistent_fields_without_internals
      */
     public function test_get_persistent_fields_without_internals_custom(): void {
         $fields = utils::get_persistent_fields_without_internals(grid::class, ['id', 'sortorder']);
@@ -206,7 +201,6 @@ final class utils_test extends advanced_testcase {
      * Test is_student method
      *
      * @return void
-     * @covers \mod_competvet\utils::is_student
      */
     public function test_is_student(): void {
         $this->prepare_scenario('set_2');
@@ -228,7 +222,6 @@ final class utils_test extends advanced_testcase {
      * Test is_student method with non-student user
      *
      * @return void
-     * @covers \mod_competvet\utils::is_student
      */
     public function test_is_student_non_student(): void {
         $this->prepare_scenario('set_2');
@@ -250,7 +243,6 @@ final class utils_test extends advanced_testcase {
      * Test get_student_roles_id method
      *
      * @return void
-     * @covers \mod_competvet\utils::get_student_roles_id
      */
     public function test_get_student_roles_id(): void {
         $studentroles = utils::get_student_roles_id();
@@ -269,7 +261,6 @@ final class utils_test extends advanced_testcase {
      * Test get_user_info method
      *
      * @return void
-     * @covers \mod_competvet\utils::get_user_info
      */
     public function test_get_user_info(): void {
         $user = $this->getDataGenerator()->create_user([
@@ -300,7 +291,6 @@ final class utils_test extends advanced_testcase {
      * Test get_user_info method with non-existent user
      *
      * @return void
-     * @covers \mod_competvet\utils::get_user_info
      */
     public function test_get_user_info_nonexistent(): void {
         $userinfo = utils::get_user_info(999999);
@@ -316,7 +306,6 @@ final class utils_test extends advanced_testcase {
      * Test user_exists method
      *
      * @return void
-     * @covers \mod_competvet\utils::user_exists
      */
     public function test_user_exists(): void {
         $user = $this->getDataGenerator()->create_user();
@@ -330,7 +319,6 @@ final class utils_test extends advanced_testcase {
      * Test user_exists method with non-existent user
      *
      * @return void
-     * @covers \mod_competvet\utils::user_exists
      */
     public function test_user_exists_nonexistent(): void {
         $exists = utils::user_exists(999999);
@@ -342,7 +330,6 @@ final class utils_test extends advanced_testcase {
      * Test user_exists method with suspended user
      *
      * @return void
-     * @covers \mod_competvet\utils::user_exists
      */
     public function test_user_exists_suspended(): void {
         $user = $this->getDataGenerator()->create_user(['suspended' => 1]);
@@ -360,7 +347,6 @@ final class utils_test extends advanced_testcase {
      * Test get_users_with_role method
      *
      * @return void
-     * @covers \mod_competvet\utils::get_users_with_role
      */
     public function test_get_users_with_role(): void {
         $this->prepare_scenario('set_2');
@@ -393,7 +379,6 @@ final class utils_test extends advanced_testcase {
      * Test get_users_with_role with non-existent role
      *
      * @return void
-     * @covers \mod_competvet\utils::get_users_with_role
      */
     public function test_get_users_with_role_nonexistent(): void {
         $this->prepare_scenario('set_2');
@@ -411,7 +396,6 @@ final class utils_test extends advanced_testcase {
      * Test get_grid_usage_count method
      *
      * @return void
-     * @covers \mod_competvet\utils::is_grid_used
      */
     public function test_get_grid_usage_count(): void {
         // Create a simple test setup without using prepare_scenario to avoid complex data.
@@ -472,7 +456,6 @@ final class utils_test extends advanced_testcase {
      * Test get_criterion_usage_count method
      *
      * @return void
-     * @covers \mod_competvet\utils::is_criterion_used
      */
     public function test_get_criterion_usage_count(): void {
         // Create a simple test setup.

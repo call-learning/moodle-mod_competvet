@@ -29,6 +29,7 @@ use mod_competvet\tests\test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\local\api\todos::class)]
 final class todo_test extends advanced_testcase {
     use test_data_definition;
 
@@ -49,7 +50,6 @@ final class todo_test extends advanced_testcase {
      * Test get_todos_for_user
      *
      * @return void
-     * @covers \mod_competvet\local\api\todos::get_todos_for_user
      */
     public function test_get_todos_for_user(): void {
         $student = core_user::get_user_by_username('student1');
@@ -73,7 +73,6 @@ final class todo_test extends advanced_testcase {
      * Test get_todos_for_target_user
      *
      * @return void
-     * @covers \mod_competvet\local\api\todos::get_todos_for_target_user
      */
     public function test_get_todos_for_target_user(): void {
         $student = core_user::get_user_by_username('student1');

@@ -32,16 +32,17 @@ use mod_competvet\tests\test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\local\api\observations::class)]
 final class observations_test extends advanced_testcase {
     use test_data_definition;
 
     /**
      * Data provider for get_all_with_planning_for_user
      *
-     * @return array
+     * @return \Generator
      */
-    public static function data_get_all_with_planning_for_user(): array {
-        return [
+    public static function data_get_all_with_planning_for_user(): \Generator {
+        yield from [
             'student1' =>
                 [
                     'category' => observation::CATEGORY_EVAL_AUTOEVAL,
@@ -84,9 +85,8 @@ final class observations_test extends advanced_testcase {
      * @param array $comments
      * @param array $criteria
      * @return void
-     * @covers       \mod_competvet\local\api\observations::create_observation
-     * @dataProvider data_get_all_with_planning_for_user
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('data_get_all_with_planning_for_user')]
     public function test_create_observation(
         int $category,
         string $student,
@@ -151,9 +151,8 @@ final class observations_test extends advanced_testcase {
      * @param array $comments
      * @param array $criteria
      * @return void
-     * @covers       \mod_competvet\local\api\observations::create_observation
-     * @dataProvider data_get_all_with_planning_for_user
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('data_get_all_with_planning_for_user')]
     public function test_edit_observation(
         int $category,
         string $student,

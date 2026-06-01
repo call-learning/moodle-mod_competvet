@@ -29,6 +29,7 @@ use stdClass;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\external\assign_roles::class)]
 final class assign_roles_test extends \advanced_testcase {
     /**
      * @var $users array
@@ -82,9 +83,8 @@ final class assign_roles_test extends \advanced_testcase {
     /**
      * Test with non existing user.
      *
-     * @covers \mod_competvet\external\assign_roles::execute
-     * @runInSeparateProcess
      */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function test_assign_roles_user_not_exist(): void {
         $this->setAdminUser();
         $result = $this->assign_roles(
@@ -120,9 +120,8 @@ final class assign_roles_test extends \advanced_testcase {
     /**
      * Test with non existing module
      *
-     * @covers \mod_competvet\external\assign_roles::execute
-     * @runInSeparateProcess
      */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function test_assign_roles_cm_not_exist(): void {
         $this->setAdminUser();
         $this->expectException(dml_missing_record_exception::class);
@@ -139,9 +138,8 @@ final class assign_roles_test extends \advanced_testcase {
     /**
      * Test with non existing role
      *
-     * @covers \mod_competvet\external\assign_roles::execute
-     * @runInSeparateProcess
      */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function test_assign_roles_role_not_exist(): void {
         $this->setAdminUser();
         $this->expectException(\moodle_exception::class);
@@ -164,10 +162,9 @@ final class assign_roles_test extends \advanced_testcase {
      * @param string $currentuser
      * @param array $expected
      *
-     * @covers       \mod_competvet\external\assign_roles::execute
-     * @dataProvider assign_role_data
-     * @runInSeparateProcess
      */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    #[\PHPUnit\Framework\Attributes\DataProvider('assign_role_data')]
     public function test_user_profile_existing_test(
         array $users,
         string $action,
@@ -212,10 +209,10 @@ final class assign_roles_test extends \advanced_testcase {
     /**
      * Data provider for assign_role_data
      *
-     * @return array
+     * @return \Generator
      */
-    public static function assign_role_data(): array {
-        return [
+    public static function assign_role_data(): \Generator {
+        yield from [
             'Add student as admin' => [
                 'users' => ['s1', 's2'],
                 'action' => 'add',

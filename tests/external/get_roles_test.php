@@ -29,6 +29,7 @@ use stdClass;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\external\get_roles::class)]
 final class get_roles_test extends \advanced_testcase {
     /**
      * @var $users array
@@ -83,9 +84,8 @@ final class get_roles_test extends \advanced_testcase {
     /**
      * Test with non existing module
      *
-     * @covers \mod_competvet\external\get_roles::execute
-     * @runInSeparateProcess
      */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function test_assign_roles_cm_not_exist(): void {
         $this->setAdminUser();
         $this->expectException(dml_missing_record_exception::class);
@@ -119,13 +119,12 @@ final class get_roles_test extends \advanced_testcase {
      *
      * @param string $currentuser Current user key.
      * @param array $expected Expected result payload.
-     * @covers       \mod_competvet\external\assign_role::execute
-     * @dataProvider get_role_data
      * @param string $currentuser
      * @param array $expected
      *
-     * @runInSeparateProcess
      */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    #[\PHPUnit\Framework\Attributes\DataProvider('get_role_data')]
     public function test_get_role_basic(
         string $currentuser,
         array $expected
@@ -164,10 +163,10 @@ final class get_roles_test extends \advanced_testcase {
     /**
      * Data provider for get_role_data
      *
-     * @return array
+     * @return \Generator
      */
-    public static function get_role_data(): array {
-        return [
+    public static function get_role_data(): \Generator {
+        yield from [
             'Get roles as admin' => [
                 'currentuser' => 'admin',
                 'expected' => [

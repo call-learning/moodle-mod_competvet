@@ -30,6 +30,7 @@ use mod_competvet\tests\test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\local\api\certifications::class)]
 final class certifications_test extends advanced_testcase {
     use test_data_definition;
 
@@ -48,7 +49,6 @@ final class certifications_test extends advanced_testcase {
 
     /**
      * Test the creation of a certification
-     * @covers \mod_competvet\local\api\certifications::add_cert_declaration
      */
     public function test_add_certification(): void {
         $student = core_user::get_user_by_username('student1');
@@ -81,7 +81,6 @@ final class certifications_test extends advanced_testcase {
 
     /**
      * Test the editing of a certification
-     * @covers \mod_competvet\local\api\certifications::update_cert_declaration
      */
     public function test_update_certification(): void {
         $certification = $this->get_certification_declaration();
@@ -114,7 +113,6 @@ final class certifications_test extends advanced_testcase {
 
     /**
      * Test the deletion of a certification
-     * @covers \mod_competvet\local\api\certifications::delete_cert_declaration
      */
     public function test_delete_certification(): void {
         $certification = $this->get_certification_declaration();
@@ -128,7 +126,6 @@ final class certifications_test extends advanced_testcase {
 
     /**
      * Test getting the supervisor invitations for a certification
-     * @covers \mod_competvet\local\api\certifications::get_declaration_supervisors
      */
     public function test_get_certification_supervisors(): void {
         $certification = $this->get_certification_declaration();
@@ -141,7 +138,6 @@ final class certifications_test extends advanced_testcase {
 
     /**
      * Test inviting a supervisor to reply on a certification
-     * @covers \mod_competvet\local\api\certifications::declaration_supervisor_invite
      */
     public function test_certification_supervisor_invite(): void {
         $certification = $this->get_certification_declaration();
@@ -161,7 +157,6 @@ final class certifications_test extends advanced_testcase {
 
     /**
      * Test removing the invitation for a supervisor to reply on a certification
-     * @covers \mod_competvet\local\api\certifications::declaration_supervisor_remove
      */
     public function test_certification_supervisor_remove(): void {
         $certification = $this->get_certification_declaration();
@@ -180,7 +175,6 @@ final class certifications_test extends advanced_testcase {
      * Test fetching a certification by ID
      *
      * @return void
-     * @covers \mod_competvet\local\api\certifications::get_certification
      */
     public function test_get_certification_by_id(): void {
         // Create a certification.
@@ -199,7 +193,6 @@ final class certifications_test extends advanced_testcase {
      * Test fetching all certifications
      *
      * @return void
-     * @covers \mod_competvet\local\api\certifications::get_certifications
      */
     public function test_get_certifications(): void {
         $this->get_certification_declaration();

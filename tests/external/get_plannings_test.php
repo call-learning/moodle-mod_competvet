@@ -27,8 +27,8 @@ use mod_competvet\tests\test_data_definition;
  * @package     mod_competvet
  * @copyright   2026 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers \mod_competvet\external\get_plannings
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\external\get_plannings::class)]
 final class get_plannings_test extends \advanced_testcase {
     use test_data_definition;
 

@@ -30,6 +30,7 @@ use stdClass;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\local\api\situations::class)]
 final class situations_test extends advanced_testcase {
     use test_data_definition;
 
@@ -41,14 +42,14 @@ final class situations_test extends advanced_testcase {
     /**
      * All for user provider with planning
      *
-     * @return array[]
+     * @return \Generator
      */
-    public static function all_for_user_provider_with_planning(): array {
+    public static function all_for_user_provider_with_planning(): \Generator {
         global $CFG;
         $results = [];
         $startdate = self::get_start_date()->getTimestamp();
         include_once($CFG->dirroot . '/mod/competvet/tests/fixtures/situation_tests_results.php');
-        return [
+        yield from [
             'student1 situations' => [
                 'student1',
                 $results['student1results'],
@@ -95,9 +96,8 @@ final class situations_test extends advanced_testcase {
      * @param string $username
      * @param array $expected
      * @return void
-     * @dataProvider all_for_user_provider_with_planning
-     * @covers       \mod_competvet\local\api\situations::get_all_situations_for
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('all_for_user_provider_with_planning')]
     public function test_get_all_situations_with_planning_for(string $username, array $expected): void {
         $user = core_user::get_user_by_username($username);
         $situations = situations::get_all_situations_with_planning_for($user->id);
@@ -115,7 +115,6 @@ final class situations_test extends advanced_testcase {
      * Get all criteria test
      *
      * @return void
-     * @covers \mod_competvet\local\api\situations::get_all_criteria
      */
     public function test_get_all_criteria(): void {
         $situation = situation::get_record(['shortname' => 'SIT1']);

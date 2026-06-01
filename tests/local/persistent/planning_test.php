@@ -25,6 +25,7 @@ use mod_competvet\tests\test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\local\persistent\planning::class)]
 final class planning_test extends advanced_testcase {
     use test_data_definition;
 
@@ -44,7 +45,6 @@ final class planning_test extends advanced_testcase {
      * Get all for user
      *
      * @return void
-     * @covers       \mod_competvet\local\api\situations::get_all_situations_for
      */
     public function test_delete_planning_and_related(): void {
         $situation = situation::get_record(['shortname' => 'SIT1']);

@@ -28,6 +28,7 @@ use mod_competvet\tests\test_data_definition;
  * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\task\student_target::class)]
 final class student_target_task_test extends advanced_testcase {
     use test_data_definition;
 
@@ -52,7 +53,6 @@ final class student_target_task_test extends advanced_testcase {
 
     /**
      * Test that the student target task sends an email to students who have not met the target.
-     * @covers \mod_competvet\task\student_target::execute
      *
      * @return void
      */

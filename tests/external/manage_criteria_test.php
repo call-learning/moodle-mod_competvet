@@ -24,13 +24,13 @@ use mod_competvet\competvet;
  * @package     mod_competvet
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers \mod_competvet\external\manage_criteria
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\external\manage_criteria::class)]
 final class manage_criteria_test extends \advanced_testcase {
     /**
      * Test creation and retrieval of grid and criteria
-     * @runInSeparateProcess
      */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function test_create_and_get_grid_and_criteria(): void {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
@@ -64,8 +64,8 @@ final class manage_criteria_test extends \advanced_testcase {
 
     /**
      * Test update of grid and criterion
-     * @runInSeparateProcess
      */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function test_update_grid_and_criterion(): void {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
@@ -114,8 +114,8 @@ final class manage_criteria_test extends \advanced_testcase {
 
     /**
      * Test deletion of grid using deleted field
-     * @runInSeparateProcess
      */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function test_delete_grid(): void {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
@@ -144,8 +144,8 @@ final class manage_criteria_test extends \advanced_testcase {
 
     /**
      * Test deletion of criterion using deleted field
-     * @runInSeparateProcess
      */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function test_delete_criterion(): void {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
@@ -191,8 +191,8 @@ final class manage_criteria_test extends \advanced_testcase {
 
     /**
      * Test deletion of option using deleted field
-     * @runInSeparateProcess
      */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function test_delete_option(): void {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
@@ -287,8 +287,8 @@ final class manage_criteria_test extends \advanced_testcase {
 
     /**
      * Test error handling for deleting non-existent criterion
-     * @runInSeparateProcess
      */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function test_delete_nonexistent_criterion(): void {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();

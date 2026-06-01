@@ -29,27 +29,28 @@ use mod_competvet\tests\test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\local\api\user_role::class)]
 final class user_role_test extends advanced_testcase {
     use test_data_definition;
 
     /**
      * User enrolments provider
      *
-     * @return array[]
+     * @return \Generator
      */
-    public static function user_enrolments_provider_all(): array {
-        return array_map(function ($item) {
-            return ['user' => $item['user'], 'expected' => $item['expected_all']];
-        }, self::basic_provider());
+    public static function user_enrolments_provider_all(): \Generator {
+        foreach (self::basic_provider() as $name => $item) {
+            yield $name => ['user' => $item['user'], 'expected' => $item['expected_all']];
+        }
     }
 
     /**
      * User enrolments provider for both get_top and get_all
      *
-     * @return array[]
+     * @return \Generator
      */
-    private static function basic_provider(): array {
-        return [
+    private static function basic_provider(): \Generator {
+        yield from [
             'simple student 1' => [
                 'user' => 'student1',
                 'expected_top' => ['SIT1' => 'student', 'SIT2' => 'student', 'SIT3' => 'student', 'SIT4' => 'student',
@@ -108,21 +109,21 @@ final class user_role_test extends advanced_testcase {
     /**
      * User enrolments provider
      *
-     * @return array[]
+     * @return \Generator
      */
-    public static function user_enrolments_provider_top(): array {
-        return array_map(function ($item) {
-            return ['user' => $item['user'], 'expected' => $item['expected_top']];
-        }, self::basic_provider());
+    public static function user_enrolments_provider_top(): \Generator {
+        foreach (self::basic_provider() as $name => $item) {
+            yield $name => ['user' => $item['user'], 'expected' => $item['expected_top']];
+        }
     }
 
     /**
      * All situation providers
      *
-     * @return array[]
+     * @return \Generator
      */
-    public static function all_situations_provider(): array {
-        return [
+    public static function all_situations_provider(): \Generator {
+        yield from [
             'simple student1' => [
                 'user' => 'student1',
                 'expected' => 'student',
@@ -164,9 +165,8 @@ final class user_role_test extends advanced_testcase {
      * @param string $user
      * @param string $expected
      * @return void
-     * @covers       \mod_competvet\local\api\user_role::get_top
-     * @dataProvider all_situations_provider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('all_situations_provider')]
     public function test_get_top_for_all_situations(string $user, string $expected): void {
         $user = core_user::get_user_by_username($user);
         if ($expected === 'exception') {
@@ -183,9 +183,8 @@ final class user_role_test extends advanced_testcase {
      * @param string $user
      * @param array $expected
      * @return void
-     * @covers       \mod_competvet\local\api\user_role::get_top
-     * @dataProvider user_enrolments_provider_top
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('user_enrolments_provider_top')]
     public function test_get_top(string $user, array $expected): void {
         $user = core_user::get_user_by_username($user);
         $situations = situation::get_records([], 'shortname', 'ASC');
@@ -206,9 +205,8 @@ final class user_role_test extends advanced_testcase {
      * @param string $user
      * @param array $expected
      * @return void
-     * @covers       \mod_competvet\local\api\user_role::get_all
-     * @dataProvider user_enrolments_provider_all
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('user_enrolments_provider_all')]
     public function test_get_all(string $user, array $expected): void {
         $user = core_user::get_user_by_username($user);
         $situations = situation::get_records([], 'shortname', 'ASC');
@@ -227,8 +225,6 @@ final class user_role_test extends advanced_testcase {
      * Test that inherited course roles do not affect activity role classification.
      *
      * @return void
-     * @covers \mod_competvet\local\persistent\situation::get_all_roles
-     * @covers \mod_competvet\local\api\user_role::get_top
      */
     public function test_get_top_ignores_parent_context_roles(): void {
         $generator = $this->getDataGenerator();

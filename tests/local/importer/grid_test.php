@@ -27,6 +27,7 @@ use mod_competvet\local\persistent\grid;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\local\importer\criterion_importer::class)]
 final class grid_test extends advanced_testcase {
     /**
      * Sample file path
@@ -41,7 +42,6 @@ final class grid_test extends advanced_testcase {
      * Test import criterion.
      *
      * @return void
-     * @covers \mod_competvet\local\persistent\grid
      */
     public function test_import_criterion(): void {
         global $CFG;
@@ -71,7 +71,6 @@ final class grid_test extends advanced_testcase {
      * Test import criterion.
      *
      * @return void
-     * @covers \mod_competvet\local\persistent\grid
      */
     public function test_import_criterion_update(): void {
         global $CFG;

@@ -35,6 +35,7 @@ use mod_competvet\tests\test_data_definition;
  * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\task\clear_pending_todos::class)]
 final class clear_pending_todos_task_test extends advanced_testcase {
     use test_data_definition;
 
@@ -51,7 +52,6 @@ final class clear_pending_todos_task_test extends advanced_testcase {
 
     /**
      * Test that the clear_pending_todos task removes todos older than the configured number of days.
-     * @covers \mod_competvet\task\clear_pending_todos::execute
      *
      * @return void
      */
@@ -91,7 +91,6 @@ final class clear_pending_todos_task_test extends advanced_testcase {
 
     /**
      * Test that the clear_pending_todos task removes todos older than a specified date.
-     * @covers \mod_competvet\task\clear_pending_todos::execute
      *
      * @return void
      */

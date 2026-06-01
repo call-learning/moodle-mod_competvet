@@ -27,16 +27,17 @@ use mod_competvet\tests\test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\task\items_todo::class)]
 final class items_todo_test extends advanced_testcase {
     use test_data_definition;
 
     /**
      * Setup the test
      *
-     * @return void
+     * @return \Generator
      */
-    public static function items_todo_provider(): array {
-        return [
+    public static function items_todo_provider(): \Generator {
+        yield from [
             'planning ending tomorrow' => [
                 'startdate' => new DateTime('-7 days'),
                 'expectedsubjects' => [
@@ -53,9 +54,8 @@ final class items_todo_test extends advanced_testcase {
      * @param DateTime $startdate
      * @param array $expectedsubjects
      * @return void
-     * @covers       \mod_competvet\task\items_todo::execute
-     * @dataProvider items_todo_provider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('items_todo_provider')]
     public function test_item_todo(DateTime $startdate, array $expectedsubjects): void {
         $this->resetAfterTest();
         set_config('immediate_email', 1, 'mod_competvet');

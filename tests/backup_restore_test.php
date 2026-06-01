@@ -45,13 +45,13 @@ require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
  * @copyright 2024 CALL Learning
  * @license https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\backup_competvet_activity_task::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\restore_competvet_activity_task::class)]
 final class backup_restore_test extends advanced_testcase {
     use test_data_definition;
 
     /**
      * Test backup and restore of a competvet activity.
-     * @covers \mod_competvet\backup\backup_competvet_activity_task
-     * @covers \mod_competvet\backup\restore_competvet_activity_task
      */
     public function test_backup_restore(): void {
         global $DB;

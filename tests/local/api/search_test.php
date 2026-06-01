@@ -27,18 +27,19 @@ use mod_competvet\tests\test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\local\api\search::class)]
 final class search_test extends advanced_testcase {
     use test_data_definition;
 
     /**
      * Data provider for search API
      *
-     * @return array
+     * @return \Generator
      */
-    public static function data_provider_search_situations(): array {
+    public static function data_provider_search_situations(): \Generator {
         $oneweek = 60 * 60 * 24 * 7; // 1 week in seconds.
         $startdate = self::get_start_date()->getTimestamp();
-        return [
+        yield from [
             'simple search' => [
                 'SIT1',
                 'student1',
@@ -108,10 +109,10 @@ final class search_test extends advanced_testcase {
     /**
      * Data provider for get_query
      *
-     * @return array
+     * @return \Generator
      */
-    public static function data_provider_search_users(): array {
-        return [
+    public static function data_provider_search_users(): \Generator {
+        yield from [
             'simple search' => [
                 'searchtext' => 'Observer',
                 'currentuser' => 'student1',
@@ -317,9 +318,8 @@ final class search_test extends advanced_testcase {
      * @param string $username
      * @param array $expectedresults
      * @return void
-     * @covers       \mod_competvet\local\api\search::search_planning
-     * @dataProvider data_provider_search_situations
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('data_provider_search_situations')]
     public function test_planning_search(string $searchtext, string $username, array $expectedresults): void {
         $user = \core_user::get_user_by_username($username);
         $this->setUser($user); // User involved in the scenario.
@@ -354,9 +354,8 @@ final class search_test extends advanced_testcase {
      * @param string $currentuser
      * @param array $expectedresults
      * @return void
-     * @covers       \mod_competvet\local\api\search::search_users_in_situations
-     * @dataProvider data_provider_search_users
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('data_provider_search_users')]
     public function test_usersearch_search(string $searchtext, string $currentuser, array $expectedresults): void {
         global $DB;
         $user = \core_user::get_user_by_username($currentuser);

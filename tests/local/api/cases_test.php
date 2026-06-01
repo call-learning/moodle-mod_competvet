@@ -28,6 +28,7 @@ use mod_competvet\tests\test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\local\api\cases::class)]
 final class cases_test extends advanced_testcase {
     use test_data_definition;
 
@@ -48,7 +49,6 @@ final class cases_test extends advanced_testcase {
      * Test get_entry
      *
      * @return void
-     * @covers \mod_competvet\local\api\cases::get_entries
      */
     public function test_get_entry(): void {
         $situation = situation::get_record(['shortname' => 'SIT1']);
@@ -86,7 +86,6 @@ final class cases_test extends advanced_testcase {
      * Test update_case
      *
      * @return void
-     * @covers \mod_competvet\local\api\cases::update_case
      */
     public function test_update_case(): void {
         $situation = situation::get_record(['shortname' => 'SIT1']);
@@ -126,7 +125,6 @@ final class cases_test extends advanced_testcase {
      * Test delete_case
      *
      * @return void
-     * @covers \mod_competvet\local\api\cases::delete_case
      */
     public function test_delete_case(): void {
         $situation = situation::get_record(['shortname' => 'SIT1']);
@@ -153,7 +151,6 @@ final class cases_test extends advanced_testcase {
      * Test get_case_list
      *
      * @return void
-     * @covers \mod_competvet\local\api\cases::get_case_list
      */
     public function test_get_case_list(): void {
         $situation = situation::get_record(['shortname' => 'SIT1']);

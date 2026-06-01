@@ -28,8 +28,8 @@ use stdClass;
  * @package     mod_competvet
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @coversDefaultClass \mod_competvet\local\importer\role_importer
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\local\importer\role_importer::class)]
 final class role_importer_test extends advanced_testcase {
     /**
      * Sample file path
@@ -66,10 +66,8 @@ final class role_importer_test extends advanced_testcase {
      * @param array $userdata Seed users keyed by username.
      * @param array $expectedroles Expected role memberships.
      * @return void
-     * @covers ::import
-     * @covers       \mod_competvet\local\importer\role_importer::import
-     * @dataProvider import_data
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('import_data')]
     public function test_simple_import(string $filepath, array $userdata, array $expectedroles): void {
         global $CFG, $DB;
         $this->setup_scenario($userdata);
@@ -90,10 +88,10 @@ final class role_importer_test extends advanced_testcase {
     /**
      * Data provider for import tests.
      *
-     * @return array[]
+     * @return \Generator
      */
-    public static function import_data(): array {
-        return [
+    public static function import_data(): \Generator {
+        yield from [
             'Import roles without existing roles' => [
                 'filepath' => '/mod/competvet/tests/fixtures/importer/role_assignments.csv',
                 'userdata' => [

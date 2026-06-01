@@ -32,6 +32,7 @@ use mod_competvet\tests\test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\mod_competvet\local\persistent\situation::class)]
 class situation_cache_test extends advanced_testcase {
     use test_data_definition;
 
@@ -123,7 +124,7 @@ class situation_cache_test extends advanced_testcase {
      *
      * @return void
      */
-    public function test_create_situation_cache() {
+    public function test_create_situation_cache(): void {
         global $DB;
         $student1 = core_user::get_user_by_username('student1');
         $this->setUser($student1);
@@ -140,10 +141,9 @@ class situation_cache_test extends advanced_testcase {
     /**
      * Test delete situation cache
      *
-     * @covers \mod_competvet\local\persistent\situation::get_all_situations_id_for
      * @return void
      */
-    public function test_delete_situation_cache() {
+    public function test_delete_situation_cache(): void {
         global $DB;
         $student1 = core_user::get_user_by_username('student1');
         $course = $DB->get_record('course', ['shortname' => 'course 1']);
@@ -162,10 +162,9 @@ class situation_cache_test extends advanced_testcase {
     /**
      * Test enrol student
      *
-     * @covers \mod_competvet\local\persistent\situation::get_all_situations_id_for
      * @return void
      */
-    public function test_enrol_student() {
+    public function test_enrol_student(): void {
         global $DB;
         $course = $DB->get_record('course', ['shortname' => 'course 1']);
         $studentx = $this->getDataGenerator()->create_and_enrol($course);
@@ -176,10 +175,9 @@ class situation_cache_test extends advanced_testcase {
     /**
      * Test enrol student
      *
-     * @covers \mod_competvet\local\persistent\situation::get_all_situations_id_for
      * @return void
      */
-    public function test_unenrol_student() {
+    public function test_unenrol_student(): void {
         global $DB;
         $course = $DB->get_record('course', ['shortname' => 'course 1']);
         $student1 = core_user::get_user_by_username('student1');
@@ -195,10 +193,9 @@ class situation_cache_test extends advanced_testcase {
     /**
      * Test add a student to a group
      *
-     * @covers \mod_competvet\local\persistent\situation::get_all_situations_id_for
      * @return void
      */
-    public function test_group_member_added() {
+    public function test_group_member_added(): void {
         global $DB;
         $student1 = core_user::get_user_by_username('student1');
         $situations = situation::get_all_situations_id_for($student1->id);
@@ -217,10 +214,9 @@ class situation_cache_test extends advanced_testcase {
     /**
      * Test remove a student from a group
      *
-     * @covers \mod_competvet\local\persistent\situation::get_all_situations_id_for
      * @return void
      */
-    public function test_group_member_removed() {
+    public function test_group_member_removed(): void {
         global $DB;
         $student1 = core_user::get_user_by_username('student1');
         $situations = situation::get_all_situations_id_for($student1->id);
@@ -239,10 +235,9 @@ class situation_cache_test extends advanced_testcase {
     /**
      * Test assign a student to a role
      *
-     * @covers \mod_competvet\local\persistent\situation::get_all_situations_id_for
      * @return void
      */
-    public function test_role_assign() {
+    public function test_role_assign(): void {
         global $DB;
         // Prepare a new role with no capability to view competvet.
         $generator = $this->getDataGenerator();
@@ -271,10 +266,9 @@ class situation_cache_test extends advanced_testcase {
     /**
      * Test unassign a student to a role
      *
-     * @covers \mod_competvet\local\persistent\situation::get_all_situations_id_for
      * @return void
      */
-    public function test_role_unassign() {
+    public function test_role_unassign(): void {
         global $DB;
         // Prepare a new role with no capability to view competvet.
         $generator = $this->getDataGenerator();

@@ -27,6 +27,7 @@ use mod_competvet\local\persistent\grid;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\local\persistent\todo;
 use mod_competvet\tests\test_data_definition;
+use PHPUnit\Framework\Attributes\CoversMethod;
 
 /**
  * Cert request API test
@@ -35,6 +36,7 @@ use mod_competvet\tests\test_data_definition;
  * @copyright   2023 CALL Learning <contact@call-learning.fr>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[CoversMethod(certification_observer::class, 'remove_validation_certifications_todo')]
 final class cert_validation_completed_test extends advanced_testcase {
     use test_data_definition;
 
@@ -76,7 +78,6 @@ final class cert_validation_completed_test extends advanced_testcase {
      * Test that sending an certification request event will actually create a todo.
      *
      * @return void
-     * @covers       \mod_competvet\local\observers\cert_observer::cert_validation_requested
      */
     public function test_request_cert_validation_completed_removes_todo(): void {
         $student = core_user::get_user_by_username('student1');
