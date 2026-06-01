@@ -64,6 +64,7 @@ class get_plannings extends external_api {
                 'name' => $group->name,
             ];
         }, $coursegroups);
+        $groups = array_values($groups);
 
         $plannings = plannings_api::get_plannings_for_situation_id($competvet->get_situation()->get('id'), $USER->id, false);
         $timezone = core_date::get_user_timezone_object();
@@ -82,14 +83,14 @@ class get_plannings extends external_api {
             $plannings[$key]['enddate'] = userdate($planning['enddate'], '%Y-%m-%dT%H:%M', $timezone, false);
             $plannings[$key]['startdatets'] = $planning['startdate'];
             $plannings[$key]['enddatets'] = $planning['enddate'];
-            $plannings[$key]['groups'] = $planninggroups;
+            $plannings[$key]['groups'] = array_values($planninggroups);
             $plannings[$key]['hasuserdata'] = plannings_api::has_user_data($planning['id']);
             $plannings[$key]['pauses'] = plannings_api::get_planning_pauses($planning['id']);
         }
         $clock = \core\di::get(\core\clock::class);
 
         return [
-            'plannings' => $plannings,
+            'plannings' => array_values($plannings),
             'groups' => $groups,
             'version' => $clock->time(),
         ];

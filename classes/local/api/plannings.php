@@ -482,7 +482,7 @@ class plannings {
      */
     public static function get_students_info_for_planning_id(int $planningid) {
         $users = static::get_students_for_planning_id($planningid);
-        return array_map(fn($user) => utils::get_user_info($user->id), $users);
+        return array_values(array_map(fn($user) => utils::get_user_info($user->id), $users));
     }
 
     /**

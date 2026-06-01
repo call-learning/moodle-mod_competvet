@@ -136,8 +136,8 @@ final class backup_restore_test extends advanced_testcase {
         $this->assertEqualWithoutIds($oldsituation->to_record(), $newsituation->to_record(), ['shortname']);
 
         // Check planning and observations.
-        $newplannings = planning::get_records(['situationid' => $newsituation->get('id')]);
-        $oldplannings = planning::get_records(['situationid' => $oldsituation->get('id')]);
+        $newplannings = array_values(planning::get_records(['situationid' => $newsituation->get('id')]));
+        $oldplannings = array_values(planning::get_records(['situationid' => $oldsituation->get('id')]));
         $this->assertEquals(count($newplannings), count($oldplannings));
         foreach ($newplannings as $planningindex => $newplanning) {
             $oldplanning = $oldplannings[$planningindex];
@@ -189,31 +189,31 @@ final class backup_restore_test extends advanced_testcase {
      * @return void
      */
     private function check_created_observations($newplanning, $oldplanning) {
-        $newobservations = observation::get_records(['planningid' => $newplanning->get('id')]);
-        $oldobservations = observation::get_records(['planningid' => $oldplanning->get('id')]);
+        $newobservations = array_values(observation::get_records(['planningid' => $newplanning->get('id')]));
+        $oldobservations = array_values(observation::get_records(['planningid' => $oldplanning->get('id')]));
         $this->assertEquals(count($newobservations), count($oldobservations));
         foreach ($newobservations as $index => $newobservation) {
             $oldobservation = $oldobservations[$index];
             $this->assertEqualWithoutIds($oldobservation->to_record(), $newobservation->to_record());
             // Check comments.
-            $newcomments = $newobservation->get_comments();
-            $oldcomments = $oldobservation->get_comments();
+            $newcomments = array_values($newobservation->get_comments());
+            $oldcomments = array_values($oldobservation->get_comments());
             $this->assertEquals(count($newcomments), count($oldcomments));
             foreach ($newcomments as $commentindex => $newcomment) {
                 $oldcomment = $oldcomments[$commentindex];
                 $this->assertEqualWithoutIds($oldcomment->to_record(), $newcomment->to_record());
             }
             // Check criteria comments.
-            $newcriteria = $newobservation->get_criteria_comments();
-            $oldcriteria = $oldobservation->get_criteria_comments();
+            $newcriteria = array_values($newobservation->get_criteria_comments());
+            $oldcriteria = array_values($oldobservation->get_criteria_comments());
             $this->assertEquals(count($newcriteria), count($oldcriteria));
             foreach ($newcriteria as $critcomindex => $newcriterion) {
                 $oldcriterion = $oldcriteria[$critcomindex];
                 $this->assertEqualWithoutIds($oldcriterion->to_record(), $newcriterion->to_record());
             }
             // Check criteria levels.
-            $newcriteria = $newobservation->get_criteria_levels();
-            $oldcriteria = $oldobservation->get_criteria_levels();
+            $newcriteria = array_values($newobservation->get_criteria_levels());
+            $oldcriteria = array_values($oldobservation->get_criteria_levels());
             $this->assertEquals(count($newcriteria), count($oldcriteria));
             foreach ($newcriteria as $critlevelindex => $newcriterion) {
                 $oldcriterion = $oldcriteria[$critlevelindex];
@@ -230,14 +230,14 @@ final class backup_restore_test extends advanced_testcase {
      * @return void
      */
     private function check_created_certifications(planning $newplanning, planning $oldplanning) {
-        $newcertifications = cert_decl::get_records(['planningid' => $newplanning->get('id')]);
-        $oldcertifications = cert_decl::get_records(['planningid' => $oldplanning->get('id')]);
+        $newcertifications = array_values(cert_decl::get_records(['planningid' => $newplanning->get('id')]));
+        $oldcertifications = array_values(cert_decl::get_records(['planningid' => $oldplanning->get('id')]));
         $this->assertEquals(count($newcertifications), count($oldcertifications));
         foreach ($newcertifications as $index => $newcertification) {
             $oldcertification = $oldcertifications[$index];
             $this->assertEqualWithoutIds($oldcertification->to_record(), $newcertification->to_record());
-            $newvalidations = cert_valid::get_records(['declid' => $newcertification->get('id')]);
-            $oldvalidations = cert_valid::get_records(['declid' => $oldcertification->get('id')]);
+            $newvalidations = array_values(cert_valid::get_records(['declid' => $newcertification->get('id')]));
+            $oldvalidations = array_values(cert_valid::get_records(['declid' => $oldcertification->get('id')]));
             $this->assertEquals(count($newvalidations), count($oldvalidations));
             foreach ($newvalidations as $valindex => $newvalidation) {
                 $oldvalidation = $oldvalidations[$valindex];
@@ -254,14 +254,14 @@ final class backup_restore_test extends advanced_testcase {
      * @return void
      */
     private function check_created_caselog(planning $newplanning, planning $oldplanning) {
-        $newcaseentries = case_entry::get_records(['planningid' => $newplanning->get('id')]);
-        $oldcaseentries = case_entry::get_records(['planningid' => $oldplanning->get('id')]);
+        $newcaseentries = array_values(case_entry::get_records(['planningid' => $newplanning->get('id')]));
+        $oldcaseentries = array_values(case_entry::get_records(['planningid' => $oldplanning->get('id')]));
         $this->assertEquals(count($newcaseentries), count($oldcaseentries));
         foreach ($newcaseentries as $index => $newcasentry) {
             $oldcaseentry = $oldcaseentries[$index];
             $this->assertEqualWithoutIds($oldcaseentry->to_record(), $newcasentry->to_record());
-            $newcasedatas = case_data::get_records(['entryid' => $newcasentry->get('id')]);
-            $oldcasedatas = case_data::get_records(['entryid' => $oldcaseentry->get('id')]);
+            $newcasedatas = array_values(case_data::get_records(['entryid' => $newcasentry->get('id')]));
+            $oldcasedatas = array_values(case_data::get_records(['entryid' => $oldcaseentry->get('id')]));
             $this->assertEquals(count($newcasedatas), count($oldcasedatas));
             foreach ($newcasedatas as $valindex => $newvalidation) {
                 $oldcasedata = $oldcasedatas[$valindex];

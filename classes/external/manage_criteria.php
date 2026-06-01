@@ -269,7 +269,7 @@ class manage_criteria extends external_api {
             return $newgrid;
         }, $grids);
         return [
-            'grids' => $grids,
+            'grids' => array_values($grids),
         ];
     }
 

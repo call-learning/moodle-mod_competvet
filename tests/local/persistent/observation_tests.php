@@ -48,10 +48,10 @@ final class observation_tests extends advanced_testcase {
     public function test_observation_comment() {
         $user = core_user::get_user_by_username('student1');
         $situation1 = situation::get_record(['shortname' => 'SIT1']);
-        $planning = planning::get_records(['situationid' => $situation1->get('id')]);
-        $planning = $planning[0];
+        $plannings = array_values(planning::get_records(['situationid' => $situation1->get('id')]));
+        $planning = $plannings[0];
 
-        $observations = observation::get_records(['planningid' => $planning->get('id')]);
+        $observations = array_values(observation::get_records(['planningid' => $planning->get('id')]));
         $this->assertCount(2, $observations);
         $observation = $observations[0];
         $comments = $observation->get_comments();
@@ -62,7 +62,7 @@ final class observation_tests extends advanced_testcase {
         $criteriacomments = $observation->get_criteria_comments();
         $this->assertCount(2, $criteriacomments);
         $this->assertEquals(
-            ['Comment autoeval1', 'Comment autoeval2'],
+            ['Comment autoeval 1', 'Comment autoeval 2'],
             array_map(fn($comment) => $comment->get('comment'), $criteriacomments)
         );
     }

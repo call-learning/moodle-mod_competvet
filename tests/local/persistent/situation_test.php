@@ -69,10 +69,12 @@ final class situation_test extends advanced_testcase {
     public function test_get_all_situation_for($username, $expected): void {
         $user = core_user::get_user_by_username($username);
         $situations = situation::get_all_situations_id_for($user->id);
-        $situationssn = array_map(function ($situationid) {
-            $situation = situation::get_record(['id' => $situationid]);
-            return $situation->get('shortname');
-        }, $situations);
+        $situationssn = array_values(
+            array_map(function($situationid) {
+                $situation = situation::get_record(['id' => $situationid]);
+                return $situation->get('shortname');
+            }, $situations)
+        );
         sort($situationssn);
         $this->assertEquals($expected, array_values($situationssn), "Expected situations for user $username are different.");
     }

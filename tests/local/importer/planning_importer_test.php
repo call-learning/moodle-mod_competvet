@@ -95,7 +95,7 @@ final class planning_importer_test extends advanced_testcase {
 
         $importer = new planning_importer(planning::class, $competvet->get_course_id(), $situation->get('id'));
         $importer->import($CFG->dirroot . self::SAMPLE_FILE_PATH);
-        $plannings = planning::get_records(['situationid' => $situation->get('id')]);
+        $plannings = array_values(planning::get_records(['situationid' => $situation->get('id')]));
         $this->assertCount(5, $plannings, 'Number of plannings should be 4 after import.');
         $this->assertEquals(10, planning_pause::count_records());
         $this->assertEquals(2, planning_pause::count_records(['planningid' => $plannings[0]->get('id')]));
@@ -118,7 +118,7 @@ final class planning_importer_test extends advanced_testcase {
             ['00:00', '23:59'],
             ['00:00', '23:00'],
         ];
-        $pauses = planning_pause::get_records(['planningid' => $planning5->get('id')]);
+        $pauses = array_values(planning_pause::get_records(['planningid' => $planning5->get('id')]));
         $this->assertCount(count($expected), $pauses, 'There should be 2 pauses for planning 5.');
         foreach ($pauses as $pause) {
             [$expectedstart, $expectedend] = array_shift($expected);
