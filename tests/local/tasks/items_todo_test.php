@@ -51,12 +51,12 @@ final class items_todo_test extends advanced_testcase {
      * Test that the end of planning tasks sends an email when there are students to grade.
      *
      * @param DateTime $startdate
-     * @param array $expectedemails
+     * @param array $expectedsubjects
      * @return void
      * @covers       \mod_competvet\task\items_todo::execute
      * @dataProvider items_todo_provider
      */
-    public function test_item_todo(DateTime $startdate, array $expectedemails): void {
+    public function test_item_todo(DateTime $startdate, array $expectedsubjects): void {
         $this->resetAfterTest();
         set_config('immediate_email', 1, 'mod_competvet');
         $this->setAdminUser(); // Needed for report builder to work.
@@ -65,12 +65,12 @@ final class items_todo_test extends advanced_testcase {
         $endofplanningtasks = new items_todo();
         $endofplanningtasks->execute();
         $emails = $emailsink->get_messages();
-        $this->assertCount(count($expectedemails), $emails);
+        $this->assertCount(count($expectedsubjects), $emails);
         usort($emails, function ($a, $b) {
             return $a->to === $b->to ? ($a->subject <=> $b->subject) : ($a->to < $b->to ? -1 : 1);
         });
         foreach ($emails as $index => $email) {
-                $this->assertEquals($expectedemails[$index], [$email->subject, $email->to]);
+                $this->assertEquals($expectedsubjects[$index], [$email->subject, $email->to]);
         }
     }
 

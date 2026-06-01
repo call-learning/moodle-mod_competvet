@@ -36,9 +36,9 @@ final class end_of_planning_task_test extends advanced_testcase {
     use test_data_definition;
 
     /**
-     * Setup the test
+     * Data provider for end of planning task tests.
      *
-     * @return void
+     * @return array
      */
     public static function end_of_planning_data_provider(): array {
         return [
@@ -63,15 +63,32 @@ final class end_of_planning_task_test extends advanced_testcase {
     }
 
     /**
+     * Data provider for end of planning task tests.
+     *
+     * @return array
+     */
+    public static function end_of_planning_data_provider_with_grade(): array {
+        return [
+            'planning ending yesterday' => [
+                'startdate' => new DateTime('-8 days'),
+            ],
+            'planning ending last week' => [
+                'startdate' => new DateTime('-12 days'), // We should see both situations.
+            ],
+        ];
+    }
+
+
+    /**
      * Test that the end of planning tasks sends an email when there are students to grade.
      *
      * @param DateTime $startdate
-     * @param array $expectedemails
+     * @param array $expectedsubjects
      * @return void
      * @covers       \mod_competvet\task\end_of_planning::execute
      * @dataProvider end_of_planning_data_provider
      */
-    public function test_end_of_planning_without_grade(DateTime $startdate, array $expectedemails): void {
+    public function test_end_of_planning_without_grade(DateTime $startdate, array $expectedsubjects): void {
         $this->resetAfterTest();
         set_config('immediate_email', 1, 'mod_competvet');
         $this->setAdminUser(); // Needed for report builder to work.
@@ -80,12 +97,12 @@ final class end_of_planning_task_test extends advanced_testcase {
         $endofplanningtasks = new end_of_planning();
         $endofplanningtasks->execute();
         $emails = $emailsink->get_messages();
-        $this->assertCount(count($expectedemails), $emails);
+        $this->assertCount(count($expectedsubjects), $emails);
         usort($emails, function ($a, $b) {
             return $a->to === $b->to ? ($a->subject <=> $b->subject) : ($a->to < $b->to ? -1 : 1);
         });
         foreach ($emails as $index => $email) {
-                $this->assertEquals($expectedemails[$index], [$email->subject, $email->to]);
+                $this->assertEquals($expectedsubjects[$index], [$email->subject, $email->to]);
         }
     }
 
@@ -95,7 +112,7 @@ final class end_of_planning_task_test extends advanced_testcase {
      * @param DateTime $startdate
      * @return void
      * @covers       \mod_competvet\task\end_of_planning::execute
-     * @dataProvider end_of_planning_data_provider
+     * @dataProvider end_of_planning_data_provider_with_grade
      */
     public function test_end_of_planning_with_grade(DateTime $startdate): void {
         $this->resetAfterTest();
