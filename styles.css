@@ -220,13 +220,16 @@
     border-width: 3px;
     font-size: 1.2rem;
 }
-.gradingapp .nav-link.active, .gradingapp .nav-link:hover {
+.gradingapp .nav-link.active,
+.gradingapp .nav-link:hover {
     border-color: transparent transparent var(--primary);
 }
-.gradingapp .nav-link.active svg .svg-fill, .gradingapp .nav-link:hover svg .svg-fill {
+.gradingapp .nav-link.active svg .svg-fill,
+.gradingapp .nav-link:hover svg .svg-fill {
     fill: var(--primary);
 }
-.gradingapp .nav-link.active svg .svg-stroke, .gradingapp .nav-link:hover svg .svg-stroke {
+.gradingapp .nav-link.active svg .svg-stroke,
+.gradingapp .nav-link:hover svg .svg-stroke {
     stroke: var(--primary);
 }
 .gradingapp .form-control:focus {
@@ -702,7 +705,8 @@
     border-radius: 10px;
     justify-content: center;
 }
-.competvet-view-todos .btn-sort:hover, .competvet-view-todos .btn-sort:focus {
+.competvet-view-todos .btn-sort:hover,
+.competvet-view-todos .btn-sort:focus {
     background: var(--light);
     text-decoration: none;
 }
