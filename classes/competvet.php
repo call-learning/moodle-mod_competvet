@@ -237,10 +237,10 @@ class competvet {
      * @throws \moodle_exception
      */
     public function has_view_access(int $userid): bool {
-        $context = $this->get_context();
-        $cminfo = get_fast_modinfo($this->cminfo->course);
+        $cminfo = get_fast_modinfo($this->cminfo->course, $userid);
         $cm = $cminfo->get_cm($this->cminfo->id);
-        $canview = ($cm->uservisible && has_capability('mod/competvet:view', $context, $userid)) || is_siteadmin($userid);
+        // Uservisible will check for 'mod/' . $this->modname . ':view' in is_user_access_restricted_by_capability.
+        $canview = ($cm->uservisible || is_siteadmin($userid));
         if (!$canview) {
             return false;
         }
