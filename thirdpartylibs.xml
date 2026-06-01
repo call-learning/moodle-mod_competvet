@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <libraries>
   <library>
-    <location>amd/src/local/xlsx.mini.js</location>
+    <location>amd/src/local/xlsx.js</location>
     <name>Sheetjs</name>
     <description>SheetJS Community Edition -- Spreadsheet Data Toolkit </description>
     <version>0.20.3</version>

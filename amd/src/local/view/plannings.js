@@ -22,7 +22,7 @@
  */
 
 import {get_strings as getStrings} from 'core/str';
-import XLSX from 'mod_competvet/local/xlsx.mini';
+import XLSX from 'mod_competvet/local/xlsx';
 
 /**
  * Initialize the plannings view and add event listeners to the search fields.
