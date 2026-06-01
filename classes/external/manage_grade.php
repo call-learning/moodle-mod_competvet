@@ -201,7 +201,6 @@ class manage_grade extends external_api {
             'result' => $grade,
             'warnings' => [],
         ];
-
     }
 
     /**
