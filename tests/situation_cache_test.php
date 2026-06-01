@@ -18,6 +18,8 @@ namespace mod_competvet;
 
 
 use advanced_testcase;
+use core_courseformat\formatactions;
+use core_courseformat\local\cmactions;
 use core_user;
 use mod_competvet\local\api\plannings;
 use mod_competvet\local\persistent\situation;
@@ -151,7 +153,7 @@ class situation_cache_test extends advanced_testcase {
         $this->assertCount(2, $situations);
         $modinfo = get_fast_modinfo($course);
         [$course, $cm] = get_course_and_cm_from_instance($situation->id, 'competvet');
-        course_delete_module($cm->id);
+        formatactions::cm($course->id)->delete($cm->id);
         $this->run_all_adhoc_tasks();
         $situations = situation::get_all_situations_id_for($student1->id);
         $this->assertCount(1, $situations);
