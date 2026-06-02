@@ -9,15 +9,15 @@
         display: flex;
         align-items: center;
         cursor: pointer;
-        background: var(--secondary);
-        color: var(--gray-dark);
+        background: var(--bs-secondary);
+        color: var(--bs-gray-dark);
         width: 20px;
         height: 20px;
         border-radius: 10px;
         justify-content: center;
 
         &:hover, &:focus {
-            background: var(--light);
+            background: var(--bs-light);
             text-decoration: none;
         }
     }

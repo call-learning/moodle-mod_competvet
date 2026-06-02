@@ -23,7 +23,7 @@
 
 import {get_string as getString} from 'core/str';
 import Notification from 'core/notification';
-import ModalFactory from 'core/modal_factory';
+import ModalCancel from 'core/modal_cancel';
 import Ajax from 'core/ajax';
 import Template from "core/templates";
 import {genericForm} from './generic_form_helper';
@@ -32,18 +32,15 @@ export const init = (modulename) => {
     const handleAskSubmit = async(event) => {
         const askObservationTitle = await getString('observation:ask', modulename);
         try {
-            const modal = await ModalFactory.create({
+            const modal = await ModalCancel.create({
                 title: askObservationTitle,
                 body: Template.render(`${modulename}/view/eval_ask_observation_modal`, {
                     'modulename': modulename,
                     ...event.detail
                 }),
-                type: ModalFactory.types.CANCEL,
-                large: true
+                large: true,
+                show: true,
             });
-
-            // Show the modal.
-            modal.show();
             return modal;
         } catch (error) {
             await Notification.exception(error);

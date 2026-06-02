@@ -23,7 +23,7 @@
 
 import {get_strings as getStrings} from 'core/str';
 import Notification from 'core/notification';
-import ModalFactory from 'core/modal_factory';
+import ModalSaveCancel from 'core/modal_save_cancel';
 import ModalEvents from 'core/modal_events';
 import Ajax from 'core/ajax';
 import {getSelectedElement} from './generic_form_helper';
@@ -41,11 +41,10 @@ export const init = async(modulename) => {
         element.addEventListener('click', async(event) => {
             event.preventDefault();
             // Init an ok cancel modal.
-            const modal = await ModalFactory.create({
+            const modal = await ModalSaveCancel.create({
                 title: deleteTitle,
                 body: deleteConfirm,
-                type: ModalFactory.types.SAVE_CANCEL,
-                large: true
+                large: true,
             }).catch(Notification.exception);
             modal.getRoot().on(ModalEvents.save, () => {
                 // Query the APO delete_observation from mod_competvet_eval

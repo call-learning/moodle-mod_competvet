@@ -197,7 +197,7 @@
 }
 .gradingapp .grade-tabs .grade-tab-indicator:not(:empty) {
     color: #fff;
-    background-color: var(--primary);
+    background-color: var(--bs-primary);
     border-radius: 1rem;
     padding: 0.25rem 0.5rem;
     font-size: 0.8rem;
@@ -222,15 +222,15 @@
 }
 .gradingapp .nav-link.active,
 .gradingapp .nav-link:hover {
-    border-color: transparent transparent var(--primary);
+    border-color: transparent transparent var(--bs-primary);
 }
 .gradingapp .nav-link.active svg .svg-fill,
 .gradingapp .nav-link:hover svg .svg-fill {
-    fill: var(--primary);
+    fill: var(--bs-primary);
 }
 .gradingapp .nav-link.active svg .svg-stroke,
 .gradingapp .nav-link:hover svg .svg-stroke {
-    stroke: var(--primary);
+    stroke: var(--bs-primary);
 }
 .gradingapp .form-control:focus {
     box-shadow: none;
@@ -698,8 +698,8 @@
     display: flex;
     align-items: center;
     cursor: pointer;
-    background: var(--secondary);
-    color: var(--gray-dark);
+    background: var(--bs-secondary);
+    color: var(--bs-gray-dark);
     width: 20px;
     height: 20px;
     border-radius: 10px;
@@ -707,6 +707,6 @@
 }
 .competvet-view-todos .btn-sort:hover,
 .competvet-view-todos .btn-sort:focus {
-    background: var(--light);
+    background: var(--bs-light);
     text-decoration: none;
 }

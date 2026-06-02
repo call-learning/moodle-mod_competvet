@@ -108,7 +108,7 @@ class Manager {
      * @param {object} btn The button that was clicked.
      */
     downloadPlanning(btn) {
-        const urlWithParams = new URL('/mod/competvet/reports.php', window.location.origin);
+        const urlWithParams = new URL(M.cfg.wwwroot + '/mod/competvet/reports.php', window.location.origin);
         urlWithParams.searchParams.append('id', this.cmId);
         urlWithParams.searchParams.append('reportname', 'planning_external_format');
         urlWithParams.searchParams.append('parameters[situationid]', btn.dataset.situationid);

@@ -136,7 +136,7 @@
 
         .grade-tab-indicator:not(:empty) {
             color: #fff;
-            background-color: var(--primary);
+            background-color: var(--bs-primary);
             border-radius: 1rem;
             padding: 0.25rem 0.5rem;
             font-size: 0.8rem;
@@ -169,15 +169,15 @@
 
         &.active,
         &:hover {
-            border-color: transparent transparent var(--primary);
+            border-color: transparent transparent var(--bs-primary);
 
             svg {
                 .svg-fill {
-                    fill: var(--primary);
+                    fill: var(--bs-primary);
                 }
 
                 .svg-stroke {
-                    stroke: var(--primary);
+                    stroke: var(--bs-primary);
                 }
             }
         }
