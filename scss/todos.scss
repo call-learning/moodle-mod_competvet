@@ -16,7 +16,8 @@
         border-radius: 10px;
         justify-content: center;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
             background: var(--light);
             text-decoration: none;
         }
