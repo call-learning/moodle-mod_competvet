@@ -19,6 +19,7 @@ namespace mod_competvet\external;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_value;
+use core_external\external_single_structure;
 use mod_competvet\competvet;
 use mod_competvet\event\observation_requested;
 use mod_competvet\local\persistent\planning;
@@ -34,10 +35,10 @@ class ask_eval_observation extends external_api {
     /**
      * Returns description of method return value
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
-    public static function execute_returns(): \external_single_structure {
-        return new \external_single_structure(
+    public static function execute_returns(): external_single_structure {
+        return new external_single_structure(
             [
                 'success' => new external_value(PARAM_BOOL, 'As the observation been asked?'),
             ]
