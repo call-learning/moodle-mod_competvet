@@ -450,7 +450,7 @@ class Manager {
             });
         });
         const result = await Repository.savePlannings(saveState);
-        this.getData();
+        await this.getData();
         pendingSaveReady.resolve();
         return result;
     }

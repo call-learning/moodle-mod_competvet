@@ -446,14 +446,36 @@ class plannings {
         string $enddate,
         string $session
     ): void {
+        $startdatets = strtotime($startdate);
+        $enddatets = strtotime($enddate);
+
+        // Find an existing planning matching the DB unique key to keep this operation idempotent.
+        $existingplanning = planning::get_record([
+            'situationid' => $situationid,
+            'groupid' => $groupid,
+            'startdate' => $startdatets,
+            'enddate' => $enddatets,
+            'session' => $session,
+        ]);
+
         $planning = planning::get_record(['id' => $planningid]);
+        if ($planning && $existingplanning && $planning->get('id') !== $existingplanning->get('id')) {
+            // Target update conflicts with another existing planning, so keep existing record as-is.
+            return;
+        }
+
+        if (!$planning && $existingplanning) {
+            // Duplicate "create" request: record already exists with same unique fields.
+            return;
+        }
+
         if (!$planning) {
             $planning = new planning(0);
         }
         $planning->set('situationid', $situationid);
         $planning->set('groupid', $groupid);
-        $planning->set('startdate', strtotime($startdate));
-        $planning->set('enddate', strtotime($enddate));
+        $planning->set('startdate', $startdatets);
+        $planning->set('enddate', $enddatets);
         $planning->set('session', $session);
         if ($planning->get('id')) {
             $planning->update();
