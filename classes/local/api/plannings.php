@@ -51,12 +51,15 @@ class plannings {
      * @param int $situationid situation ID
      * @param int $userid user ID
      * @param bool $nofuture do not show future situation
+     * @param bool $viewall if true, return plannings for all groups even when the user is a student
+     *                      (used by the management/editor view where the user may also hold a student role)
      * @return array array of plannings
      */
     public static function get_plannings_for_situation_id(
         int $situationid,
         int $userid,
-        bool $nofuture = true
+        bool $nofuture = true,
+        bool $viewall = false
     ): array {
         // Check if user has access to this situation, else throw an error.
         $competvet = competvet::get_from_situation_id($situationid);
@@ -70,7 +73,7 @@ class plannings {
             'situationid' => $situationid,
         ];
         $planninngssql = 'situationid = :situationid';
-        if ($isstudent) {
+        if ($isstudent && !$viewall) {
             global $DB;
             // Remove planning for which this user is not involved.
             $allusergroups = groups_get_all_groups($situationcontext->get_course_context()->instanceid, $userid);
