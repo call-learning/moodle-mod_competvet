@@ -66,7 +66,16 @@ class get_plannings extends external_api {
         }, $coursegroups);
         $groups = array_values($groups);
 
-        $plannings = plannings_api::get_plannings_for_situation_id($competvet->get_situation()->get('id'), $USER->id, false);
+        // Users who can edit plannings manage the full list, so they must see plannings for every group
+        // even if they also hold a student role in this situation (which would otherwise filter the list
+        // down to their own groups).
+        $viewall = has_capability('mod/competvet:editplanning', $context);
+        $plannings = plannings_api::get_plannings_for_situation_id(
+            $competvet->get_situation()->get('id'),
+            $USER->id,
+            false,
+            $viewall
+        );
         $timezone = core_date::get_user_timezone_object();
         // Covert the startdate and enddate to a human readable format using yyyy-MM-dd.
         foreach ($plannings as $key => $planning) {
