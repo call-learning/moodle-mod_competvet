@@ -1,0 +1,26 @@
+schema: spec-driven
+
+context: |
+  OpenSpec authoring language policy:
+  - Write all OpenSpec artifacts in English by default.
+  - Keep French terms only when they are part of the technical implementation,
+    product vocabulary, database fields, code identifiers, UI labels, or domain
+    names that must remain unchanged.
+  - When a French term is kept for technical accuracy, explain it in English if
+    the meaning would otherwise be ambiguous.
+  - Avoid mixing French and English in narrative sections of the same artifact.
+  - Optimize for implementation clarity and consistency across proposal, specs,
+    design, and tasks.
+
+rules:
+  proposal:
+    - Write proposal narrative in English.
+    - Keep technical identifiers, existing field names, and code terms unchanged even if they are French.
+  specs:
+    - Write requirements and scenarios in English.
+    - Keep implementation-bound French terms only when renaming them would create ambiguity with the codebase.
+  design:
+    - Write design rationale and trade-offs in English.
+    - When referring to French technical vocabulary from the product or schema, preserve the exact term and explain it in English if needed.
+  tasks:
+    - Write all task descriptions in English.
