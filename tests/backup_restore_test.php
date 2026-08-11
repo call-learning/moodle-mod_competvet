@@ -132,19 +132,11 @@ final class backup_restore_test extends advanced_testcase {
         $newsituation = competvet::get_from_cmid($cm->id)->get_situation();
         $oldsituation = $competvet->get_situation();
 
-        // Debug: log original and restored grid references.
-        $origEvalGrid = $oldsituation->get('evalgrid');
-        $origCertifGrid = $oldsituation->get('certifgrid');
-        $origListGrid = $oldsituation->get('listgrid');
-        $newEvalGrid = $newsituation->get('evalgrid');
-        $newCertifGrid = $newsituation->get('certifgrid');
-        $newListGrid = $newsituation->get('listgrid');
-
         $this->check_created_instances($oldsituation, $newsituation);
 
         // Verify grid and criterion integrity after restore.
-        $this->check_grid_integrity($oldsituation, $newsituation, $oldgridcount);
-        $this->check_criterion_integrity($oldsituation, $newsituation, $oldcriterioncount);
+        $this->check_grid_integrity($oldgridcount);
+        $this->check_criterion_integrity($oldcriterioncount);
         $this->check_grid_reference_integrity($oldsituation, $newsituation);
         $this->check_criterion_reference_integrity($oldsituation, $newsituation);
     }
@@ -152,11 +144,9 @@ final class backup_restore_test extends advanced_testcase {
     /**
      * Check that grid counts are correct after restore (no unintended duplication).
      *
-     * @param situation $oldsituation
-     * @param situation $newsituation
      * @param int $oldgridcount
      */
-    private function check_grid_integrity(situation $oldsituation, situation $newsituation, int $oldgridcount) {
+    private function check_grid_integrity(int $oldgridcount) {
         // The restored course should have exactly one more grid than before (the restored activity's grid).
         // If grid reuse kicked in, the count should be the same as before (grid was reused, not duplicated).
         $newgridcount = grid::count_records();
@@ -171,11 +161,9 @@ final class backup_restore_test extends advanced_testcase {
     /**
      * Check that criterion counts are correct after restore (no unintended duplication).
      *
-     * @param situation $oldsituation
-     * @param situation $newsituation
      * @param int $oldcriterioncount
      */
-    private function check_criterion_integrity(situation $oldsituation, situation $newsituation, int $oldcriterioncount) {
+    private function check_criterion_integrity(int $oldcriterioncount) {
         // The restored course should have exactly one more criterion than before (the restored activity's criteria).
         $newcriterioncount = criterion::count_records();
         $expectednewcriterioncount = $oldcriterioncount + 1;
@@ -555,52 +543,43 @@ final class backup_restore_test extends advanced_testcase {
         global $DB;
         // Check if evaluation grid already exists.
         if (!$DB->get_record('competvet_grid', ['idnumber' => 'DEFAULTEVALGRID'])) {
-            $evalgrid = new grid(0, [
+            $evalgrid = new grid(0, (object) [
                 'name' => 'Default evaluation grid',
                 'idnumber' => 'DEFAULTEVALGRID',
                 'type' => grid::COMPETVET_CRITERIA_EVALUATION,
                 'sortorder' => 0,
             ]);
             $evalgrid->create();
-            error_log("DEBUG: Created evalgrid with id=" . $evalgrid->get('id'));
             // Create default criteria for evaluation grid.
             $this->create_default_criteria($evalgrid->get('id'));
-        } else {
-            error_log("DEBUG: evalgrid already exists");
         }
         // Check if certification grid already exists.
         if (!$DB->get_record('competvet_grid', ['idnumber' => 'DEFAULTCERTIFGRID'])) {
-            $certifgrid = new grid(0, [
+            $certifgrid = new grid(0, (object) [
                 'name' => 'Default certification grid',
                 'idnumber' => 'DEFAULTCERTIFGRID',
                 'type' => grid::COMPETVET_CRITERIA_CERTIFICATION,
                 'sortorder' => 0,
             ]);
             $certifgrid->create();
-            error_log("DEBUG: Created certifgrid with id=" . $certifgrid->get('id'));
             // Create default criterion for certification grid.
-            $certcrit = new criterion(0, [
+            $certcrit = new criterion(0, (object) [
                 'label' => 'CERT1',
                 'idnumber' => 'CERT1',
                 'gridid' => $certifgrid->get('id'),
                 'sort' => 0,
             ]);
             $certcrit->create();
-        } else {
-            error_log("DEBUG: certifgrid already exists");
         }
         // Check if list grid already exists.
         if (!$DB->get_record('competvet_grid', ['idnumber' => 'DEFAULTLISTGRID'])) {
-            $listgrid = new grid(0, [
+            $listgrid = new grid(0, (object) [
                 'name' => 'Default list grid',
                 'idnumber' => 'DEFAULTLISTGRID',
                 'type' => grid::COMPETVET_CRITERIA_LIST,
                 'sortorder' => 0,
             ]);
             $listgrid->create();
-            error_log("DEBUG: Created listgrid with id=" . $listgrid->get('id'));
-        } else {
-            error_log("DEBUG: listgrid already exists");
         }
     }
 
@@ -613,7 +592,7 @@ final class backup_restore_test extends advanced_testcase {
         // Create parent criteria Q001, Q002, Q003 with their children.
         $parentids = ['Q001', 'Q002', 'Q003'];
         foreach ($parentids as $idnumber) {
-            $parent = new criterion(0, [
+            $parent = new criterion(0, (object) [
                 'label' => $idnumber,
                 'idnumber' => $idnumber,
                 'gridid' => $gridid,
@@ -622,7 +601,7 @@ final class backup_restore_test extends advanced_testcase {
             $parent->create();
             // Create 5 child criteria for each parent.
             for ($i = 1; $i <= 5; $i++) {
-                $child = new criterion(0, [
+                $child = new criterion(0, (object) [
                     'label' => "{$idnumber}.{$i}",
                     'idnumber' => "{$idnumber}.{$i}",
                     'gridid' => $gridid,
