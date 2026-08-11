@@ -1,3 +1,8 @@
 node_modules
 .DS_Store
 *phpunit.xml
+.agents
+cocoindex_code/
+.codex/
+.opencode/
+openspec/
