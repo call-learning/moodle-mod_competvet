@@ -113,6 +113,46 @@ final class manage_criteria_test extends \advanced_testcase {
     }
 
     /**
+     * New criteria can be included in the same request as a reorder.
+     */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    public function test_reorder_with_new_criterion(): void {
+        $this->resetAfterTest();
+        $grid = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Grid with new criterion', 'idnumber' => 'GRID010',
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+        ]);
+        $grid->create();
+        $criterion = new \mod_competvet\local\persistent\criterion(0, (object) [
+            'gridid' => $grid->get('id'), 'label' => 'Existing', 'idnumber' => 'CRIT010',
+            'parentid' => 0, 'sort' => 1,
+        ]);
+        $criterion->create();
+
+        $this->setAdminUser();
+        $result = $this->manage_criteria_update([
+            [
+                'gridid' => $grid->get('id'), 'type' => $grid->get('type'), 'updatesortorder' => true,
+                'criteria' => [
+                    [
+                        'criterionid' => 0, 'label' => 'New', 'idnumber' => 'CRIT011', 'sortorder' => 1,
+                        'haschanged' => true, 'hasoptions' => false, 'options' => [],
+                    ],
+                    [
+                        'criterionid' => $criterion->get('id'), 'label' => 'Existing', 'idnumber' => 'CRIT010',
+                        'sortorder' => 2, 'options' => [],
+                    ],
+                ],
+            ],
+        ], $grid->get('type'));
+
+        $this->assertTrue($result['result']);
+        $criteria = $this->manage_criteria_get($grid->get('type'), $grid->get('id'))['grids'][0]['criteria'];
+        $this->assertSame('New', $criteria[0]['label']);
+        $this->assertSame('Existing', $criteria[1]['label']);
+    }
+
+    /**
      * Test deletion of grid using deleted field
      */
     #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
@@ -328,6 +368,119 @@ final class manage_criteria_test extends \advanced_testcase {
         $result = $this->manage_criteria_update($deleteparams, $grid->get('type'));
         $this->assertTrue($result['result']);
         $this->assertNotEmpty($result['warnings']);
+    }
+
+    /**
+     * Structural edits must not move criteria between grids.
+     */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    public function test_reject_unsafe_criterion_structure_changes(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $grid1 = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Grid one', 'idnumber' => 'GRID007',
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+        ]);
+        $grid1->create();
+        $grid2 = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Grid two', 'idnumber' => 'GRID008',
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+        ]);
+        $grid2->create();
+        $criterion = new \mod_competvet\local\persistent\criterion(0, (object) [
+            'gridid' => $grid1->get('id'), 'label' => 'Criterion', 'idnumber' => 'CRIT007',
+            'parentid' => 0, 'sort' => 1,
+        ]);
+        $criterion->create();
+
+        $this->expectException(\moodle_exception::class);
+        \mod_competvet\local\api\criteria::update_criterion(
+            $criterion->get('id'),
+            'Criterion',
+            'CRIT007',
+            1,
+            $grid2->get('id'),
+            0,
+            null
+        );
+    }
+
+    /**
+     * A parent cannot be removed while one of its used options remains.
+     */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    public function test_delete_parent_preserves_used_children(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $grid = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Grid for parent delete', 'idnumber' => 'GRID009',
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+        ]);
+        $grid->create();
+        $parent = new \mod_competvet\local\persistent\criterion(0, (object) [
+            'gridid' => $grid->get('id'), 'label' => 'Parent', 'idnumber' => 'CRIT009',
+            'parentid' => 0, 'sort' => 1,
+        ]);
+        $parent->create();
+        $option = new \mod_competvet\local\persistent\criterion(0, (object) [
+            'gridid' => $grid->get('id'), 'label' => 'Used option', 'idnumber' => 'OPT009',
+            'parentid' => $parent->get('id'), 'sort' => 1,
+        ]);
+        $option->create();
+        $DB->insert_record('competvet_obs_crit_level', (object) [
+            'situationid' => 0, 'observationid' => 0, 'criterionid' => $option->get('id'), 'level' => 1,
+        ]);
+
+        $this->assertFalse(\mod_competvet\local\api\criteria::delete_criterion($parent->get('id')));
+        $this->assertTrue($DB->record_exists('competvet_criterion', ['id' => $parent->get('id')]));
+        $this->assertTrue($DB->record_exists('competvet_criterion', ['id' => $option->get('id')]));
+    }
+
+    /**
+     * A new criterion with criterionid=0 and haschanged=false must not break sort-order updates.
+     */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    public function test_reorder_with_new_criterion_without_haschanged(): void {
+        $this->resetAfterTest();
+        $grid = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Grid for reorder edge case', 'idnumber' => 'GRID012',
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+        ]);
+        $grid->create();
+        $criterion = new \mod_competvet\local\persistent\criterion(0, (object) [
+            'gridid' => $grid->get('id'), 'label' => 'Existing', 'idnumber' => 'CRIT012',
+            'parentid' => 0, 'sort' => 1,
+        ]);
+        $criterion->create();
+
+        $this->setAdminUser();
+        // Simulate frontend sending a new criterion with criterionid=0 and haschanged=false
+        // alongside a reorder request. This used to cause an exception because 0 was added
+        // to the sort-order array.
+        $result = $this->manage_criteria_update([
+            [
+                'gridid' => $grid->get('id'), 'type' => $grid->get('type'), 'updatesortorder' => true,
+                'criteria' => [
+                    [
+                        'criterionid' => 0, 'label' => 'New (unchanged)', 'idnumber' => 'CRIT013',
+                        'sortorder' => 1, 'haschanged' => false, 'hasoptions' => false, 'options' => [],
+                    ],
+                    [
+                        'criterionid' => $criterion->get('id'), 'label' => 'Existing', 'idnumber' => 'CRIT012',
+                        'sortorder' => 2, 'options' => [],
+                    ],
+                ],
+            ],
+        ], $grid->get('type'));
+
+        $this->assertTrue($result['result'], 'Reorder with new criterion (no haschanged) should not throw.');
+        $criteria = $this->manage_criteria_get($grid->get('type'), $grid->get('id'))['grids'][0]['criteria'];
+        // Only the existing criterion should appear (the new one was not created because haschanged=false).
+        $this->assertCount(1, $criteria);
+        $this->assertSame('Existing', $criteria[0]['label']);
     }
 
     /**

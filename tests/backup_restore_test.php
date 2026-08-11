@@ -206,6 +206,16 @@ final class backup_restore_test extends advanced_testcase {
                 $DB->record_exists('competvet_grid', ['id' => $gridid]),
                 "Restored situation references non-existent grid ID $gridid. Total grids in DB: " . $DB->count_records('competvet_grid')
             );
+            $criteria = $DB->get_records('competvet_criterion', ['gridid' => $gridid]);
+            foreach ($criteria as $criterion) {
+                if (!$criterion->parentid) {
+                    continue;
+                }
+                $parent = $DB->get_record('competvet_criterion', ['id' => $criterion->parentid]);
+                $this->assertNotFalse($parent, 'Restored criterion parent should exist.');
+                $this->assertEquals($gridid, $parent->gridid, 'Restored criterion parent must belong to the same grid.');
+                $this->assertEquals(0, $parent->parentid, 'Restored criterion parent must be a top-level criterion.');
+            }
         }
     }
 
