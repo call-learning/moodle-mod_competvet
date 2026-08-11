@@ -97,6 +97,7 @@ class manage_criteria extends external_api {
      * @return array
      */
     public static function update($grids, $type): array {
+        global $DB;
         $params = self::validate_parameters(self::update_parameters(), ['grids' => $grids, 'type' => $type]);
         self::validate_context(context_system::instance());
 
@@ -104,11 +105,18 @@ class manage_criteria extends external_api {
         $type = $params['type'];
         $warnings = [];
         $results = [];
-        $setgridmodified = false;
+        $transaction = $DB->start_delegated_transaction();
         // Update or insert the grid by calling the correct API.
         foreach ($grids as $grid) {
             if ($grid['deleted'] ?? false) {
-                criteria::delete_grid($grid['gridid']);
+                if (!criteria::delete_grid($grid['gridid'])) {
+                    $warnings[] = [
+                        'item' => 'grid',
+                        'itemid' => $grid['gridid'],
+                        'warningcode' => 'deletionfailed',
+                        'message' => 'Grid could not be deleted',
+                    ];
+                }
                 continue;
             }
             $gridid = $grid['gridid'];
@@ -121,12 +129,8 @@ class manage_criteria extends external_api {
                     $type
                 );
             }
-            if ($grid['updatesortorder'] ?? false) {
-                $criteriaorder = array_map(function ($criterion) {
-                    return $criterion['criterionid'];
-                }, $grid['criteria']);
-                criteria::update_criteria_sortorder($criteriaorder);
-            }
+            $setgridmodified = false;
+            $criterionids = [];
             foreach ($grid['criteria'] as $criterion) {
                 if (
                     ($criterion['deleted'] ?? false) || ($criterion['updatesortorder'] ?? false) ||
@@ -145,12 +149,7 @@ class manage_criteria extends external_api {
                     }
                     continue;
                 }
-                if ($criterion['updatesortorder'] ?? false) {
-                    $criteriaorder = array_map(function ($option) {
-                        return $option['optionid'];
-                    }, $criterion['options']);
-                    criteria::update_criteria_sortorder($criteriaorder);
-                }
+                $criterionid = $criterion['criterionid'];
                 if ($criterion['haschanged'] ?? false) {
                     $criterionid = criteria::update_criterion(
                         $criterion['criterionid'],
@@ -162,6 +161,7 @@ class manage_criteria extends external_api {
                         null
                     );
                     if ($criterion['hasoptions'] ?? false) {
+                        $optionids = [];
                         foreach ($criterion['options'] as $option) {
                             if ($option['deleted'] ?? false) {
                                 if (!criteria::delete_criterion($option['optionid'])) {
@@ -175,7 +175,7 @@ class manage_criteria extends external_api {
                                 continue;
                             }
                             $grade = $option['grade'] ?? null;
-                            criteria::update_criterion(
+                            $optionid = criteria::update_criterion(
                                 $option['optionid'],
                                 $option['label'],
                                 $option['idnumber'],
@@ -184,14 +184,36 @@ class manage_criteria extends external_api {
                                 $criterionid,
                                 $grade
                             );
+                            $optionids[] = $optionid;
+                        }
+                        if ($criterion['updatesortorder'] ?? false) {
+                            criteria::update_criteria_sortorder($optionids, $gridid, $criterionid);
                         }
                     }
                 }
+                // Only include persisted criterion IDs in the sort-order collection.
+                // New criteria (criterionid === 0) that have not been created yet
+                // must not appear in the sort-order array — they are created above
+                // when haschanged is true, and their real ID is collected here.
+                if ($criterionid) {
+                    $criterionids[] = $criterionid;
+                }
+                if (($criterion['updatesortorder'] ?? false) && !($criterion['haschanged'] ?? false)) {
+                    $optionids = array_map(function ($option) {
+                        return $option['optionid'];
+                    }, $criterion['options']);
+                    criteria::update_criteria_sortorder($optionids, $gridid, $criterionid);
+                }
+            }
+            if ($grid['updatesortorder'] ?? false) {
+                criteria::update_criteria_sortorder($criterionids, $gridid);
             }
             if ($setgridmodified) {
                 criteria::set_grid_modified($gridid);
             }
         }
+
+        $transaction->allow_commit();
 
         if (count($results) === 0) {
             $result = true;
