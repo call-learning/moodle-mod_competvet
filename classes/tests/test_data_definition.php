@@ -90,13 +90,20 @@ trait test_data_definition {
             foreach ($data['users'] as $role => $usernames) {
                 foreach ($usernames as $username) {
                     if (empty($users[$username])) {
-                        $users[$username] = $generator->create_user(
-                            [
-                                'username' => $username,
-                                'firstname' => ucfirst($username . 'first'),
-                                'lastname' => ucfirst($username . 'last'),
-                            ]
-                        );
+                        // Check if user already exists in the database (e.g., from a previous
+                        // call to generates_definition with the same username).
+                        $existinguser = $DB->get_record('user', ['username' => $username]);
+                        if ($existinguser) {
+                            $users[$username] = $existinguser;
+                        } else {
+                            $users[$username] = $generator->create_user(
+                                [
+                                    'username' => $username,
+                                    'firstname' => ucfirst($username . 'first'),
+                                    'lastname' => ucfirst($username . 'last'),
+                                ]
+                            );
+                        }
                     }
                     $generator->enrol_user($users[$username]->id, $course->id, $role);
                 }

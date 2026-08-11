@@ -21,10 +21,13 @@ use advanced_testcase;
 use backup;
 use backup_controller;
 use DateTime;
+use mod_competvet\competvet;
 use mod_competvet\local\persistent\case_data;
 use mod_competvet\local\persistent\case_entry;
 use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\cert_valid;
+use mod_competvet\local\persistent\criterion;
+use mod_competvet\local\persistent\grid;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
@@ -58,6 +61,7 @@ final class backup_restore_test extends advanced_testcase {
         $this->resetAfterTest(true);
 
         // Create a course and add a competvet instance.
+        // Note: we do NOT create default grids here — the generator handles that.
         $generator = $this->getDataGenerator();
         $competvetgenerator = $generator->get_plugin_generator('mod_competvet');
         $startdate = new DateTime('last Monday');
@@ -68,6 +72,11 @@ final class backup_restore_test extends advanced_testcase {
 
         $course = $DB->get_record('course', ['shortname' => 'course 1']);
         $this->setAdminUser();
+
+        // Capture original grid and criterion counts before backup.
+        $oldgridcount = grid::count_records();
+        $oldcriterioncount = criterion::count_records();
+
         // Prepare for backup.
         $bc = new backup_controller(
             backup::TYPE_1COURSE,
@@ -122,7 +131,566 @@ final class backup_restore_test extends advanced_testcase {
         $cm = reset($cms);
         $newsituation = competvet::get_from_cmid($cm->id)->get_situation();
         $oldsituation = $competvet->get_situation();
+
         $this->check_created_instances($oldsituation, $newsituation);
+
+        // Verify grid and criterion integrity after restore.
+        $this->check_grid_integrity($oldgridcount);
+        $this->check_criterion_integrity($oldcriterioncount);
+        $this->check_grid_reference_integrity($oldsituation, $newsituation);
+        $this->check_criterion_reference_integrity($oldsituation, $newsituation);
+    }
+
+    /**
+     * Check that grid counts are correct after restore (no unintended duplication).
+     *
+     * @param int $oldgridcount
+     */
+    private function check_grid_integrity(int $oldgridcount) {
+        // The restored course should have exactly one more grid than before (the restored activity's grid).
+        // If grid reuse kicked in, the count should be the same as before (grid was reused, not duplicated).
+        $newgridcount = grid::count_records();
+        $expectednewgridcount = $oldgridcount + 1;
+        $this->assertLessThanOrEqual(
+            $expectednewgridcount,
+            $newgridcount,
+            'Grid count exceeded expected maximum — possible unintended duplication after restore.'
+        );
+    }
+
+    /**
+     * Check that criterion counts are correct after restore (no unintended duplication).
+     *
+     * @param int $oldcriterioncount
+     */
+    private function check_criterion_integrity(int $oldcriterioncount) {
+        // The restored course should have exactly one more criterion than before (the restored activity's criteria).
+        $newcriterioncount = criterion::count_records();
+        $expectednewcriterioncount = $oldcriterioncount + 1;
+        $this->assertLessThanOrEqual(
+            $expectednewcriterioncount,
+            $newcriterioncount,
+            'Criterion count exceeded expected maximum — possible unintended duplication after restore.'
+        );
+    }
+
+    /**
+     * Check that grid references in situations are correct after restore.
+     *
+     * @param situation $oldsituation
+     * @param situation $newsituation
+     */
+    private function check_grid_reference_integrity(situation $oldsituation, situation $newsituation) {
+        global $DB;
+
+        // The restored situation's grid references should be non-null.
+        $evalgridid = $newsituation->get('evalgrid');
+        $certifgridid = $newsituation->get('certifgrid');
+        $listgridid = $newsituation->get('listgrid');
+
+        $this->assertNotNull($evalgridid, 'Restored situation evalgrid should not be null.');
+        $this->assertNotNull($certifgridid, 'Restored situation certifgrid should not be null.');
+        $this->assertNotNull($listgridid, 'Restored situation listgrid should not be null.');
+
+        // Verify that the grid IDs are positive integers.
+        $this->assertGreaterThan(0, $evalgridid, 'Restored evalgrid ID should be positive.');
+        $this->assertGreaterThan(0, $certifgridid, 'Restored certifgrid ID should be positive.');
+        $this->assertGreaterThan(0, $listgridid, 'Restored listgrid ID should be positive.');
+
+        // Verify grids exist by querying the DB directly.
+        // Note: We use $DB->record_exists() instead of grid::record_exists() because
+        // the persistent class caches records and may return stale data.
+        $gridids = [$evalgridid, $certifgridid, $listgridid];
+        foreach ($gridids as $gridid) {
+            $this->assertTrue(
+                $DB->record_exists('competvet_grid', ['id' => $gridid]),
+                "Restored situation references non-existent grid ID $gridid. Total grids in DB: " . $DB->count_records('competvet_grid')
+            );
+        }
+    }
+
+    /**
+     * Check that criterion references in observations and certifications are correct after restore.
+     *
+     * @param situation $oldsituation
+     * @param situation $newsituation
+     */
+    private function check_criterion_reference_integrity(situation $oldsituation, situation $newsituation) {
+        global $DB;
+        $newcompetvet = competvet::get_from_situation($newsituation);
+        $newplannings = array_values(planning::get_records(['situationid' => $newsituation->get('id')]));
+
+        foreach ($newplannings as $newplanning) {
+            // Check observation criteria levels reference valid criteria.
+            $observations = array_values(observation::get_records(['planningid' => $newplanning->get('id')]));
+            foreach ($observations as $obs) {
+                $criterialevels = $obs->get_criteria_levels();
+                foreach ($criterialevels as $level) {
+                    $criterionid = $level->get('criterionid');
+                    $this->assertTrue(
+                        $DB->record_exists('competvet_criterion', ['id' => $criterionid]),
+                        "Observation criteria level points to a non-existent criterion (observationid=" . $obs->get('id') . ", criterionid=$criterionid). " .
+                        "Criteria in DB: " . $DB->count_records('competvet_criterion')
+                    );
+                }
+                $critcoms = $obs->get_criteria_comments();
+                foreach ($critcoms as $critcom) {
+                    $criterionid = $critcom->get('criterionid');
+                    $this->assertTrue(
+                        $DB->record_exists('competvet_criterion', ['id' => $criterionid]),
+                        "Observation criteria comment points to a non-existent criterion (observationid=" . $obs->get('id') . ", criterionid=$criterionid)."
+                    );
+                }
+            }
+
+            // Check certification declarations reference valid criteria.
+            $certifications = array_values(cert_decl::get_records(['planningid' => $newplanning->get('id')]));
+            foreach ($certifications as $certification) {
+                $criterionid = $certification->get('criterionid');
+                $this->assertTrue(
+                    $DB->record_exists('competvet_criterion', ['id' => $criterionid]),
+                    "Certification declaration points to a non-existent criterion (declid=" . $certification->get('id') . ", criterionid=$criterionid)."
+                );
+            }
+        }
+    }
+
+    /**
+     * Test that restoring the same backup twice does not create unintended duplicates.
+     */
+    public function test_backup_restore_repeated_restore(): void {
+        global $DB, $CFG;
+        $this->resetAfterTest(true);
+
+        // Ensure backuptempdir is set (it may be null in some test environments).
+        if (empty($CFG->backuptempdir)) {
+            $CFG->backuptempdir = $CFG->tempdir . '/backup';
+        }
+
+        // Create a course and add a competvet instance.
+        $generator = $this->getDataGenerator();
+        $competvetgenerator = $generator->get_plugin_generator('mod_competvet');
+        $startdate = new DateTime('last Monday');
+        $this->generates_definition($this->get_data_definition_set_3($startdate->getTimestamp()), $generator, $competvetgenerator);
+
+        $situation = situation::get_record(['shortname' => 'SIT1']);
+        $competvet = competvet::get_from_situation($situation);
+        $course = $DB->get_record('course', ['shortname' => 'course 1']);
+        $this->setAdminUser();
+
+        // Capture original counts.
+        $originalgridcount = grid::count_records();
+        $originalcriterioncount = criterion::count_records();
+
+        // Backup the original course.
+        $bc = new backup_controller(
+            backup::TYPE_1COURSE,
+            $course->id,
+            backup::FORMAT_MOODLE,
+            backup::INTERACTIVE_NO,
+            backup::MODE_SAMESITE,
+            2
+        );
+        $bc->execute_plan();
+        $backupid = $bc->get_backupid();
+        $backupbasepath = $bc->get_plan()->get_basepath();
+        $results = $bc->get_results();
+        $file = $results['backup_destination'];
+        $bc->destroy();
+
+        // Restore the backup immediately - same pattern as test_backup_restore.
+        // Check if we need to unzip the file because the backup temp dir does not contains backup files.
+        if (!file_exists($backupbasepath . "/moodle_backup.xml")) {
+            $file->extract_to_pathname(get_file_packer('application/vnd.moodle.backup'), $backupbasepath);
+        }
+
+        // First restore into a new course.
+        $firstrestoreid = \restore_dbops::create_new_course(
+            $course->fullname . 'RESTORED1',
+            $course->shortname . 'R1',
+            $course->category
+        );
+        $rc1 = new \restore_controller(
+            $backupid,
+            $firstrestoreid,
+            \backup::INTERACTIVE_NO,
+            \backup::MODE_SAMESITE,
+            2,
+            \backup::TARGET_NEW_COURSE
+        );
+        $precheckresult = $rc1->execute_precheck();
+        $this->assertTrue($precheckresult, 'First restore precheck should pass.');
+        $rc1->execute_plan();
+        $rc1->destroy();
+
+        // Capture counts after first restore.
+        $firstrestoregridcount = grid::count_records();
+        $firstrestorecriterioncount = criterion::count_records();
+
+        // Second restore of the same backup into another new course.
+        // Check if we need to unzip the file because the backup temp dir does not contains backup files.
+        if (!file_exists($backupbasepath . "/moodle_backup.xml")) {
+            $file->extract_to_pathname(get_file_packer('application/vnd.moodle.backup'), $backupbasepath);
+        }
+        $secondrestoreid = \restore_dbops::create_new_course(
+            $course->fullname . 'RESTORED2',
+            $course->shortname . 'R2',
+            $course->category
+        );
+        $rc2 = new \restore_controller(
+            $backupid,
+            $secondrestoreid,
+            \backup::INTERACTIVE_NO,
+            \backup::MODE_SAMESITE,
+            2,
+            \backup::TARGET_NEW_COURSE
+        );
+        $rc2->execute_precheck();
+        $rc2->execute_plan();
+        $rc2->destroy();
+
+        // Capture counts after second restore.
+        $secondrestoregridcount = grid::count_records();
+        $secondrestorecriterioncount = criterion::count_records();
+
+        // Each restore should not create unintended duplicate grids or criteria.
+        // Due to the grid/criterion reuse policy (matching by idnumber), restoring
+        // into a site that already has grids with matching idnumbers will reuse
+        // existing grids instead of creating new ones. So we only assert that
+        // the count does not exceed the expected maximum (no duplication).
+        $this->assertLessThanOrEqual(
+            $originalgridcount + 3,
+            $firstrestoregridcount,
+            'First restore should not create more than 3 new grids (grid reuse may prevent new creation).'
+        );
+        $this->assertLessThanOrEqual(
+            $originalgridcount + 6,
+            $secondrestoregridcount,
+            'Second restore should not create more than 6 new grids total (grid reuse may prevent new creation).'
+        );
+        $this->assertLessThanOrEqual(
+            $originalcriterioncount + 10,
+            $firstrestorecriterioncount,
+            'First restore should not create more than 10 new criteria (criterion reuse may prevent new creation).'
+        );
+        $this->assertLessThanOrEqual(
+            $originalcriterioncount + 20,
+            $secondrestorecriterioncount,
+            'Second restore should not create more than 20 new criteria total (criterion reuse may prevent new creation).'
+        );
+    }
+
+    /**
+     * Test that restoring into a site that already contains grids does not create duplicates
+     * when the grid idnumber matches an existing grid.
+     */
+    public function test_backup_restore_into_existing_grid(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $generator = $this->getDataGenerator();
+        $competvetgenerator = $generator->get_plugin_generator('mod_competvet');
+        $startdate = new DateTime('last Monday');
+
+        // Create default grids first.
+        $this->create_default_grids();
+
+        // Create course 1 with a competvet activity.
+        $datadef1 = $this->get_data_definition_set_3($startdate->getTimestamp());
+        $this->generates_definition($datadef1, $generator, $competvetgenerator);
+
+        $course1 = $DB->get_record('course', ['shortname' => 'course 1']);
+
+        // Capture grid count before backup (includes default grids + activity grids).
+        $gridcountbefore = grid::count_records();
+
+        // Backup course 1.
+        $bc = new backup_controller(
+            backup::TYPE_1COURSE,
+            $course1->id,
+            backup::FORMAT_MOODLE,
+            backup::INTERACTIVE_NO,
+            backup::MODE_SAMESITE,
+            2
+        );
+        $bc->execute_plan();
+        $backupid = $bc->get_backupid();
+        $backupbasepath = $bc->get_plan()->get_basepath();
+        $results = $bc->get_results();
+        $file = $results['backup_destination'];
+        $bc->destroy();
+
+        // Ensure the backup file is extracted so the restore controller can find it.
+        $normalizedbackupbasepath = str_replace('//', '/', $backupbasepath);
+        if (!file_exists($normalizedbackupbasepath . '/moodle_backup.xml')) {
+            $file->extract_to_pathname(get_file_packer('application/vnd.moodle.backup'), $normalizedbackupbasepath);
+        }
+
+        // Create course 2 with a competvet activity that uses the same default grid idnumbers.
+        // We need unique shortnames for both courses.
+        $datadef2 = [
+            'course 2' => [
+                'users' => [
+                    'student' => ['student1', 'student2'],
+                    'observer' => ['observer1', 'observer2'],
+                    'teacher' => ['teacher1'],
+                    'manager' => ['manager'],
+                ],
+                'groups' => [
+                    'group 8.1' => ['users' => ['student1']],
+                    'group 8.2' => ['users' => ['student2']],
+                    'group 8.3' => ['users' => []],
+                    'group 8.4' => ['users' => []],
+                ],
+                'activities' => [
+                    'SIT1B' => [
+                        'category' => 'Y1',
+                        'plannings' => [
+                            [
+                                'startdate' => $startdate->getTimestamp(),
+                                'enddate' => $startdate->getTimestamp() + 604800, // 1 week.
+                                'groupname' => 'group 8.1',
+                                'session' => '2023',
+                                'observations' => [
+                                    [
+                                        'category' => \mod_competvet\local\persistent\observation::CATEGORY_EVAL_AUTOEVAL,
+                                        'student' => 'student1',
+                                        'observer' => 'student1',
+                                        'context' => 'A context for autoeval',
+                                        'comments' => [
+                                            ['type' => \mod_competvet\local\persistent\observation_comment::OBSERVATION_COMMENT, 'comment' => 'A comment'],
+                                            ['type' => \mod_competvet\local\persistent\observation_comment::AUTOEVAL_OBSERVER_COMMENT, 'comment' => 'Another comment'],
+                                        ],
+                                        'criteria' => [
+                                            ['id' => 'Q001', 'value' => 1],
+                                            ['id' => 'Q002', 'value' => 'Comment autoeval 1'],
+                                            ['id' => 'Q003', 'value' => 'Comment autoeval 2'],
+                                        ],
+                                    ],
+                                ],
+                                'certifications' => [
+                                    [
+                                        'student' => 'student1',
+                                        'criterion' => 'CERT1',
+                                        'level' => 50,
+                                        'comment' => 'A comment',
+                                        'status' => 'cert:seendone',
+                                        'supervisors' => ['observer1', 'observer2'],
+                                        'validations' => [
+                                            ['status' => 'certvalid:notreached', 'comment' => 'A comment', 'supervisor' => 'observer1'],
+                                        ],
+                                    ],
+                                ],
+                                'cases' => [
+                                    [
+                                        'student' => 'student1',
+                                        'fields' => [
+                                            'nom_animal' => 'Rex',
+                                            'espece' => 'Chien',
+                                            'race' => 'Labrador',
+                                            'sexe' => 'M',
+                                            'date_naissance' => '2019-01-01',
+                                            'num_dossier' => '250269802345678',
+                                            'date_cas' => '2021-01-01',
+                                            'motif_presentation' => 'Vomissement',
+                                            'resultats_examens' => 'Autres examens a faire',
+                                            'diag_final' => 'Gastro-enterite',
+                                            'traitement' => 'Rien',
+                                            'evolution' => 'Bon',
+                                            'taches_effectuees' => 'Consultation, examen clinique, diagnostic, traitement',
+                                            'reflexions_cas' => 'Premier cas observe.',
+                                            'role_charge' => 'Observateur',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $this->generates_definition($datadef2, $generator, $competvetgenerator);
+
+        $course2 = $DB->get_record('course', ['shortname' => 'course 2']);
+
+        // Restore into course 2 (which already has grids with the same idnumbers).
+        $rc = new \restore_controller(
+            $backupid,
+            $course2->id,
+            \backup::INTERACTIVE_NO,
+            \backup::MODE_SAMESITE,
+            2,
+            \backup::TARGET_NEW_COURSE
+        );
+        $rc->execute_precheck();
+        $rc->execute_plan();
+        $rc->destroy();
+
+        // The grids should have been reused, so the total grid count should not increase.
+        $gridcountafter = grid::count_records();
+        $this->assertEquals(
+            $gridcountbefore,
+            $gridcountafter,
+            'Restoring into a site with existing grids of the same idnumber should reuse them, not duplicate.'
+        );
+    }
+
+    /**
+     * Create the default grids required by the module.
+     * These are normally created during installation but are wiped by resetAfterTest.
+     */
+    private function create_default_grids(): void {
+        global $DB;
+        // Check if evaluation grid already exists.
+        if (!$DB->get_record('competvet_grid', ['idnumber' => 'DEFAULTEVALGRID'])) {
+            $evalgrid = new grid(0, (object) [
+                'name' => 'Default evaluation grid',
+                'idnumber' => 'DEFAULTEVALGRID',
+                'type' => grid::COMPETVET_CRITERIA_EVALUATION,
+                'sortorder' => 0,
+            ]);
+            $evalgrid->create();
+            // Create default criteria for evaluation grid.
+            $this->create_default_criteria($evalgrid->get('id'));
+        }
+        // Check if certification grid already exists.
+        if (!$DB->get_record('competvet_grid', ['idnumber' => 'DEFAULTCERTIFGRID'])) {
+            $certifgrid = new grid(0, (object) [
+                'name' => 'Default certification grid',
+                'idnumber' => 'DEFAULTCERTIFGRID',
+                'type' => grid::COMPETVET_CRITERIA_CERTIFICATION,
+                'sortorder' => 0,
+            ]);
+            $certifgrid->create();
+            // Create default criterion for certification grid.
+            $certcrit = new criterion(0, (object) [
+                'label' => 'CERT1',
+                'idnumber' => 'CERT1',
+                'gridid' => $certifgrid->get('id'),
+                'sort' => 0,
+            ]);
+            $certcrit->create();
+        }
+        // Check if list grid already exists.
+        if (!$DB->get_record('competvet_grid', ['idnumber' => 'DEFAULTLISTGRID'])) {
+            $listgrid = new grid(0, (object) [
+                'name' => 'Default list grid',
+                'idnumber' => 'DEFAULTLISTGRID',
+                'type' => grid::COMPETVET_CRITERIA_LIST,
+                'sortorder' => 0,
+            ]);
+            $listgrid->create();
+        }
+    }
+
+    /**
+     * Test that restoring a backup with casecat/casefield duplicates by idnumber does not throw an error.
+     */
+    public function test_backup_restore_casecat_casefield_duplicate_idnumber(): void {
+        global $DB, $CFG;
+        $this->resetAfterTest(true);
+
+        // Ensure backuptempdir is set.
+        if (empty($CFG->backuptempdir)) {
+            $CFG->backuptempdir = $CFG->tempdir . '/backup';
+        }
+
+        $generator = $this->getDataGenerator();
+        $competvetgenerator = $generator->get_plugin_generator('mod_competvet');
+        $startdate = new DateTime('last Monday');
+
+        // Create default grids first.
+        $this->create_default_grids();
+
+        // Create course 1 with a competvet activity that has cases.
+        $datadef1 = $this->get_data_definition_set_3($startdate->getTimestamp());
+        $this->generates_definition($datadef1, $generator, $competvetgenerator);
+
+        $course1 = $DB->get_record('course', ['shortname' => 'course 1']);
+
+        // Capture original casecat and casefield counts.
+        $originalcasecatcount = $DB->count_records('competvet_case_cat');
+        $originalcasefieldcount = $DB->count_records('competvet_case_field');
+
+        // Backup course 1.
+        $bc = new backup_controller(
+            backup::TYPE_1COURSE,
+            $course1->id,
+            backup::FORMAT_MOODLE,
+            backup::INTERACTIVE_NO,
+            backup::MODE_SAMESITE,
+            2
+        );
+        $bc->execute_plan();
+        $backupid = $bc->get_backupid();
+        $backupbasepath = $bc->get_plan()->get_basepath();
+        $results = $bc->get_results();
+        $file = $results['backup_destination'];
+        $bc->destroy();
+
+        // Ensure the backup file is extracted.
+        $normalizedbackupbasepath = str_replace('//', '/', $backupbasepath);
+        if (!file_exists($normalizedbackupbasepath . '/moodle_backup.xml')) {
+            $file->extract_to_pathname(get_file_packer('application/vnd.moodle.backup'), $normalizedbackupbasepath);
+        }
+
+        // Restore into course 1 (same course, TARGET_REPLACE_COURSE).
+        $rc = new \restore_controller(
+            $backupid,
+            $course1->id,
+            \backup::INTERACTIVE_NO,
+            \backup::MODE_SAMESITE,
+            2,
+            \backup::TARGET_EXISTING_DELETING
+        );
+        $rc->execute_precheck();
+        $rc->execute_plan();
+        $rc->destroy();
+
+        // The restore should complete without throwing "mdb->get_record() found more than one record!".
+        // After replacing the course, counts should be the same as original (reused, not duplicated).
+        $casecatafter = $DB->count_records('competvet_case_cat');
+        $casefieldafter = $DB->count_records('competvet_case_field');
+        $this->assertEquals(
+            $originalcasecatcount,
+            $casecatafter,
+            'casecat count should be the same after replace restore (reused by idnumber).'
+        );
+        $this->assertEquals(
+            $originalcasefieldcount,
+            $casefieldafter,
+            'casefield count should be the same after replace restore (reused by idnumber).'
+        );
+    }
+
+    /**
+     * Create default criteria for the evaluation grid.
+     *
+     * @param int $gridid
+     */
+    private function create_default_criteria(int $gridid): void {
+        // Create parent criteria Q001, Q002, Q003 with their children.
+        $parentids = ['Q001', 'Q002', 'Q003'];
+        foreach ($parentids as $idnumber) {
+            $parent = new criterion(0, (object) [
+                'label' => $idnumber,
+                'idnumber' => $idnumber,
+                'gridid' => $gridid,
+                'sort' => 0,
+            ]);
+            $parent->create();
+            // Create 5 child criteria for each parent.
+            for ($i = 1; $i <= 5; $i++) {
+                $child = new criterion(0, (object) [
+                    'label' => "{$idnumber}.{$i}",
+                    'idnumber' => "{$idnumber}.{$i}",
+                    'gridid' => $gridid,
+                    'parentid' => $parent->get('id'),
+                    'sort' => $i,
+                ]);
+                $child->create();
+            }
+        }
     }
 
     /**

@@ -157,6 +157,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
     /**
      * Process the grid data.
      *
+     * Grid reuse policy: grids are matched by idnumber. If a grid with the
+     * same idnumber already exists in the target site, it is reused.
+     * Otherwise a new grid is created. This prevents unintended duplication
+     * when restoring the same backup multiple times or into a site that
+     * already contains structurally identical grids.
+     *
      * @param array $data The data to process.
      * @return void
      */
@@ -168,18 +174,26 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         $data->situationid = $this->get_new_parentid('situation');
 
-        // Check if the grid already exists.
-        if (!$DB->record_exists('competvet_grid', ['idnumber' => $data->idnumber])) {
-            // Insert the grid record.
-            $newitemid = $DB->insert_record('competvet_grid', $data);
+        // Grid reuse policy: match by idnumber only.
+        $existinggridid = $DB->get_field('competvet_grid', 'id', ['idnumber' => $data->idnumber]);
+        if ($existinggridid) {
+            // Grid already exists — reuse it. Do not update the existing record;
+            // the reused grid may belong to a different situation in the target.
+            $newitemid = $existinggridid;
         } else {
-            $newitemid = $DB->get_field('competvet_grid', 'id', ['idnumber' => $data->idnumber]);
+            // No matching grid — create a new one.
+            $newitemid = $DB->insert_record('competvet_grid', $data);
         }
         $this->set_mapping('grid', $oldid, $newitemid);
     }
 
     /**
      * Process the criterion data.
+     *
+     * Criterion reuse policy: criteria are matched by the pair (idnumber, gridid).
+     * If a criterion with the same idnumber already exists within the target
+     * grid, it is reused. Otherwise a new criterion is created. Parent-child
+     * relationships are remapped via the criterion mapping table.
      *
      * @param array $data The data to process.
      * @return void
@@ -192,13 +206,19 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         $data->gridid = $this->get_new_parentid('grid');
         $data->parentid = $this->get_mappingid('criterion', $data->parentid);
-        // Check if the criterion already exists.
-        if (!$DB->record_exists('competvet_criterion', ['idnumber' => $data->idnumber, 'gridid' => $data->gridid])) {
-            // Insert the criterion record.
-            $criterionitemid = $DB->insert_record('competvet_criterion', $data);
+
+        // Criterion reuse policy: match by (idnumber, gridid) pair.
+        $existingcriterionid = $DB->get_field(
+            'competvet_criterion',
+            'id',
+            ['idnumber' => $data->idnumber, 'gridid' => $data->gridid]
+        );
+        if ($existingcriterionid) {
+            // Criterion already exists in the target grid — reuse it.
+            $criterionitemid = $existingcriterionid;
         } else {
-            $criterionitemid =
-                $DB->get_field('competvet_criterion', 'id', ['idnumber' => $data->idnumber, 'gridid' => $data->gridid]);
+            // No matching criterion — create a new one.
+            $criterionitemid = $DB->insert_record('competvet_criterion', $data);
         }
         $this->set_mapping('criterion', $oldid, $criterionitemid);
     }
@@ -387,7 +407,8 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
             // Insert the category record.
             $casecatid = $DB->insert_record('competvet_case_cat', $data);
         } else {
-            $casecatid = $DB->get_field('competvet_case_cat', 'id', ['idnumber' => $data->idnumber]);
+            $cases = $DB->get_records('competvet_case_cat', ['idnumber' => $data->idnumber]);
+            $casecatid = $cases ? reset($cases)->id : $DB->insert_record('competvet_case_cat', $data);
         }
         // Insert the case category record.
         $this->set_mapping('casecat', $oldid, $casecatid);
@@ -410,7 +431,8 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
             // Insert the field record.
             $casefieldid = $DB->insert_record('competvet_case_field', $data);
         } else {
-            $casefieldid = $DB->get_field('competvet_case_field', 'id', ['idnumber' => $data->idnumber]);
+            $fields = $DB->get_records('competvet_case_field', ['idnumber' => $data->idnumber]);
+            $casefieldid = $fields ? reset($fields)->id : $DB->insert_record('competvet_case_field', $data);
         }
         $this->set_mapping('casefield', $oldid, $casefieldid);
     }
