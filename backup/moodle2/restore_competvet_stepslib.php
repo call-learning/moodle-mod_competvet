@@ -177,6 +177,10 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         // Grid reuse policy: match by idnumber only.
         $existinggridid = $DB->get_field('competvet_grid', 'id', ['idnumber' => $data->idnumber]);
         if ($existinggridid) {
+            $existinggrid = $DB->get_record('competvet_grid', ['id' => $existinggridid], 'id, type');
+            if ((int) $existinggrid->type !== (int) $data->type) {
+                throw new restore_step_exception('competvet_grid_type_conflict', $data->idnumber);
+            }
             // Grid already exists — reuse it. Do not update the existing record;
             // the reused grid may belong to a different situation in the target.
             $newitemid = $existinggridid;
@@ -214,6 +218,10 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
             ['idnumber' => $data->idnumber, 'gridid' => $data->gridid]
         );
         if ($existingcriterionid) {
+            $existingcriterion = $DB->get_record('competvet_criterion', ['id' => $existingcriterionid], 'id, parentid');
+            if ((int) $existingcriterion->parentid !== (int) $data->parentid) {
+                throw new restore_step_exception('competvet_criterion_parent_conflict', $data->idnumber);
+            }
             // Criterion already exists in the target grid — reuse it.
             $criterionitemid = $existingcriterionid;
         } else {

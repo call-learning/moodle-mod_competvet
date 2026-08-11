@@ -20,6 +20,7 @@ use mod_competvet\local\persistent\grid;
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\local\persistent\planning;
+use mod_competvet\utils;
 use tool_monitor\output\managesubs\subs;
 
 /**
@@ -56,9 +57,14 @@ class criteria {
             $grid->set('type', $type);
             $grid->create();
         } else {
+            if (!$grid->canedit()) {
+                throw new \moodle_exception('invaliddata', 'competvet', '', 'grid');
+            }
+            if ($grid->get('type') !== $type) {
+                throw new \moodle_exception('invaliddata', 'competvet', '', 'grid type');
+            }
             $grid->set('name', $gridname);
             $grid->set('sortorder', $sortorder);
-            $grid->set('type', $type);
             $grid->update();
         }
         return $grid->get('id');
@@ -87,15 +93,16 @@ class criteria {
         if (!$grid || !$grid->can_delete()) {
             return false;
         }
-        if ($grid) {
-            $grid->delete();
-        }
         $criteria = criterion::get_records(['gridid' => $gridid]);
         foreach ($criteria as $criterion) {
-            if ($criterion->can_delete()) {
-                $criterion->delete();
+            if (!$criterion->can_delete()) {
+                return false;
             }
         }
+        foreach ($criteria as $criterion) {
+            $criterion->delete();
+        }
+        $grid->delete();
         return true;
     }
 
@@ -211,9 +218,29 @@ class criteria {
         int $parentid,
         ?float $grade
     ): int {
+        $grid = grid::get_record(['id' => $gridid]);
+        if (!$grid) {
+            throw new \moodle_exception('invaliddata', 'competvet', '', 'grid');
+        }
         $criterion = criterion::get_record(['id' => $criterionid]);
         if (!$criterion) {
             $criterion = new criterion(0);
+        } else if ($criterion->get('gridid') !== $gridid) {
+            throw new \moodle_exception('invaliddata', 'competvet', '', 'criterion structure');
+        } else if (
+            utils::is_criterion_used($criterion)
+            && ($criterion->get('parentid') !== $parentid || $criterion->get('idnumber') !== $idnumber)
+        ) {
+            throw new \moodle_exception('invaliddata', 'competvet', '', 'criterion structure');
+        }
+        if ($parentid) {
+            $parent = criterion::get_record(['id' => $parentid]);
+            if (
+                !$parent || $parent->get('gridid') !== $gridid || $parent->get('parentid') !== 0
+                || $parentid === $criterionid
+            ) {
+                throw new \moodle_exception('invaliddata', 'competvet', '', 'criterion parent');
+            }
         }
         $criterion->set('label', $criterionname);
         $criterion->set('idnumber', $idnumber);
@@ -243,26 +270,35 @@ class criteria {
         if (!$criterion->can_delete()) {
             return false;
         }
-        $criterion->delete();
         $options = criterion::get_records(['parentid' => $criterionid]);
         foreach ($options as $option) {
-            if ($option->can_delete()) {
-                $option->delete();
+            if (!$option->can_delete()) {
+                return false;
             }
+        }
+        $criterion->delete();
+        foreach ($options as $option) {
+            $option->delete();
         }
         return true;
     }
 
     /**
-     * Update the criteria sort order
-     * @param array $criteria - The criterias
+     * Update the criteria sort order for one level of one grid.
+     * The caller must pass persisted IDs only; new records must be created first.
+     * @param array $criteria - The criteria IDs in their desired order
+     * @param int $gridid - The grid id
+     * @param int $parentid - The parent id, or zero for top-level criteria
      */
-    public static function update_criteria_sortorder(array $criteria): void {
+    public static function update_criteria_sortorder(array $criteria, int $gridid, int $parentid = 0): void {
+        if (count($criteria) !== count(array_unique($criteria))) {
+            throw new \moodle_exception('invaliddata', 'competvet', '', 'sort order');
+        }
         $sortorder = 1;
         foreach ($criteria as $criterionid) {
             $criterion = criterion::get_record(['id' => $criterionid]);
-            if (!$criterion) {
-                continue;
+            if (!$criterion || $criterion->get('gridid') !== $gridid || $criterion->get('parentid') !== $parentid) {
+                throw new \moodle_exception('invaliddata', 'competvet', '', 'sort order');
             }
             $criterion->set('sort', $sortorder);
             $criterion->update();
