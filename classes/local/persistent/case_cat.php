@@ -41,6 +41,10 @@ class case_cat extends persistent {
      */
     protected static function define_properties() {
         return [
+            'versionid' => [
+                'null' => NULL_NOT_ALLOWED, 'type' => PARAM_INT, 'default' => 0,
+                'message' => new lang_string('invaliddata', 'competvet', 'versionid'),
+            ],
             'idnumber' => [
                 'null' => NULL_NOT_ALLOWED,
                 'type' => PARAM_ALPHANUMEXT,

@@ -136,6 +136,34 @@ class case_field extends persistent {
     }
 
     /**
+     * Get a case field by its idnumber. It manages automatically the version
+     * and will get it by its default/current version.
+     *
+     * @param string $idnumber The field idnumber.
+     * @param int|null $versionid The version id to filter by. Defaults to the current version.
+     * @return case_field|null
+     */
+    public static function get_by_idnumber(string $idnumber, ?int $versionid = null): ?case_field {
+        if ($versionid === null) {
+            $version = case_version::get_current();
+            $versionid = $version ? $version->get('id') : 0;
+        }
+        // Find all categories for this version.
+        $categories = case_cat::get_records(['versionid' => $versionid]);
+        if (empty($categories)) {
+            return null;
+        }
+        // Search within each category for this version.
+        foreach ($categories as $category) {
+            $field = self::get_record(['idnumber' => $idnumber, 'categoryid' => $category->get('id')]);
+            if ($field) {
+                return $field;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Convert a raw value to a value that can be stored in the database.
      * @param mixed $value
      * @return mixed

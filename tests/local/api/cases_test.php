@@ -17,7 +17,11 @@
 namespace mod_competvet\local\api;
 use advanced_testcase;
 use core_user;
+use mod_competvet\setup;
+use mod_competvet\local\persistent\case_cat;
+use mod_competvet\local\persistent\case_entry;
 use mod_competvet\local\persistent\case_field;
+use mod_competvet\local\persistent\case_version;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\tests\test_data_definition;
 
@@ -32,7 +36,7 @@ final class cases_test extends advanced_testcase {
     use test_data_definition;
 
     /**
-     * Setup the test
+     * Setup the test.
      *
      * @return void
      */
@@ -40,6 +44,8 @@ final class cases_test extends advanced_testcase {
         parent::setUp();
         $this->resetAfterTest();
         $this->setAdminUser(); // Needed for report builder to work.
+        // Ensure Caselog schema is available before generating test data.
+        setup::ensure_case_versions();
         $this->prepare_scenario('set_2');
         $this->set_current_date();
     }
@@ -62,6 +68,7 @@ final class cases_test extends advanced_testcase {
         }
         // Get the first entry and check a couple of fields.
         $firstcase = $entries->cases[0];
+        $this->assertEquals(case_version::get_record(['name' => 'Legacy Caselog'])->get('id'), $firstcase->versionid);
         foreach ($firstcase->categories as $category) {
             $this->assertNotEmpty($category->name);
             foreach ($category->fields as $field) {
@@ -97,8 +104,10 @@ final class cases_test extends advanced_testcase {
 
         $case = $entries->cases[0];
         $caseid = $case->id;
-        $datecasfield = case_field::get_record(['idnumber' => 'date_cas']);
-        $rolechargefield = case_field::get_record(['idnumber' => 'role_charge']);
+        $legacyversion = case_version::get_record(['name' => 'Legacy Caselog']);
+        $legacyversionid = $legacyversion ? $legacyversion->get('id') : 0;
+        $datecasfield = case_field::get_by_idnumber('date_cas', $legacyversionid);
+        $rolechargefield = case_field::get_by_idnumber('role_charge', $legacyversionid);
         $newdata = [$datecasfield->get('id') => '01 January 2023', $rolechargefield->get('id') => 2];
         // Adjust based on actual fields.
 
@@ -168,11 +177,11 @@ final class cases_test extends advanced_testcase {
         $expectedcases = [
             [
                 'date' => 1609430400,
-                'label' => 'Vomissement',
+                'label' => 'Rex Chien',
             ],
             [
                 'date' => 1686326400,
-                'label' => 'Vomissement',
+                'label' => 'Brian Oiseau',
             ],
         ];
 
@@ -180,5 +189,436 @@ final class cases_test extends advanced_testcase {
             $this->assertEquals($expectedcases[$index]['date'], $case['date'], 'Case date does not match.');
             $this->assertEquals($expectedcases[$index]['label'], $case['label'], 'Case label does not match.');
         }
+    }
+
+    /**
+     * Test that character limits use Unicode characters and normalised line endings.
+     *
+     * @return void
+     * @covers \mod_competvet\local\api\cases::character_count
+     */
+    public function test_character_count(): void {
+        $this->assertSame(3, cases::character_count("a\r\nb"));
+        $this->assertSame(4, cases::character_count('éééé'));
+    }
+
+    /**
+     * Test that get_all_versions returns all Caselog form versions.
+     *
+     * @return void
+     * @covers \mod_competvet\local\api\cases::get_all_versions
+     */
+    public function test_get_all_versions(): void {
+        $versions = cases::get_all_versions();
+        $this->assertNotEmpty($versions);
+        // Should have at least legacy and current versions.
+        $this->assertGreaterThanOrEqual(2, count($versions));
+        // Each version should have the expected keys.
+        foreach ($versions as $version) {
+            $this->assertArrayHasKey('id', $version);
+            $this->assertArrayHasKey('name', $version);
+            $this->assertArrayHasKey('iscurrent', $version);
+            $this->assertArrayHasKey('metadata', $version);
+            $this->assertIsInt($version['id']);
+            $this->assertIsString($version['name']);
+            $this->assertIsBool($version['iscurrent']);
+        }
+        // Exactly one version should be current (based on the setting).
+        $currentcount = array_reduce($versions, fn($c, $v) => $c + ($v['iscurrent'] ? 1 : 0), 0);
+        $this->assertSame(1, $currentcount);
+    }
+
+    /**
+     * Test that get_version_structure returns structure for a specific version.
+     *
+     * @return void
+     * @covers \mod_competvet\local\api\cases::get_version_structure
+     */
+    public function test_get_version_structure(): void {
+        $current = case_version::get_current();
+        $this->assertNotNull($current);
+        $structure = cases::get_version_structure($current->get('id'));
+        $this->assertNotEmpty($structure);
+        // Should have categories with fields.
+        foreach ($structure as $category) {
+            $this->assertArrayHasKey('id', (array)$category);
+            $this->assertArrayHasKey('name', (array)$category);
+            $this->assertArrayHasKey('fields', (array)$category);
+        }
+    }
+
+    /**
+     * Verify the published version contains the configured Caselog content.
+     *
+     * @return void
+     * @covers \mod_competvet\local\persistent\case_version::read_metadata
+     * @covers \mod_competvet\local\api\cases::get_version_structure
+     */
+    public function test_current_version_contains_configured_content(): void {
+        $current = case_version::get_current();
+        $this->assertNotNull($current);
+        $metadata = $current->read_metadata();
+        $this->assertSame('Ajouter une transmission de cas clinique', $metadata['tutorialtitle']);
+        $this->assertStringContainsString('Synthétisez un ou plusieurs cas cliniques', $metadata['tutorial']);
+        $this->assertStringContainsString('Cette section évalue votre capacité', $metadata['chapo']);
+
+        $structure = cases::get_version_structure($current->get('id'));
+        $fields = [];
+        foreach ($structure as $category) {
+            foreach ($category->fields as $field) {
+                $fields[$field->idnumber] = $field;
+            }
+        }
+
+        $expectedfields = [
+            'nom_animal', 'espece', 'num_dossier', 'date_cas', 'role_charge',
+            'transmission_clinique', 'reflexions_enseignements',
+        ];
+        foreach ($expectedfields as $idnumber) {
+            $this->assertArrayHasKey($idnumber, $fields);
+        }
+        $this->assertArrayNotHasKey('diag_final', $fields);
+        $this->assertSame('Transmission clinique', $fields['transmission_clinique']->name);
+        $this->assertSame(1200, $this->get_field_config($fields['transmission_clinique'])['maxlength']);
+        $this->assertSame(800, $this->get_field_config($fields['reflexions_enseignements'])['maxlength']);
+    }
+
+    /**
+     * Verify API payloads retain version metadata for historical entries.
+     *
+     * @return void
+     * @covers \mod_competvet\local\api\cases::get_entries
+     */
+    public function test_get_entry_exposes_version_metadata(): void {
+        $situation = situation::get_record(['shortname' => 'SIT1']);
+        $student = core_user::get_user_by_username('student1');
+        $plannings = plannings::get_plannings_for_situation_id($situation->get('id'), $student->id);
+        $planning = array_shift($plannings);
+        $entry = array_shift(cases::get_entries($planning['id'], $student->id)->cases);
+
+        $metadata = json_decode($entry->versionmetadata, true);
+        $this->assertIsArray($metadata);
+        $this->assertSame('Ajouter un cas clinique', $metadata['tutorialtitle']);
+    }
+
+    /**
+     * Verify pre-versioned entries are migrated to the legacy version and validated.
+     *
+     * @return void
+     * @covers \mod_competvet\setup::ensure_case_versions
+     */
+    public function test_migrate_legacy_case_entries(): void {
+        global $DB;
+
+        $situation = situation::get_record(['shortname' => 'SIT1']);
+        $student = core_user::get_user_by_username('student1');
+        $plannings = plannings::get_plannings_for_situation_id($situation->get('id'), $student->id);
+        $planning = array_shift($plannings);
+        $entry = array_shift(cases::get_entries($planning['id'], $student->id)->cases);
+        $legacy = case_version::get_record(['name' => 'Legacy Caselog']);
+        $this->assertNotNull($legacy);
+
+        $DB->set_field('competvet_case_entry', 'versionid', 0, ['id' => $entry->id]);
+
+        // Migration is handled inside ensure_case_versions().
+        setup::ensure_case_versions();
+
+        $migrated = case_entry::get_record(['id' => $entry->id]);
+        $this->assertSame($legacy->get('id'), $migrated->get('versionid'));
+    }
+
+    /**
+     * Test that create_case assigns the current version automatically.
+     *
+     * @return void
+     * @covers \mod_competvet\local\api\cases::create_case
+     */
+    public function test_create_case_uses_current_version(): void {
+        $situation = situation::get_record(['shortname' => 'SIT1']);
+        $student = core_user::get_user_by_username('student1');
+        $plannings = plannings::get_plannings_for_situation_id($situation->get('id'), $student->id);
+        $planning = array_shift($plannings);
+        $current = case_version::get_current();
+        $this->assertNotNull($current);
+        $fields = [1 => 'test', 2 => 'test'];
+        $caseid = cases::create_case($planning['id'], $student->id, $fields);
+        $entry = case_entry::get_record(['id' => $caseid]);
+        $this->assertNotNull($entry);
+        $this->assertSame($current->get('id'), $entry->get('versionid'));
+    }
+
+    /**
+     * Verify entries from legacy and current versions can be read together.
+     *
+     * @return void
+     * @covers \mod_competvet\local\api\cases::get_entries
+     */
+    public function test_get_entries_supports_mixed_versions(): void {
+        $situation = situation::get_record(['shortname' => 'SIT1']);
+        $student = core_user::get_user_by_username('student1');
+        $plannings = plannings::get_plannings_for_situation_id($situation->get('id'), $student->id);
+        $planning = array_shift($plannings);
+        $current = case_version::get_current();
+        $this->assertNotNull($current);
+        $legacy = case_version::get_record(['name' => 'Legacy Caselog']);
+        $this->assertNotNull($legacy);
+        $animal = $this->get_current_field('nom_animal');
+        $species = $this->get_current_field('espece');
+        cases::create_case($planning['id'], $student->id, [
+            $animal->id => 'Current case',
+            $species->id => 'Chien',
+        ]);
+
+        $entries = cases::get_entries($planning['id'], $student->id)->cases;
+        $versionids = array_map(static fn($entry): int => $entry->versionid, $entries);
+        $this->assertContains($legacy->get('id'), $versionids);
+        $this->assertContains($current->get('id'), $versionids);
+    }
+
+    /**
+     * Test that update_case preserves the entry's version.
+     *
+     * @return void
+     * @covers \mod_competvet\local\api\cases::update_case
+     */
+    public function test_update_case_preserves_version(): void {
+        $situation = situation::get_record(['shortname' => 'SIT1']);
+        $student = core_user::get_user_by_username('student1');
+        $plannings = plannings::get_plannings_for_situation_id($situation->get('id'), $student->id);
+        $planning = array_shift($plannings);
+        $entries = cases::get_entries($planning['id'], $student->id);
+        $case = $entries->cases[0];
+        $caseid = $case->id;
+        $originalversion = $case->versionid;
+        $datecasfield = case_field::get_by_idnumber('date_cas');
+        $newdata = [$datecasfield->get('id') => '01 March 2024'];
+        $this->setAdminUser();
+        cases::update_case($caseid, $newdata);
+        $updated = case_entry::get_record(['id' => $caseid]);
+        $this->assertSame($originalversion, $updated->get('versionid'));
+    }
+
+    /**
+     * Verify editing a legacy entry preserves fields absent from the current form.
+     *
+     * @return void
+     * @covers \mod_competvet\local\api\cases::update_case
+     */
+    public function test_update_case_preserves_legacy_values(): void {
+        $situation = situation::get_record(['shortname' => 'SIT1']);
+        $student = core_user::get_user_by_username('student1');
+        $plannings = plannings::get_plannings_for_situation_id($situation->get('id'), $student->id);
+        $planning = array_shift($plannings);
+        $entry = array_shift(cases::get_entries($planning['id'], $student->id)->cases);
+        $legacyreflection = null;
+        $datefieldid = null;
+        foreach ($entry->categories as $category) {
+            foreach ($category->fields as $field) {
+                if ($field->idnumber === 'reflexions_cas') {
+                    $legacyreflection = $field->value;
+                }
+                if ($field->idnumber === 'date_cas') {
+                    $datefieldid = $field->id;
+                }
+            }
+        }
+        $this->assertNotNull($legacyreflection);
+        $this->assertNotNull($datefieldid);
+
+        $this->setAdminUser();
+        cases::update_case($entry->id, [$datefieldid => '01 April 2024']);
+        $updated = cases::get_entry($entry->id);
+        $updatedreflection = null;
+        foreach ($updated->categories as $category) {
+            foreach ($category->fields as $field) {
+                if ($field->idnumber === 'reflexions_cas') {
+                    $updatedreflection = $field->value;
+                }
+            }
+        }
+        $this->assertSame($legacyreflection, $updatedreflection);
+    }
+
+    /**
+     * Test that character validation rejects values exceeding the limit.
+     *
+     * @return void
+     * @covers \mod_competvet\local\api\cases::validate_fields
+     */
+    public function test_validate_fields_rejects_too_long(): void {
+        $current = case_version::get_current();
+        $this->assertNotNull($current);
+        $structure = cases::get_case_structure($current->get('id'));
+        $transmission = $this->get_current_field('transmission_clinique');
+        $fields = [$transmission->id => str_repeat('a', 1201)];
+        $this->expectException(\moodle_exception::class);
+        cases::validate_fields($fields, $structure);
+    }
+
+    /**
+     * Test that character validation accepts values within the limit.
+     *
+     * @return void
+     * @covers \mod_competvet\local\api\cases::validate_fields
+     */
+    public function test_validate_fields_accepts_within_limit(): void {
+        $current = case_version::get_current();
+        $this->assertNotNull($current);
+        $structure = cases::get_case_structure($current->get('id'));
+        $transmission = $this->get_current_field('transmission_clinique');
+        $reflection = $this->get_current_field('reflexions_enseignements');
+        $fields = [
+            $transmission->id => str_repeat('a', 1200),
+            $reflection->id => str_repeat('b', 800),
+        ];
+        // Should not throw.
+        cases::validate_fields($fields, $structure);
+    }
+
+    /**
+     * Test that character validation rejects an overlong personal reflection.
+     *
+     * @return void
+     * @covers \mod_competvet\local\api\cases::validate_fields
+     */
+    public function test_validate_fields_rejects_overlong_reflection(): void {
+        $current = case_version::get_current();
+        $this->assertNotNull($current);
+        $structure = cases::get_case_structure($current->get('id'));
+        $reflection = $this->get_current_field('reflexions_enseignements');
+        $this->expectException(\moodle_exception::class);
+        cases::validate_fields([$reflection->id => str_repeat('a', 801)], $structure);
+    }
+
+    /**
+     * Find a field in the current published structure.
+     *
+     * @param string $idnumber Field identifier.
+     * @return object
+     */
+    private function get_current_field(string $idnumber): object {
+        $current = case_version::get_current();
+        $structure = cases::get_case_structure($current->get('id'));
+        foreach ($structure as $category) {
+            foreach ($category->fields as $field) {
+                if ($field->idnumber === $idnumber) {
+                    return $field;
+                }
+            }
+        }
+        $this->fail('Current Caselog field not found: ' . $idnumber);
+    }
+
+    /**
+     * Decode a field configuration.
+     *
+     * @param object $field Caselog field (stdClass or persistent).
+     * @return array
+     */
+    private function get_field_config(object $field): array {
+        $configdata = is_object($field) && method_exists($field, 'get')
+            ? $field->get('configdata')
+            : $field->configdata;
+        return json_decode(stripslashes((string)$configdata), true) ?: [];
+    }
+
+    /**
+     * Test that ensure_case_versions creates versions, migrates existing categories,
+     * and imports new categories/fields from JSON.
+     *
+     * @return void
+     * @covers \mod_competvet\setup::ensure_case_versions
+     */
+    public function test_ensure_case_versions_migration_flow(): void {
+        global $DB;
+
+        // Clean slate: remove any existing caselog data.
+        // setUp() already called ensure_case_versions(), so we need to clean up first.
+        $DB->delete_records(case_version::TABLE);
+        $DB->delete_records(case_field::TABLE);
+        $DB->delete_records(case_cat::TABLE);
+        $DB->delete_records(case_entry::TABLE);
+
+        // Manually create pre-versioned categories (simulating old DB state).
+        $legacycat = new case_cat(0, (object) [
+            'name' => 'L\'animal',
+            'idnumber' => 'c_legacy_1',
+            'sortorder' => 1,
+            'description' => '',
+            'versionid' => 0,
+        ]);
+        $legacycat->create();
+        $legacycatid = $legacycat->get('id');
+
+        $legacyfield = new case_field(0, (object) [
+            'idnumber' => 'nom_animal',
+            'name' => 'Prenom de l\'animal',
+            'type' => 'text',
+            'description' => '',
+            'sortorder' => 1,
+            'categoryid' => $legacycatid,
+            'configdata' => '{}',
+        ]);
+        $legacyfield->create();
+
+        // Run the full flow (migration is now handled inside ensure_case_versions).
+        setup::ensure_case_versions();
+
+        // Versions should exist.
+        $legacyversion = case_version::get_record(['name' => 'Legacy Caselog']);
+        $this->assertNotNull($legacyversion);
+        $currentversion = case_version::get_record(['name' => 'Clinical transmission']);
+        $this->assertNotNull($currentversion);
+
+        // Pre-versioned category should be migrated to legacy version.
+        $migratedcat = case_cat::get_record(['id' => $legacycatid]);
+        $this->assertNotNull($migratedcat);
+        $this->assertSame($legacyversion->get('id'), $migratedcat->get('versionid'));
+
+        // New current version categories should exist.
+        $currentcats = case_cat::get_records(['versionid' => $currentversion->get('id')]);
+        $this->assertNotEmpty($currentcats);
+
+        // New current version fields should exist.
+        $transmissionfield = case_field::get_by_idnumber('transmission_clinique');
+        $this->assertNotNull($transmissionfield);
+        $this->assertSame(1200, $this->get_field_config($transmissionfield)['maxlength']);
+
+        $reflectionfield = case_field::get_by_idnumber('reflexions_enseignements');
+        $this->assertNotNull($reflectionfield);
+        $this->assertSame(800, $this->get_field_config($reflectionfield)['maxlength']);
+
+        // Legacy fields should still exist under legacy category.
+        $this->assertNull(case_field::get_by_idnumber('prenom_animal'));
+        $versions = case_version::get_records();
+        $firstversion = reset($versions);
+        $legacyfieldbyid = case_field::get_by_idnumber('nom_animal', $firstversion->get('id'));
+        $this->assertNotNull($legacyfieldbyid);
+        $this->assertEquals($legacyfield->get('id'), $legacyfieldbyid->get('id'));
+    }
+
+    /**
+     * Test that ensure_case_versions is idempotent — running it twice does not duplicate data.
+     *
+     * @return void
+     * @covers \mod_competvet\setup::ensure_case_versions
+     */
+    public function test_ensure_case_versions_is_idempotent(): void {
+        // Run once.
+        setup::ensure_case_versions();
+
+        $legacyversion = case_version::get_record(['name' => 'Legacy Caselog']);
+        $currentversion = case_version::get_record(['name' => 'Clinical transmission']);
+        $legacycatcount = case_cat::count_records(['versionid' => $legacyversion->get('id')]);
+        $currentcatcount = case_cat::count_records(['versionid' => $currentversion->get('id')]);
+
+        // Run again.
+        setup::ensure_case_versions();
+
+        // Counts should be unchanged.
+        $this->assertSame($legacyversion->get('id'), case_version::get_record(['name' => 'Legacy Caselog'])->get('id'));
+        $this->assertSame($currentversion->get('id'), case_version::get_record(['name' => 'Clinical transmission'])->get('id'));
+        $this->assertSame($legacycatcount, case_cat::count_records(['versionid' => $legacyversion->get('id')]));
+        $this->assertSame($currentcatcount, case_cat::count_records(['versionid' => $currentversion->get('id')]));
     }
 }

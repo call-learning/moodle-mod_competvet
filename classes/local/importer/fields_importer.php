@@ -32,6 +32,23 @@ class fields_importer extends base_persistent_importer {
     protected $categorycache = [];
 
     /**
+     * @var int The versionid to assign to imported categories.
+     */
+    protected $versionid = 0;
+
+    /**
+     * Constructor for fields_importer.
+     *
+     * @param string $persistenclass
+     * @param array|null $options
+     * @param int $versionid The versionid to assign to imported categories.
+     */
+    public function __construct(string $persistenclass, ?array $options = [], int $versionid = 0) {
+        parent::__construct($persistenclass, $options);
+        $this->versionid = $versionid;
+    }
+
+    /**
      * Zet een CSV rij om naar een object dat opgeslagen kan worden.
      * @param array $row De huidige rij data van de CSV.
      * @param csv_iterator $reader De CSV reader.
@@ -39,28 +56,24 @@ class fields_importer extends base_persistent_importer {
      */
     protected function to_persistent_data(array $row, csv_iterator $reader): object {
         $categoryname = $row[0];
-        if (!isset($this->categorycache[$categoryname])) {
-            $category = case_cat::get_record(['name' => $categoryname]);
+        $cachekey = $categoryname . '|' . $this->versionid;
+        if (!isset($this->categorycache[$cachekey])) {
+            $category = case_cat::get_record(['name' => $categoryname, 'versionid' => $this->versionid]);
             $sortorder = case_cat::count_records() + 1;
             if (!$category) {
                 $category = new case_cat(null, (object) [
                     'name' => $categoryname,
                     'idnumber' => 'c' . $sortorder,
                     'sortorder' => $sortorder,
-                    'description' => "",
+                    'description' => '',
+                    'versionid' => $this->versionid,
                 ]);
                 $category->save();
             }
-            $this->categorycache[$categoryname] = $category->get('id');
+            $this->categorycache[$cachekey] = $category->get('id');
         }
         $fielddata = parent::to_persistent_data($row, $reader);
-        $fielddata->categoryid = $this->categorycache[$categoryname];
-        $fielddata->idnumber = $row[1];
-        $fielddata->name = $row[2];
-        $fielddata->sortorder = $row[3];
-        $fielddata->type = $row[4];
-        $fielddata->description = $row[5];
-        $fielddata->configdata = $row[6];
+        $fielddata->categoryid = $this->categorycache[$cachekey];
 
         return $fielddata;
     }

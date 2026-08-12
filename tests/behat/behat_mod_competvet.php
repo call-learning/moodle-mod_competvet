@@ -46,6 +46,15 @@ class behat_mod_competvet extends behat_base {
     }
 
     /**
+     * Ensures the Caselog form schema is imported and legacy data is migrated.
+     *
+     * @Given the CompetVet caselog schema has been initialised
+     */
+    public function the_competvet_caselog_schema_has_been_initialised(): void {
+        \mod_competvet\setup::ensure_case_versions();
+    }
+
+    /**
      * Creates the activity-specific certification grid used by the activity tests.
      *
      * @Given the CompetVet activity-specific certification grid exists for :shortname
@@ -518,7 +527,7 @@ class behat_mod_competvet extends behat_base {
         $url = new moodle_url('/mod/competvet/manageglobalcriteria.php');
 
         // Navigate to the URL.
-        $this->getSession()->visit($url);
+        $this->getSession()->visit($this->locate_path($url->out_as_local_url()));
 
         $exception = new ExpectationException('Manage Global Criteria page did not load correctly', $this->getSession());
 
@@ -670,5 +679,127 @@ class behat_mod_competvet extends behat_base {
         }
 
         return $options[$optionindex];
+    }
+    /**
+     * Navigates to the emulator page (student-facing page with tabs).
+     *
+     * Takes a situation name, a planning description, and a tab name.
+     * Derives cmid, planningid, and studentid automatically.
+     * Uses the current Behat user as the studentid.
+     *
+     * Planning description format: "startdate > enddate > session > situationname"
+     * (same format used by the generator, e.g. "last Monday > Monday next week > SESSION1 > SIT1")
+     *
+     * Tab-to-pagetype mapping:
+     * - eval → student_evaluations
+     * - cert → student_certifications
+     * - list → student_list
+     *
+     * Example: And I navigate to the emulator page on the "SIT1" situation "last Monday > Monday next week > SESSION1 > SIT1" planning "list" page
+     *
+     * @Given /^I navigate to the emulator page on the "(?P<situation>[^"]*)" situation "(?P<planning>[^"]*)" planning "(?P<tab>[^"]*)" page$/
+     *
+     * @param string $situationname The situation shortname (e.g. "SIT1")
+     * @param string $planningdescription The planning description (e.g. "last Monday > Monday next week > SESSION1 > SIT1")
+     * @param string $tabname The tab name (eval, cert, or list)
+     */
+    public function i_navigate_to_the_emulator_page($situationname, $planningdescription, $tabname) {
+        // Parse the planning description to extract planning details.
+        $descriptionparts = array_map('trim', explode('>', $planningdescription));
+        if (count($descriptionparts) < 4) {
+            throw new Exception("Invalid planning description format. Expected: 'startdate > enddate > session > situationname'");
+        }
+        [$startdate, $enddate, $session, $situationfromplanning] = $descriptionparts;
+
+        // Validate situation matches.
+        if ($situationfromplanning !== $situationname) {
+            throw new Exception("Situation in planning description ('$situationfromplanning') does not match given situation ('$situationname')");
+        }
+
+        // Look up the situation by shortname.
+        $situation = \mod_competvet\local\persistent\situation::get_record(['shortname' => $situationname]);
+        if (empty($situation)) {
+            throw new Exception("Situation '$situationname' not found");
+        }
+        $situationid = $situation->get('id');
+
+        // Get the competvet instance from the situation.
+        $competvet = \mod_competvet\competvet::get_from_situation_id($situationid);
+        $cmid = $competvet->get_course_module_id();
+
+        // Map tab name to pagetype.
+        $tabpagemap = [
+            'eval' => 'student_evaluations',
+            'cert' => 'student_certifications',
+            'list' => 'student_list',
+        ];
+
+        if (!isset($tabpagemap[$tabname])) {
+            throw new Exception("Unknown tab '$tabname'. Valid tabs are: " . implode(', ', array_keys($tabpagemap)));
+        }
+        $pagetype = $tabpagemap[$tabname];
+
+        // Look up the planning by dates, session, and situation.
+        $startdatetimestamp = strtotime($startdate);
+        $enddatetimestamp = strtotime($enddate);
+        if (!$startdatetimestamp || !$enddatetimestamp) {
+            throw new Exception("Invalid dates in planning description: '$startdate' > '$enddate'");
+        }
+
+        $planning = \mod_competvet\local\persistent\planning::get_by_dates_and_situation(
+            $startdatetimestamp,
+            $enddatetimestamp,
+            $session,
+            $situationid
+        );
+        if (empty($planning)) {
+            throw new Exception("Planning not found for situation '$situationname', dates '$startdate' > '$enddate', session '$session'");
+        }
+        $planningid = $planning->get('id');
+
+        // Use the current Behat user as the studentid.
+        $studentid = \core_user::get_user_by_username('student1')->id;
+
+        // Navigate to the emulator page with the correct pagetype.
+        $url = new \moodle_url('/mod/competvet/view.php', [
+            'pagetype' => $pagetype,
+            'id' => $cmid,
+            'planningid' => $planningid,
+            'studentid' => $studentid,
+        ]);
+
+        $this->getSession()->visit($this->locate_path($url->out_as_local_url(false)));
+
+        // Wait for the appropriate container to confirm the page loaded.
+        $this->spin(function ($context) use ($pagetype) {
+            $currenturl = new \moodle_url($this->getSession()->getCurrentUrl());
+            $currentpagetype = $currenturl->get_param('pagetype');
+
+            if ($currentpagetype !== $pagetype) {
+                throw new Exception(
+                    "Expected pagetype '$pagetype' but got '$currentpagetype'"
+                );
+            }
+
+            // URL is correct, now check for DOM element.
+            $page = $this->getSession()->getPage();
+            $container = null;
+            switch ($pagetype) {
+                case 'student_evaluations':
+                    $container = $page->find('css', '.competvet-view-evaluations');
+                    break;
+                case 'student_certifications':
+                case 'student_list':
+                    $container = $page->find('css', '.gradingapp');
+                    break;
+            }
+
+            if (!$container) {
+                throw new Exception(
+                    "Emulator container not found for pagetype '$pagetype'"
+                );
+            }
+            return true;
+        });
     }
 }

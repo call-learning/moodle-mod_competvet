@@ -62,6 +62,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
             'certvalid',
             '/activity/competvet/situations/situation/plannings/planning/certdecls/certdecl/certvalids/certvalid'
         );
+        $caseversion = new restore_path_element('caseversion', '/activity/competvet/caseversions/caseversion');
         $casecat = new restore_path_element('casecat', '/activity/competvet/casecats/casecat');
         $casefield = new restore_path_element('casefield', '/activity/competvet/casecats/casecat/casefields/casefield');
         $caseentry = new restore_path_element(
@@ -84,8 +85,30 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         return $this->prepare_activity_structure([
             $competvet, $situation, $planning, $grid, $criterion, $observation, $obscomment,
             $grade, $obscritlevel, $obscritcom, $todo, $certdecl, $certdeclasso, $certvalid,
-            $casecat, $casefield, $caseentry, $casedata, $formdata, $casefieldmap,
+            $caseversion, $casecat, $casefield, $caseentry, $casedata, $formdata, $casefieldmap,
         ]);
+    }
+
+    /**
+     * Process a Caselog version.
+     *
+     * Versions are global plugin records. Reuse an existing version by its
+     * stable name and map the backup ID to the destination ID.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
+    protected function process_caseversion($data) {
+        global $DB;
+
+        $data = (object) $data;
+        $existing = $DB->get_record('competvet_case_version', ['name' => $data->name]);
+        if ($existing) {
+            $versionid = $existing->id;
+        } else {
+            $versionid = $DB->insert_record('competvet_case_version', $data);
+        }
+        $this->set_mapping('caseversion', $data->id, $versionid);
     }
 
     /**
@@ -411,11 +434,13 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $data = (object) $data;
         $oldid = $data->id;
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
-        if (!$DB->record_exists('competvet_case_cat', ['idnumber' => $data->idnumber])) {
+        $data->versionid = $this->map_case_version($data->versionid ?? 0);
+        $conditions = ['idnumber' => $data->idnumber, 'versionid' => $data->versionid];
+        if (!$DB->record_exists('competvet_case_cat', $conditions)) {
             // Insert the category record.
             $casecatid = $DB->insert_record('competvet_case_cat', $data);
         } else {
-            $cases = $DB->get_records('competvet_case_cat', ['idnumber' => $data->idnumber]);
+            $cases = $DB->get_records('competvet_case_cat', $conditions);
             $casecatid = $cases ? reset($cases)->id : $DB->insert_record('competvet_case_cat', $data);
         }
         // Insert the case category record.
@@ -435,11 +460,12 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $oldid = $data->id;
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         $data->categoryid = $this->get_mappingid('casecat', $data->categoryid);
-        if (!$DB->record_exists('competvet_case_field', ['idnumber' => $data->idnumber])) {
+        $conditions = ['idnumber' => $data->idnumber, 'categoryid' => $data->categoryid];
+        if (!$DB->record_exists('competvet_case_field', $conditions)) {
             // Insert the field record.
             $casefieldid = $DB->insert_record('competvet_case_field', $data);
         } else {
-            $fields = $DB->get_records('competvet_case_field', ['idnumber' => $data->idnumber]);
+            $fields = $DB->get_records('competvet_case_field', $conditions);
             $casefieldid = $fields ? reset($fields)->id : $DB->insert_record('competvet_case_field', $data);
         }
         $this->set_mapping('casefield', $oldid, $casefieldid);
@@ -459,9 +485,36 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $data->usermodified = $this->get_mappingid('user', $data->usermodified);
         $data->studentid = $this->get_mappingid('user', $data->studentid);
         $data->planningid = $this->get_mappingid('planning', $data->planningid);
+        $data->versionid = $this->map_case_version($data->versionid ?? 0);
         // Insert the case entry record.
         $entryid = $DB->insert_record('competvet_case_entry', $data);
         $this->set_mapping('caseentry', $oldid, $entryid);
+    }
+
+    /**
+     * Map a backed-up Caselog version ID to the destination site.
+     *
+     * Backups created before versioning have no version ID and are treated as
+     * legacy entries when the legacy version exists.
+     *
+     * @param int $versionid The source version ID.
+     * @return int The destination version ID.
+     */
+    private function map_case_version(int $versionid): int {
+        global $DB;
+
+        if ($versionid === 0) {
+            $legacyversionid = (int)$DB->get_field('competvet_case_version', 'id', ['name' => 'Legacy Caselog']);
+            if ($legacyversionid === 0) {
+                throw new \moodle_exception('Legacy Caselog version is missing during restore.');
+            }
+            return $legacyversionid;
+        }
+        $mappedversionid = (int)$this->get_mappingid('caseversion', $versionid);
+        if ($mappedversionid === 0) {
+            throw new \moodle_exception('Invalid Caselog version mapping during restore.');
+        }
+        return $mappedversionid;
     }
 
     /**

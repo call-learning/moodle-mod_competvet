@@ -44,7 +44,7 @@ class case_form_add extends dynamic_form {
         $mform->setType('studentid', PARAM_INT);
         $mform->addElement('hidden', 'returnurl');
         $mform->setType('returnurl', PARAM_URL);
-        $cases = cases::get_case_structure();
+        $cases = cases::get_case_structure(null);
         foreach ($cases as $category) {
             $mform->addElement('header', 'category_' . $category->id, $category->name);
             foreach ($category->fields as $field) {
@@ -53,19 +53,19 @@ class case_form_add extends dynamic_form {
                     $mform->setType('field_' . $field->id, PARAM_TEXT);
                 }
                 if ($field->type == 'textarea') {
-                    $rows = 2;
-                    if (isset($field->configdata)) {
-                        $json = json_decode(stripslashes($field->configdata));
-                        $rows = $json->rows;
+                    $config = json_decode(stripslashes((string)$field->configdata), true) ?: [];
+                    $attributes = ['rows' => $config['rows'] ?? 2];
+                    if (!empty($config['maxlength'])) {
+                        $attributes['maxlength'] = $config['maxlength'];
                     }
-                    $mform->addElement('textarea', 'field_' . $field->id, $field->name, ['rows' => $rows]);
+                    $mform->addElement('textarea', 'field_' . $field->id, $field->name, $attributes);
                     $mform->setType('field_' . $field->id, PARAM_TEXT);
                 }
                 if ($field->type == 'select') {
                     $options = [];
                     if (isset($field->configdata)) {
-                        $json = json_decode(stripslashes($field->configdata));
-                        $options = (array)$json->options;
+                        $config = json_decode(stripslashes((string)$field->configdata), true) ?: [];
+                        $options = (array)($config['options'] ?? []);
                     }
                     $mform->addElement('select', 'field_' . $field->id, $field->name, $options);
                     $mform->setType('field_' . $field->id, PARAM_INT);
@@ -152,12 +152,12 @@ class case_form_add extends dynamic_form {
     }
 
     /**
-     * Process form data
+     * Process form data.
      *
      * @param object $data The form data
      * @return array
      */
-    private static function process_form_data($data) {
+    private static function process_form_data(object $data): array {
         $fields = [];
         foreach ($data as $key => $value) {
             if (strpos($key, 'field_') === 0) {
