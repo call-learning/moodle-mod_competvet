@@ -32,6 +32,52 @@ use Behat\Mink\Exception\ExpectationException as ExpectationException;
  */
 class behat_mod_competvet extends behat_base {
     /**
+     * Runs the post-install task responsible for creating the default grids.
+     *
+     * The task is normally queued during plugin installation and executed by
+     * cron, but the Behat site may not have run it yet.
+     *
+     * @Given the CompetVet default grids have been initialised
+     */
+    public function the_competvet_default_grids_have_been_initialised(): void {
+        $task = new \mod_competvet\task\post_install();
+        $task->set_custom_data(['create_default_grids']);
+        $task->execute();
+    }
+
+    /**
+     * Creates the activity-specific certification grid used by the activity tests.
+     *
+     * @Given the CompetVet activity-specific certification grid exists for :shortname
+     * @param string $shortname
+     */
+    public function the_competvet_activity_specific_certification_grid_exists_for(string $shortname): void {
+        $situation = \mod_competvet\local\persistent\situation::get_record(
+            ['shortname' => $shortname],
+            MUST_EXIST
+        );
+        $grid = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Activity certification grid',
+            'idnumber' => 'ACTIVITYCERTIFGRID',
+            'situationid' => $situation->get('id'),
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_CERTIFICATION,
+        ]);
+        $grid->create();
+
+        $criterion = new \mod_competvet\local\persistent\criterion(0, (object) [
+            'gridid' => $grid->get('id'),
+            'label' => 'Savoir être',
+            'idnumber' => 'ACTIVITYCRITERION',
+            'parentid' => 0,
+            'sort' => 1,
+        ]);
+        $criterion->create();
+
+        $situation->set('certifgrid', $grid->get('id'));
+        $situation->update();
+    }
+
+    /**
      * Opens the grading page for a specific student and verifies the title.
      *
      * Example: And I open grading page for "Student One"
@@ -49,29 +95,44 @@ class behat_mod_competvet extends behat_base {
             throw new Exception('Table with selector "' . $tableselector . '" not found');
         }
 
-        // Find the row containing the student's name.
+        // Find the row containing the student\'s name.
         $studentrow = $table->find('xpath', './/tr[contains(., "' . $studentname . '")]');
         if (!$studentrow) {
             throw new Exception('Row containing student "' . $studentname . '" not found in table');
         }
 
-        // Step 2: Click the "Grade student" button in the student's row.
+        // Step 2: Click the "Grade student" button in the student\'s row.
         $button = $studentrow->findLink('Grade student');
         if (!$button) {
             throw new Exception('Grade student button not found in row for student "' . $studentname . '"');
         }
         $button->click();
 
-        // Wait for 1 second to allow the page to load.
-        sleep(1);
+        // Step 3: Wait for the grading page to load by checking for the grading-app element.
+        $this->spin(function($context) {
+            $page = $context->getSession()->getPage();
+            // Check that the grading-app container has been rendered.
+            $gradingapp = $page->find('css', '[data-region="grading-app"]');
+            if (!$gradingapp) {
+                throw new Exception('Grading app container [data-region="grading-app"] not found');
+            }
+            return true;
+        });
 
-        // Step 3: Wait for the title "Global Evaluation" to be visible on the grading page.
-        $this->spin(
-            function($context) {
-                $page = $context->getSession()->getPage();
-                return $page->hasContent('Global Evaluation');
-            },
-        );
+        // Step 4: Wait for the globalgrade form content to be populated by JavaScript.
+        $this->spin(function($context) {
+            $page = $context->getSession()->getPage();
+            $form = $page->find('css', 'form[data-region="globalgrade"]');
+            if (!$form) {
+                throw new Exception('Grading modal form with data-region="globalgrade" not found');
+            }
+            // Check that the form has been populated (has a non-empty innerHTML).
+            $inner = $form->getHtml();
+            if (trim($inner) === '') {
+                throw new Exception('globalgrade form is still empty, JavaScript has not rendered content yet');
+            }
+            return true;
+        });
     }
 
     /**
@@ -159,14 +220,14 @@ class behat_mod_competvet extends behat_base {
             throw new Exception('Form with data-region "' . $dataregion . '" not found');
         }
 
-        // Locate the submit button within this form.
-        $submitbutton = $form->findButton('Submit');
+        // Locate the submit button within this form by data-action attribute.
+        $submitbutton = $form->find('css', 'button[data-action="save"]');
         if (!$submitbutton) {
             throw new Exception('Submit button not found in form with data-region "' . $dataregion . '"');
         }
 
         // Click the submit button.
-        $submitbutton->press();
+        $submitbutton->click();
     }
 
     /**

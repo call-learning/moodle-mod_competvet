@@ -211,6 +211,13 @@ class criteria {
         int $parentid,
         ?float $grade
     ): int {
+        $grid = grid::get_record(['id' => $gridid]);
+        if (!$grid) {
+            throw new \moodle_exception('invaliddata', 'competvet', '', 'grid');
+        }
+        if (!$grid->can_manage()) {
+            throw new \moodle_exception('noaccess', 'mod_competvet');
+        }
         $criterion = criterion::get_record(['id' => $criterionid]);
         if (!$criterion) {
             $criterion = new criterion(0);

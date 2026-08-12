@@ -4,6 +4,9 @@ Feature: Testing manage_criteria in mod_competvet
   as an admin
   I need to be able change the criteria text
 
+  Background:
+    Given the CompetVet default grids have been initialised
+
   @javascript
   Scenario: Edit the Evaluation criteria and option texts
     Given I am logged in as "admin"
@@ -41,3 +44,21 @@ Feature: Testing manage_criteria in mod_competvet
     And I press "List criteria"
     Then I should see "Quantité et variété des situations cliniques"
     And I should see "Quantité"
+
+  @javascript
+  Scenario: Restricted global grid administrator can access and edit grids
+    Given the following "users" exist:
+      | username | firstname | lastname | email                |
+      | student1 | Student   | One      | student1@example.com |
+    And the following "role capability" exists:
+      | role                                  | student |
+      | mod/competvet:manageglobalcriteria    | allow   |
+    And the following "system role assigns" exist:
+      | user     | course               | role    |
+      | student1 | Acceptance test site | student |
+    And I log in as "student1"
+    And I navigate to the manage criteria page
+    Then I should see "Savoir être"
+    And I change criterium row "1" in grid row "1" to "Compétence relationnelle"
+    And I reload the page
+    And I should see "Compétence relationnelle"

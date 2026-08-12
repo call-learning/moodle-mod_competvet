@@ -85,7 +85,10 @@ class managecriteria extends base {
     public function check_access(): void {
         global $PAGE;
         $context = $PAGE->context;
-        if (!has_capability('mod/competvet:editcriteria', $context)) {
+        $capability = $context->contextlevel === CONTEXT_SYSTEM
+            ? 'mod/competvet:manageglobalcriteria'
+            : 'mod/competvet:editcriteria';
+        if (!has_capability($capability, $context)) {
             throw new \moodle_exception('noaccess', 'mod_competvet');
         }
     }
