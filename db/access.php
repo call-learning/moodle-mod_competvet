@@ -26,6 +26,14 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
+    'mod/competvet:viewprogressionreport' => [
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+        ],
+    ],
     'mod/competvet:manageglobalcriteria' => [
         'riskbitmask' => RISK_XSS,
         'captype' => 'write',

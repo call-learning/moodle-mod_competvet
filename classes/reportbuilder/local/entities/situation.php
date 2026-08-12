@@ -237,9 +237,11 @@ class situation extends base {
         return
             [
                 "LEFT JOIN {competvet} {$competvetalias} ON {$competvetalias}.id = {$situationalias}.competvetid",
-                "LEFT JOIN {course_modules} {$coursemodulealias} ON {$competvetalias}.id = {$coursemodulealias}.instance",
                 "LEFT JOIN {modules} {$modulealias}
-             ON {$modulealias}.id = {$coursemodulealias}.module AND {$modulealias}.name = 'competvet'",
+             ON {$modulealias}.name = 'competvet'",
+                "LEFT JOIN {course_modules} {$coursemodulealias}
+             ON {$competvetalias}.id = {$coursemodulealias}.instance
+            AND {$coursemodulealias}.module = {$modulealias}.id",
                 "LEFT JOIN {context} {$contextalias} ON {$contextalias}.instanceid = {$coursemodulealias}.id
                     AND {$contextalias}.contextlevel = " .
                 CONTEXT_MODULE,

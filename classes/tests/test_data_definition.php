@@ -130,7 +130,6 @@ trait test_data_definition {
                 foreach (($situationinfo['plannings'] ?? []) as $planningdef) {
                     $groupid = groups_get_group_by_name($course->id, $planningdef['groupname']);
                     $planning = $competvetevalgenerator->create_planning([
-                        'courseid' => $course->id,
                         'startdate' => $planningdef['startdate'],
                         'enddate' => $planningdef['enddate'],
                         'groupid' => $groupid,
@@ -830,6 +829,47 @@ trait test_data_definition {
                                 'startdate' => $startdate + $oneweek / 2,
                                 'enddate' => $startdate + $oneweek + $oneweek / 2,
                                 'groupname' => 'group 8.2',
+                                'session' => '2023',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Data definition for progression tests requiring a planning with no observations.
+     *
+     * @param int $startdate
+     * @return array $datadefinition
+     */
+    private function get_data_definition_set_6(int $startdate): array {
+        $oneweek = 60 * 60 * 24 * 7; // 1 week in seconds.
+        return [
+            'course 6' => [
+                'users' => [
+                    'student' => ['student1', 'student2'],
+                    'observer' => ['observer1', 'observer2'],
+                    'teacher' => ['teacher1'],
+                    'manager' => ['manager'],
+                ],
+                'groups' => [
+                    'group 8.1' => [
+                        'users' => ['student1'],
+                    ],
+                    'group 8.2' => [
+                        'users' => ['student2'],
+                    ],
+                ],
+                'activities' => [
+                    'SIT6' => [
+                        'category' => 'Y1',
+                        'plannings' => [
+                            [
+                                'startdate' => $startdate,
+                                'enddate' => $startdate + $oneweek,
+                                'groupname' => 'group 8.1',
                                 'session' => '2023',
                             ],
                         ],

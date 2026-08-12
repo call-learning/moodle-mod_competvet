@@ -459,5 +459,29 @@
         <KEY NAME="usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
+    <TABLE NAME="competvet_progression" COMMENT="Materialized competency progression results">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="studentid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="situationid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="planningid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="criterionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="bestlevel" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="totalobservations" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecalculated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="student_fk" TYPE="foreign" FIELDS="studentid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="situation_fk" TYPE="foreign" FIELDS="situationid" REFTABLE="competvet_situation" REFFIELDS="id"/>
+        <KEY NAME="planning_fk" TYPE="foreign" FIELDS="planningid" REFTABLE="competvet_planning" REFFIELDS="id"/>
+        <KEY NAME="criterion_fk" TYPE="foreign" FIELDS="criterionid" REFTABLE="competvet_criterion" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="context_ux" UNIQUE="true" FIELDS="studentid, situationid, planningid, criterionid"/>
+        <INDEX NAME="student_planning_ix" UNIQUE="false" FIELDS="studentid, planningid"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>
