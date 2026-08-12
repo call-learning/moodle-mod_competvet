@@ -53,7 +53,7 @@ class manage_grade extends external_api {
             'cmid' => new external_value(PARAM_INT, 'The course module id', VALUE_REQUIRED),
             'planningid' => new external_value(PARAM_INT, 'The planning id', VALUE_REQUIRED),
             'grade' => new external_value(PARAM_TEXT, 'The grade', VALUE_REQUIRED),
-            'feedback' => new external_value(PARAM_TEXT, 'The feedback', VALUE_OPTIONAL),
+            'feedback' => new external_value(PARAM_TEXT, 'The feedback', VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -64,10 +64,10 @@ class manage_grade extends external_api {
      * @param int $cmid
      * @param int $planningid
      * @param string $grade
-     * @param string $feedback
+     * @param string|null $feedback
      * @return array The processing result
      */
-    public static function update($userid, $cmid, $planningid, $grade, $feedback): array {
+    public static function update(int $userid, int $cmid, int $planningid, string $grade, ?string $feedback = ''): array {
         global $DB;
         $params = self::validate_parameters(self::update_parameters(), [
             'userid' => $userid,
@@ -109,26 +109,26 @@ class manage_grade extends external_api {
             'cmid' => $competvet->get_course_module_id(),
             'planningid' => $planningid,
         ]);
-        $existing = $DB->record_exists_select(
-            'task_adhoc',
-            "classname = :classname AND " . $DB->sql_compare_text('customdata') . " = " . $DB->sql_compare_text(':customdata'),
-            [
-                'classname' => '\mod_competvet\task\student_graded',
-                'customdata' => $customdata,
-            ]
-        );
-
-        if (!$existing) {
-            $task = new \mod_competvet\task\student_graded();
-            $task->set_custom_data((object)[
-                'studentid' => $userid,
-                'cmid' => $competvet->get_course_module_id(),
-                'planningid' => $planningid,
-            ]);
-            \core\task\manager::queue_adhoc_task($task);
-        }
-        $lettergrade = $competvet->get_letter_grade($grade);
         if ($result) {
+            $existing = $DB->record_exists_select(
+                'task_adhoc',
+                "classname = :classname AND " . $DB->sql_compare_text('customdata') . " = " . $DB->sql_compare_text(':customdata'),
+                [
+                    'classname' => '\mod_competvet\task\student_graded',
+                    'customdata' => $customdata,
+                ]
+            );
+
+            if (!$existing) {
+                $task = new \mod_competvet\task\student_graded();
+                $task->set_custom_data((object)[
+                    'studentid' => $userid,
+                    'cmid' => $competvet->get_course_module_id(),
+                    'planningid' => $planningid,
+                ]);
+                \core\task\manager::queue_adhoc_task($task);
+            }
+            $lettergrade = $competvet->get_letter_grade($grade);
             return [
                 'result' => true,
                 'lettergrade' => $lettergrade,
@@ -137,8 +137,14 @@ class manage_grade extends external_api {
         } else {
             return [
                 'result' => false,
-                'lettergrade' => '',
-                'warnings' => [],
+                'warnings' => [
+                    [
+                        'item' => 'grade',
+                        'itemid' => $item->id,
+                        'warningcode' => 'cannotupdate',
+                        'message' => 'Cannot update grade',
+                    ],
+                ],
             ];
         }
     }
@@ -150,8 +156,8 @@ class manage_grade extends external_api {
      */
     public static function update_returns(): external_single_structure {
         return new external_single_structure([
-            'result' => new external_value(PARAM_BOOL, 'The processing result'),
-            'lettergrade' => new external_value(PARAM_TEXT, 'The letter grade'),
+            'result' => new external_value(PARAM_BOOL, 'The processing result', VALUE_REQUIRED),
+            'lettergrade' => new external_value(PARAM_TEXT, 'The letter grade', VALUE_OPTIONAL),
             'warnings' => new external_warnings(),
         ]);
     }
