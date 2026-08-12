@@ -114,11 +114,7 @@ class situation extends persistent {
             return $allrolescache->get($cachekey);
         }
         $competvet = competvet::get_from_instance_id($this->raw_get('competvetid'));
-        // Direct activity assignments should win over inherited course/category/system roles.
-        $roles = $this->get_filtered_roles($competvet, $userid, false);
-        if (empty($roles)) {
-            $roles = $this->get_filtered_roles($competvet, $userid, true);
-        }
+        $roles = $this->get_effective_roles($competvet, $userid);
         $roles = array_unique($roles);
         if (empty($roles)) {
             $roles = [self::UNKNOWN_ROLE_TYPE => null];
@@ -126,6 +122,24 @@ class situation extends persistent {
         $returnedroles = array_keys($roles);
         $allrolescache->set($cachekey, $returnedroles);
         return $returnedroles;
+    }
+
+    /**
+     * Get the effective CompetVet roles for a user.
+     *
+     * Direct activity assignments are authoritative. Parent-context roles are
+     * only considered when the user has no relevant role on the activity.
+     *
+     * @param competvet $competvet
+     * @param int $userid
+     * @return array
+     */
+    private function get_effective_roles(competvet $competvet, int $userid): array {
+        $roles = $this->get_filtered_roles($competvet, $userid, false);
+        if (!empty($roles)) {
+            return $roles;
+        }
+        return $this->get_filtered_roles($competvet, $userid, true);
     }
 
     /**

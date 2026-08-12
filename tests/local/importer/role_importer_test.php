@@ -84,6 +84,26 @@ final class role_importer_test extends advanced_testcase {
         }
     }
 
+    /**
+     * Reimporting a row removes roles that are no longer present in the CSV.
+     *
+     * @return void
+     */
+    public function test_reimport_clears_stale_module_roles(): void {
+        global $CFG, $DB;
+        $this->setup_scenario(['s1' => 'student']);
+        $this->setAdminUser();
+        $roleimporter = new role_importer($this->course->id, $this->cminfo->id);
+        $roleimporter->import($CFG->dirroot . self::SAMPLE_FILE_PATH);
+        $roleimporter->import($CFG->dirroot . '/mod/competvet/tests/fixtures/importer/role_assignments_reimport.csv');
+
+        $context = \context_module::instance($this->cminfo->id);
+        $evaluatorid = $DB->get_field('role', 'id', ['shortname' => 'evaluator']);
+        $observerid = $DB->get_field('role', 'id', ['shortname' => 'observer']);
+        $this->assertFalse(user_has_role_assignment($this->users['s1']->id, $evaluatorid, $context->id));
+        $this->assertTrue(user_has_role_assignment($this->users['s1']->id, $observerid, $context->id));
+    }
+
 
     /**
      * Data provider for import tests.
