@@ -20,6 +20,8 @@ use mod_competvet\utils;
 use mod_competvet\output\view\student_evaluations;
 use mod_competvet\output\view\student_certifications;
 use mod_competvet\output\view\student_list;
+use mod_competvet\output\view\student_progression;
+use mod_competvet\output\view\observer_observation;
 use mod_competvet\output\view\student_tabs;
 use tabobject;
 
@@ -63,6 +65,28 @@ class renderer extends \plugin_renderer_base {
         $output .= $this->output->tabtree($tabtree, $currenttab);
         $output .= $this->render_from_template($certificationinfo->get_template_name($this->output), $data);
         return $output;
+    }
+
+    /**
+     * Render the observer observation view
+     *
+     * @param observer_observation $observationinfo
+     * @return string
+     */
+    public function render_observer_observation(observer_observation $observationinfo) {
+        $data = $observationinfo->export_for_template($this);
+        return $this->render_from_template($observationinfo->get_template_name($this->output), $data);
+    }
+
+    /**
+     * Render the student progression view
+     *
+     * @param student_progression $progressioninfo
+     * @return string
+     */
+    public function render_student_progression(student_progression $progressioninfo) {
+        $data = $progressioninfo->export_for_template($this);
+        return $this->render_from_template($progressioninfo->get_template_name($this->output), $data);
     }
 
     /**

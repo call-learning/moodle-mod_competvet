@@ -36,3 +36,21 @@ export const deletePlanning = (planningid) => {
 
     return fetchMany([{methodname: 'mod_competvet_delete_planning', args}])[0];
 };
+
+/**
+ * Get the competency progression for a student on a planning.
+ *
+ * @param   {Number} planningid The planning ID
+ * @param   {Number} studentid The student user ID
+ * @param   {Number} [threshold] Optional acquisition threshold (0-100)
+ * @returns {Promise}
+ */
+export const getProgression = (planningid, studentid, threshold = null) => {
+    const args = {
+        planningid,
+        studentid,
+        threshold,
+    };
+
+    return fetchMany([{methodname: 'mod_competvet_get_progression', args}])[0];
+};

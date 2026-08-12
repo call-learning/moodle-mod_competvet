@@ -250,4 +250,12 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'moodle/role:assign',
     ],
+    'mod_competvet_get_progression' => [
+        'classname' => \mod_competvet\external\get_progression::class,
+        'methodname' => 'execute',
+        'description' => 'Get the competency progression for a student on a planning',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:view',
+    ],
 ];

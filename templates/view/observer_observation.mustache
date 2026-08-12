@@ -1,0 +1,139 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_competvet/view/observer_observation
+
+    Displays the student's progression history for observers making observations.
+
+    Example context (json):
+    {
+        "planningid": 1,
+        "studentid": 2,
+        "summary": {
+            "total": 10,
+            "acquired": 4,
+            "evaluated_not_acquired": 3,
+            "not_evaluated": 3
+        },
+        "criteria": [
+            {
+                "criterionid": 1,
+                "label": "Criterion label",
+                "state": "acquired",
+                "state_label": "Acquired",
+                "state_css_class": "acquired",
+                "state_icon": "fa-check-circle",
+                "bestlevel": 45,
+                "totalobservations": 2,
+                "levelhistory": [
+                    {"level": 40, "timemodified": "12/01/2024"},
+                    {"level": 45, "timemodified": "15/01/2024"}
+                ]
+            }
+        ],
+        "hasprogression": true,
+        "haspreviouslevels": true
+    }
+}}
+<div class="competvet-observer-observation-view">
+    {{#hasprogression}}
+    <div class="progression-summary mb-4">
+        <h4>{{#str}}progression_summary, mod_competvet{{/str}}</h4>
+        <div class="row text-center">
+            <div class="col-3">
+                <div class="card border-0">
+                    <div class="card-body">
+                        <h3 class="mb-0">{{#str}}total, core{{/str}}</h3>
+                        <p class="h4 mb-0">{{summary.total}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="card border-0">
+                    <div class="card-body">
+                        <h3 class="mb-0">{{#str}}progression_state_acquired, mod_competvet{{/str}}</h3>
+                        <p class="h4 mb-0 text-success">{{summary.acquired}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="card border-0">
+                    <div class="card-body">
+                        <h3 class="mb-0">{{#str}}progression_state_evaluated_not_acquired, mod_competvet{{/str}}</h3>
+                        <p class="h4 mb-0 text-warning">{{summary.evaluated_not_acquired}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="card border-0">
+                    <div class="card-body">
+                        <h3 class="mb-0">{{#str}}progression_state_not_evaluated, mod_competvet{{/str}}</h3>
+                        <p class="h4 mb-0 text-secondary">{{summary.not_evaluated}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="progression-details mb-4">
+        <h5>{{#str}}progression_view_observer, mod_competvet{{/str}}</h5>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">{{#str}}criterion, mod_competvet{{/str}}</th>
+                        <th scope="col">{{#str}}state, core{{/str}}</th>
+                        <th scope="col">{{#str}}level, mod_competvet{{/str}}</th>
+                        <th scope="col">{{#str}}observations, mod_competvet{{/str}}</th>
+                        <th scope="col">{{#str}}progression_view_observer, mod_competvet{{/str}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#criteria}}
+                    <tr class="progression-{{state_css_class}}">
+                        <td>{{{label}}}</td>
+                        <td>
+                            <span class="badge badge-{{state_css_class}}">
+                                <i class="fa {{state_icon}}" aria-hidden="true"></i>
+                                {{state_label}}
+                            </span>
+                        </td>
+                        <td>{{#bestlevel}}{{bestlevel}}/{{maxlevel}}{{/bestlevel}}{{^bestlevel}}-{{/bestlevel}}</td>
+                        <td>{{totalobservations}}</td>
+                        <td>
+                            {{#levelhistory}}
+                            <div class="level-history-item">
+                                <span class="badge bg-secondary">{{level}}%</span>
+                                <small class="text-muted">{{timemodified}}</small>
+                            </div>
+                            {{/levelhistory}}
+                            {{^levelhistory}}
+                            <span class="text-muted">{{#str}}no_previous_data, mod_competvet{{/str}}</span>
+                            {{/levelhistory}}
+                        </td>
+                    </tr>
+                    {{/criteria}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{^hasprogression}}
+    <div class="alert alert-info">
+        {{#str}}progression_no_criteria, mod_competvet{{/str}}
+    </div>
+    {{/hasprogression}}
+</div>

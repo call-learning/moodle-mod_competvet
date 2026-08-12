@@ -22,6 +22,7 @@ use mod_competvet\competvet;
 use mod_competvet\local\api\grading as grading_api;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\reportbuilder\local\systemreports\case_entries;
+use mod_competvet\reportbuilder\local\systemreports\competency_progression;
 use moodle_url;
 use renderer_base;
 use single_button;
@@ -104,6 +105,24 @@ class plannings extends base {
             ['reportid' => $reportid, 'id' => $this->cmid]
         );
 
+        // Register the competency progression report in the same way.
+        $progressionreportdata = [
+            'type' => \core_reportbuilder\local\report\base::TYPE_SYSTEM_REPORT,
+            'source' => competency_progression::class,
+            'component' => competvet::COMPONENT_NAME,
+            'contextid' => $competvet->get_context()->id,
+        ];
+
+        if (!($progressionreport = report::get_record($progressionreportdata))) {
+            $progressionreport = manager::create_report_persistent((object) $progressionreportdata);
+        }
+
+        $progressionreportid = $progressionreport->get('id');
+        $progressionreportbaseurl = new moodle_url(
+            '/mod/competvet/reports.php',
+            ['reportid' => $progressionreportid, 'id' => $this->cmid]
+        );
+
         foreach ($planningstatsbycategory as $categorytext => $planningstats) {
             $category = new stdClass();
             $category->categorytext = $categorytext;
@@ -128,6 +147,14 @@ class plannings extends base {
                     $caselogreporturl->param('parameters[studentid]', $student->id);
                     $caselogreporturl->param('parameters[planningid]', $planningstat['id']);
                     $student->caselogreporturl = ($caselogreporturl)->out(false);
+
+                    // Progression report URL for this student.
+                    $progressionreporturl = clone $progressionreportbaseurl;
+                    $progressionreporturl->param('returnurl', $returnurl);
+                    $progressionreporturl->param('parameters[studentid]', $student->id);
+                    $progressionreporturl->param('parameters[planningid]', $planningstat['id']);
+                    $student->progressionreporturl = ($progressionreporturl)->out(false);
+
                     $studentswithreporturl[] = $student;
                 }
                 $planningresult->students = $studentswithreporturl;

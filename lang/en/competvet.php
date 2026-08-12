@@ -584,3 +584,23 @@ $string['validate'] = 'Validate this essential';
 $string['validated'] = 'Validated';
 $string['view'] = 'View';
 $string['viewgrade'] = 'View grade';
+
+// Competency progression strings.
+$string['progression_state_acquired'] = 'Acquired';
+$string['progression_state_evaluated_not_acquired'] = 'Evaluated - not acquired';
+$string['progression_state_not_evaluated'] = 'Not evaluated';
+$string['progression_title'] = 'Competency progression';
+$string['progression_summary'] = 'Progression summary';
+$string['progression_summary_acquired'] = 'Acquired: {$a}';
+$string['progression_summary_evaluated_not_acquired'] = 'Evaluated but not acquired: {$a}';
+$string['progression_summary_not_evaluated'] = 'Not evaluated: {$a}';
+$string['progression_view_student'] = 'Student competency progression';
+$string['progression_view_observer'] = 'Competency progression for observation';
+$string['progression_view_report'] = 'Competency progression report';
+$string['progression_filter_state'] = 'Filter by state';
+$string['progression_filter_all'] = 'All states';
+$string['progression_filter_acquired'] = 'Acquired only';
+$string['progression_filter_evaluated_not_acquired'] = 'Evaluated but not acquired only';
+$string['progression_filter_not_evaluated'] = 'Not evaluated only';
+$string['progression_no_criteria'] = 'No evaluation criteria are configured for this planning.';
+$string['no_previous_data'] = 'No previous observation data';
