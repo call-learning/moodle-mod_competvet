@@ -50,6 +50,7 @@ final class manage_criteria_test extends \advanced_testcase {
             'sort' => 1,
         ]);
         $criterion->create();
+        $this->setAdminUser();
         $result = $this->manage_criteria_get(
             \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
             $grid->get('id'),
@@ -60,6 +61,103 @@ final class manage_criteria_test extends \advanced_testcase {
         $this->assertEquals('Test Grid', $result['grids'][0]['gridname']);
         $this->assertCount(1, $result['grids'][0]['criteria']);
         $this->assertEquals('Test Criterion', $result['grids'][0]['criteria'][0]['label']);
+    }
+
+    /**
+     * A restricted system role can manage global grids without being a site admin.
+     */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    public function test_restricted_global_grid_manager_access(): void {
+        $this->resetAfterTest();
+        $grid = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Restricted grid', 'idnumber' => 'GRID011',
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+        ]);
+        $grid->create();
+
+        $roleid = create_role('Global grid manager', 'globalgridmanager', 'Manage global CompetVet grids');
+        assign_capability(
+            'mod/competvet:manageglobalcriteria',
+            CAP_ALLOW,
+            $roleid,
+            \context_system::instance()->id
+        );
+        $user = $this->getDataGenerator()->create_user();
+        role_assign($roleid, $user->id, \context_system::instance()->id);
+        $this->setUser($user);
+
+        $result = $this->manage_criteria_get(
+            \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+            $grid->get('id')
+        );
+        $this->assertCount(1, $result['grids']);
+        $this->assertTrue($result['grids'][0]['canedit']);
+
+        $criterion = new \mod_competvet\local\persistent\criterion(0, (object) [
+            'gridid' => $grid->get('id'),
+            'label' => 'Restricted criterion',
+            'idnumber' => 'CRIT011',
+            'parentid' => 0,
+            'sort' => 1,
+        ]);
+        $criterion->create();
+
+        $result = $this->manage_criteria_update([
+            [
+                'gridid' => $grid->get('id'),
+                'gridname' => 'Restricted grid updated',
+                'type' => $grid->get('type'),
+                'haschanged' => true,
+                'criteria' => [
+                    [
+                        'criterionid' => $criterion->get('id'),
+                        'label' => 'Restricted criterion updated',
+                        'idnumber' => 'CRIT011',
+                        'sortorder' => 1,
+                        'haschanged' => true,
+                        'hasoptions' => false,
+                        'options' => [],
+                    ],
+                ],
+            ],
+        ], $grid->get('type'));
+        $this->assertTrue($result['result']);
+
+        $result = $this->manage_criteria_update([
+            [
+                'gridid' => $grid->get('id'),
+                'type' => $grid->get('type'),
+                'criteria' => [
+                    [
+                        'criterionid' => $criterion->get('id'),
+                        'label' => 'Restricted criterion updated',
+                        'idnumber' => 'CRIT011',
+                        'sortorder' => 1,
+                        'deleted' => true,
+                        'hasoptions' => false,
+                        'options' => [],
+                    ],
+                ],
+            ],
+        ], $grid->get('type'));
+        $this->assertTrue($result['result']);
+
+        $result = $this->manage_criteria_update([
+            [
+                'gridid' => $grid->get('id'),
+                'type' => $grid->get('type'),
+                'deleted' => true,
+                'criteria' => [],
+            ],
+        ], $grid->get('type'));
+        $this->assertTrue($result['result']);
+
+        $this->setUser($this->getDataGenerator()->create_user());
+        $this->expectException(\required_capability_exception::class);
+        $this->manage_criteria_get(
+            \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+            $grid->get('id')
+        );
     }
 
     /**
@@ -365,9 +463,8 @@ final class manage_criteria_test extends \advanced_testcase {
         // Test with non-admin user.
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
-        $result = $this->manage_criteria_update($deleteparams, $grid->get('type'));
-        $this->assertTrue($result['result']);
-        $this->assertNotEmpty($result['warnings']);
+        $this->expectException(\moodle_exception::class);
+        $this->manage_criteria_update($deleteparams, $grid->get('type'));
     }
 
     /**

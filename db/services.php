@@ -102,7 +102,8 @@ $functions = [
         'description' => 'Update the criteria',
         'type' => 'write',
         'ajax' => true,
-        'capabilities' => 'mod/competvet:editcriteria',
+        // The API selects the required capability from the grid scope.
+        'capabilities' => '',
     ],
     'mod_competvet_get_criteria' => [
         'classname' => \mod_competvet\external\manage_criteria::class,
@@ -110,7 +111,8 @@ $functions = [
         'description' => 'get the criteria',
         'type' => 'read',
         'ajax' => true,
-        'capabilities' => 'mod/competvet:view',
+        // The API selects the required capability from the grid scope.
+        'capabilities' => '',
     ],
     'mod_competvet_manage_plannings' => [
         'classname' => \mod_competvet\external\manage_plannings::class,

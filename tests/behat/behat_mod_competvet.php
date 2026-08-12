@@ -32,6 +32,52 @@ use Behat\Mink\Exception\ExpectationException as ExpectationException;
  */
 class behat_mod_competvet extends behat_base {
     /**
+     * Runs the post-install task responsible for creating the default grids.
+     *
+     * The task is normally queued during plugin installation and executed by
+     * cron, but the Behat site may not have run it yet.
+     *
+     * @Given the CompetVet default grids have been initialised
+     */
+    public function the_competvet_default_grids_have_been_initialised(): void {
+        $task = new \mod_competvet\task\post_install();
+        $task->set_custom_data(['create_default_grids']);
+        $task->execute();
+    }
+
+    /**
+     * Creates the activity-specific certification grid used by the activity tests.
+     *
+     * @Given the CompetVet activity-specific certification grid exists for :shortname
+     * @param string $shortname
+     */
+    public function the_competvet_activity_specific_certification_grid_exists_for(string $shortname): void {
+        $situation = \mod_competvet\local\persistent\situation::get_record(
+            ['shortname' => $shortname],
+            MUST_EXIST
+        );
+        $grid = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Activity certification grid',
+            'idnumber' => 'ACTIVITYCERTIFGRID',
+            'situationid' => $situation->get('id'),
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_CERTIFICATION,
+        ]);
+        $grid->create();
+
+        $criterion = new \mod_competvet\local\persistent\criterion(0, (object) [
+            'gridid' => $grid->get('id'),
+            'label' => 'Savoir être',
+            'idnumber' => 'ACTIVITYCRITERION',
+            'parentid' => 0,
+            'sort' => 1,
+        ]);
+        $criterion->create();
+
+        $situation->set('certifgrid', $grid->get('id'));
+        $situation->update();
+    }
+
+    /**
      * Opens the grading page for a specific student and verifies the title.
      *
      * Example: And I open grading page for "Student One"
