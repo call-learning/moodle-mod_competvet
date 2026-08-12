@@ -1,84 +1,126 @@
 ## Purpose
 
-Define a Caselog page that supports concise and pedagogically useful clinical-case handover, with unified input, explicit length limits, and a distinct personal reflection.
+Define a single Caselog experience for clearly transmitting one or more clinical cases while separating concise handover information from personal clinical learning.
 
 ## ADDED Requirements
 
 ### Requirement: The Caselog form is presented as one continuous page
 The system SHALL present the Caselog creation and edit experience as one vertically scrollable page, without splitting the user through separate screens or steps.
-The page SHALL keep the existing fields `Nom de l'animal`, `Espece`, `Numero de dossier`, `Date de la prise en charge` and `Role dans la prise en charge`.
+The page SHALL keep `Nom de l'animal`, `Espece`, `Numero de dossier`, `Date de la prise en charge concernée`, and `Mon rôle dans la prise en charge`.
 The page SHALL place the completion actions at the bottom in this order: `Enregistrer le brouillon`, `Annuler`, `Valider`.
 
 #### Scenario: Open a Caselog entry for editing
 - **WHEN** a learner opens a Caselog entry in create or edit mode
-- **THEN** the learner sees a single continuous page containing the retained identity fields, the clinical transmission section, the reflection section, and the three completion actions at the bottom
+- **THEN** the learner sees a single continuous page containing the retained identification fields, the clinical transmission section, the reflection section, and the three completion actions at the bottom
 
-### Requirement: Active categories define the structure of new Caselog forms
+### Requirement: The initial tutorial and Caselog page explain the exercise
+Before access to the case, the system SHALL display the tutorial title `Ajouter une transmission de cas clinique` and explain that the exercise is to synthesise one or more clinical cases for a colleague taking over, not to rewrite a complete dossier or a bibliographic review.
+The Caselog page SHALL display this chapo:
+`Cette section évalue votre capacité à transmettre un cas clinique, comme à un.e collègue, de façon claire, synthétique et exploitable : contexte, problème principal, éléments cliniques utiles, prise en charge réalisée, suites prévues et points de vigilance.`
+The page SHALL explain that a separate personal reflection is expected.
+
+#### Scenario: Read the Caselog instructions
+- **WHEN** a learner reaches the tutorial or opens the Caselog page
+- **THEN** the learner can read the validated exercise instructions, the pedagogical chapo, and the distinction between clinical transmission and personal reflection
+
+### Requirement: The current form version defines new Caselog forms
 The system SHALL continue to use `competvet_case_cat` to group Caselog fields by category.
-The system SHALL allow a category to be marked active or inactive for form usage.
-The system SHALL include only active categories in new Caselog create and edit forms.
+The system SHALL organize categories and fields within an explicitly identified Caselog form version.
+The system SHALL include only categories belonging to the current published form version when creating a new Caselog entry, while retaining `Espece` in the active identification fields.
 
 #### Scenario: Create a new Caselog entry
 - **WHEN** a learner opens a new Caselog form
-- **THEN** the form renders only the categories currently marked active for Caselog data entry
+- **THEN** the form renders the identification fields and only the categories belonging to the current published form version
 
-#### Scenario: Edit a Caselog entry with only active categories
-- **WHEN** a learner edits a Caselog entry whose data only belongs to active categories
-- **THEN** the form renders the active-category structure only
+### Requirement: Caselog form versions remain available for existing entries
+The system SHALL support multiple Caselog form versions at the same time.
+Each Caselog entry SHALL store the form version used to create it.
+The system SHALL assign the current published form version to new entries.
+Published form versions and their field definitions SHALL remain available after a newer version is published.
+An existing entry SHALL be displayed and edited using the form version stored on that entry, without being silently converted to the current version.
 
-### Requirement: Historical Caselog data remains readable
-The system SHALL preserve the display of historical categories and fields already stored on existing Caselog entries, even when those categories are no longer active in new forms.
-The system SHALL not require legacy categories or fields to remain active in order to render historical entries.
+#### Scenario: Create an entry with the current version
+- **WHEN** a learner creates a new Caselog entry
+- **THEN** the system assigns the current published form version and renders that version's fields
+
+#### Scenario: Display an entry from an older version
+- **WHEN** a learner or evaluator opens an entry created with an older form version
+- **THEN** the system renders the fields and labels belonging to that stored version, even if a newer version is current
+
+#### Scenario: Edit an entry from an older version
+- **WHEN** a learner edits and saves an entry created with an older form version
+- **THEN** the system continues using that version and preserves its version-specific values without migrating them to the current form
+
+### Requirement: Historical Caselog data remains readable and safe during edits
+The system SHALL preserve the display of historical categories and fields already stored on existing Caselog entries, even when those categories are no longer part of the current published form version.
+The system SHALL not require legacy categories or fields to remain in the current version in order to render historical entries.
+When an existing entry is edited, legacy values SHALL remain preserved unless the learner explicitly changes or removes them through an available control.
 
 #### Scenario: Open a historical Caselog entry
 - **WHEN** a learner or evaluator opens an existing Caselog entry containing data from inactive categories or legacy fields
 - **THEN** the application displays those stored categories and fields so the historical case remains readable
 
-### Requirement: The page explains the pedagogical goal of the Caselog
-The system SHALL display a chapo explaining that the Caselog evaluates the ability to transmit a clinical case in a clear, synthetic and actionable way for a colleague taking over.
-The system SHALL state that the learner must not rewrite the full dossier or a bibliographic review and that a separate personal reflection is expected.
-The system SHALL display one example model for `Transmission clinique` and one example model for `Reflexion sur le cas`.
+#### Scenario: Edit an entry containing inactive legacy data
+- **WHEN** a learner edits an existing Caselog entry containing inactive legacy values and saves the entry
+- **THEN** the application preserves those legacy values and does not discard them because their categories are inactive
 
-#### Scenario: Read the Caselog instructions
-- **WHEN** a learner opens the Caselog page
-- **THEN** the learner can read the pedagogical chapo and see separate example models for the clinical transmission and the personal reflection
+### Requirement: Caselog APIs expose and preserve form versions
+The local display layer, `local_competvet`, and the mobile application APIs SHALL expose the form-version identifier and the field definitions or metadata needed to interpret each Caselog entry.
+Read APIs SHALL return historical entries according to their stored form version.
+Edit APIs SHALL accept updates to entries from supported older versions without silently converting their fields to the current version.
+Version-independent lists and summaries SHALL use stable entry data and SHALL not require fields that exist only in one form version.
+
+#### Scenario: Read entries from several versions
+- **WHEN** a consumer requests Caselog entries created with different form versions
+- **THEN** each entry includes enough version information for the consumer to render its own fields and values correctly
+
+#### Scenario: Update an older-version entry through an API
+- **WHEN** a supported consumer updates an entry created with an older form version
+- **THEN** the API persists the update against that version and does not reinterpret the entry as the current version
 
 ### Requirement: The Caselog captures a bounded clinical transmission
-The system SHALL replace the current `Diagnostic final` field with a multiline field titled `Transmission clinique - 300 mots maximum`.
-The system SHALL show helper text telling the learner to write in a synthetic or telegraphic style and to include the clinically useful commemorative, anamnestic, clinical, paraclinical, treatment, follow-up and vigilance elements needed for handover.
-The system SHALL limit the field to 300 words maximum.
+The system SHALL replace the current `Diagnostic final` field with a multiline field titled `Transmission clinique (1200 caractères maximum)`.
+The system SHALL show this helper text:
+`L’objectif n’est pas de rédiger un dossier complet mais de vous exercer à synthétiser les informations essentielles. Listez ici, de façon hiérarchisée, uniquement les éléments décisifs pour la compréhension du cas et son suivi. Omettez les éléments anecdotiques.`
+The system SHALL limit the field to 1200 characters maximum.
 
 #### Scenario: Enter a valid clinical transmission
-- **WHEN** a learner enters a transmission of 300 words or fewer
+- **WHEN** a learner enters a transmission of 1200 characters or fewer
 - **THEN** the system accepts the text for draft save and final validation
 
 #### Scenario: Exceed the clinical transmission limit
-- **WHEN** a learner enters more than 300 words in `Transmission clinique`
-- **THEN** the system blocks final validation and explains that the field is limited to 300 words maximum
+- **WHEN** a learner enters more than 1200 characters in `Transmission clinique`
+- **THEN** the system rejects the submission and explains that the field is limited to 1200 characters maximum
 
 ### Requirement: The Caselog captures a separate personal reflection
-The system SHALL provide a multiline field titled `Reflexion sur le cas - 300 mots maximum`.
-The system SHALL show helper text explaining that this field is for personal clinical progression, including what the learner understood better, what was difficult, what still needs consolidation and which next actions would help progress.
-The system SHALL limit the field to 300 words maximum.
-The system SHALL keep `Role dans la prise en charge` unchanged.
+The system SHALL provide a multiline field titled `Réflexions et enseignements issus du cas (800 caractères maximum)`.
+The system SHALL show this helper text:
+`Listez ici - Ce que vous avez mieux compris, - Ce qui vous a mis en difficulté et que vous referiez différemment avec le recul, - Les points que vous devez consolider.`
+The system SHALL limit the field to 800 characters maximum.
+The system SHALL keep `Mon rôle dans la prise en charge` unchanged.
 
 #### Scenario: Enter a valid reflection
-- **WHEN** a learner enters a reflection of 300 words or fewer
+- **WHEN** a learner enters a reflection of 800 characters or fewer
 - **THEN** the system accepts the text for draft save and final validation as a reflection distinct from the clinical transmission
 
 #### Scenario: Exceed the reflection limit
-- **WHEN** a learner enters more than 300 words in `Reflexion sur le cas`
-- **THEN** the system blocks final validation and explains that the field is limited to 300 words maximum
+- **WHEN** a learner enters more than 800 characters in `Réflexions et enseignements issus du cas`
+- **THEN** the system rejects the submission and explains that the field is limited to 800 characters maximum
 
 ### Requirement: Draft and final submission are distinct
 The system SHALL let the learner save a Caselog as a draft without marking it as validated.
 The system SHALL let the learner cancel without applying the current changes.
 The system SHALL let the learner validate the Caselog once the required content satisfies the page rules.
+The system SHALL enforce both character limits before persisting either a draft or a validated submission.
 
 #### Scenario: Save a draft
-- **WHEN** a learner clicks `Enregistrer le brouillon`
+- **WHEN** a learner clicks `Enregistrer le brouillon` with text fields within their character limits
 - **THEN** the system persists the current Caselog content and keeps the entry in draft state
 
+#### Scenario: Cancel changes
+- **WHEN** a learner clicks `Annuler`
+- **THEN** the system leaves the current changes unapplied
+
 #### Scenario: Validate the Caselog
-- **WHEN** a learner clicks `Valider` and both bounded text fields satisfy the 300-word limit
+- **WHEN** a learner clicks `Valider` and both bounded text fields satisfy their character limits and the page's required fields
 - **THEN** the system persists the content and marks the entry as validated

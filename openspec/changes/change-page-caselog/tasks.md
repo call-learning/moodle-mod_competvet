@@ -1,19 +1,22 @@
 ## 1. Data model and Caselog schema
 
 - [ ] 1.1 Add a persisted status for Caselog entries with at least `draft` and `validated`, plus an upgrade step that initializes legacy entries to `validated`
-- [ ] 1.2 Add an `active` flag on `competvet_case_cat` and a migration strategy that distinguishes categories used for new forms from legacy categories kept for historical display
-- [ ] 1.3 Update the default Caselog structure to retain the requested identity fields, replace `Diagnostic final` with `Transmission clinique - 300 mots maximum`, keep `Role dans la prise en charge`, and add `Reflexion sur le cas - 300 mots maximum` while preserving legacy categories and fields for backward readability
-- [ ] 1.4 Extend Caselog metadata so the application can render the chapo, example blocks, helper text and 300-word limits from configuration
+- [ ] 1.2 Introduce immutable Caselog form-version metadata and associate each entry with the version used to create it, including migration of existing entries to the legacy version
+- [ ] 1.3 Keep published versions and their category/field definitions immutable, and publish the new structure as a separate current version
+- [ ] 1.4 Update the current form version to retain `Nom de l'animal`, `Espece`, `Numero de dossier`, `Date de la prise en charge concernée` and `Mon rôle dans la prise en charge`, replace `Diagnostic final` with `Transmission clinique (1200 caractères maximum)`, and add `Réflexions et enseignements issus du cas (800 caractères maximum)` while preserving legacy definitions
+- [ ] 1.5 Extend Caselog metadata so each version can render its tutorial, chapo, field instructions and character limits from configuration
 
 ## 2. Caselog entry workflow
 
 - [ ] 2.1 Replace the modal-based add/edit Caselog launcher with a dedicated single-page create/edit flow
-- [ ] 2.2 Filter new Caselog create and edit forms so they only render active categories, while historical entry display keeps rendering stored inactive categories and fields
-- [ ] 2.3 Implement the single vertically scrollable Caselog page with the retained fields, instructional content, examples, and bottom actions `Enregistrer le brouillon`, `Annuler`, `Valider`
+- [ ] 2.2 Select the current published version for new entries and the stored version for existing entries, while retaining `Espece` in the current identification fields
+- [ ] 2.3 Implement the single vertically scrollable Caselog page with the retained fields, validated tutorial/chapo/instructions, and bottom actions `Enregistrer le brouillon`, `Annuler`, `Valider`
 - [ ] 2.4 Wire the save actions so `Enregistrer le brouillon` persists draft state, `Annuler` leaves the current changes unapplied, and `Valider` persists a validated entry
+- [ ] 2.5 Preserve legacy version-specific values when an existing Caselog entry is edited and saved
 
 ## 3. Validation and downstream adaptations
 
-- [ ] 3.1 Implement shared word-count validation for `Transmission clinique` and `Reflexion sur le cas` in both the page UI and the server-side submission path
-- [ ] 3.2 Update Caselog API and summary consumers that currently depend on removed fields such as `motif_presentation`, using retained data for labels and displays instead
-- [ ] 3.3 Add or update automated coverage for category activation, backward display of legacy entries, draft versus validated behavior, 300-word limit enforcement, and the revised Caselog display flow
+- [ ] 3.1 Implement shared character-count validation for `Transmission clinique` (1200 characters) and `Réflexions et enseignements issus du cas` (800 characters) in both the page UI and the server-side submission path
+- [ ] 3.2 Update local Caselog display code, `local_competvet`, and mobile-facing APIs to expose form-version metadata and preserve version-specific reads and edits
+- [ ] 3.3 Update Caselog list and summary consumers that currently depend on removed fields such as `motif_presentation`, using retained version-independent data for labels and displays instead
+- [ ] 3.4 Add or update automated coverage for mixed form versions, backward display and edit preservation of legacy entries, draft versus validated behavior, 1200/800-character limit enforcement, tutorial/chapo content, API payloads, and the revised Caselog display flow

@@ -1,15 +1,15 @@
 ## Context
 
-See `proposal.md` for motivation. The current Caselog implementation is data-driven from `data/default_cas_form.csv`, persisted through `competvet_case_cat` and `competvet_case_field`, rendered by `classes/form/case_form_add.php` and `classes/form/case_form_edit.php`, and opened through `amd/src/local/forms/case_form.js` with `core_form/modalform`. Categories currently serve both as the logical grouping of fields and as the page-by-page structure of the form. The current structure still exposes fields such as `Diagnostic final`, `Motif de presentation`, `Traitement`, `Evolution` and `Taches / procedures effectuees`, does not enforce a word-based limit, and only offers a single modal save action. The case list helper in `classes/local/api/cases.php` also derives a label from `motif_presentation`, so removing fields has downstream impact beyond the form itself.
+See `proposal.md` for motivation. The current Caselog implementation is data-driven from `data/default_cas_form.csv`, persisted through `competvet_case_cat` and `competvet_case_field`, rendered by `classes/form/case_form_add.php` and `classes/form/case_form_edit.php`, and opened through `amd/src/local/forms/case_form.js` with `core_form/modalform`. Categories currently serve both as the logical grouping of fields and as the page-by-page structure of the form. The current structure still exposes fields such as `Diagnostic final`, `Motif de presentation`, `Traitement`, `Evolution` and `Taches / procedures effectuees`, does not enforce the validated character limits, and only offers a single modal save action. The case list helper in `classes/local/api/cases.php` also derives a label from `motif_presentation`, so removing fields has downstream impact beyond the form itself.
 
 ## Goals / Non-Goals
 
 **Goals:**
 - Deliver a single continuous Caselog entry experience with the exact retained, replaced and added fields requested for the pedagogical use case.
-- Enforce 300-word limits reliably for `Transmission clinique` and `Reflexion sur le cas`.
+- Enforce a 1200-character limit for `Transmission clinique` and an 800-character limit for `Réflexions et enseignements issus du cas`.
 - Support distinct draft and final validation actions.
 - Preserve existing Caselog data access patterns where possible while updating downstream consumers that rely on removed fields.
-- Keep historical Caselog categories and fields readable while constraining new forms to the new active category set.
+- Keep historical Caselog categories and fields readable and preserved during edits while constraining new forms to the new active category set; retain `Espece` in the active identification structure.
 
 **Non-Goals:**
 - Redesign unrelated CompetVet forms or generic modal helpers used by other features.
@@ -27,24 +27,25 @@ Alternatives considered:
 - Keep `ModalForm` and overload the footer with custom buttons. Rejected because it would fight the generic helper, complicate state handling and still constrain page layout.
 - Keep the data-driven backend but open the form in a full page. Chosen because it isolates Caselog-specific UX changes without destabilizing other modal-based forms.
 
-### Keep the data-driven field structure and version it through category activation
-Decision: continue using `competvet_case_cat` and `competvet_case_field` as the source of truth for Caselog structure, and add an activation flag on categories so new forms only render active categories while historical entries remain readable with their stored legacy categories.
+### Keep the data-driven field structure and version complete form schemas
+Decision: continue using `competvet_case_cat` and `competvet_case_field` as the source of truth for Caselog structure, but organize them into immutable, explicitly identified form versions. Store the selected form-version identifier on each Caselog entry. Mark one version as current for new entries; do not mutate published versions in place.
 
-Rationale: the current PHP forms already iterate over dynamic case fields, categories are already the grouping mechanism used page by page, and `cases::get_case_structure()` already carries `description` and `configdata`. Extending category state is lower risk than deleting old categories or hardcoding every field in a brand-new renderer. This also gives a direct compatibility path: old entries still point to the same stored categories and fields.
+Rationale: the current PHP forms already iterate over dynamic case fields, categories are already the grouping mechanism used page by page, and `cases::get_case_structure()` already carries `description` and `configdata`. Versioning the complete schema is safer than changing shared categories in place: old entries continue to resolve their original labels, ordering, metadata and values, while new entries resolve the current version.
 
 Alternatives considered:
 - Hardcode the complete page markup in a custom template. Rejected because it duplicates the existing form schema and makes future Caselog field evolution harder.
-- Store the chapo and examples only in language strings. Rejected because the field schema already owns most authoring metadata and should remain the source of truth for this form.
-- Duplicate legacy and new structures in parallel without an activation mechanism. Rejected because the application would have no clear rule to decide which categories belong in new forms.
+- Store the chapo, tutorial and field instructions only in language strings. Rejected because the field schema already owns most authoring metadata and should remain the source of truth for this form.
+- Mutate shared categories and fields in place. Rejected because existing entries could no longer be rendered or edited according to the form they originally used.
+- Keep only one current schema and transform old entries on read. Rejected because it risks data loss and makes API/mobile compatibility dependent on irreversible conversions.
 
-### Filter creation and edition by active categories, not historical data reads
-Decision: use category activation to filter the structure returned for new Caselog forms, while keeping historical read paths capable of rendering inactive categories and fields already linked to an entry.
+### Select schemas by entry version
+Decision: new entries use the current published form version, while existing entries use the version stored with the entry for display and editing. `Espece` remains part of the current identification fields even though it was omitted from the validated field sequence.
 
-Rationale: form generation and historical rendering have different goals. New entry and edit experiences need the current pedagogical structure, while read access must preserve meaning for legacy entries. Separating these concerns avoids breaking old records.
+Rationale: form generation and historical rendering have different goals. New entries need the current pedagogical structure, while historical reads and edits must preserve meaning and stored values for legacy entries. Selecting by entry version avoids breaking old records and allows further versions to coexist.
 
 Alternatives considered:
-- Keep inactive categories editable forever. Rejected because it would undermine the new form structure and keep obsolete pedagogical sections alive.
-- Hide inactive categories everywhere. Rejected because it would break backward readability of existing cases.
+- Expose all versions as choices for every new entry. Rejected because new entries must consistently use the current published pedagogical structure.
+- Remove old versions after migration. Rejected because historical entries must remain readable and editable.
 
 ### Add explicit Caselog entry status
 Decision: add a persisted Caselog status that distinguishes at least `draft` and `validated`, and default pre-existing entries to `validated` during migration.
@@ -63,28 +64,39 @@ Rationale: the current list label uses `motif_presentation`, which is not part o
 Alternatives considered:
 - Keep `motif_presentation` hidden only for list labels. Rejected because it adds a hidden authoring obligation that conflicts with the simplified pedagogy.
 
-### Enforce word limits on both client and server
-Decision: validate the 300-word maximum in the page UI for immediate feedback and again on the server before persisting drafts or final validation.
+### Preserve version information across local and external consumers
+Decision: update the local display layer, `local_competvet`, and mobile-facing APIs so every Caselog payload identifies its form version and exposes the metadata required to interpret its fields. Version-independent summaries use stable entry data rather than version-specific fields.
 
-Rationale: client-only counting is bypassable, while server-only counting delays feedback. Both layers are needed for a predictable Moodle form experience.
+Rationale: a consumer cannot safely render or edit an entry if it assumes the current schema. Returning the version with the field definitions lets older and newer entries coexist without silently remapping values. Keeping stable summary fields separate from dynamic form fields limits downstream coupling.
 
 Alternatives considered:
-- Character-based limits. Rejected because the requirement is expressed in words.
+- Normalize every API response to the current schema. Rejected because it loses the original form semantics and can discard fields unknown to the current version.
+- Require each client to hardcode every form version. Rejected because it prevents independent form evolution and makes mobile releases a deployment blocker.
+
+### Enforce character limits on both client and server
+Decision: validate the 1200-character maximum for `Transmission clinique` and the 800-character maximum for `Réflexions et enseignements issus du cas` in the page UI for immediate feedback and again on the server before persisting drafts or final validation.
+
+Rationale: client-only counting is bypassable, while server-only counting delays feedback. Both layers are needed for a predictable Moodle form experience. The same normalization rule must be used in both layers so spaces, line breaks and Unicode characters produce consistent results.
+
+Alternatives considered:
+- Word-based limits. Rejected because the validated requirement is expressed in characters.
 - Server-only validation. Rejected because it gives a poor writing experience on long free-text fields.
 
 ## Risks / Trade-offs
 
 - [Workflow rewrite scope] Replacing a modal with a dedicated page touches JS launchers, routing and form submission paths -> Mitigation: isolate the change to Caselog entry flows and keep the generic modal helper untouched for other forms.
 - [Data migration] Introducing a status field requires upgrading persisted entries safely -> Mitigation: add an upgrade step that initializes legacy entries as `validated` and keep backward-compatible reads during rollout.
-- [Category activation drift] A wrong `active` flag could hide categories from new forms unexpectedly -> Mitigation: define explicit defaults, include upgrade seeding, and test active versus inactive category selection.
-- [Word count ambiguity] Counting words consistently across punctuation and line breaks can drift between browser and PHP implementations -> Mitigation: define one normalization rule and reuse it in both layers.
-- [Downstream regressions] Reports or lists may assume removed case fields still exist -> Mitigation: audit direct references to removed idnumbers and update them in the same change.
+- [Current-version drift] Selecting or changing the current version incorrectly could make new entries use the wrong schema -> Mitigation: define one published current version, make version selection explicit, and test new entries alongside older entries.
+- [Schema version drift] A published version could be changed in place and invalidate old entries -> Mitigation: make published versions immutable and reject or separately publish edits as a new version.
+- [Character count ambiguity] Counting characters consistently across line breaks and Unicode text can drift between browser and PHP implementations -> Mitigation: define one normalization rule and reuse it in both layers.
+- [Downstream regressions] Local, `local_competvet`, or mobile consumers may assume one schema or removed fields still exist -> Mitigation: expose version metadata, preserve stable summary fields, and test mixed-version payloads and updates.
 
 ## Migration Plan
 
 1. Add the new persisted entry status and run an upgrade step that marks existing Caselog entries as `validated`.
-2. Add an `active` marker on Caselog categories and initialize legacy categories according to the new intended structure.
-3. Update the default Caselog field structure and any seeding or regeneration utilities that derive case fields from CSV, without removing legacy categories needed for historical display.
-4. Introduce the dedicated Caselog page/form flow, filtering create/edit forms by active categories while keeping read/update APIs compatible with existing case data where possible.
-5. Switch add/edit entry launchers to the new page and update list/report summaries that depended on removed fields.
-6. Roll back by restoring the previous launcher and category activation mapping only if no migrated data depends on the new status semantics.
+2. Create or identify the legacy form version and associate all existing Caselog entries with it.
+3. Publish the new form version with its own categories and fields, without changing the legacy version's definitions.
+4. Introduce the dedicated Caselog page/form flow, including the validated initial tutorial, chapo and field instructions; select the current version for new entries and the stored version for existing entries.
+5. Update local display code, `local_competvet`, mobile-facing APIs, and list/report summaries to preserve version metadata and avoid dependencies on removed fields.
+6. Test mixed-version reads, edits, drafts, final validation, and API payloads before publishing another version.
+7. Roll back by selecting the previous published version for new entries and retaining all existing version associations; do not delete published schemas.
