@@ -517,7 +517,13 @@ class plannings {
      * @return bool
      */
     public static function has_user_data(int $planningid): bool {
-        $hasobservations = observation::count_records(['planningid' => $planningid]) > 0;
+        $hasobservations = false;
+        foreach (observation::get_records(['planningid' => $planningid]) as $observation) {
+            if (!$observation->is_empty()) {
+                $hasobservations = true;
+                break;
+            }
+        }
         $hascases = case_entry::count_records(['planningid' => $planningid]) > 0;
         $hascertifications = cert_decl::count_records(['planningid' => $planningid]) > 0;
         return $hasobservations || $hascases || $hascertifications;

@@ -167,9 +167,15 @@ class get_evaluations extends external_api {
             self::collect_grades($userobservation, $criteria, $gradedobservations, $gradedautoevals);
             self::collect_comments($userobservation, $comments);
             self::collect_subcriteria_comments($userobservation, $comments);
+            $isempty = !observation::has_usable_grade(array_map(
+                fn($criterion) => $criterion['level'] ?? null,
+                $userobservation['criteria']
+            ));
             if ($userobservation['category'] == observation::CATEGORY_EVAL_OBSERVATION) {
                 $hasobserverevaluations = true;
-                $numberofobservations++;
+                if (!$isempty) {
+                    $numberofobservations++;
+                }
             } else {
                 $hasautoevaluations = true;
             }

@@ -66,4 +66,19 @@ final class observation_tests extends advanced_testcase {
             array_map(fn($comment) => $comment->get('comment'), $criteriacomments)
         );
     }
+
+    /**
+     * Empty grades include both null and the no-grade sentinel.
+     *
+     * @return void
+     */
+    public function test_empty_grade_rule(): void {
+        $this->assertTrue(observation_criterion_level::is_an_empty_level(null));
+        $this->assertTrue(observation_criterion_level::is_an_empty_level(
+            observation_criterion_level::NO_GRADE_LEVEL
+        ));
+        $this->assertFalse(observation_criterion_level::is_an_empty_level(0));
+        $this->assertFalse(observation::has_usable_grade([null, observation_criterion_level::NO_GRADE_LEVEL]));
+        $this->assertTrue(observation::has_usable_grade([observation_criterion_level::NO_GRADE_LEVEL, 0]));
+    }
 }

@@ -225,6 +225,34 @@ class observation extends persistent {
     }
 
     /**
+     * Whether this observation contains no usable grades.
+     *
+     * @return bool
+     */
+    public function is_empty(): bool {
+        $grades = array_map(
+            fn($criterionlevel) => $criterionlevel->get('level'),
+            $this->get_criteria_levels()
+        );
+        return !self::has_usable_grade($grades);
+    }
+
+    /**
+     * Whether a list of grades contains at least one usable grade.
+     *
+     * @param array $grades
+     * @return bool
+     */
+    public static function has_usable_grade(array $grades): bool {
+        foreach ($grades as $grade) {
+            if (!observation_criterion_level::is_an_empty_level($grade)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Get the comments for the observation
      *
      * @return observation_comment[]

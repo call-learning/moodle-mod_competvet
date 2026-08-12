@@ -15,14 +15,21 @@ The system SHALL apply the same emptiness rule consistently across purge operati
 ### Requirement: Empty observations are excluded from observation counters
 The system SHALL NOT count empty observations as completed or effective observations in user-facing counters, summaries, or planning indicators.
 The system SHALL keep non-empty observations counted normally.
+The system SHALL distinguish effective observation counts from observation visibility. Excluding an empty observation from an effective counter SHALL NOT by itself remove it from observation lists or unfinished-observation views.
 
 #### Scenario: Mixed empty and non-empty observations
 - **WHEN** a student has both empty observations and non-empty observations on the same planning
 - **THEN** only the non-empty observations contribute to observation counters and status indicators
 
+#### Scenario: Newly created empty observation remains visible
+- **WHEN** an observation has been created but contains only empty grades and has not been explicitly purged
+- **THEN** the observation remains available to the relevant observation view or read API
+- **AND** it is not counted as an effective graded observation
+
 ### Requirement: The system provides a purge process for empty observations
 The system SHALL provide a process that can remove observations classified as empty after they were created by mistake or abandoned.
 The purge process SHALL remove the empty observation together with any dependent observation records that no longer have meaning once the empty observation is deleted.
+The system SHALL NOT rely on counter filtering as a substitute for display or cleanup. Empty observations remain present until the explicit purge process is run.
 
 #### Scenario: Purge removes an empty observation
 - **WHEN** the purge process targets an observation classified as empty

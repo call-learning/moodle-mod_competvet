@@ -36,6 +36,29 @@ use mod_competvet\utils;
  */
 class observations {
     /**
+     * Delete empty observations for a planning.
+     *
+     * @param int $planningid
+     * @return int Number of deleted observations.
+     */
+    public static function purge_empty_observations(int $planningid): int {
+        $planning = planning::get_record(['id' => $planningid]);
+        if (!$planning) {
+            throw new \moodle_exception('planningnotfound', 'mod_competvet', '', $planningid);
+        }
+        $competvet = competvet::get_from_situation($planning->get_situation());
+        require_capability('mod/competvet:candoeverything', $competvet->get_context());
+
+        $deleted = 0;
+        foreach (observation::get_records(['planningid' => $planningid]) as $observation) {
+            if ($observation->is_empty() && $observation->delete()) {
+                $deleted++;
+            }
+        }
+        return $deleted;
+    }
+
+    /**
      * Get all observations for a given planning
      *
      * @param int $planningid

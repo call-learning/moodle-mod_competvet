@@ -6,7 +6,7 @@ See `proposal.md` for motivation. CompetVet currently creates observation record
 
 **Goals:**
 - Define one reusable server-side rule that decides whether an observation is empty.
-- Ensure counters and summary flags ignore empty observations.
+- Ensure effective counters and planning data checks ignore empty observations without hiding unfinished observation records.
 - Provide a purge path for existing empty observations created by mistake.
 - Reuse existing cascading deletion behavior instead of inventing a parallel cleanup path.
 - Keep observations with at least one real grade intact.
@@ -28,13 +28,14 @@ Alternatives considered:
 - Re-implement emptiness checks independently in each API. Rejected because counters would diverge over time.
 
 ### Separate "ignore in counters" from "purge from storage"
-Decision: make counting logic ignore empty observations regardless of whether the purge has already been run, and keep purge as a separate explicit maintenance action.
+Decision: make effective counting logic ignore empty observations regardless of whether the purge has already been run, while keeping unfinished empty observations available to observation read/list views. Keep purge as a separate explicit maintenance action.
 
-Rationale: the user wants both correct behavior going forward and a cleanup path for existing data. If counting depends on purge having already happened, the bug would remain until maintenance is run.
+Rationale: the user wants both correct behavior going forward and a cleanup path for existing data. If counting depends on purge having already happened, the bug would remain until maintenance is run. If visibility depends on counting, a newly created unfinished observation can disappear before the user has a chance to complete it.
 
 Alternatives considered:
 - Rely only on purge. Rejected because stale data would still skew results until cleanup is executed everywhere.
 - Auto-delete observations opportunistically during reads. Rejected because hidden write side effects on read paths are risky and hard to audit.
+- Hide all empty observations from read/list views. Rejected because an unfinished observation must remain available for completion until an explicit purge is requested.
 
 ### Use full observation deletion for purge
 Decision: purge empty observations by deleting the observation record itself and relying on existing cascade cleanup in the observation persistent to remove dependent comments and criterion records.

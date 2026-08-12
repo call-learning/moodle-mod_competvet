@@ -7,7 +7,8 @@ Evaluation observations can be created by mistake or remain empty after testing 
 - Define clearly what counts as an empty observation in CompetVet, especially an observation with no usable grade.
 - Add a purge process that removes observations created by mistake and left empty, together with their dependent data.
 - Ensure empty observations are no longer counted as real observations in indicators and views that rely on those counters.
-- Align APIs and screens that display the number or existence of observations so they ignore empty observations.
+- Keep newly created or unfinished empty observations available in observation views until an explicit purge removes them.
+- Align effective-count APIs and planning data checks so they ignore empty observations, while observation visibility APIs continue to expose unfinished empty observations until purge.
 - Add regression coverage for identifying empty observations, purging them, and excluding them from counters.
 
 ## Capabilities

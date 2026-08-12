@@ -22,6 +22,7 @@ use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\observation_comment;
 use mod_competvet\local\persistent\observation_criterion_comment;
 use mod_competvet\local\persistent\observation_criterion_level;
+use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\tests\test_data_definition;
 
@@ -197,5 +198,103 @@ final class observations_test extends advanced_testcase {
             'observationid' => $newobs->id,
             'type' => observation_comment::OBSERVATION_COMMENT,
         ])->get('comment'));
+    }
+
+    /**
+     * Empty observations are purged with all dependent records while graded ones remain.
+     *
+     * @return void
+     */
+    public function test_purge_empty_observations(): void {
+        $student = core_user::get_user_by_username('student1');
+        $observer = core_user::get_user_by_username('observer1');
+        $situation = situation::get_record(['shortname' => 'SIT1']);
+        $planning = array_shift(plannings::get_plannings_for_situation_id($situation->get('id'), $student->id));
+        $criterionid = criterion::get_record(['idnumber' => 'Q001'])->get('id');
+        $baselineevaluations = \mod_competvet\external\get_evaluations::execute($planning['id'], $student->id);
+        $emptyid = observations::create_observation(
+            observation::CATEGORY_EVAL_OBSERVATION,
+            $planning['id'],
+            $student->id,
+            $observer->id,
+            'Abandoned context',
+            [],
+            [['id' => $criterionid, 'level' => 50]]
+        );
+        $gradedid = observations::create_observation(
+            observation::CATEGORY_EVAL_OBSERVATION,
+            $planning['id'],
+            $student->id,
+            $observer->id,
+            null,
+            [],
+            [['id' => $criterionid, 'level' => 1]]
+        );
+
+        $this->assertTrue(observation::get_record(['id' => $emptyid])->is_empty());
+        $this->assertFalse(observation::get_record(['id' => $gradedid])->is_empty());
+        $visibleids = array_column(observations::get_user_observations($planning['id'], $student->id), 'id');
+        $this->assertContains($emptyid, $visibleids);
+        $evaluations = \mod_competvet\external\get_evaluations::execute($planning['id'], $student->id);
+        $this->assertEquals(
+            $baselineevaluations['numberofobservations'] + 1,
+            $evaluations['numberofobservations']
+        );
+        $this->assertTrue($evaluations['hasobserverevaluations']);
+        $this->assertEquals(1, observations::purge_empty_observations($planning['id']));
+        $this->assertFalse(observation::get_record(['id' => $emptyid]));
+        $this->assertEquals(0, observation_comment::count_records(['observationid' => $emptyid]));
+        $this->assertEquals(0, observation_criterion_level::count_records(['observationid' => $emptyid]));
+        $this->assertEquals(0, observation_criterion_comment::count_records(['observationid' => $emptyid]));
+        $this->assertTrue((bool) observation::get_record(['id' => $gradedid]));
+    }
+
+    /**
+     * Read-only users cannot run the purge.
+     *
+     * @return void
+     */
+    public function test_purge_empty_observations_requires_capability(): void {
+        $student = core_user::get_user_by_username('student1');
+        $planning = array_shift(plannings::get_plannings_for_situation_id(
+            situation::get_record(['shortname' => 'SIT1'])->get('id'),
+            $student->id
+        ));
+        $this->setUser($student);
+        $this->expectException(\required_capability_exception::class);
+        observations::purge_empty_observations($planning['id']);
+    }
+
+    /**
+     * A planning containing only an empty observation has no effective user data.
+     *
+     * @return void
+     */
+    public function test_empty_observation_does_not_populate_planning(): void {
+        $student = core_user::get_user_by_username('student1');
+        $sourceplanning = array_shift(plannings::get_plannings_for_situation_id(
+            situation::get_record(['shortname' => 'SIT1'])->get('id'),
+            $student->id
+        ));
+        $sourceplanning = planning::get_record(['id' => $sourceplanning['id']]);
+        $planning = new planning(0);
+        $planning->set('situationid', $sourceplanning->get('situationid'));
+        $planning->set('groupid', $sourceplanning->get('groupid'));
+        $planning->set('startdate', $sourceplanning->get('startdate') + 86400);
+        $planning->set('enddate', $sourceplanning->get('enddate') + 86400);
+        $planning->set('session', 'empty-observation-test');
+        $planning->create();
+
+        observations::create_observation(
+            observation::CATEGORY_EVAL_OBSERVATION,
+            $planning->get('id'),
+            $student->id,
+            core_user::get_user_by_username('observer1')->id,
+            null,
+            [],
+            []
+        );
+
+        $this->assertFalse(plannings::has_user_data($planning->get('id')));
     }
 }
