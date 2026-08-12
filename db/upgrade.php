@@ -350,5 +350,28 @@ function xmldb_competvet_upgrade($oldversion) {
         setup::create_update_roles(); // Add user:viewdetails to observers.
         upgrade_mod_savepoint(true, 202512100300, 'competvet');
     }
+    if ($oldversion < 202608190002) {
+        $table = new xmldb_table('competvet_progression');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('studentid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('situationid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('planningid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('criterionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('bestlevel', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('totalobservations', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecalculated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('student_fk', XMLDB_KEY_FOREIGN, ['studentid'], 'user', ['id']);
+        $table->add_key('situation_fk', XMLDB_KEY_FOREIGN, ['situationid'], 'competvet_situation', ['id']);
+        $table->add_key('planning_fk', XMLDB_KEY_FOREIGN, ['planningid'], 'competvet_planning', ['id']);
+        $table->add_key('criterion_fk', XMLDB_KEY_FOREIGN, ['criterionid'], 'competvet_criterion', ['id']);
+        $table->add_index('context_ux', XMLDB_INDEX_UNIQUE, ['studentid', 'situationid', 'planningid', 'criterionid']);
+        $table->add_index('student_planning_ix', XMLDB_INDEX_NOTUNIQUE, ['studentid', 'planningid']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        upgrade_mod_savepoint(true, 202608190002, 'competvet');
+    }
     return true;
 }

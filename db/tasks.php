@@ -66,4 +66,13 @@ $tasks = [
         'dayofweek' => '*',
         'month' => '*',
     ],
+    [
+        'classname' => 'mod_competvet\task\refresh_progression',
+        'blocking' => 0,
+        'minute' => '0,30',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*',
+    ],
 ];
