@@ -52,6 +52,18 @@ class case_entry extends persistent {
                 'type' => PARAM_INT,
                 'message' => new lang_string('invaliddata', 'competvet', 'planningid'),
             ],
+            'versionid' => [
+                'null' => NULL_NOT_ALLOWED,
+                'type' => PARAM_INT,
+                'default' => 0,
+                'message' => new lang_string('invaliddata', 'competvet', 'versionid'),
+            ],
+            'status' => [
+                'null' => NULL_NOT_ALLOWED,
+                'type' => PARAM_ALPHA,
+                'default' => 'validated',
+                'message' => new lang_string('invaliddata', 'competvet', 'status'),
+            ],
         ];
     }
 

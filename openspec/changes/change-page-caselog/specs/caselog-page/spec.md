@@ -64,19 +64,19 @@ When an existing entry is edited, legacy values SHALL remain preserved unless th
 - **WHEN** a learner edits an existing Caselog entry containing inactive legacy values and saves the entry
 - **THEN** the application preserves those legacy values and does not discard them because their categories are inactive
 
-### Requirement: Caselog APIs expose and preserve form versions
-The local display layer, `local_competvet`, and the mobile application APIs SHALL expose the form-version identifier and the field definitions or metadata needed to interpret each Caselog entry.
-Read APIs SHALL return historical entries according to their stored form version.
-Edit APIs SHALL accept updates to entries from supported older versions without silently converting their fields to the current version.
+### Requirement: Caselog web flows preserve form versions without changing local/mobile contracts
+The Caselog web display and edit flows SHALL resolve each entry using its stored form version.
+New-entry creation SHALL select the current published version on the server; consumers SHALL NOT provide a form-version identifier to choose it.
+The existing `local_competvet` and mobile-facing API contracts SHALL remain unchanged.
 Version-independent lists and summaries SHALL use stable entry data and SHALL not require fields that exist only in one form version.
 
-#### Scenario: Read entries from several versions
-- **WHEN** a consumer requests Caselog entries created with different form versions
-- **THEN** each entry includes enough version information for the consumer to render its own fields and values correctly
+#### Scenario: Display entries from several versions in the web flow
+- **WHEN** the web flow displays Caselog entries created with different form versions
+- **THEN** each entry is rendered using the stored version's fields and values
 
-#### Scenario: Update an older-version entry through an API
-- **WHEN** a supported consumer updates an entry created with an older form version
-- **THEN** the API persists the update against that version and does not reinterpret the entry as the current version
+#### Scenario: Create through an existing consumer API
+- **WHEN** an existing consumer creates a Caselog entry without a form-version parameter
+- **THEN** the server assigns the current published version and persists the entry without changing the consumer contract
 
 ### Requirement: The Caselog captures a bounded clinical transmission
 The system SHALL replace the current `Diagnostic final` field with a multiline field titled `Transmission clinique (1200 caractères maximum)`.

@@ -46,7 +46,9 @@ class case_form_edit extends dynamic_form {
         $mform->setType('returnurl', PARAM_URL);
         $mform->addElement('hidden', 'entryid', $this->optional_param('entryid', null, PARAM_INT));
         $mform->setType('entryid', PARAM_INT);
-        $cases = cases::get_case_structure();
+        $entryid = $this->optional_param('entryid', null, PARAM_INT);
+        $entry = $entryid ? cases::get_entry($entryid) : null;
+        $cases = cases::get_case_structure($entry->versionid ?? null);
         foreach ($cases as $category) {
             $mform->addElement('header', 'category_' . $category->id, $category->name);
             foreach ($category->fields as $field) {
@@ -61,7 +63,12 @@ class case_form_edit extends dynamic_form {
                         $json = json_decode(stripslashes($field->configdata));
                         $rows = $json->rows;
                     }
-                    $mform->addElement('textarea', 'field_' . $field->id, $field->name, ['rows' => $rows]);
+                    $config = json_decode(stripslashes((string)$field->configdata), true) ?: [];
+                    $attributes = ['rows' => $config['rows'] ?? $rows];
+                    if (!empty($config['maxlength'])) {
+                        $attributes['maxlength'] = $config['maxlength'];
+                    }
+                    $mform->addElement('textarea', 'field_' . $field->id, $field->name, $attributes);
                     $mform->setType('field_' . $field->id, PARAM_TEXT);
                 }
                 if ($field->type == 'select') {

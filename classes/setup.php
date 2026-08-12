@@ -181,5 +181,88 @@ class setup {
         global $CFG;
         $criterionimporter = new fields_importer(case_field::class);
         $criterionimporter->import($CFG->dirroot . "/mod/competvet/data/default_cas_form.csv");
+        self::ensure_case_versions();
+    }
+
+    /** Create the immutable legacy and current Caselog schemas when needed. */
+    public static function ensure_case_versions(): void {
+        global $DB;
+        $versionclass = '\\mod_competvet\\local\\persistent\\case_version';
+        if (!$versionclass::get_record([])) {
+            $legacy = new $versionclass(0, (object)[
+                'name' => 'Legacy Caselog', 'iscurrent' => 0,
+                'metadata' => json_encode(['tutorialtitle' => 'Ajouter un cas clinique'], JSON_UNESCAPED_UNICODE),
+            ]);
+            $legacy->create();
+            $legacyid = $legacy->get('id');
+            $DB->set_field('competvet_case_cat', 'versionid', $legacyid, []);
+            $current = new $versionclass(0, (object)[
+                'name' => 'Clinical transmission', 'iscurrent' => 1,
+                'metadata' => json_encode([
+                    'tutorialtitle' => 'Ajouter une transmission de cas clinique',
+                    'tutorial' => 'Synthétisez un ou plusieurs cas cliniques pour un collègue qui prend le relais. Il ne s’agit ni de réécrire un dossier complet, ni de faire une revue bibliographique.',
+                    'chapo' => 'Cette section évalue votre capacité à transmettre un cas clinique, comme à un.e collègue, de façon claire, synthétique et exploitable : contexte, problème principal, éléments cliniques utiles, prise en charge réalisée, suites prévues et points de vigilance.',
+                ], JSON_UNESCAPED_UNICODE),
+            ]);
+            $current->create();
+            $currentid = $current->get('id');
+            $legacycats = $DB->get_records('competvet_case_cat', ['versionid' => $legacyid], 'sortorder');
+            $wanted = ['nom_animal', 'espece', 'num_dossier', 'date_cas', 'role_charge'];
+            foreach ($legacycats as $legacycat) {
+                $fields = $DB->get_records('competvet_case_field', ['categoryid' => $legacycat->id], 'sortorder');
+                $newfields = [];
+                foreach ($fields as $field) {
+                    if (in_array($field->idnumber, $wanted)) {
+                        $newfields[] = $field;
+                    }
+                }
+                if (!$newfields) {
+                    continue;
+                }
+                $catid = $DB->insert_record('competvet_case_cat', (object)[
+                    'versionid' => $currentid, 'name' => $legacycat->name,
+                    'idnumber' => $legacycat->idnumber, 'description' => $legacycat->description,
+                    'sortorder' => $legacycat->sortorder, 'usermodified' => 0,
+                    'timecreated' => time(), 'timemodified' => time(),
+                ]);
+                foreach ($newfields as $field) {
+                    $name = $field->name;
+                    if ($field->idnumber === 'date_cas') {
+                        $name = 'Date de la prise en charge concernée';
+                    } else if ($field->idnumber === 'role_charge') {
+                        $name = 'Mon rôle dans la prise en charge';
+                    }
+                    $DB->insert_record('competvet_case_field', (object)[
+                        'idnumber' => $field->idnumber, 'name' => $name,
+                        'type' => $field->type, 'description' => $field->description,
+                        'sortorder' => $field->sortorder, 'categoryid' => $catid,
+                        'configdata' => $field->configdata, 'usermodified' => 0,
+                        'timecreated' => time(), 'timemodified' => time(),
+                    ]);
+                }
+            }
+            $transcat = $DB->get_record('competvet_case_cat', ['versionid' => $currentid, 'name' => 'Cas clinique']);
+            if (!$transcat) {
+                $transcat = $DB->get_record('competvet_case_cat', ['versionid' => $currentid]);
+            }
+            if ($transcat) {
+                $DB->insert_record('competvet_case_field', (object)[
+                    'idnumber' => 'transmission_clinique',
+                    'name' => 'Transmission clinique (1200 caractères maximum)', 'type' => 'textarea',
+                    'description' => 'L’objectif n’est pas de rédiger un dossier complet mais de vous exercer à synthétiser les informations essentielles. Listez ici, de façon hiérarchisée, uniquement les éléments décisifs pour la compréhension du cas et son suivi. Omettez les éléments anecdotiques.',
+                    'sortorder' => 20, 'categoryid' => $transcat->id,
+                    'configdata' => json_encode(['rows' => 8, 'maxlength' => 1200], JSON_UNESCAPED_UNICODE),
+                    'usermodified' => 0, 'timecreated' => time(), 'timemodified' => time(),
+                ]);
+                $DB->insert_record('competvet_case_field', (object)[
+                    'idnumber' => 'reflexions_enseignements',
+                    'name' => 'Réflexions et enseignements issus du cas (800 caractères maximum)', 'type' => 'textarea',
+                    'description' => 'Listez ici - Ce que vous avez mieux compris, - Ce qui vous a mis en difficulté et que vous referiez différemment avec le recul, - Les points que vous devez consolider.',
+                    'sortorder' => 21, 'categoryid' => $transcat->id,
+                    'configdata' => json_encode(['rows' => 6, 'maxlength' => 800], JSON_UNESCAPED_UNICODE),
+                    'usermodified' => 0, 'timecreated' => time(), 'timemodified' => time(),
+                ]);
+            }
+        }
     }
 }

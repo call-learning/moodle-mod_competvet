@@ -19,6 +19,7 @@ use mod_competvet\local\api\certifications;
 use mod_competvet\local\api\todos;
 use mod_competvet\local\persistent\case_entry;
 use mod_competvet\local\persistent\case_field;
+use mod_competvet\local\persistent\case_version;
 use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\cert_decl_asso;
 use mod_competvet\local\persistent\cert_valid;
@@ -536,7 +537,13 @@ class mod_competvet_generator extends testing_module_generator {
                 $fields[$newkey] = $field;
             }
         }
+        // These fixtures describe the pre-versioned form and must remain legacy records.
+        $legacy = case_version::get_record(['name' => 'Legacy Caselog']);
         $caseid = cases::create_case($record->planningid, $record->studentid, $fields);
+        if ($legacy) {
+            global $DB;
+            $DB->set_field('competvet_case_entry', 'versionid', $legacy->get('id'), ['id' => $caseid]);
+        }
         $case = case_entry::get_record(['id' => $caseid]);
         return $case->to_record();
     }

@@ -350,5 +350,41 @@ function xmldb_competvet_upgrade($oldversion) {
         setup::create_update_roles(); // Add user:viewdetails to observers.
         upgrade_mod_savepoint(true, 202512100300, 'competvet');
     }
+    if ($oldversion < 202608120400) {
+        $table = new xmldb_table('competvet_case_version');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL);
+        $table->add_field('iscurrent', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('metadata', XMLDB_TYPE_TEXT, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        $table = new xmldb_table('competvet_case_cat');
+        $field = new xmldb_field('versionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $table = new xmldb_table('competvet_case_entry');
+        $field = new xmldb_field('versionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('status', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'validated', 'versionid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        \mod_competvet\setup::ensure_case_versions();
+        $legacy = \mod_competvet\local\persistent\case_version::get_record(['name' => 'Legacy Caselog']);
+        if ($legacy) {
+            $DB->set_field('competvet_case_entry', 'versionid', $legacy->get('id'), ['versionid' => 0]);
+        }
+        $DB->set_field('competvet_case_entry', 'status', 'validated', ['status' => '']);
+        upgrade_mod_savepoint(true, 202608120400, 'competvet');
+    }
     return true;
 }

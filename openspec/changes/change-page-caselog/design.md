@@ -64,14 +64,14 @@ Rationale: the current list label uses `motif_presentation`, which is not part o
 Alternatives considered:
 - Keep `motif_presentation` hidden only for list labels. Rejected because it adds a hidden authoring obligation that conflicts with the simplified pedagogy.
 
-### Preserve version information across local and external consumers
-Decision: update the local display layer, `local_competvet`, and mobile-facing APIs so every Caselog payload identifies its form version and exposes the metadata required to interpret its fields. Version-independent summaries use stable entry data rather than version-specific fields.
+### Preserve version information without changing local or mobile API contracts
+Decision: keep form-version selection and historical schema resolution inside the CompetVet web implementation. New entries always use the server-side current version; existing entries use their stored version. Do not add version-selection parameters or change the existing `local_competvet` or mobile-facing API contracts. Version-independent summaries continue using stable entry data rather than version-specific fields.
 
-Rationale: a consumer cannot safely render or edit an entry if it assumes the current schema. Returning the version with the field definitions lets older and newer entries coexist without silently remapping values. Keeping stable summary fields separate from dynamic form fields limits downstream coupling.
+Rationale: the mobile and local consumers must remain backwards compatible and must not decide which form version is used. The web implementation can preserve historical schemas without requiring a client release or changing the existing service payloads.
 
 Alternatives considered:
 - Normalize every API response to the current schema. Rejected because it loses the original form semantics and can discard fields unknown to the current version.
-- Require each client to hardcode every form version. Rejected because it prevents independent form evolution and makes mobile releases a deployment blocker.
+- Change each client API to expose or select every form version. Rejected because it changes the existing local/mobile contract and makes mobile releases a deployment blocker.
 
 ### Enforce character limits on both client and server
 Decision: validate the 1200-character maximum for `Transmission clinique` and the 800-character maximum for `Réflexions et enseignements issus du cas` in the page UI for immediate feedback and again on the server before persisting drafts or final validation.

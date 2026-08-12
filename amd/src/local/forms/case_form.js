@@ -13,11 +13,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-import {genericFormCreate} from "./generic_form_helper";
 import Repository from '../new-repository';
 
 /**
- * Create a Modal Form to add a case
+ * Open the dedicated full-page Caselog form.
  *
  * @module     mod_competvet/local/forms/case_form
  * @copyright  2024 Bas Brands <bas@sonsbeekmedia.nl>
@@ -29,9 +28,6 @@ import Repository from '../new-repository';
  * @param {string} modulename
  */
 export const init = (modulename) => {
-    const onSubmitHandler = () => {
-        window.location.reload();
-    };
     const button = document.querySelector('[data-action="case-add"]');
     if (!button) {
         return;
@@ -40,9 +36,7 @@ export const init = (modulename) => {
         event.preventDefault();
         const gradingApp = document.querySelector('[data-region="grading-app"]');
         const data = gradingApp.dataset;
-        const modalForm = genericFormCreate(data, 'case:add', modulename, 'case_form_add');
-        modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, onSubmitHandler);
-        modalForm.show();
+        window.location.assign(`/mod/competvet/case.php?cmid=${data.cmid}&planningid=${data.planningid}&studentid=${data.studentid}`);
     });
     document.addEventListener('click', async(event) => {
         if (event.target.closest('[data-action="delete-case"]')) {
@@ -54,10 +48,7 @@ export const init = (modulename) => {
             const button = event.target.closest('[data-action="edit-case"]');
             const gradingApp = document.querySelector('[data-region="grading-app"]');
             const data = gradingApp.dataset;
-            data.entryid = button.dataset.id;
-            const modalForm = genericFormCreate(data, 'case:edit', modulename, 'case_form_edit', button.dataset.id);
-            modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, onSubmitHandler);
-            modalForm.show();
+            window.location.assign(`/mod/competvet/case.php?cmid=${data.cmid}&planningid=${data.planningid}&studentid=${data.studentid}&entryid=${button.dataset.id}`);
         }
     });
 };

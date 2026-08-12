@@ -22,6 +22,7 @@ use mod_competvet\local\persistent\case_cat;
 use mod_competvet\local\persistent\case_data;
 use mod_competvet\local\persistent\case_entry;
 use mod_competvet\local\persistent\case_field;
+use mod_competvet\local\persistent\case_version;
 use stdClass;
 
 /**
@@ -39,12 +40,11 @@ class cases {
      * @return stdClass
      */
     public static function get_entry(int $caseid): stdClass {
-        $structure = self::get_case_structure();
         $caseentry = case_entry::get_record(['id' => $caseid]);
         if (empty($caseentry)) {
             throw new \moodle_exception('case_not_found', 'competvet', '', $caseid);
         }
-        return self::do_get_entry_content($structure, $caseentry);
+        return self::do_get_entry_content(self::get_case_structure($caseentry->get('versionid')), $caseentry);
     }
 
     /**
@@ -52,13 +52,17 @@ class cases {
      *
      * @return array
      */
-    public static function get_case_structure(): array {
-        $casestructure = cache::make('mod_competvet', 'casestructures');
-        if ($casestructure->get('casestructure')) {
-            return $casestructure->get('casestructure');
+    public static function get_case_structure(?int $versionid = null): array {
+        if ($versionid === null) {
+            $version = case_version::get_current();
+            $versionid = $version ? $version->get('id') : 0;
         }
-        $categories = case_cat::get_records();
-        $fields = case_field::get_records([], 'sortorder');
+        $casestructure = cache::make('mod_competvet', 'casestructures');
+        $cachekey = 'casestructure_' . $versionid;
+        if ($casestructure->get($cachekey)) {
+            return $casestructure->get($cachekey);
+        }
+        $categories = case_cat::get_records(['versionid' => $versionid], 'sortorder');
         $data = [];
         foreach ($categories as $category) {
             $data[$category->get('id')] = (object) [
@@ -66,18 +70,19 @@ class cases {
                 'name' => $category->get('name'),
                 'fields' => [],
             ];
+            $fields = case_field::get_records(['categoryid' => $category->get('id')], 'sortorder');
+            foreach ($fields as $field) {
+                $data[$category->get('id')]->fields[] = (object) [
+                    'id' => $field->get('id'),
+                    'idnumber' => $field->get('idnumber'),
+                    'name' => $field->get('name'),
+                    'type' => $field->get('type'),
+                    'configdata' => $field->get('configdata'),
+                    'description' => $field->get('description'),
+                ];
+            }
         }
-        foreach ($fields as $field) {
-            $data[$field->get('categoryid')]->fields[] = (object) [
-                'id' => $field->get('id'),
-                'idnumber' => $field->get('idnumber'),
-                'name' => $field->get('name'),
-                'type' => $field->get('type'),
-                'configdata' => $field->get('configdata'),
-                'description' => $field->get('description'),
-            ];
-        }
-        $casestructure->set('casestructures', array_values($data));
+        $casestructure->set($cachekey, array_values($data));
         return array_values($data);
     }
 
@@ -127,6 +132,9 @@ class cases {
             'studentid' => $caseentry->get('studentid'),
             'timecreated' => $caseentry->get('timecreated'),
             'usermodified' => $caseentry->get('usermodified'),
+            'versionid' => $caseentry->get('versionid'),
+            'status' => $caseentry->get('status'),
+            'versionmetadata' => json_encode((case_version::get_record(['id' => $caseentry->get('versionid')]))?->read_metadata() ?? [], JSON_UNESCAPED_UNICODE),
             'categories' => $case,
             'canedit' => $caseentry->can_edit(),
             'candelete' => $caseentry->can_delete(),
@@ -143,11 +151,15 @@ class cases {
      *
      * @return int
      */
-    public static function create_case(int $planningid, int $studentid, array $fields): int {
+    public static function create_case(int $planningid, int $studentid, array $fields, string $status = 'validated'): int {
         // Create the case.
         $case = new case_entry();
         $case->set('planningid', $planningid);
         $case->set('studentid', $studentid);
+        $version = case_version::get_current();
+        $case->set('versionid', $version ? $version->get('id') : 0);
+        $case->set('status', $status === 'draft' ? 'draft' : 'validated');
+        self::validate_fields($fields, $version ? self::get_case_structure($version->get('id')) : []);
         $case->create();
         $case->save();
 
@@ -170,7 +182,7 @@ class cases {
      * @param array $fields The fields
      * @return void
      */
-    public static function update_case(int $entryid, array $fields): void {
+    public static function update_case(int $entryid, array $fields, string $status = 'validated'): void {
         // Update the case.
         $case = case_entry::get_record(['id' => $entryid]);
         if (empty($case)) {
@@ -179,6 +191,7 @@ class cases {
         if (!$case->can_edit()) {
             throw new \moodle_exception('cannoteditcaselog', 'competvet');
         }
+        self::validate_fields($fields, self::get_case_structure($case->get('versionid')));
         foreach ($fields as $fieldid => $value) {
             $records = case_data::get_records(['entryid' => $entryid, 'fieldid' => $fieldid], 'timecreated');
             if (empty($records)) {
@@ -194,6 +207,8 @@ class cases {
                 $data->save();
             }
         }
+        $case->set('status', $status === 'draft' ? 'draft' : 'validated');
+        $case->update();
     }
 
     /**
@@ -242,7 +257,7 @@ class cases {
             $casetrans['espece'] = self::get_case_field_value($case, 'espece') ?? '';
             $casetrans['animal'] = self::get_case_field_value($case, 'nom_animal') ?? '';
             $casetrans['date'] = intval($date);
-            $casetrans['label'] = self::get_case_field_value($case, 'motif_presentation') ?? '';
+            $casetrans['label'] = trim(($casetrans['animal'] ?? '') . ' ' . ($casetrans['espece'] ?? ''));
             $casetrans['canedit'] = $case->canedit;
             $casetrans['candelete'] = $case->candelete;
             $caselist[] = $casetrans;
@@ -258,11 +273,10 @@ class cases {
      * @return stdClass
      */
     public static function get_entries(int $planningid, int $studentid): stdClass {
-        $structure = self::get_case_structure();
         $entries = case_entry::get_records(['studentid' => $studentid, 'planningid' => $planningid]);
         $cases = [];
         foreach ($entries as $entry) {
-            $case = self::do_get_entry_content($structure, $entry);
+            $case = self::do_get_entry_content(self::get_case_structure($entry->get('versionid')), $entry);
             $cases[] = $case;
         }
         return (object) [
@@ -271,17 +285,69 @@ class cases {
     }
 
     /**
-     * Get case field value accross categories
+     * List all Caselog form versions.
      *
-     * @param mixed $case
-     * @param string $string
-     * @param bool $rawvalue
-     * @return mixed|null
+     * @return array
      */
-    private static function get_case_field_value(mixed $case, string $string, bool $rawvalue = false) {
+    public static function get_all_versions(): array {
+        $versions = case_version::get_records([], 'id DESC');
+        $result = [];
+        foreach ($versions as $version) {
+            $result[] = [
+                'id' => $version->get('id'),
+                'name' => $version->get('name'),
+                'iscurrent' => (bool)$version->get('iscurrent'),
+                'metadata' => $version->read_metadata(),
+            ];
+        }
+        return $result;
+    }
+
+    /**
+     * Get the case form structure for a specific version.
+     *
+     * @param int $versionid The version id
+     * @return array
+     */
+    public static function get_version_structure(int $versionid): array {
+        return self::get_case_structure($versionid);
+    }
+
+    /** Validate configured bounded text fields before persistence. */
+    public static function validate_fields(array $values, array $structure): void {
+        $limits = [];
+        foreach ($structure as $category) {
+            foreach ($category->fields as $field) {
+                $config = json_decode(stripslashes((string)$field->configdata), true) ?: [];
+                if (!empty($config['maxlength'])) {
+                    $limits[$field->id] = (int)$config['maxlength'];
+                }
+            }
+        }
+        foreach ($limits as $fieldid => $limit) {
+            if (isset($values[$fieldid]) && self::character_length((string)$values[$fieldid]) > $limit) {
+                throw new \moodle_exception('caselogfieldtoolong', 'mod_competvet', '', $limit);
+            }
+        }
+    }
+
+    /** Count Unicode characters using the same normalisation as the browser. */
+    public static function character_length(string $value): int {
+        return mb_strlen(str_replace(["\r\n", "\r"], "\n", $value));
+    }
+
+    /**
+     * Get case field value across categories.
+     *
+     * @param object $case The case object with categories
+     * @param string $fieldidnumber The field idnumber to look for
+     * @param bool $rawvalue Whether to return the raw value or display value
+     * @return mixed
+     */
+    private static function get_case_field_value(mixed $case, string $fieldidnumber, bool $rawvalue = false) {
         foreach ($case->categories as $category) {
             foreach ($category->fields as $field) {
-                if ($field->idnumber == $string) {
+                if ($field->idnumber == $fieldidnumber) {
                     if ($rawvalue) {
                         return $field->value;
                     } else {

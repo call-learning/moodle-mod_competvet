@@ -58,7 +58,12 @@ class case_form_add extends dynamic_form {
                         $json = json_decode(stripslashes($field->configdata));
                         $rows = $json->rows;
                     }
-                    $mform->addElement('textarea', 'field_' . $field->id, $field->name, ['rows' => $rows]);
+                    $config = json_decode(stripslashes((string)$field->configdata), true) ?: [];
+                    $attributes = ['rows' => $config['rows'] ?? $rows];
+                    if (!empty($config['maxlength'])) {
+                        $attributes['maxlength'] = $config['maxlength'];
+                    }
+                    $mform->addElement('textarea', 'field_' . $field->id, $field->name, $attributes);
                     $mform->setType('field_' . $field->id, PARAM_TEXT);
                 }
                 if ($field->type == 'select') {
