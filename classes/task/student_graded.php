@@ -45,13 +45,8 @@ class student_graded extends \core\task\adhoc_task {
      * Execute the task.
      */
     public function execute() {
-        // Check if this task is enabled.
-        if (!get_config('mod_competvet', 'student_graded_enabled')) {
-            return;
-        }
         $data = $this->get_custom_data();
         $cmid = $data->cmid;
-        $competvet = competvet::get_from_cmid($cmid);
         $studentid = $data->studentid;
         $student = core_user::get_user($studentid);
         if (!$student) {
@@ -66,6 +61,12 @@ class student_graded extends \core\task\adhoc_task {
         foreach ($todos as $todo) {
             $todo->delete();
         }
+
+        // Notification delivery is optional, but must not prevent cleanup.
+        if (!get_config('mod_competvet', 'student_graded_enabled')) {
+            return;
+        }
+        $competvet = competvet::get_from_cmid($cmid);
 
         // Send the email.
         $recipients[] = $student;

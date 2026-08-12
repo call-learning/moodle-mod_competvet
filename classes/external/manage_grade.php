@@ -52,7 +52,7 @@ class manage_grade extends external_api {
             'cmid' => new external_value(PARAM_INT, 'The course module id', VALUE_REQUIRED),
             'planningid' => new external_value(PARAM_INT, 'The planning id', VALUE_REQUIRED),
             'grade' => new external_value(PARAM_TEXT, 'The grade', VALUE_REQUIRED),
-            'feedback' => new external_value(PARAM_TEXT, 'The feedback', VALUE_OPTIONAL),
+            'feedback' => new external_value(PARAM_TEXT, 'The feedback', VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -108,26 +108,26 @@ class manage_grade extends external_api {
             'cmid' => $competvet->get_course_module_id(),
             'planningid' => $planningid,
         ]);
-        $existing = $DB->record_exists_select(
-            'task_adhoc',
-            "classname = :classname AND " . $DB->sql_compare_text('customdata') . " = " . $DB->sql_compare_text(':customdata'),
-            [
-                'classname' => '\mod_competvet\task\student_graded',
-                'customdata' => $customdata,
-            ]
-        );
-
-        if (!$existing) {
-            $task = new \mod_competvet\task\student_graded();
-            $task->set_custom_data((object)[
-                'studentid' => $userid,
-                'cmid' => $competvet->get_course_module_id(),
-                'planningid' => $planningid,
-            ]);
-            \core\task\manager::queue_adhoc_task($task);
-        }
-        $lettergrade = $competvet->get_letter_grade($grade);
         if ($result) {
+            $existing = $DB->record_exists_select(
+                'task_adhoc',
+                "classname = :classname AND " . $DB->sql_compare_text('customdata') . " = " . $DB->sql_compare_text(':customdata'),
+                [
+                    'classname' => '\mod_competvet\task\student_graded',
+                    'customdata' => $customdata,
+                ]
+            );
+
+            if (!$existing) {
+                $task = new \mod_competvet\task\student_graded();
+                $task->set_custom_data((object)[
+                    'studentid' => $userid,
+                    'cmid' => $competvet->get_course_module_id(),
+                    'planningid' => $planningid,
+                ]);
+                \core\task\manager::queue_adhoc_task($task);
+            }
+            $lettergrade = $competvet->get_letter_grade($grade);
             return [
                 'result' => true,
                 'lettergrade' => $lettergrade,
