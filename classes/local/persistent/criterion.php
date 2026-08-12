@@ -81,7 +81,8 @@ class criterion extends persistent {
      * @return bool
      */
     public function can_delete(): bool {
-        if (!has_capability('mod/competvet:editcriteria', \context_system::instance())) {
+        $grid = grid::get_record(['id' => $this->get('gridid')]);
+        if (!$grid || !$grid->can_manage()) {
             return false;
         }
         $isused = utils::is_criterion_used($this);

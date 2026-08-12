@@ -135,7 +135,23 @@ class grid extends persistent {
         if ($this->get('idnumber') == self::DEFAULT_GRID_SHORTNAME[$this->get('type')]) {
             return false;
         }
-        return true;
+        return $this->can_manage();
+    }
+
+    /**
+     * Whether the current user can manage this grid in its scope.
+     * @return bool
+     */
+    public function can_manage(): bool {
+        if (empty($this->get('situationid'))) {
+            return has_capability('mod/competvet:manageglobalcriteria', \context_system::instance());
+        }
+        $situation = situation::get_record(['id' => $this->get('situationid')]);
+        if (!$situation) {
+            return false;
+        }
+        $competvet = \mod_competvet\competvet::get_from_situation($situation);
+        return has_capability('mod/competvet:editcriteria', $competvet->get_context());
     }
 
     /**
@@ -147,7 +163,7 @@ class grid extends persistent {
         if ($this->get('idnumber') == self::DEFAULT_GRID_SHORTNAME[$this->get('type')]) {
             return false;
         }
-        if (!has_capability('mod/competvet:editcriteria', \context_system::instance())) {
+        if (!$this->can_manage()) {
             return false;
         }
         if (utils::is_grid_used($this)) {
