@@ -18,6 +18,7 @@ namespace mod_competvet\local\observers;
 
 use mod_competvet\event\cert_validation_completed;
 use mod_competvet\event\cert_validation_requested;
+use mod_competvet\local\api\certifications;
 use mod_competvet\local\api\todos;
 use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\cert_decl_asso;
@@ -58,8 +59,8 @@ class certification_observer {
     /**
      * Cancel pending todos
      *
-     * When a certification validation is done by an observer, we set the status of the other
-     * Todo related to this same certification to" done".
+     * Close validation todos only when the current validation cycle is complete. A rejecting
+     * validation keeps the declaration actionable for a later validation cycle.
      *
      * @param cert_validation_completed $event
      * @return void
@@ -68,6 +69,11 @@ class certification_observer {
         $eventdata = $event->get_data();
         ['declid' => $declid] =
             $eventdata['other'];
-        todos::cancel_certification_validation($declid);
+        $certification = certifications::get_certification($declid);
+        if (!empty($certification['confirmed'])) {
+            todos::cancel_certification_validation($declid);
+        } else {
+            todos::reopen_certification_validation($declid);
+        }
     }
 }

@@ -208,4 +208,19 @@ final class certifications_test extends advanced_testcase {
         $this->assertCount(5, $certifications);
         $this->assertCount(1, array_filter($certifications, fn($cert) => $cert['isdeclared']));
     }
+
+    /**
+     * Rejected certifications are placed in the waiting report bucket.
+     */
+    public function test_rejected_certification_is_waiting_in_status_report(): void {
+        $student = core_user::get_user_by_username('student1');
+        $situation = situation::get_record(['shortname' => 'SIT1']);
+        $plannings = plannings::get_plannings_for_situation_id($situation->get('id'), $student->id);
+        $planning = array_shift($plannings);
+
+        $statuses = certifications::get_certifications_by_status($planning['id'], $student->id);
+
+        $this->assertCount(1, $statuses[certifications::GLOBAL_CERT_STATUS_WAITING]);
+        $this->assertCount(0, $statuses[certifications::GLOBAL_CERT_STATUS_VALIDATED]);
+    }
 }
