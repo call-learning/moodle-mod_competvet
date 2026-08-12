@@ -74,4 +74,63 @@ final class lib_test extends advanced_testcase {
         $this->assertEquals(0, $DB->count_records('competvet_case_entry'));
         $this->assertEquals(0, $DB->count_records('competvet_case_data'));
     }
+
+    /**
+     * Numeric CompetVet activities create a points grade item.
+     *
+     * @return void
+     */
+    public function test_numeric_grade_item_is_created_in_points_mode(): void {
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $cm = $generator->create_module('competvet', ['course' => $course->id, 'grade' => 10]);
+
+        $item = \grade_item::fetch([
+            'itemtype' => 'mod',
+            'itemmodule' => 'competvet',
+            'iteminstance' => $cm->id,
+            'courseid' => $course->id,
+            'itemnumber' => 0,
+        ]);
+
+        $this->assertSame(GRADE_TYPE_VALUE, (int) $item->gradetype);
+        $this->assertSame(10.0, (float) $item->grademax);
+    }
+
+    /**
+     * A drifted numeric grade item is normalised before it is read or written.
+     *
+     * @return void
+     */
+    public function test_numeric_grade_item_is_normalised_for_reads_and_writes(): void {
+        global $DB;
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $cm = $generator->create_module('competvet', ['course' => $course->id, 'grade' => 10]);
+        $item = \grade_item::fetch([
+            'itemtype' => 'mod',
+            'itemmodule' => 'competvet',
+            'iteminstance' => $cm->id,
+            'courseid' => $course->id,
+            'itemnumber' => 0,
+        ]);
+
+        // Simulate an incompatible gradebook edit.
+        $DB->update_record('grade_items', (object) [
+            'id' => $item->id,
+            'gradetype' => GRADE_TYPE_NONE,
+            'scaleid' => null,
+        ]);
+
+        $competvet = competvet::get_from_cmid($cm->cmid);
+        $this->assertSame(GRADE_TYPE_VALUE, (int) $competvet->get_grade_item()->gradetype);
+        $this->assertSame(10, $competvet->get_grade_type_for(0));
+
+        // The public grade update path applies the same points configuration.
+        competvet_grade_item_update($cm);
+        $item = \grade_item::fetch(['id' => $item->id]);
+        $this->assertSame(GRADE_TYPE_VALUE, (int) $item->gradetype);
+        $this->assertSame(10.0, (float) $item->grademax);
+    }
 }

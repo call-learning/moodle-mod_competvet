@@ -18,8 +18,8 @@ namespace mod_competvet;
 
 use cm_info;
 use context_module;
-use core_grades\component_gradeitems;
 use grade_item;
+use mod_competvet\local\grader;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
 use stdClass;
@@ -392,14 +392,7 @@ class competvet {
      * @return int
      */
     public function get_grade_type_for(int $itemnumber): int {
-        $gradefieldname = component_gradeitems::get_field_name_for_itemnumber(self::COMPONENT_NAME, $itemnumber, 'grade');
-        $item = grade_item::fetch([
-            'itemtype' => 'mod',
-            'itemmodule' => self::MODULE_NAME,
-            'iteminstance' => $this->instance->id,
-            'courseid' => $this->course->id,
-            'itemnumber' => $itemnumber,
-        ]);
+        $item = $this->get_grade_item($itemnumber);
         switch ($item->gradetype) {
             case GRADE_TYPE_VALUE:
                 return $item->grademax;
@@ -414,13 +407,32 @@ class competvet {
      * Get the grade item for this module
      * @return \grade_item
      */
-    public function get_grade_item(): \grade_item {
-        return \grade_item::fetch([
+    public function get_grade_item(int $itemnumber = 0): \grade_item {
+        $params = [
             'itemtype' => 'mod',
             'itemmodule' => self::MODULE_NAME,
             'iteminstance' => $this->get_instance_id(),
             'courseid' => $this->get_course_id(),
-        ]);
+            'itemnumber' => $itemnumber,
+        ];
+        $item = \grade_item::fetch($params);
+        if (!$item) {
+            throw new \coding_exception('CompetVet grade item not found.');
+        }
+
+        // Positive CompetVet grades are written as numeric values. Normalise a
+        // grade item changed outside the activity before it is read or used.
+        if ($this->get_instance()->grade > 0 && $item->gradetype !== GRADE_TYPE_VALUE) {
+            $moduleinstance = clone $this->get_instance();
+            $moduleinstance->modname = self::MODULE_NAME;
+            $moduleinstance->coursemodule = $this->cminfo->id;
+            $result = (new grader($moduleinstance))->grade_item_update();
+            if ($result !== GRADE_UPDATE_OK) {
+                throw new \moodle_exception('errorgradeupdate', 'grades');
+            }
+            $item = \grade_item::fetch($params);
+        }
+        return $item;
     }
 
     /**

@@ -95,12 +95,7 @@ class manage_grade extends external_api {
             ];
         }
 
-        $item = \grade_item::fetch([
-            'itemtype' => 'mod',
-            'itemmodule' => 'competvet',
-            'iteminstance' => $competvet->get_instance_id(),
-            'courseid' => $competvet->get_course_id(),
-        ]);
+        $item = $competvet->get_grade_item();
         $result = $item->update_final_grade($userid, $grade, null, $feedback, FORMAT_HTML);
 
         $customdata = json_encode((object)[
