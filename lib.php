@@ -220,19 +220,6 @@ function competvet_grade_item_update($moduleinstance, $grades = false): int {
 }
 
 /**
- * Extends the global navigation tree by adding mod_competvet nodes if there is a relevant content.
- *
- * This can be called by an AJAX request so do not rely on $PAGE as it might not be set up properly.
- *
- * @param navigation_node $competvetnode An object representing the navigation tree node.
- * @param stdClass $course
- * @param stdClass $module
- * @param cm_info $cm
- */
-function competvet_extend_navigation($competvetnode, $course, $module, $cm) {
-}
-
-/**
  * Extends the settings navigation with the mod_competvet settings.
  *
  * This function is called when the context for the page is a mod_competvet module.
@@ -293,6 +280,17 @@ function competvet_extend_settings_navigation($settingsnav, $competvetnode = nul
             navigation_node::TYPE_SETTING,
             '',
             'managenotifications'
+        );
+        $competvetnode->add_node($node, $beforekey);
+    }
+    if (has_capability('mod/competvet:manageglobalcriteria', context_system::instance())) {
+        $url = new moodle_url('/mod/competvet/manageglobalcriteria.php');
+        $node = navigation_node::create(
+            get_string('manageglobalcriteria', 'mod_competvet'),
+            $url,
+            navigation_node::TYPE_SETTING,
+            '',
+            'competvetmanageglobalcriteria'
         );
         $competvetnode->add_node($node, $beforekey);
     }

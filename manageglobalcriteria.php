@@ -28,9 +28,7 @@ require('../../config.php');
 
 require_login();
 
-if (!is_siteadmin()) {
-    throw new moodle_exception('error:permission', 'mod_competvet');
-}
+require_capability('mod/competvet:manageglobalcriteria', context_system::instance());
 
 $url = new moodle_url('/mod/competvet/manageglobalcriteria.php', []);
 $PAGE->set_url($url);

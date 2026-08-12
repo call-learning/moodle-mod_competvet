@@ -34,6 +34,10 @@ You can also run the following command to complete the installation from the com
 
 After installation, add a "CompetVet Eval" activity to a course. Configure the rotations, the competencies to be assessed, and the user roles (students, supervisors, observers). Students and supervisors can then enter and validate evaluations directly in Moodle.
 
+### Global grid administration
+
+To delegate global grid maintenance without granting broader site administration rights, create or edit a restricted role at system context and grant it `mod/competvet:manageglobalcriteria`. Assign that role to the selected users at system context. The capability controls access to the global grid page and its grid and criterion operations.
+
 ## License
 
 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>

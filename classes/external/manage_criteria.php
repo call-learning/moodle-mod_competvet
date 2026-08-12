@@ -29,6 +29,7 @@ use external_multiple_structure;
 use external_warnings;
 use mod_competvet\local\api\criteria;
 use mod_competvet\local\persistent\grid;
+use mod_competvet\local\persistent\situation;
 
 /**
  * Class manage_criteria
@@ -108,6 +109,17 @@ class manage_criteria extends external_api {
         $transaction = $DB->start_delegated_transaction();
         // Update or insert the grid by calling the correct API.
         foreach ($grids as $grid) {
+            $storedgrid = grid::get_record(['id' => $grid['gridid']]);
+            if ($storedgrid && !$storedgrid->can_manage()) {
+                throw new \moodle_exception('noaccess', 'mod_competvet');
+            }
+            if (!$storedgrid && empty($grid['situationid'])) {
+                require_capability('mod/competvet:manageglobalcriteria', context_system::instance());
+            } else if (!$storedgrid && !empty($grid['situationid'])) {
+                $situation = situation::get_record(['id' => $grid['situationid']], MUST_EXIST);
+                $competvet = \mod_competvet\competvet::get_from_situation($situation);
+                require_capability('mod/competvet:editcriteria', $competvet->get_context());
+            }
             if ($grid['deleted'] ?? false) {
                 if (!criteria::delete_grid($grid['gridid'])) {
                     $warnings[] = [
