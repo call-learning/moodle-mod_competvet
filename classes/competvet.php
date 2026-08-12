@@ -404,7 +404,9 @@ class competvet {
     }
 
     /**
-     * Get the grade item for this module
+     * Get the grade item for this module.
+     *
+     * @param int $itemnumber The grade item number
      * @return \grade_item
      */
     public function get_grade_item(int $itemnumber = 0): \grade_item {

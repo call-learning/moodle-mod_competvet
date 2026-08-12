@@ -40,9 +40,19 @@ To delegate global grid maintenance without granting broader site administration
 
 ## Changelog
 
-### 2.5.9
+### 2.5.8
 
-- Certification validation rejections now return declarations to a pending validation workflow. Review and, if necessary, adapt or revalidate mobile application consumers of certification status.
+- Caselog form versioning: case entries now carry a `versionid` linking them to a specific form schema. Legacy entries are migrated to a "Legacy Caselog" version automatically on upgrade.
+- Caselog `get_case_list` API: the `label` field now returns `nom_animal + espece` (e.g. "Rex Chien") instead of `motif_presentation`. The `motif_presentation` value is still available in the full entry payload via `cases::get_entry()`.
+- Backup/restore: grids and criteria are now correctly reused by `idnumber` on restore instead of duplicating. Fixed `get_field()` calls that threw on duplicate idnumbers (Fix #811).
+- Grid editing integrity hardened: external API and restore process now validate grid/criterion operations more strictly (MDL-874).
+- New `mod/competvet:manageglobalcriteria` capability: allows delegated management of global grids and criteria without broader site admin rights. Exposed via activity admin menu and web service (Fix #811).
+- Final grade TODO cleanup: `manage_grade` external API and `student_graded` task refactored for cleaner grade management (Fix #530).
+- Empty observations purge: new CLI script `cli/purge_empty_observations.php` and API methods to remove observations with no field values (Fix #351).
+- Inherited role conflicts fixed: planning and situation role assignment logic corrected to handle inherited roles properly (Fix #598).
+- Certification revalidation: rejected certifications now return to pending validation workflow instead of being lost (Fix #805).
+- Points-based grade items enforced: grade item creation now validates point-based grading configuration (Fix #843).
+- Competency progression report: new report and external API (`get_progression.php`) for tracking student competency progression across plannings. Includes system report, frontend repository method, and progression task (Fix #813).
 
 ## License
 

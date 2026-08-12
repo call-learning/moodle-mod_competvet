@@ -274,6 +274,11 @@ class behat_mod_competvet_generator extends behat_generator_base {
      * @return array
      */
     protected function preprocess_case(array $data): array {
+        $version = \mod_competvet\local\persistent\case_version::get_current();
+        if (isset($data['version'])) {
+            $data['version'] = trim($data['version']);
+            $version = \mod_competvet\local\persistent\case_version::get_record(['name' => $data['version']]);
+        }
         if (isset($data['fields'])) {
             $fields = json_decode('{' . $data['fields'] . '}', false);
             $data['fields'] = [];
@@ -281,7 +286,7 @@ class behat_mod_competvet_generator extends behat_generator_base {
                 $fieldsid = [];
                 foreach ($fields as $key => $value) {
                     if (!isset($fieldsid[$key])) {
-                        $fieldrecord = \mod_competvet\local\persistent\case_field::get_record(['idnumber' => $key]);
+                        $fieldrecord = \mod_competvet\local\persistent\case_field::get_by_idnumber($key, $version->get('id'));
                         if ($fieldrecord) {
                             $fieldsid[$key] = $fieldrecord->get('id');
                         }

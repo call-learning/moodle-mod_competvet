@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-use mod_competvet\setup;
-
 /**
  * Execute local_cveteval upgrade from the given old version.
  *
@@ -212,6 +210,7 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2024101603, 'competvet');
     }
     if ($oldversion < 2024112600) {
+
         // Define table competvet_planning_pause to be created.
         $table = new xmldb_table('competvet_planning_pause');
 
@@ -238,6 +237,7 @@ function xmldb_competvet_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024120401) {
+
         // Define field recipientid to be added to competvet_notification.
         $table = new xmldb_table('competvet_notification');
         $field = new xmldb_field('recipientid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'competvetid');
@@ -281,6 +281,7 @@ function xmldb_competvet_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025021004) {
+
         // Define field textvalue to be added to competvet_case_data.
         $table = new xmldb_table('competvet_case_data');
         $field = new xmldb_field('textvalue', XMLDB_TYPE_TEXT, null, null, null, null, null, 'charvalue');
@@ -303,6 +304,7 @@ function xmldb_competvet_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025031000) {
+
         // Define field haslettergrades to be added to competvet_situation.
         $table = new xmldb_table('competvet_situation');
         $field = new xmldb_field('haslettergrades', XMLDB_TYPE_INTEGER, '1', null, null, null, '1', 'hascase');
@@ -335,19 +337,19 @@ function xmldb_competvet_upgrade($oldversion) {
 
     if ($oldversion < 2025090402) {
         // Reset roles to add role:assign capability.
-        setup::create_update_roles();
+        \mod_competvet\setup::create_update_roles();
         upgrade_mod_savepoint(true, 2025090402, 'competvet');
     }
     // Watch out: php ../../admin/cli/cfg.php --component=mod_competvet --name=version --set=2025090402 .
     if ($oldversion < 202512100300) {
         // Define field ismandatory to be added to competvet_case_field.
-        $casefield = \mod_competvet\local\persistent\case_field::get_record(['idnumber' => 'resultats_examens']);
-        if ($casefield) {
+        $casefieldconfigs = \mod_competvet\local\persistent\case_field::get_records(['idnumber' => 'resultats_examens']);
+        foreach ($casefieldconfigs as $casefield) {
             $casefield->set('name', 'Éléments cliniques et paracliniques les plus pertinents');
             $casefield->update();
         }
         // Competvet savepoint reached.
-        setup::create_update_roles(); // Add user:viewdetails to observers.
+        \mod_competvet\setup::create_update_roles(); // Add user:viewdetails to observers.
         upgrade_mod_savepoint(true, 202512100300, 'competvet');
     }
     if ($oldversion < 202608190002) {
@@ -372,6 +374,48 @@ function xmldb_competvet_upgrade($oldversion) {
             $dbman->create_table($table);
         }
         upgrade_mod_savepoint(true, 202608190002, 'competvet');
+    }
+    if ($oldversion < 202608190004) {
+        $table = new xmldb_table('competvet_case_version');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL);
+        $table->add_field('metadata', XMLDB_TYPE_TEXT, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_index('name_ux', XMLDB_INDEX_UNIQUE, ['name']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        } else {
+            $index = new xmldb_index('name_ux', XMLDB_INDEX_UNIQUE, ['name']);
+            if (!$dbman->index_exists($table, $index)) {
+                $dbman->add_index($table, $index);
+            }
+        }
+
+        $table = new xmldb_table('competvet_case_cat');
+        $field = new xmldb_field('versionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $table = new xmldb_table('competvet_case_entry');
+        $field = new xmldb_field('versionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        \mod_competvet\setup::ensure_case_versions();
+
+        upgrade_mod_savepoint(true, 202608190004, 'competvet');
+    }
+    if ($oldversion < 202608230001) {
+        // Add unique index on (idnumber, categoryid) for case_field.
+        $table = new xmldb_table('competvet_case_field');
+        $index = new xmldb_index('idnumber_category_ux', XMLDB_INDEX_UNIQUE, ['idnumber', 'categoryid']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        upgrade_mod_savepoint(true, 202608230001, 'competvet');
     }
     return true;
 }

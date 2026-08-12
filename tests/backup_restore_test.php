@@ -744,7 +744,7 @@ final class backup_restore_test extends advanced_testcase {
         // Still check that we have no null values in the excluded keys, so if it is not null in the expected, it should
         // also not be null in actual.
         $additionalpattern = !empty($additionalexcludedkeys) ? '|'. implode('|', $additionalexcludedkeys) : '';
-        $keypattern = '/id|timemodified|timecreated|usermodified' . $additionalpattern . '/';
+        $keypattern = '/id|timemodified|timecreated|usermodified|versionid' . $additionalpattern . '/';
         $expectednotnull = array_filter($expected, fn($key) => preg_match($keypattern, $key), ARRAY_FILTER_USE_KEY);
         $actualnotnull = array_filter($actual, fn($key) => preg_match($keypattern, $key), ARRAY_FILTER_USE_KEY);
         foreach ($expectednotnull as $key => $value) {

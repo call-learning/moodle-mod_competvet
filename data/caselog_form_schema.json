@@ -1,0 +1,68 @@
+{
+    "versions": [
+        {
+            "key": "legacy",
+            "name": "Legacy Caselog",
+            "metadata": {
+                "tutorialtitle": "Ajouter un cas clinique"
+            }
+        },
+        {
+            "key": "clinical-transmission",
+            "name": "Clinical transmission",
+            "metadata": {
+                "tutorialtitle": "Ajouter une transmission de cas clinique",
+                "tutorial": "Synthétisez un ou plusieurs cas cliniques pour un collègue qui prend le relais. Il ne s'agit ni de réécrire un dossier complet, ni de faire une revue bibliographique.",
+                "chapo": "Cette section évalue votre capacité à transmettre un cas clinique, comme à un.e collègue, de façon claire, synthétique et exploitable : contexte, problème principal, éléments cliniques utiles, prise en charge réalisée, suites prévues et points de vigilance."
+            }
+        }
+    ],
+    "categories": [
+        {
+            "name": "L'animal",
+            "versionkey": "legacy",
+            "fields": [
+                { "idnumber": "nom_animal", "name": "Nom de l'animal", "sortorder": 1, "type": "text", "description": "", "configdata": "{}" },
+                { "idnumber": "espece", "name": "Espèce", "sortorder": 2, "type": "text", "description": "", "configdata": "{}" },
+                { "idnumber": "race", "name": "Race", "sortorder": 3, "type": "text", "description": "", "configdata": "{}" },
+                { "idnumber": "sexe", "name": "Sexe", "sortorder": 4, "type": "text", "description": "", "configdata": "{}" },
+                { "idnumber": "date_naissance", "name": "Date de naissance", "sortorder": 5, "type": "date", "description": "", "configdata": "{\"placeholder\": \"Si approximative, indiquer 01/01/année\"}" },
+                { "idnumber": "num_dossier", "name": "Numéro de dossier", "sortorder": 6, "type": "text", "description": "", "configdata": "{}" }
+            ]
+        },
+        {
+            "name": "Cas clinique",
+            "versionkey": "legacy",
+            "fields": [
+                { "idnumber": "date_cas", "name": "Date", "sortorder": 7, "type": "date", "description": "", "configdata": "{\"placeholder\": \"[date_du_jour]\"}" },
+                { "idnumber": "motif_presentation", "name": "Motif de présentation", "sortorder": 8, "type": "text", "description": "", "configdata": "{\"placeholder\": \"Exemple: vomissements aigus\"}" },
+                { "idnumber": "resultats_examens", "name": "Éléments cliniques et paracliniques les plus pertinents", "sortorder": 9, "type": "textarea", "description": "", "configdata": "{\"placeholder\": \"Exemple : azotémie rénale, signes échographiques de néphrite aigue, PCR Leptospira + (urines)\", \"rows\": 3}" },
+                { "idnumber": "diag_final", "name": "Diagnostic final", "sortorder": 10, "type": "text", "description": "", "configdata": "{\"placeholder\": \"Exemple : leptospirose\"}" },
+                { "idnumber": "traitement", "name": "Traitement", "sortorder": 11, "type": "textarea", "description": "", "configdata": "{\"placeholder\": \"Exemple : fluidothérapie, amoxicilline ac. clavulanique, maropitant\", \"rows\": 2}" },
+                { "idnumber": "evolution", "name": "Evolution", "sortorder": 12, "type": "textarea", "description": "", "configdata": "{\"placeholder\": \"Exemple : sortie d'hospitalisation après 48h\", \"rows\": 2}" }
+            ]
+        },
+        {
+            "name": "Prise en charge",
+            "versionkey": "legacy",
+            "fields": [
+                { "idnumber": "role_charge", "name": "Rôle dans la prise en charge", "sortorder": 13, "type": "select", "description": "", "configdata": "{\"options\":{\"1\":\"Observateur\",\"2\":\"Principal acteur (responsable du cas)\",\"3\":\"En assistance d'un autre étudiant responsable\",\"4\":\"En groupe sans responsable attitré\"}}" },
+                { "idnumber": "taches_effectuees", "name": "Tâches / procédures effectuées", "sortorder": 14, "type": "textarea", "description": "", "configdata": "{\"placeholder\": \"Exemple de tâches effectuées\", \"rows\": 4}" },
+                { "idnumber": "reflexions_cas", "name": "Réflexions sur le cas", "sortorder": 15, "type": "textarea", "description": "", "configdata": "{\"placeholder\": \"Décrivez ici ce que vous avez appris de ce cas, les principaux défis que vous avez rencontrés, les domaines sur lesquels vous devrez encore travailler, ainsi que les aspects sur lesquels ce cas vous a aidé à progresser. En résumé, identifiez pour vous-même les éléments clés à retenir, ceux qui vous aideront à vous améliorer grâce à l'analyse que vous en faites ici\", \"rows\": 10}" }
+            ]
+        },
+        {
+            "name": "Cas clinique",
+            "versionkey": "clinical-transmission",
+            "fields": [
+                { "idnumber": "nom_animal", "name": "Nom de l'animal", "sortorder": 1, "type": "text", "description": "", "configdata": "{}" },
+                { "idnumber": "espece", "name": "Espèce", "sortorder": 2, "type": "text", "description": "", "configdata": "{}" },
+                { "idnumber": "num_dossier", "name": "Numéro de dossier", "sortorder": 3, "type": "text", "description": "", "configdata": "{}" },
+                { "idnumber": "date_cas", "name": "Date de la prise en charge concernée", "sortorder": 4, "type": "date", "description": "", "configdata": "{\"placeholder\": \"[date_du_jour]\"}" },
+                { "idnumber": "role_charge", "name": "Mon rôle dans la prise en charge", "sortorder": 5, "type": "select", "description": "", "configdata": "{\"options\":{\"1\":\"Observateur\",\"2\":\"Principal acteur (responsable du cas)\",\"3\":\"En assistance d'un autre étudiant responsable\",\"4\":\"En groupe sans responsable attitré\"}}" },
+                { "idnumber": "transmission_clinique", "name": "Transmission clinique", "sortorder": 6, "type": "textarea", "description": "L'objectif n'est pas de rédiger un dossier complet mais de vous exercer à synthétiser les informations essentielles. Listez ici, de façon hiérarchisée, uniquement les éléments décisifs pour la compréhension du cas et son suivi. Omettez les éléments anecdotiques.", "configdata": "{\"rows\": 8, \"maxlength\": 1200}" },
+                { "idnumber": "reflexions_enseignements", "name": "Réflexions et enseignements issus du cas", "sortorder": 7, "type": "textarea", "description": "Listez ici - Ce que vous avez mieux compris, - Ce qui vous a mis en difficulté et que vous referiez différemment avec le recul, - Les points que vous devez consolider.", "configdata": "{\"rows\": 6, \"maxlength\": 800}" }
+            ]
+        }
+    ]
+}

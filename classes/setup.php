@@ -177,9 +177,43 @@ class setup {
      *
      * @return void
      */
-    public static function create_default_cases() {
-        global $CFG;
-        $criterionimporter = new fields_importer(case_field::class);
-        $criterionimporter->import($CFG->dirroot . "/mod/competvet/data/default_cas_form.csv");
+    public static function create_default_cases(): void {
+        self::ensure_case_versions();
+    }
+
+    /**
+     * Create the immutable legacy and current Caselog schemas when needed.
+     *
+     * @return void
+     * @throws \moodle_exception If the schema file is missing.
+     */
+    public static function ensure_case_versions(): void {
+        global $CFG, $DB;
+        $json = $CFG->dirroot . '/mod/competvet/data/caselog_form_schema.json';
+        if (!is_readable($json)) {
+            throw new \moodle_exception('caselog_schema_missing', 'mod_competvet', '', $json);
+        }
+
+        // Import schema first (creates versions and new categories/fields).
+        \mod_competvet\local\importer\caselog_schema_importer::import($json);
+
+        // Migrate pre-versioned data to the legacy version.
+        // Single lookup ensures consistency between category and entry migration.
+        $legacy = \mod_competvet\local\persistent\case_version::get_record(['name' => 'Legacy Caselog']);
+        if ($legacy) {
+            // Migrate pre-versioned categories to the legacy version.
+            $DB->set_field('competvet_case_cat', 'versionid', $legacy->get('id'), ['versionid' => 0]);
+
+            // Migrate pre-versioned entries to the legacy version.
+            $DB->set_field('competvet_case_entry', 'versionid', $legacy->get('id'), ['versionid' => 0]);
+        }
+
+        // Set default caselog version to the one marked as current in the schema.
+        $defaultversion = $DB->get_field('competvet_case_version', 'id', ['name' => 'Clinical transmission'], 'id');
+        if (empty($defaultversion)) {
+            // Fallback: use the first version if the named one was not created.
+            $defaultversion = $DB->get_field('competvet_case_version', 'id', [], 'id');
+        }
+        set_config('caselog_default_version', $defaultversion, 'mod_competvet');
     }
 }

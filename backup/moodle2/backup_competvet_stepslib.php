@@ -111,9 +111,14 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
             'usermodified', 'timecreated', 'timemodified',
         ]);
 
+        $caseversions = new backup_nested_element('caseversions');
+        $caseversion = new backup_nested_element('caseversion', ['id'], [
+            'name', 'metadata', 'timecreated', 'timemodified',
+        ]);
+
         $casecats = new backup_nested_element('casecats');
         $casecat = new backup_nested_element('casecat', ['id'], [
-            'name', 'idnumber', 'description', 'sortorder', 'usermodified',
+            'versionid', 'name', 'idnumber', 'description', 'sortorder', 'usermodified',
             'timecreated', 'timemodified',
         ]);
 
@@ -125,7 +130,7 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
 
         $caseentries = new backup_nested_element('caseentries');
         $caseentry = new backup_nested_element('caseentry', ['id'], [
-            'studentid', 'planningid', 'usermodified', 'timecreated', 'timemodified',
+            'studentid', 'planningid', 'versionid', 'usermodified', 'timecreated', 'timemodified',
         ]);
 
         $casedatas = new backup_nested_element('casedatas');
@@ -152,6 +157,9 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
 
         $grid->add_child($criteria);
         $criteria->add_child($criterion);
+
+        $competvet->add_child($caseversions);
+        $caseversions->add_child($caseversion);
 
         $competvet->add_child($casecats);
         $casecats->add_child($casecat);
@@ -210,6 +218,7 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
         $planning->set_source_table('competvet_planning', ['situationid' => backup::VAR_PARENTID]);
         $grid->set_source_table('competvet_grid', []);
         $criterion->set_source_table('competvet_criterion', ['gridid' => backup::VAR_PARENTID]);
+        $caseversion->set_source_table('competvet_case_version', []);
         $casecat->set_source_table('competvet_case_cat', []);
         $casefield->set_source_table('competvet_case_field', ['categoryid' => backup::VAR_PARENTID]);
         if ($userinfo) {

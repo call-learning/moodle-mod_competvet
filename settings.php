@@ -301,5 +301,38 @@ if ($hassiteconfig) {
                 PARAM_INT
             )
         );
+
+        // Caselog version setting.
+        $settings->add(
+            new admin_setting_heading(
+                'mod_competvet/caselog_version_heading',
+                get_string('caselogversion', 'mod_competvet'),
+                get_string('caselogversion_desc', 'mod_competvet'),
+            )
+        );
+
+        if (!during_initial_install()) {
+            global $DB;
+            $versions = $DB->get_records('competvet_case_version', [], 'id', 'id, name');
+            if ($versions) {
+                $versionoptions = [];
+                $defaultversion = get_config('mod_competvet', 'caselog_default_version');
+                if (empty($defaultversion)) {
+                    $defaultversion = key($versions);
+                }
+                foreach ($versions as $version) {
+                    $versionoptions[$version->id] = $version->name;
+                }
+                $settings->add(
+                    new admin_setting_configselect(
+                        'mod_competvet/caselog_default_version',
+                        get_string('caselog_default_version', 'mod_competvet'),
+                        get_string('caselog_default_version_desc', 'mod_competvet'),
+                        $defaultversion,
+                        $versionoptions
+                    )
+                );
+            }
+        }
     }
 }
