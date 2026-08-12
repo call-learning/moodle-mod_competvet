@@ -38,6 +38,12 @@ After installation, add a "CompetVet Eval" activity to a course. Configure the r
 
 To delegate global grid maintenance without granting broader site administration rights, create or edit a restricted role at system context and grant it `mod/competvet:manageglobalcriteria`. Assign that role to the selected users at system context. The capability controls access to the global grid page and its grid and criterion operations.
 
+## Changelog
+
+### 2.5.9
+
+- Certification validation rejections now return declarations to a pending validation workflow. Review and, if necessary, adapt or revalidate mobile application consumers of certification status.
+
 ## License
 
 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>

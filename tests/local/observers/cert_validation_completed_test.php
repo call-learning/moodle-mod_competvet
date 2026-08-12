@@ -93,4 +93,57 @@ final class cert_validation_completed_test extends advanced_testcase {
         certifications::validate_cert_declaration($this->declid, $observer1->id, cert_valid::STATUS_CONFIRMED, '', FORMAT_PLAIN);
         $this->assertEquals(0, todo::count_records(['status' => todo::STATUS_PENDING]));
     }
+
+    /**
+     * A rejecting validation keeps the declaration pending and reopens its todos.
+     */
+    public function test_rejected_certification_is_pending_and_actionable(): void {
+        $student = core_user::get_user_by_username('student1');
+        $observer1 = core_user::get_user_by_username('observer1');
+        $observer2 = core_user::get_user_by_username('observer2');
+        certifications::declaration_supervisor_invite($this->declid, $observer1->id, $student->id);
+        certifications::declaration_supervisor_invite($this->declid, $observer2->id, $student->id);
+
+        certifications::validate_cert_declaration(
+            $this->declid,
+            $observer1->id,
+            cert_valid::STATUS_LEVEL_NOT_REACHED,
+            '',
+            FORMAT_PLAIN
+        );
+
+        $certification = certifications::get_certification($this->declid);
+        $this->assertFalse($certification['confirmed']);
+        $this->assertTrue($certification['rejected']);
+        $this->assertSame(2, todo::count_records(['status' => todo::STATUS_PENDING]));
+    }
+
+    /**
+     * A later confirming validation can complete a previously rejected declaration.
+     */
+    public function test_rejected_certification_can_be_revalidated(): void {
+        $student = core_user::get_user_by_username('student1');
+        $observer1 = core_user::get_user_by_username('observer1');
+        certifications::declaration_supervisor_invite($this->declid, $observer1->id, $student->id);
+
+        certifications::validate_cert_declaration(
+            $this->declid,
+            $observer1->id,
+            cert_valid::STATUS_LEVEL_NOT_REACHED,
+            '',
+            FORMAT_PLAIN
+        );
+        certifications::validate_cert_declaration(
+            $this->declid,
+            $observer1->id,
+            cert_valid::STATUS_CONFIRMED,
+            '',
+            FORMAT_PLAIN
+        );
+
+        $certification = certifications::get_certification($this->declid);
+        $this->assertTrue($certification['confirmed']);
+        $this->assertFalse($certification['rejected']);
+        $this->assertEquals(0, todo::count_records(['status' => todo::STATUS_PENDING]));
+    }
 }

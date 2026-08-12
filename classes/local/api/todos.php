@@ -17,6 +17,7 @@
 namespace mod_competvet\local\api;
 
 use mod_competvet\local\persistent\cert_decl;
+use mod_competvet\local\persistent\cert_decl_asso;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\todo;
@@ -118,16 +119,15 @@ class todos {
         $todo = null;
         if ($existingtodos) {
             // Find the one with the same declid.
-            foreach ($existingtodos as $todo) {
-                $data = json_decode($todo->get('data'));
+            foreach ($existingtodos as $existingtodo) {
+                $data = json_decode($existingtodo->get('data'));
                 if ($data->declid == $declid) {
+                    $todo = $existingtodo;
                     break;
                 }
-                $todo = null;
             }
         }
         if ($todo) {
-            $todo = reset($existingtodos);
             $todo->set('status', todo::STATUS_PENDING);
             $todo->update();
         } else {
@@ -173,6 +173,19 @@ class todos {
                     $todo->update();
                 }
             }
+        }
+    }
+
+    /**
+     * Reopen validation todos for all observers associated with a declaration.
+     *
+     * @param int $declid
+     * @return void
+     */
+    public static function reopen_certification_validation(int $declid): void {
+        $associations = cert_decl_asso::get_records(['declid' => $declid]);
+        foreach ($associations as $association) {
+            self::ask_for_certification_validation($declid, $association->get('supervisorid'));
         }
     }
 

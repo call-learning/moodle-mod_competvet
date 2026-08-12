@@ -304,7 +304,7 @@ class certifications {
             if ($cert['status'] == cert_decl::STATUS_STUDENT_NOTSEEN) {
                 $certsbystatus[self::GLOBAL_CERT_STATUS_NOT_SEEN][] = $cert;
             } else {
-                if (!$cert['hasvalidations'] || $cert['levelnotreached']) {
+                if (!$cert['confirmed']) {
                     $certsbystatus[self::GLOBAL_CERT_STATUS_WAITING][] = $cert;
                 } else {
                     $certsbystatus[self::GLOBAL_CERT_STATUS_VALIDATED][] = $cert;
@@ -374,6 +374,7 @@ class certifications {
         $certrecord['confirmed'] = false;
         $certrecord['levelnotreached'] = false;
         $certrecord['hasvalidations'] = false;
+        $certrecord['rejected'] = false;
         $certrecord['timemodified'] = 0;
 
         return $certrecord;
@@ -413,6 +414,7 @@ class certifications {
         $certrecord['observernotseen'] = false;
         $certrecord['levelnotreached'] = false;
         $certrecord['hasvalidations'] = false;
+        $certrecord['rejected'] = false;
 
         if ($withfeedback) {
             $certrecord['feedback'] = [
@@ -428,6 +430,7 @@ class certifications {
         if (!empty($valids)) {
             $certrecord['hasvalidations'] = true;
         }
+        $currentvalidations = [];
         foreach ($valids as $valid) {
             $validrecord = [];
             $validrecord['id'] = $valid->get('id');
@@ -435,9 +438,15 @@ class certifications {
             $validrecord['status'] = $valid->get('status');
             $validrecord['timemodified'] = $valid->get('timemodified');
 
-            $certrecord['confirmed'] = ($valid->get('status') == cert_valid::STATUS_CONFIRMED);
-            $certrecord['observernotseen'] = ($valid->get('status') == cert_valid::STATUS_OBSERVER_NOTSEEN);
-            $certrecord['levelnotreached'] = ($valid->get('status') == cert_valid::STATUS_LEVEL_NOT_REACHED);
+            $supervisorid = $valid->get('supervisorid');
+            if (
+                !isset($currentvalidations[$supervisorid])
+                || $valid->get('timemodified') > $currentvalidations[$supervisorid]->get('timemodified')
+                || ($valid->get('timemodified') == $currentvalidations[$supervisorid]->get('timemodified')
+                    && $valid->get('id') > $currentvalidations[$supervisorid]->get('id'))
+            ) {
+                $currentvalidations[$supervisorid] = $valid;
+            }
             $supervisor = $validrecord['supervisor'];
             if ($withfeedback) {
                 $validrecord['feedback'] = [
@@ -453,7 +462,63 @@ class certifications {
 
             $certrecord['validations'][] = $validrecord;
         }
+        foreach ($currentvalidations as $valid) {
+            $status = $valid->get('status');
+            $certrecord['observernotseen'] = $certrecord['observernotseen']
+                || $status == cert_valid::STATUS_OBSERVER_NOTSEEN;
+            $certrecord['levelnotreached'] = $certrecord['levelnotreached']
+                || $status == cert_valid::STATUS_LEVEL_NOT_REACHED;
+            $certrecord['rejected'] = $certrecord['rejected'] || $status != cert_valid::STATUS_CONFIRMED;
+        }
+        $certrecord['confirmed'] = !empty($currentvalidations) && !$certrecord['rejected'];
         return $certrecord;
+    }
+
+    /**
+     * Check if a certification declaration is confirmed.
+     *
+     * A certification is confirmed when all validations are confirmed.
+     * If there are multiple validations for the same supervisor, only the latest one is considered.
+     * This method avoids loading user information (which requires $PAGE) and is safe
+     * to call from event observers or other non-page contexts.
+     *
+     * @param int $declid The declaration id.
+     * @return bool True if confirmed, false otherwise.
+     */
+    public static function is_certification_confirmed(int $declid): bool {
+        if (!cert_decl::record_exists($declid)) {
+            return false;
+        }
+
+        $cert = new cert_decl($declid);
+
+        $valids = cert_valid::get_records(['declid' => $cert->get('id')]);
+        if (empty($valids)) {
+            return false;
+        }
+
+        // Build a map of the latest validation per supervisor.
+        $latestvalidations = [];
+        foreach ($valids as $valid) {
+            $supervisorid = $valid->get('supervisorid');
+            if (
+                !isset($latestvalidations[$supervisorid])
+                || $valid->get('timemodified') > $latestvalidations[$supervisorid]->get('timemodified')
+                || ($valid->get('timemodified') == $latestvalidations[$supervisorid]->get('timemodified')
+                    && $valid->get('id') > $latestvalidations[$supervisorid]->get('id'))
+            ) {
+                $latestvalidations[$supervisorid] = $valid;
+            }
+        }
+
+        // Check if all latest validations are confirmed.
+        foreach ($latestvalidations as $valid) {
+            if ($valid->get('status') != cert_valid::STATUS_CONFIRMED) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

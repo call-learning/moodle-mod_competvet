@@ -18,6 +18,7 @@ namespace mod_competvet\local\api;
 use advanced_testcase;
 use core_user;
 use mod_competvet\local\persistent\cert_decl;
+use mod_competvet\local\persistent\cert_valid;
 use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\grid;
 use mod_competvet\local\persistent\situation;
@@ -207,5 +208,80 @@ final class certifications_test extends advanced_testcase {
 
         $this->assertCount(5, $certifications);
         $this->assertCount(1, array_filter($certifications, fn($cert) => $cert['isdeclared']));
+    }
+
+    /**
+     * Rejected certifications are placed in the waiting report bucket.
+     */
+    public function test_rejected_certification_is_waiting_in_status_report(): void {
+        $student = core_user::get_user_by_username('student1');
+        $situation = situation::get_record(['shortname' => 'SIT1']);
+        $plannings = plannings::get_plannings_for_situation_id($situation->get('id'), $student->id);
+        $planning = array_shift($plannings);
+
+        $statuses = certifications::get_certifications_by_status($planning['id'], $student->id);
+
+        $this->assertCount(1, $statuses[certifications::GLOBAL_CERT_STATUS_WAITING]);
+        $this->assertCount(0, $statuses[certifications::GLOBAL_CERT_STATUS_VALIDATED]);
+    }
+
+    /**
+     * Test that is_certification_confirmed returns false when there are no validations.
+     */
+    public function test_is_certification_confirmed_no_validations(): void {
+        $cert = $this->get_certification_declaration();
+
+        $this->assertFalse(certifications::is_certification_confirmed($cert->id));
+    }
+
+    /**
+     * Test that is_certification_confirmed returns true when all validations are confirmed.
+     */
+    public function test_is_certification_confirmed_all_validations_confirmed(): void {
+        $cert = $this->get_certification_declaration();
+        $student = core_user::get_user_by_username('student1');
+        $observer1 = core_user::get_user_by_username('observer1');
+        $observer2 = core_user::get_user_by_username('observer2');
+
+        certifications::declaration_supervisor_invite($cert->id, $observer1->id, $student->id);
+        certifications::declaration_supervisor_invite($cert->id, $observer2->id, $student->id);
+
+        certifications::validate_cert_declaration($cert->id, $observer1->id, cert_valid::STATUS_CONFIRMED, '', FORMAT_PLAIN);
+        certifications::validate_cert_declaration($cert->id, $observer2->id, cert_valid::STATUS_CONFIRMED, '', FORMAT_PLAIN);
+
+        $this->assertTrue(certifications::is_certification_confirmed($cert->id));
+    }
+
+    /**
+     * Test that is_certification_confirmed returns false when at least one validation is not confirmed.
+     */
+    public function test_is_certification_confirmed_one_not_confirmed(): void {
+        $cert = $this->get_certification_declaration();
+        $student = core_user::get_user_by_username('student1');
+        $observer1 = core_user::get_user_by_username('observer1');
+        $observer2 = core_user::get_user_by_username('observer2');
+
+        certifications::declaration_supervisor_invite($cert->id, $observer1->id, $student->id);
+        certifications::declaration_supervisor_invite($cert->id, $observer2->id, $student->id);
+
+        certifications::validate_cert_declaration($cert->id, $observer1->id, cert_valid::STATUS_CONFIRMED, '', FORMAT_PLAIN);
+        certifications::validate_cert_declaration(
+            $cert->id,
+            $observer2->id,
+            cert_valid::STATUS_LEVEL_NOT_REACHED,
+            '',
+            FORMAT_PLAIN
+        );
+
+        $this->assertFalse(certifications::is_certification_confirmed($cert->id));
+    }
+
+    /**
+     * Test that is_certification_confirmed returns false for a non-existent declaration.
+     */
+    public function test_is_certification_confirmed_nonexistent(): void {
+        global $DB;
+        $this->assertFalse($DB->record_exists('competvet_cert_decl', ['id' => 999999]));
+        $this->assertFalse(certifications::is_certification_confirmed(999999));
     }
 }
