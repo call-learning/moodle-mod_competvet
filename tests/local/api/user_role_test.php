@@ -244,4 +244,26 @@ final class user_role_test extends advanced_testcase {
         $this->assertSame(['observer'], user_role::get_all($user->id, $situation->get('id')));
         $this->assertSame('observer', user_role::get_top($user->id, $situation->get('id')));
     }
+
+    /**
+     * Teacher roles inherited from the course do not override a direct observer role.
+     *
+     * @return void
+     */
+    public function test_get_top_ignores_inherited_teacher_for_direct_observer(): void {
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(['fullname' => 'Teacher Scope Course', 'shortname' => 'TSC']);
+        $instance = $generator->create_module('competvet', ['course' => $course->id, 'name' => 'Teacher Scoped Competvet']);
+        $modulecontext = context_module::instance($instance->cmid);
+        $coursecontext = context_course::instance($course->id);
+        $user = $generator->create_user(['username' => 'directobserver']);
+        $roles = array_column(get_all_roles($coursecontext), 'id', 'shortname');
+
+        role_assign($roles['teacher'], $user->id, $coursecontext->id);
+        role_assign($roles['observer'], $user->id, $modulecontext->id);
+
+        $situation = situation::get_record(['competvetid' => $instance->id], MUST_EXIST);
+        $this->assertSame(['observer'], user_role::get_all($user->id, $situation->get('id')));
+        $this->assertSame('observer', user_role::get_top($user->id, $situation->get('id')));
+    }
 }

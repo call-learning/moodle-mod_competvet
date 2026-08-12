@@ -35,9 +35,9 @@ class user_role {
      * @var array
      */
     const ROLES_CONFLICTS = [
+        ['student', 'observer'],
         ['student', 'teacher'],
         ['student', 'evaluator'],
-        ['student', 'observer'],
         ['student', 'admincompetvet'],
     ];
 
