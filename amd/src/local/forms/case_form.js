@@ -25,9 +25,8 @@ import Repository from '../new-repository';
 
 /**
  * Initialize module
- * @param {string} modulename
  */
-export const init = (modulename) => {
+export const init = () => {
     const button = document.querySelector('[data-action="case-add"]');
     if (!button) {
         return;
@@ -36,7 +35,12 @@ export const init = (modulename) => {
         event.preventDefault();
         const gradingApp = document.querySelector('[data-region="grading-app"]');
         const data = gradingApp.dataset;
-        window.location.assign(`/mod/competvet/case.php?cmid=${data.cmid}&planningid=${data.planningid}&studentid=${data.studentid}`);
+        const params = new URLSearchParams({
+            cmid: data.cmId,
+            planningid: data.planningid,
+            studentid: data.studentid,
+        });
+        window.location.assign(`/mod/competvet/case.php?${params}`);
     });
     document.addEventListener('click', async(event) => {
         if (event.target.closest('[data-action="delete-case"]')) {
@@ -48,7 +52,13 @@ export const init = (modulename) => {
             const button = event.target.closest('[data-action="edit-case"]');
             const gradingApp = document.querySelector('[data-region="grading-app"]');
             const data = gradingApp.dataset;
-            window.location.assign(`/mod/competvet/case.php?cmid=${data.cmid}&planningid=${data.planningid}&studentid=${data.studentid}&entryid=${button.dataset.id}`);
+            const params = new URLSearchParams({
+                cmid: data.cmId,
+                planningid: data.planningid,
+                studentid: data.studentid,
+                entryid: button.dataset.id,
+            });
+            window.location.assign(`/mod/competvet/case.php?${params}`);
         }
     });
 };

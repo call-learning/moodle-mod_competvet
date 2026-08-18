@@ -265,4 +265,20 @@ class setup {
             }
         }
     }
+
+    /**
+     * Migrate pre-versioned Caselog entries to the legacy version.
+     *
+     * @return void
+     */
+    public static function migrate_legacy_case_entries(): void {
+        global $DB;
+
+        $legacy = \mod_competvet\local\persistent\case_version::get_record(['name' => 'Legacy Caselog']);
+        if (!$legacy) {
+            return;
+        }
+        $DB->set_field('competvet_case_entry', 'versionid', $legacy->get('id'), ['versionid' => 0]);
+        $DB->set_field('competvet_case_entry', 'status', 'validated', ['status' => '']);
+    }
 }

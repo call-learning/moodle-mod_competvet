@@ -19,4 +19,4 @@
 - [x] 3.1 Implement shared character-count validation for `Transmission clinique` (1200 characters) and `Réflexions et enseignements issus du cas` (800 characters) in both the page UI and the server-side submission path
 - [x] 3.2 Keep the existing `local_competvet` and mobile-facing API contracts unchanged; select the current version server-side for new entries and preserve stored versions internally for web display and editing
 - [x] 3.3 Update Caselog list and summary consumers that currently depend on removed fields such as `motif_presentation`, using retained version-independent data for labels and displays instead
-- [ ] 3.4 Add or update automated coverage for mixed form versions, backward display and edit preservation of legacy entries, draft versus validated behavior, 1200/800-character limit enforcement, tutorial/chapo content, API payloads, and the revised Caselog display flow
+- [x] 3.4 Add or update automated coverage for mixed form versions, backward display and edit preservation of legacy entries, draft versus validated behavior, 1200/800-character limit enforcement, tutorial/chapo content, API payloads, and the revised Caselog display flow

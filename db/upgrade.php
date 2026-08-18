@@ -379,11 +379,7 @@ function xmldb_competvet_upgrade($oldversion) {
         }
 
         \mod_competvet\setup::ensure_case_versions();
-        $legacy = \mod_competvet\local\persistent\case_version::get_record(['name' => 'Legacy Caselog']);
-        if ($legacy) {
-            $DB->set_field('competvet_case_entry', 'versionid', $legacy->get('id'), ['versionid' => 0]);
-        }
-        $DB->set_field('competvet_case_entry', 'status', 'validated', ['status' => '']);
+        \mod_competvet\setup::migrate_legacy_case_entries();
         upgrade_mod_savepoint(true, 202608120400, 'competvet');
     }
     return true;

@@ -17,6 +17,7 @@
 namespace mod_competvet\local\api;
 use advanced_testcase;
 use core_user;
+use mod_competvet\setup;
 use mod_competvet\local\persistent\case_entry;
 use mod_competvet\local\persistent\case_field;
 use mod_competvet\local\persistent\case_version;
@@ -224,6 +225,81 @@ final class cases_test extends advanced_testcase {
         }
     }
 
+    /**
+     * Verify the published version contains the configured Caselog content.
+     *
+     * @return void
+     */
+    public function test_current_version_contains_configured_content(): void {
+        $current = case_version::get_current();
+        $this->assertNotNull($current);
+        $metadata = $current->read_metadata();
+        $this->assertSame('Ajouter une transmission de cas clinique', $metadata['tutorialtitle']);
+        $this->assertStringContainsString('Synthétisez un ou plusieurs cas cliniques', $metadata['tutorial']);
+        $this->assertStringContainsString('Cette section évalue votre capacité', $metadata['chapo']);
+
+        $structure = cases::get_version_structure($current->get('id'));
+        $fields = [];
+        foreach ($structure as $category) {
+            foreach ($category->fields as $field) {
+                $fields[$field->idnumber] = $field;
+            }
+        }
+
+        $expectedfields = [
+            'nom_animal', 'espece', 'num_dossier', 'date_cas', 'role_charge',
+            'transmission_clinique', 'reflexions_enseignements',
+        ];
+        foreach ($expectedfields as $idnumber) {
+            $this->assertArrayHasKey($idnumber, $fields);
+        }
+        $this->assertArrayNotHasKey('diag_final', $fields);
+        $this->assertSame('Transmission clinique (1200 caractères maximum)', $fields['transmission_clinique']->name);
+        $this->assertSame(1200, $this->get_field_config($fields['transmission_clinique'])['maxlength']);
+        $this->assertSame(800, $this->get_field_config($fields['reflexions_enseignements'])['maxlength']);
+    }
+
+    /**
+     * Verify API payloads retain version metadata for historical entries.
+     *
+     * @return void
+     */
+    public function test_get_entry_exposes_version_metadata(): void {
+        $situation = situation::get_record(['shortname' => 'SIT1']);
+        $student = core_user::get_user_by_username('student1');
+        $planning = array_shift(plannings::get_plannings_for_situation_id($situation->get('id'), $student->id));
+        $entry = array_shift(cases::get_entries($planning['id'], $student->id)->cases);
+
+        $metadata = json_decode($entry->versionmetadata, true);
+        $this->assertIsArray($metadata);
+        $this->assertSame('Ajouter un cas clinique', $metadata['tutorialtitle']);
+    }
+
+    /**
+     * Verify pre-versioned entries are migrated to the legacy version and validated.
+     *
+     * @return void
+     */
+    public function test_migrate_legacy_case_entries(): void {
+        global $DB;
+
+        $situation = situation::get_record(['shortname' => 'SIT1']);
+        $student = core_user::get_user_by_username('student1');
+        $planning = array_shift(plannings::get_plannings_for_situation_id($situation->get('id'), $student->id));
+        $entry = array_shift(cases::get_entries($planning['id'], $student->id)->cases);
+        $legacy = case_version::get_record(['name' => 'Legacy Caselog']);
+        $this->assertNotNull($legacy);
+
+        $DB->set_field('competvet_case_entry', 'versionid', 0, ['id' => $entry->id]);
+        $DB->set_field('competvet_case_entry', 'status', '', ['id' => $entry->id]);
+
+        setup::migrate_legacy_case_entries();
+
+        $migrated = case_entry::get_record(['id' => $entry->id]);
+        $this->assertSame($legacy->get('id'), $migrated->get('versionid'));
+        $this->assertSame('validated', $migrated->get('status'));
+    }
+
     /** Test that create_case assigns the current version automatically. */
     public function test_create_case_uses_current_version(): void {
         $situation = situation::get_record(['shortname' => 'SIT1']);
@@ -238,6 +314,32 @@ final class cases_test extends advanced_testcase {
         $this->assertNotNull($entry);
         $this->assertSame($current->get('id'), $entry->get('versionid'));
         $this->assertSame('validated', $entry->get('status'));
+    }
+
+    /**
+     * Verify entries from legacy and current versions can be read together.
+     *
+     * @return void
+     */
+    public function test_get_entries_supports_mixed_versions(): void {
+        $situation = situation::get_record(['shortname' => 'SIT1']);
+        $student = core_user::get_user_by_username('student1');
+        $planning = array_shift(plannings::get_plannings_for_situation_id($situation->get('id'), $student->id));
+        $current = case_version::get_current();
+        $this->assertNotNull($current);
+        $legacy = case_version::get_record(['name' => 'Legacy Caselog']);
+        $this->assertNotNull($legacy);
+        $animal = $this->get_current_field('nom_animal');
+        $species = $this->get_current_field('espece');
+        cases::create_case($planning['id'], $student->id, [
+            $animal->id => 'Current case',
+            $species->id => 'Chien',
+        ]);
+
+        $entries = cases::get_entries($planning['id'], $student->id)->cases;
+        $versionids = array_map(static fn($entry): int => $entry->versionid, $entries);
+        $this->assertContains($legacy->get('id'), $versionids);
+        $this->assertContains($current->get('id'), $versionids);
     }
 
     /** Test that create_case can save a draft. */
@@ -271,6 +373,45 @@ final class cases_test extends advanced_testcase {
         $this->assertSame($originalversion, $updated->get('versionid'));
     }
 
+    /**
+     * Verify editing a legacy entry preserves fields absent from the current form.
+     *
+     * @return void
+     */
+    public function test_update_case_preserves_legacy_values(): void {
+        $situation = situation::get_record(['shortname' => 'SIT1']);
+        $student = core_user::get_user_by_username('student1');
+        $planning = array_shift(plannings::get_plannings_for_situation_id($situation->get('id'), $student->id));
+        $entry = array_shift(cases::get_entries($planning['id'], $student->id)->cases);
+        $legacyreflection = null;
+        $datefieldid = null;
+        foreach ($entry->categories as $category) {
+            foreach ($category->fields as $field) {
+                if ($field->idnumber === 'reflexions_cas') {
+                    $legacyreflection = $field->value;
+                }
+                if ($field->idnumber === 'date_cas') {
+                    $datefieldid = $field->id;
+                }
+            }
+        }
+        $this->assertNotNull($legacyreflection);
+        $this->assertNotNull($datefieldid);
+
+        $this->setAdminUser();
+        cases::update_case($entry->id, [$datefieldid => '01 April 2024']);
+        $updated = cases::get_entry($entry->id);
+        $updatedreflection = null;
+        foreach ($updated->categories as $category) {
+            foreach ($category->fields as $field) {
+                if ($field->idnumber === 'reflexions_cas') {
+                    $updatedreflection = $field->value;
+                }
+            }
+        }
+        $this->assertSame($legacyreflection, $updatedreflection);
+    }
+
     /** Test that update_case can set draft status. */
     public function test_update_case_draft_status(): void {
         $situation = situation::get_record(['shortname' => 'SIT1']);
@@ -293,20 +434,8 @@ final class cases_test extends advanced_testcase {
         $current = case_version::get_current();
         $this->assertNotNull($current);
         $structure = cases::get_case_structure($current->get('id'));
-        // Find a field with maxlength (transmission_clinique has 1200).
-        $maxlengthfield = null;
-        foreach ($structure as $category) {
-            foreach ($category->fields as $field) {
-                $config = json_decode((string)$field->configdata, true) ?: [];
-                if (!empty($config['maxlength'])) {
-                    $maxlengthfield = $field->id;
-                    break 2;
-                }
-            }
-        }
-        $this->assertNotNull($maxlengthfield, 'Expected at least one bounded field');
-        $longvalue = str_repeat('a', 1201);
-        $fields = [$maxlengthfield => $longvalue];
+        $transmission = $this->get_current_field('transmission_clinique');
+        $fields = [$transmission->id => str_repeat('a', 1201)];
         $this->expectException(\moodle_exception::class);
         cases::validate_fields($fields, $structure);
     }
@@ -316,20 +445,56 @@ final class cases_test extends advanced_testcase {
         $current = case_version::get_current();
         $this->assertNotNull($current);
         $structure = cases::get_case_structure($current->get('id'));
-        $maxlengthfield = null;
+        $transmission = $this->get_current_field('transmission_clinique');
+        $reflection = $this->get_current_field('reflexions_enseignements');
+        $fields = [
+            $transmission->id => str_repeat('a', 1200),
+            $reflection->id => str_repeat('b', 800),
+        ];
+        // Should not throw.
+        cases::validate_fields($fields, $structure);
+    }
+
+    /**
+     * Test that character validation rejects an overlong personal reflection.
+     *
+     * @return void
+     */
+    public function test_validate_fields_rejects_overlong_reflection(): void {
+        $current = case_version::get_current();
+        $this->assertNotNull($current);
+        $structure = cases::get_case_structure($current->get('id'));
+        $reflection = $this->get_current_field('reflexions_enseignements');
+        $this->expectException(\moodle_exception::class);
+        cases::validate_fields([$reflection->id => str_repeat('a', 801)], $structure);
+    }
+
+    /**
+     * Find a field in the current published structure.
+     *
+     * @param string $idnumber Field identifier.
+     * @return object
+     */
+    private function get_current_field(string $idnumber): object {
+        $current = case_version::get_current();
+        $structure = cases::get_case_structure($current->get('id'));
         foreach ($structure as $category) {
             foreach ($category->fields as $field) {
-                $config = json_decode((string)$field->configdata, true) ?: [];
-                if (!empty($config['maxlength'])) {
-                    $maxlengthfield = $field->id;
-                    break 2;
+                if ($field->idnumber === $idnumber) {
+                    return $field;
                 }
             }
         }
-        $this->assertNotNull($maxlengthfield, 'Expected at least one bounded field');
-        $validvalue = str_repeat('a', 1200);
-        $fields = [$maxlengthfield => $validvalue];
-        // Should not throw.
-        cases::validate_fields($fields, $structure);
+        $this->fail('Current Caselog field not found: ' . $idnumber);
+    }
+
+    /**
+     * Decode a field configuration.
+     *
+     * @param object $field Caselog field.
+     * @return array
+     */
+    private function get_field_config(object $field): array {
+        return json_decode(stripslashes((string)$field->configdata), true) ?: [];
     }
 }
