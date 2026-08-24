@@ -54,11 +54,12 @@ final class grid_test extends advanced_testcase {
         $evalgrid->create();
         $criterionimporter = new criterion_importer(criterion::class);
         $criterionimporter->import($CFG->dirroot . self::SAMPLE_FILE_PATH);
-        $this->assertEquals(40, criterion::count_records(['gridid' => intval($evalgrid->get('id'))]));
-        foreach (['Q001', 'Q035'] as $critname) {
+        $this->assertEquals(38, criterion::count_records(['gridid' => intval($evalgrid->get('id'))]));
+        $expectedchildcounts = ['Q001' => 5, 'Q035' => 4];
+        foreach ($expectedchildcounts as $critname => $expectedcount) {
             $crit = criterion::get_record(['gridid' => $evalgrid->get('id'), 'idnumber' => $critname]);
             $this->assertEquals(
-                5,
+                $expectedcount,
                 criterion::count_records(['gridid' => $evalgrid->get('id'), 'parentid' => $crit->get('id')])
             );
             foreach (criterion::get_records(['gridid' => $evalgrid->get('id'), 'parentid' => $crit->get('id')]) as $c) {
@@ -84,12 +85,12 @@ final class grid_test extends advanced_testcase {
         $evalgrid->create();
         $criterionimporter = new criterion_importer(criterion::class);
         $criterionimporter->import($CFG->dirroot . self::SAMPLE_FILE_PATH);
-        $this->assertEquals(40, criterion::count_records(['gridid' => $evalgrid->get('id')]));
+        $this->assertEquals(38, criterion::count_records(['gridid' => $evalgrid->get('id')]));
         $criterionimporter = new criterion_importer(criterion::class);
         $criterionimporter->import($CFG->dirroot . self::SAMPLE_FILE_PATH);
-        $this->assertEquals(40, criterion::count_records(['gridid' => $evalgrid->get('id')]));
+        $this->assertEquals(38, criterion::count_records(['gridid' => $evalgrid->get('id')]));
         $criterionimporter->import($CFG->dirroot . self::SAMPLE_MODIFIED_FILE_PATH);
-        $this->assertEquals(40, criterion::count_records(['gridid' => $evalgrid->get('id')]));
+        $this->assertEquals(38, criterion::count_records(['gridid' => $evalgrid->get('id')]));
         $crit01 = criterion::get_record(['gridid' => $evalgrid->get('id'), 'idnumber' => 'Q001']);
         $crit02 = criterion::get_record(['gridid' => $evalgrid->get('id'), 'idnumber' => 'Q002']);
         $this->assertEquals('Savoir être bien', $crit01->get('label'));

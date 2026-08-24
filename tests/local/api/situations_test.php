@@ -120,7 +120,7 @@ final class situations_test extends advanced_testcase {
     public function test_get_all_criteria(): void {
         $situation = situation::get_record(['shortname' => 'SIT1']);
         $criteria = situations::get_all_criteria($situation->get('id'));
-        $this->assertCount(40, $criteria);
+        $this->assertCount(38, $criteria);
         $this->assertEquals([
             'id' => 1,
             'label' => 'Savoir être',

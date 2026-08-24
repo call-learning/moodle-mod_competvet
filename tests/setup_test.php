@@ -57,11 +57,12 @@ final class setup_test extends advanced_testcase {
      */
     public function test_default_grid_setup(): void {
         $evalgrid = grid::get_default_grid(grid::COMPETVET_CRITERIA_EVALUATION);
-        $this->assertEquals(40, criterion::count_records(['gridid' => $evalgrid->get('id')]));
-        foreach (['Q001', 'Q035'] as $critname) {
+        $this->assertEquals(38, criterion::count_records(['gridid' => $evalgrid->get('id')]));
+        $expectedchildcounts = ['Q001' => 5, 'Q035' => 4];
+        foreach ($expectedchildcounts as $critname => $expectedcount) {
             $crit = criterion::get_record(['gridid' => $evalgrid->get('id'), 'idnumber' => $critname]);
             $this->assertEquals(
-                5,
+                $expectedcount,
                 criterion::count_records(['gridid' => $evalgrid->get('id'), 'parentid' => $crit->get('id')])
             );
             foreach (criterion::get_records(['gridid' => $evalgrid->get('id'), 'parentid' => $crit->get('id')]) as $c) {

@@ -442,5 +442,12 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 202608240000, 'competvet');
     }
 
+    if ($oldversion < 202608240002) {
+        // Create adhoc task to fix split criteria (Q025/Q026 merge, Q038/Q039 merge, Q040→Q039 rename).
+        $task = new \mod_competvet\task\fix_split_criteria();
+        \core\task\manager::queue_adhoc_task($task, true);
+        upgrade_mod_savepoint(true, 202608240002, 'competvet');
+    }
+
     return true;
 }
