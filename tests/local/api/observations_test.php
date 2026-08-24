@@ -128,7 +128,7 @@ final class observations_test extends advanced_testcase {
         $this->assertEquals(1, observation_comment::count_records(['observationid' => $observationid,
             'type' => observation_comment::OBSERVATION_PRIVATE_COMMENT, ]));
         $this->assertEquals(7, observation_criterion_level::count_records(['observationid' => $observationid]));
-        $this->assertEquals(33, observation_criterion_comment::count_records(['observationid' => $observationid]));
+        $this->assertEquals(31, observation_criterion_comment::count_records(['observationid' => $observationid]));
         foreach (array_filter($criteria, fn($crit) => isset($crit['level'])) as $critelevel) {
             $this->assertEquals(
                 $critelevel['level'],

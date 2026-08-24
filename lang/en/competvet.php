@@ -584,6 +584,7 @@ $string['tabletitle:evals'] = 'Observations';
 $string['tagarea_competvet_situation'] = 'Situations';
 $string['tagcollection_situations'] = 'Situations';
 $string['task:cleanup'] = 'Clean up CompetVet data';
+$string['task:fix_split_criteria'] = 'Fix split criteria (Q025/Q026 merge, Q038/Q039 merge and Q040→Q039 rename)';
 $string['task:refresh_progression'] = 'Refresh competency progression results';
 $string['timegraded'] = 'Time graded';
 $string['todo:action'] = 'Action';
