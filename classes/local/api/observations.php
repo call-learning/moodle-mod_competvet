@@ -215,6 +215,9 @@ class observations {
         ?array $comments = [],
         ?array $criteria = []
     ): int {
+        // Guard: reject writes to historical plannings.
+        plannings::check_write_allowed($planningid);
+
         global $USER;
         $observation = new observation(0);
         $observation->set('category', $category);
@@ -319,11 +322,15 @@ class observations {
         array $comments = [],
         array $criteria = [],
     ) {
-        global $USER;
         $observation = observation::get_record(['id' => $observationid]);
         if (!$observation) {
             throw new \moodle_exception('invalidobservationid', 'competvet');
         }
+
+        // Guard: reject writes to historical plannings.
+        plannings::check_write_allowed($observation->get('planningid'));
+
+        global $USER;
         // We now set the status to completed as we have seen and saved the observation.
         $observation->set('status', observation::STATUS_COMPLETED);
         $observation->update();

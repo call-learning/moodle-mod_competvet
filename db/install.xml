@@ -499,5 +499,21 @@
         <INDEX NAME="student_planning_ix" UNIQUE="false" FIELDS="studentid, planningid"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="competvet_group_history" COMMENT="Stores historical metadata for plannings whose Moodle group has been deleted.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="planningid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="groupname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="planning_fk" TYPE="foreign" FIELDS="planningid" REFTABLE="competvet_planning" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="planning_ux" UNIQUE="true" FIELDS="planningid"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>

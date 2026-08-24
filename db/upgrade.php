@@ -210,7 +210,6 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2024101603, 'competvet');
     }
     if ($oldversion < 2024112600) {
-
         // Define table competvet_planning_pause to be created.
         $table = new xmldb_table('competvet_planning_pause');
 
@@ -237,7 +236,6 @@ function xmldb_competvet_upgrade($oldversion) {
     }
 
     if ($oldversion < 2024120401) {
-
         // Define field recipientid to be added to competvet_notification.
         $table = new xmldb_table('competvet_notification');
         $field = new xmldb_field('recipientid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'competvetid');
@@ -281,7 +279,6 @@ function xmldb_competvet_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025021004) {
-
         // Define field textvalue to be added to competvet_case_data.
         $table = new xmldb_table('competvet_case_data');
         $field = new xmldb_field('textvalue', XMLDB_TYPE_TEXT, null, null, null, null, null, 'charvalue');
@@ -304,7 +301,6 @@ function xmldb_competvet_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025031000) {
-
         // Define field haslettergrades to be added to competvet_situation.
         $table = new xmldb_table('competvet_situation');
         $field = new xmldb_field('haslettergrades', XMLDB_TYPE_INTEGER, '1', null, null, null, '1', 'hascase');
@@ -417,5 +413,34 @@ function xmldb_competvet_upgrade($oldversion) {
         }
         upgrade_mod_savepoint(true, 202608230001, 'competvet');
     }
+
+    if ($oldversion < 202608240000) {
+        // Define table competvet_group_history to be created.
+        $table = new xmldb_table('competvet_group_history');
+
+        // Adding fields to table competvet_group_history.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('planningid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('groupname', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table competvet_group_history.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('planning_fk', XMLDB_KEY_FOREIGN, ['planningid'], 'competvet_planning', ['id']);
+
+        // Conditionally launch create table for competvet_group_history.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        $table = new xmldb_table('competvet_group_history');
+        $index = new xmldb_index('planning_ux', XMLDB_INDEX_UNIQUE, ['planningid']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        upgrade_mod_savepoint(true, 202608240000, 'competvet');
+    }
+
     return true;
 }

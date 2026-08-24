@@ -20,9 +20,11 @@ use core_date;
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\case_entry;
 use mod_competvet\local\persistent\cert_decl;
+use mod_competvet\local\persistent\group_history;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\planning_pause;
+use mod_competvet\local\persistent\situation;
 use mod_competvet\utils;
 
 defined('MOODLE_INTERNAL') || die();
@@ -43,7 +45,58 @@ class plannings {
     /**
      * Planning fields managed in the API
      */
-    const API_PLANNING_FIELDS = ['id', 'situationid', 'startdate', 'enddate', 'session', 'session', 'groupid', 'groupname'];
+    const API_PLANNING_FIELDS = [
+        'id', 'situationid', 'startdate', 'enddate', 'session', 'session',
+        'groupid', 'groupname', 'historical', 'readonly',
+    ];
+
+    /**
+     * Resolve historical metadata for a planning.
+     *
+     * Returns an array with:
+     *  - historical: bool - true if the planning's group no longer exists
+     *  - readonly: bool - true if the planning is historical (and thus read-only)
+     *  - groupname: string - current group name, preserved history name, or fallback
+     *
+     * @param int $planningid The planning ID.
+     * @return array The metadata array.
+     */
+    public static function resolve_planning_metadata(int $planningid): array {
+        global $DB;
+        $planning = planning::get_record(['id' => $planningid]);
+        if (!$planning) {
+            return ['historical' => false, 'readonly' => false, 'groupname' => ''];
+        }
+
+        $groupid = $planning->get('groupid');
+        $situation = $planning->get_situation();
+        $competvet = competvet::get_from_situation_id($situation->get('id'));
+        $courseid = $competvet->get_course_module()->course;
+
+        // Check if the group exists within the planning's course context.
+        $groupexists = $DB->record_exists('groups', ['id' => $groupid]);
+
+        if ($groupexists) {
+            // Normal planning: use the current group name.
+            return [
+                'historical' => false,
+                'readonly' => false,
+                'groupname' => groups_get_group_name($groupid),
+            ];
+        }
+
+        // Historical planning: look for preserved group name.
+        $historicalname = group_history::get_group_name_for_planning($planningid);
+        $groupname = $historicalname !== null
+            ? $historicalname
+            : get_string('historicalgroupunknown', 'mod_competvet', $groupid);
+
+        return [
+            'historical' => true,
+            'readonly' => true,
+            'groupname' => $groupname,
+        ];
+    }
 
     /**
      * Get planning for a given situation ID
@@ -51,12 +104,14 @@ class plannings {
      * @param int $situationid situation ID
      * @param int $userid user ID
      * @param bool $nofuture do not show future situation
+     * @param bool $viewall if true, return plannings for all groups even when the user is a student
      * @return array array of plannings
      */
     public static function get_plannings_for_situation_id(
         int $situationid,
         int $userid,
-        bool $nofuture = true
+        bool $nofuture = true,
+        bool $viewall = false
     ): array {
         // Check if user has access to this situation, else throw an error.
         $competvet = competvet::get_from_situation_id($situationid);
@@ -69,31 +124,45 @@ class plannings {
         $planningfilters = [
             'situationid' => $situationid,
         ];
-        $planninngssql = 'situationid = :situationid';
-        if ($isstudent) {
+        $planninngsql = 'situationid = :situationid';
+        $allusergroupsid = [];
+        if ($isstudent && !$viewall) {
             global $DB;
-            // Remove planning for which this user is not involved.
+            // For historical plannings, include them even if the student is not in any group.
+            // For normal plannings, filter by group membership.
             $allusergroups = groups_get_all_groups($situationcontext->get_course_context()->instanceid, $userid);
             $allusergroupsid = array_keys($allusergroups);
             if (empty($allusergroupsid)) {
-                return [];
+                // No groups - only return historical plannings (where group doesn't exist).
+                // We'll filter these out later after fetching all plannings.
+                $planninngsql .= ' AND 1=1';
+            } else {
+                [$sql, $params] = $DB->get_in_or_equal($allusergroupsid, SQL_PARAMS_NAMED, 'allusergroupsid');
+                $planninngsql .= " AND groupid $sql";
+                $planningfilters = array_merge($planningfilters, $params);
             }
-            [$sql, $params] = $DB->get_in_or_equal($allusergroupsid, SQL_PARAMS_NAMED, 'allusergroupsid');
-            $planninngssql .= " AND groupid $sql";
-            $planningfilters = array_merge($planningfilters, $params);
         }
         if ($nofuture) {
             $clock = \core\di::get(\core\clock::class);
             $nextmonday = $clock->now();
             $nextmonday = $nextmonday->modify('next Monday');
             $planningfilters['minstartdate'] = $nextmonday->getTimestamp();
-            $planninngssql .= " AND startdate < :minstartdate";
+            $planninngsql .= " AND startdate < :minstartdate";
         }
-        $allplannings = planning::get_records_select($planninngssql, $planningfilters, 'startdate ASC');
+        $allplannings = planning::get_records_select($planninngsql, $planningfilters, 'startdate ASC');
         $plannings = [];
         foreach ($allplannings as $planning) {
             $newplanning = (array) $planning->to_record();
-            $newplanning['groupname'] = groups_get_group_name($planning->get('groupid'));
+            $metadata = self::resolve_planning_metadata($planning->get('id'));
+            $newplanning['groupname'] = $metadata['groupname'];
+            $newplanning['historical'] = $metadata['historical'];
+            $newplanning['readonly'] = $metadata['readonly'];
+
+            // When the student is not in any group, only return historical plannings.
+            if ($isstudent && !$viewall && empty($allusergroupsid) && !$metadata['historical']) {
+                continue;
+            }
+
             $newplanning = array_intersect_key($newplanning, array_fill_keys(self::API_PLANNING_FIELDS, 0));
             $plannings[] = $newplanning;
         }
@@ -156,10 +225,36 @@ class plannings {
     /**
      * Retrieves the users which are students  associated with a given planning ID.
      *
+     * For normal plannings, uses Moodle group membership.
+     * For historical plannings (group deleted), derives participants from CompetVet records.
+     *
      * @param int $planningid The ID of the planning.
      * @return array An array of users.
      */
     public static function get_students_for_planning_id(int $planningid): array {
+        $planning = planning::get_record(['id' => $planningid]);
+        if (!$planning) {
+            return [];
+        }
+
+        $metadata = self::resolve_planning_metadata($planningid);
+
+        if (!$metadata['historical']) {
+            // Normal planning: use Moodle group membership.
+            return self::get_students_from_group_membership($planningid);
+        }
+
+        // Historical planning: derive from CompetVet records.
+        return self::get_students_from_records($planningid);
+    }
+
+    /**
+     * Get students from Moodle group membership (normal planning path).
+     *
+     * @param int $planningid The planning ID.
+     * @return array An array of user objects.
+     */
+    protected static function get_students_from_group_membership(int $planningid): array {
         $planning = planning::get_record(['id' => $planningid]);
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         $situationcontext = $competvet->get_context();
@@ -171,6 +266,52 @@ class plannings {
             }
         }
         return $groupmembers;
+    }
+
+    /**
+     * Get students from CompetVet records (historical planning path).
+     *
+     * Collects distinct student IDs from observations, certifications, cases,
+     * and grades attached to the planning, then loads user objects.
+     *
+     * @param int $planningid The planning ID.
+     * @return array An array of user objects.
+     */
+    protected static function get_students_from_records(int $planningid): array {
+        global $DB;
+
+        // Collect distinct student IDs from all planning-scoped CompetVet records.
+        $sql = "SELECT DISTINCT o.studentid
+                  FROM {competvet_observation} o
+                 WHERE o.planningid = :planningid
+                UNION
+                SELECT DISTINCT cd.studentid
+                  FROM {competvet_cert_decl} cd
+                 WHERE cd.planningid = :planningid2
+                UNION
+                SELECT DISTINCT ce.studentid
+                  FROM {competvet_case_entry} ce
+                 WHERE ce.planningid = :planningid3";
+
+        $params = [
+            'planningid' => $planningid,
+            'planningid2' => $planningid,
+            'planningid3' => $planningid,
+        ];
+
+        $studentids = $DB->get_fieldset_sql($sql, $params);
+        if (empty($studentids)) {
+            return [];
+        }
+
+        [$insql, $inparams] = $DB->get_in_or_equal($studentids, SQL_PARAMS_NAMED, 'sid');
+        $sql = "SELECT u.*
+                  FROM {user} u
+                 WHERE u.id $insql
+                   AND u.deleted = 0
+              ORDER BY u.lastname, u.firstname";
+
+        return $DB->get_records_sql($sql, $inparams);
     }
 
     /**
@@ -236,7 +377,10 @@ class plannings {
             $planningarray,
             array_fill_keys(['id', 'startdate', 'enddate', 'session', 'groupid', 'situationid'], 0)
         );
-        $planningarray['groupname'] = groups_get_group_name($planning->get('groupid'));
+        $metadata = self::resolve_planning_metadata($planningid);
+        $planningarray['groupname'] = $metadata['groupname'];
+        $planningarray['historical'] = $metadata['historical'];
+        $planningarray['readonly'] = $metadata['readonly'];
         $planningarray['situationname'] = $competvet->get_course_module()->name;
         $planningarray['cmid'] = $competvet->get_course_module()->id;
         return $planningarray;
@@ -446,6 +590,20 @@ class plannings {
         string $enddate,
         string $session
     ): void {
+        // Guard: reject writes to historical plannings.
+        self::check_write_allowed($planningid);
+
+        $startdatets = strtotime($startdate);
+        $enddatets = strtotime($enddate);
+
+        // Find an existing planning matching the DB unique key to keep this operation idempotent.
+        $existingplanning = planning::get_record([
+            'situationid' => $situationid,
+            'groupid' => $groupid,
+            'startdate' => $startdatets,
+            'enddate' => $enddatets,
+            'session' => $session,
+        ]);
         $planning = planning::get_record(['id' => $planningid]);
         if (!$planning) {
             $planning = new planning(0);
@@ -468,6 +626,9 @@ class plannings {
      * @param int $planningid - The planning id
      */
     public static function delete_planning(int $planningid): void {
+        // Guard: reject writes to historical plannings.
+        self::check_write_allowed($planningid);
+
         $planning = planning::get_record(['id' => $planningid]);
         if ($planning) {
             $planning->delete();
@@ -584,5 +745,159 @@ class plannings {
             }
         }
         return false;
+    }
+
+    /**
+     * Check if a planning is historical (group deleted) and throw an error if so.
+     *
+     * This guard should be called before any planning-scoped mutation
+     * (planning updates, evaluation CRUD, certification, cases, forms, deletions).
+     *
+     * @param int $planningid The planning ID to check.
+     * @return void
+     * @throws \moodle_exception If the planning is historical and write is not allowed.
+     */
+    public static function check_write_allowed(int $planningid): void {
+        $metadata = self::resolve_planning_metadata($planningid);
+        if ($metadata['historical']) {
+            throw new \moodle_exception(
+                'historicalplanningreadonly',
+                'mod_competvet',
+                '',
+                get_string('historicalplanningreadonly', 'mod_competvet')
+            );
+        }
+    }
+
+    /**
+     * Detect plannings whose referenced Moodle groups no longer exist.
+     *
+     * Returns an array of objects with missing-group information.
+     *
+     * @param int|null $situationid Optional filter by situation ID.
+     * @param int|null $planningid  Optional filter by planning ID.
+     * @return array Array of objects with missing-group details.
+     */
+    public static function detect_missing_groups(?int $situationid = null, ?int $planningid = null): array {
+        global $DB;
+
+        // Build the planning filter.
+        $planningfilter = [];
+        if ($situationid !== null) {
+            $planningfilter['situationid'] = $situationid;
+        }
+        if ($planningid !== null) {
+            $planningfilter['id'] = $planningid;
+        }
+
+        $plannings = empty($planningfilter) ? planning::get_records() : planning::get_records($planningfilter);
+
+        $missing = [];
+        foreach ($plannings as $planning) {
+            $groupid = $planning->get('groupid');
+            if (empty($groupid)) {
+                continue;
+            }
+
+            $situation = situation::get_record(['id' => $planning->get('situationid')]);
+            if (!$situation) {
+                continue;
+            }
+            $competvet = competvet::get_from_situation($situation);
+            $courseid = $competvet->get_course_module()->course;
+
+            // Check if the group exists within the planning's course context.
+            $groupexists = groups_group_exists($groupid);
+
+            if ($groupexists) {
+                continue;
+            }
+
+            // Group is missing. Check for history.
+            $hashistory = group_history::has_history_for_planning($planning->get('id'));
+            $historyname = $hashistory ? group_history::get_group_name_for_planning($planning->get('id')) : null;
+
+            $missing[] = (object) [
+                'planningid' => $planning->get('id'),
+                'situationid' => $planning->get('situationid'),
+                'situationname' => $situation->get('shortname'),
+                'groupid' => $groupid,
+                'groupname' => groups_get_group_name($groupid),
+                'session' => $planning->get('session'),
+                'startdate' => $planning->get('startdate'),
+                'enddate' => $planning->get('enddate'),
+                'history_present' => $hashistory,
+                'history_name' => $historyname,
+            ];
+        }
+
+        return $missing;
+    }
+
+    /**
+     * Import group-history metadata for a planning.
+     *
+     * Returns an array of result objects with status, planningid, groupname, and message.
+     *
+     * @param array $rows Array of [planningid, groupname] pairs.
+     * @param bool $dryrun If true, only preview without writing.
+     * @return array Array of result objects.
+     */
+    public static function import_group_history(array $rows, bool $dryrun = false): array {
+        $results = [];
+
+        foreach ($rows as $row) {
+            [$planningid, $groupname] = $row;
+            $planningid = (int) $planningid;
+
+            // Validate planning exists.
+            $planning = planning::get_record(['id' => $planningid]);
+            if (!$planning) {
+                $results[] = (object) [
+                    'status' => 'error',
+                    'planningid' => $planningid,
+                    'groupname' => $groupname,
+                    'message' => "Planning {$planningid} does not exist.",
+                ];
+                continue;
+            }
+
+            // Idempotent upsert.
+            $existing = group_history::get_for_planning($planningid);
+            if ($existing) {
+                $results[] = (object) [
+                    'status' => 'duplicate',
+                    'planningid' => $planningid,
+                    'groupname' => $groupname,
+                    'message' => "History already exists for planning {$planningid}.",
+                ];
+                continue;
+            }
+
+            if ($dryrun) {
+                $results[] = (object) [
+                    'status' => 'dryrun',
+                    'planningid' => $planningid,
+                    'groupname' => $groupname,
+                    'message' => "Would create history for planning {$planningid}, name '{$groupname}'.",
+                ];
+            } else {
+                $history = new group_history(0, (object) [
+                    'planningid' => $planningid,
+                    'groupname' => $groupname,
+                    'timecreated' => time(),
+                    'timemodified' => time(),
+                ]);
+                $history->create();
+                $results[] = (object) [
+                    'status' => 'created',
+                    'planningid' => $planningid,
+                    'groupname' => $groupname,
+                    'message' => "Created history for planning {$planningid}, name '{$groupname}'.",
+                ];
+            }
+        }
+
+        return $results;
     }
 }

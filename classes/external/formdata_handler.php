@@ -85,6 +85,9 @@ class formdata_handler extends external_api {
 
         $userid = $params['userid'];
         $planningid = $params['planningid'];
+
+        // Guard: reject writes to historical plannings.
+        \mod_competvet\local\api\plannings::check_write_allowed($planningid);
         $graderid = $USER->id;
         $formname = $params['formname'];
         $json = $params['json'];

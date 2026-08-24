@@ -123,6 +123,7 @@ class plannings extends base {
             ['reportid' => $progressionreportid, 'id' => $this->cmid]
         );
 
+        $historicalplannings = [];
         foreach ($planningstatsbycategory as $categorytext => $planningstats) {
             $category = new stdClass();
             $category->categorytext = $categorytext;
@@ -130,6 +131,45 @@ class plannings extends base {
             $category->plannings = [];
             foreach ($planningstats as $planningstat) {
                 $planning = $planningwithids[$planningstat['id']];
+
+                // Separate historical plannings into their own flat list.
+                if (!empty($planning['historical'])) {
+                    $planningresult = new stdClass();
+                    $planningresult->id = $planningstat['id'];
+                    $planningresult->starttimestamp = $planning['startdate'];
+                    $planningresult->endtimestamp = $planning['enddate'];
+                    $planningresult->startdate = planning::get_planning_date_string($planning['startdate']);
+                    $planningresult->enddate = planning::get_planning_date_string($planning['enddate']);
+                    $planningresult->groupname = $planning['groupname'];
+                    $planningresult->session = $planning['session'];
+                    $planningresult->historical = true;
+                    $planningresult->readonly = true;
+                    $planningresult->nbstudents = $planningstat['stats']['nbstudents'];
+                    $studentswithreporturl = [];
+                    foreach ($planningstat['stats']['students'] as $student) {
+                        $caselogreporturl = clone $caselogreportbaseurl;
+                        $caselogreporturl->param('returnurl', $returnurl);
+                        $caselogreporturl->param('parameters[studentid]', $student->id);
+                        $caselogreporturl->param('parameters[planningid]', $planningstat['id']);
+                        $student->caselogreporturl = ($caselogreporturl)->out(false);
+
+                        $progressionreporturl = clone $progressionreportbaseurl;
+                        $progressionreporturl->param('returnurl', $returnurl);
+                        $progressionreporturl->param('parameters[studentid]', $student->id);
+                        $progressionreporturl->param('parameters[planningid]', $planningstat['id']);
+                        $student->progressionreporturl = ($progressionreporturl)->out(false);
+
+                        $studentswithreporturl[] = $student;
+                    }
+                    $planningresult->students = $studentswithreporturl;
+                    $planningresult->viewurl = (new moodle_url(
+                        $this->viewplanning,
+                        ['planningid' => $planningstat['id']]
+                    ))->out(false);
+                    $historicalplannings[] = $planningresult;
+                    continue;
+                }
+
                 $planningresult = new stdClass();
                 $planningresult->id = $planningstat['id'];
                 $planningresult->starttimestamp = $planning['startdate'];
@@ -138,6 +178,8 @@ class plannings extends base {
                 $planningresult->enddate = planning::get_planning_date_string($planning['enddate']);
                 $planningresult->groupname = $planning['groupname'];
                 $planningresult->session = $planning['session'];
+                $planningresult->historical = false;
+                $planningresult->readonly = false;
                 $planningresult->nbstudents = $planningstat['stats']['nbstudents'];
                 $studentswithreporturl = [];
                 foreach ($planningstat['stats']['students'] as $student) {
@@ -166,6 +208,16 @@ class plannings extends base {
             }
             $data['categories'][] = $category;
         }
+
+        // Append historical plannings as a flat list at the end.
+        if (!empty($historicalplannings)) {
+            $historicalcategory = new stdClass();
+            $historicalcategory->categorytext = get_string('historicalplanning', 'mod_competvet');
+            $historicalcategory->categoryid = 'historical';
+            $historicalcategory->plannings = $historicalplannings;
+            $data['categories'][] = $historicalcategory;
+        }
+
         $data['situationname'] = $this->situationname;
         $data['isgrader'] = $this->isgrader;
         return $data;

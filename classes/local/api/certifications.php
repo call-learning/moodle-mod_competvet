@@ -88,6 +88,9 @@ class certifications {
         int $commentformat,
         int $status
     ) {
+        // Guard: reject writes to historical plannings.
+        plannings::check_write_allowed($planningid);
+
         $cert = new cert_decl();
         $cert->set('criterionid', $criterionid);
         $cert->set('studentid', $studentid);
@@ -117,6 +120,10 @@ class certifications {
         ?int $commentformat = null,
         ?int $status = null
     ): bool {
+        // Guard: reject writes to historical plannings.
+        $cert = new cert_decl($declid);
+        plannings::check_write_allowed($cert->get('planningid'));
+
         $arguments = compact('level', 'comment', 'commentformat', 'status');
         $arguments = array_filter($arguments, function ($value) {
             return $value !== null;
@@ -137,6 +144,8 @@ class certifications {
      */
     public static function delete_cert_declaration($declid) {
         $cert = new cert_decl($declid);
+        // Guard: reject writes to historical plannings.
+        plannings::check_write_allowed($cert->get('planningid'));
         if ($cert->delete()) {
             return true;
         }

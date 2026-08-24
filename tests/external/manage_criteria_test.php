@@ -156,7 +156,6 @@ final class manage_criteria_test extends \advanced_testcase {
         ], $grid->get('type'));
         $this->assertTrue($result['result']);
 
-
         // I can still get the criteria.
         $this->setUser($this->getDataGenerator()->create_user());
         $criteria = $this->manage_criteria_get(

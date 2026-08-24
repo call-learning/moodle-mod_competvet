@@ -156,6 +156,9 @@ class cases {
         int $studentid,
         array $fields
     ): int {
+        // Guard: reject writes to historical plannings.
+        plannings::check_write_allowed($planningid);
+
         // Create the case.
         $case = new case_entry();
         $case->set('planningid', $planningid);
@@ -194,6 +197,8 @@ class cases {
         if (!$case->can_edit()) {
             throw new \moodle_exception('cannoteditcaselog', 'competvet');
         }
+        // Guard: reject writes to historical plannings.
+        plannings::check_write_allowed($case->get('planningid'));
         self::validate_fields($fields, self::get_case_structure($case->get('versionid')));
         foreach ($fields as $fieldid => $value) {
             $records = case_data::get_records(['entryid' => $entryid, 'fieldid' => $fieldid], 'timecreated');
@@ -227,6 +232,8 @@ class cases {
         if (!$case->can_delete()) {
             throw new \moodle_exception('cannotdeletecaselog', 'competvet');
         }
+        // Guard: reject writes to historical plannings.
+        plannings::check_write_allowed($case->get('planningid'));
         try {
             $case->delete();
             $data = case_data::get_records(['entryid' => $entryid]);
