@@ -42,6 +42,11 @@ use mod_competvet\reportbuilder\local\entities\situation;
  */
 class planning_external_format extends system_report {
     /**
+     * Date format for export.
+     */
+    const DATE_FORMAT = '%d/%m/%Y %H:%M';
+
+    /**
      * Initialise the report
      */
     protected function initialise(): void {
@@ -80,12 +85,13 @@ class planning_external_format extends system_report {
         // Now also join the
         // Now we can call our helper methods to add the content we want to include in the report.
         $this->add_columns();
+        $this->add_date_columns($planningentity);
         $this->add_pauses_columns($planningentity);
         $this->add_filters();
 
         // Here we do this intentionally as any button inserted in the page results in a javascript error.
         // This is due to fact that if we insert it in an existing form this will nest the form and this is not allowed.
-        $hasfilters = $this->get_parameter('hasfilters', false, PARAM_BOOL);
+        $hasfilters = (bool) $this->get_parameter('hasfilters', false, PARAM_BOOL);
         $this->set_downloadable(true);
         $this->set_filter_form_default($hasfilters);
     }
@@ -98,19 +104,52 @@ class planning_external_format extends system_report {
      */
     protected function add_columns(): void {
         $columns = [
-            'planning:startdate',
-            'planning:enddate',
             'planning:session',
             'group:name',
         ];
 
         $this->add_columns_from_entities($columns);
-        // Add pause columns (we have as many column as the max of pauses for a planning).
+        $this->get_column('group:name')->set_title(
+            new lang_string('planning_external_format:groupname', 'mod_competvet')
+        );
+        $this->get_column('planning:session')->set_title(
+            new lang_string('planning_external_format:session', 'mod_competvet')
+        );
+    }
 
-        $this->get_column('group:name')->set_title(new lang_string('group'));
+    /**
+     * Add date columns to the report.
+     *
+     * @param planning $planningentity The planning entity.
+     * @return void
+     */
+    protected function add_date_columns(planning $planningentity): void {
 
-        // Default sorting.
-        $this->set_initial_sort_column('planning:startdate', SORT_ASC);
+        $planningalias = $planningentity->get_table_alias('competvet_planning');
+        $column = (new column(
+            'startdatets',
+            new lang_string('planning_external_format:startdate', 'mod_competvet'),
+            $planningentity->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->set_type(column::TYPE_TIMESTAMP)
+            ->add_fields("{$planningalias}.startdate")
+            ->set_is_sortable(true)
+            ->add_callback([format::class, 'userdate'], self::DATE_FORMAT);
+
+        $this->add_column($column);
+        $column = (new column(
+            'enddatets',
+            new lang_string('planning_external_format:enddate', 'mod_competvet'),
+            $planningentity->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->set_type(column::TYPE_TIMESTAMP)
+            ->add_fields("{$planningalias}.enddate")
+            ->set_is_sortable(true)
+            ->add_callback([format::class, 'userdate'], self::DATE_FORMAT);
+        $this->add_column($column);
+        $this->set_initial_sort_column('planning:startdatets', SORT_ASC);
     }
 
     /**
@@ -152,7 +191,7 @@ class planning_external_format extends system_report {
             $this->add_column(
                 new column(
                     "pause_{$i}_startdate",
-                    new lang_string('planning_pause_export:startdate', 'mod_competvet', $i),
+                    new lang_string('planning_external_format:planningpausestart', 'mod_competvet', $i),
                     $planningentity->get_entity_name()
                 )
             )
@@ -165,14 +204,18 @@ class planning_external_format extends system_report {
                             return '';
                         }
                         $dates = explode('|', $row->startdates);
-                        return isset($dates[$i - 1]) ? format::userdate(intval($dates[$i - 1]), $row) : '';
+                        return isset($dates[$i - 1]) ? format::userdate(
+                            intval($dates[$i - 1]),
+                            $row,
+                            self::DATE_FORMAT
+                        ) : '';
                     }
                 );
 
             $this->add_column(
                 new column(
                     "pause_{$i}_enddate",
-                    new lang_string('planning_pause_export:enddate', 'mod_competvet', $i),
+                    new lang_string('planning_external_format:planningpauseend', 'mod_competvet', $i),
                     $planningentity->get_entity_name()
                 )
             )
@@ -185,7 +228,11 @@ class planning_external_format extends system_report {
                             return '';
                         }
                         $dates = explode('|', $row->enddates);
-                        return isset($dates[$i - 1]) ? format::userdate(intval($dates[$i - 1]), $row) : '';
+                        return isset($dates[$i - 1]) ? format::userdate(
+                            intval($dates[$i - 1]),
+                            $row,
+                            self::DATE_FORMAT
+                        ) : '';
                     }
                 );
         }
