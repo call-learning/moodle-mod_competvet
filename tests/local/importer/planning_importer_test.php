@@ -134,6 +134,69 @@ final class planning_importer_test extends advanced_testcase {
     }
 
     /**
+     * Test import planning with dates containing seconds (Excel export format).
+     */
+    public function test_import_planning_with_seconds_in_dates(): void {
+        global $CFG;
+        $this->resetAfterTest();
+        $data = [
+            'course 1' => [
+                'users' => [
+                    'student' => ['student1'],
+                    'manager' => ['manager'],
+                ],
+                'groups' => [
+                    'Group1' => [
+                        'users' => ['student1'],
+                    ],
+                ],
+                'activities' => [
+                    'SIT1' => [
+                        'category' => 'Y1',
+                    ],
+                ],
+            ],
+        ];
+        $this->prepare($data);
+        $situation = situation::get_record(['shortname' => 'SIT1']);
+        $competvet = competvet::get_from_situation($situation);
+
+        // Create a temporary CSV with seconds in the date (Excel export format).
+        $csvcontent = "Group Name;Start Date;End Date;Session;Pause_start_1;Pause_end_1\n"
+            . "Group1;01/09/2024 00:00:00;07/09/2024 23:00:00;session-seconds;02/09/2024 00:00:00;03/09/2024 23:00:00\n";
+        $tmpfile = tempnam($CFG->tempdir, 'planning_test_');
+        file_put_contents($tmpfile, $csvcontent);
+
+        $importer = new planning_importer(planning::class, $competvet->get_course_id(), $situation->get('id'));
+        $importer->import($tmpfile);
+        unlink($tmpfile);
+
+        $planning = planning::get_record(['situationid' => $situation->get('id'), 'session' => 'session-seconds']);
+        $this->assertNotFalse($planning, 'Planning with seconds-format dates should import successfully.');
+        $this->assertEquals(
+            '00:00',
+            \core_date::strftime('%H:%M', $planning->get('startdate')),
+        );
+        $this->assertEquals(
+            '23:00',
+            \core_date::strftime('%H:%M', $planning->get('enddate')),
+        );
+
+        // Verify pause dates were also parsed correctly with seconds.
+        $pauses = planning_pause::get_records(['planningid' => $planning->get('id')]);
+        $this->assertCount(1, $pauses);
+        $pause = reset($pauses);
+        $this->assertEquals(
+            '00:00',
+            \core_date::strftime('%H:%M', $pause->get('startdate')),
+        );
+        $this->assertEquals(
+            '23:00',
+            \core_date::strftime('%H:%M', $pause->get('enddate')),
+        );
+    }
+
+    /**
      * Test import planning avec planning existant (mise à jour).
      */
     public function test_import_planning_with_existing(): void {

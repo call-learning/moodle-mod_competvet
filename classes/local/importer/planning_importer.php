@@ -205,13 +205,24 @@ class planning_importer extends base_persistent_importer {
         // Check if time is included in the date string.
         if (strpos($datestring, ':') !== false) {
             $format = 'd/m/Y H:i';
+            // Try first without the second.
+            $dt = DateTime::createFromFormat($format, $datestring);
+            if ($dt === false) {
+                $format = 'd/m/Y H:i:s';
+                // Sometimes excel converts dates to strings with seconds, so we need to deal with this.
+                $dt = DateTime::createFromFormat($format, $datestring);
+                if ($dt === false) {
+                    throw new \moodle_exception('invaliddate', 'mod_competvet', null, $datestring);
+                }
+            }
         } else {
             $format = 'd/m/Y';
+            $dt = DateTime::createFromFormat($format, $datestring);
+            if ($dt === false) {
+                throw new \moodle_exception('invaliddate', 'mod_competvet', null, $datestring);
+            }
         }
-        $dt = DateTime::createFromFormat($format, $datestring);
-        if ($dt === false) {
-            throw new \moodle_exception('invaliddate', 'mod_competvet', null, $datestring);
-        }
+
         $year = (int) $dt->format('Y');
         if ($year < 1900 || $year > 2099) {
             throw new \moodle_exception('invaliddate', 'mod_competvet', null, $datestring);
