@@ -145,6 +145,11 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
             'usermodified', 'timecreated', 'timemodified',
         ]);
 
+        $grouphistories = new backup_nested_element('grouphistories');
+        $grouphistory = new backup_nested_element('grouphistory', ['id'], [
+            'planningid', 'groupname', 'timecreated', 'timemodified',
+        ]);
+
         $casefieldsmap = new backup_nested_element('casefieldsmap');
         $casefieldmap = new backup_nested_element('casefieldmap', ['id'], [
             'fieldid', 'situationid',
@@ -209,6 +214,9 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
         $planning->add_child($formdatas);
         $formdatas->add_child($formdata);
 
+        $planning->add_child($grouphistories);
+        $grouphistories->add_child($grouphistory);
+
         $casefield->add_child($casefieldsmap);
         $casefieldsmap->add_child($casefieldmap);
 
@@ -234,6 +242,7 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
             $caseentry->set_source_table('competvet_case_entry', ['planningid' => backup::VAR_PARENTID]);
             $casedata->set_source_table('competvet_case_data', ['entryid' => backup::VAR_PARENTID]);
             $formdata->set_source_table('competvet_formdata', ['planningid' => backup::VAR_PARENTID]);
+            $grouphistory->set_source_table('competvet_group_history', ['planningid' => backup::VAR_PARENTID]);
             $casefieldmap->set_source_table('competvet_case_fields', ['fieldid' => backup::VAR_PARENTID]);
         }
         // Define id annotations.
@@ -279,6 +288,7 @@ class backup_competvet_activity_structure_step extends backup_activity_structure
         $formdata->annotate_ids('user', 'userid');
         $formdata->annotate_ids('planning', 'planningid');
         $formdata->annotate_ids('user', 'graderid');
+        $grouphistory->annotate_ids('planning', 'planningid');
         $casefieldmap->annotate_ids('casefield', 'fieldid');
         $casefieldmap->annotate_ids('situation', 'situationid');
         $grid->annotate_ids('user', 'usermodified');

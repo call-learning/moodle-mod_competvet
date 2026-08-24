@@ -76,6 +76,10 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
             );
         $formdata =
             new restore_path_element('formdata', '/activity/competvet/situations/situation/plannings/planning/formdatas/formdata');
+        $grouphistory = new restore_path_element(
+            'grouphistory',
+            '/activity/competvet/situations/situation/plannings/planning/grouphistories/grouphistory'
+        );
         $casefieldmap = new restore_path_element(
             'casefieldmap',
             '/activity/competvet/casecats/casecat/casefields/casefield/casefieldsmap/casefieldmap'
@@ -85,7 +89,7 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         return $this->prepare_activity_structure([
             $competvet, $situation, $planning, $grid, $criterion, $observation, $obscomment,
             $grade, $obscritlevel, $obscritcom, $todo, $certdecl, $certdeclasso, $certvalid,
-            $caseversion, $casecat, $casefield, $caseentry, $casedata, $formdata, $casefieldmap,
+            $caseversion, $casecat, $casefield, $caseentry, $casedata, $formdata, $grouphistory, $casefieldmap,
         ]);
     }
 
@@ -551,6 +555,27 @@ class restore_competvet_activity_structure_step extends restore_activity_structu
         $data->graderid = $this->get_mappingid('user', $data->graderid);
         // Insert the form data record.
         $DB->insert_record('competvet_formdata', $data);
+    }
+
+    /**
+     * Process group history data.
+     *
+     * Group history is restored with the planning ID remapped, but the
+     * historical group name is preserved as metadata without
+     * requiring a Moodle group mapping.
+     *
+     * @param array $data The data to process.
+     * @return void
+     */
+    protected function process_grouphistory($data) {
+        global $DB;
+
+        $data = (object) $data;
+        $oldid = $data->id;
+        $data->planningid = $this->get_mappingid('planning', $data->planningid);
+        // The historical group name is preserved as metadata.
+        // No group mapping is performed.
+        $DB->insert_record('competvet_group_history', $data);
     }
 
     /**

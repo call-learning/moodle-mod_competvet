@@ -229,7 +229,12 @@ class situation_cache_test extends advanced_testcase {
         $situations = situation::get_all_situations_id_for($student1->id);
         $this->assertCount(1, $situations);
         $plannings =  plannings::get_plannings_for_situation_id($firstsituation, $student1->id);
-        $this->assertCount(0, $plannings); // We should not see any planning as we are not in a group.
+        // After removing from group, only historical plannings remain visible.
+        $this->assertGreaterThan(0, $plannings);
+        // All remaining plannings should be marked as historical.
+        foreach ($plannings as $planning) {
+            $this->assertTrue($planning['historical'], "Planning {$planning['id']} should be historical");
+        }
     }
 
     /**

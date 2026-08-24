@@ -847,4 +847,108 @@ final class backup_restore_test extends advanced_testcase {
             }
         }
     }
+
+    /**
+     * Test backup and restore of historical planning data (group deleted).
+     *
+     * @return void
+     */
+    public function test_backup_restore_historical_planning(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $generator = $this->getDataGenerator();
+        $competvetgenerator = $generator->get_plugin_generator('mod_competvet');
+        $startdate = new DateTime('last Monday');
+        $this->generates_definition($this->get_data_definition_set_3($startdate->getTimestamp()), $generator, $competvetgenerator);
+
+        $situation = situation::get_record(['shortname' => 'SIT1']);
+        $plannings = planning::get_records(['situationid' => $situation->get('id')]);
+        $planning = reset($plannings);
+        $planningid = $planning->get('id');
+
+        // Delete the group to make the planning historical.
+        $group = groups_get_group($planning->get('groupid'));
+        groups_delete_group($group);
+
+        // Add historical group metadata.
+        $this->add_group_history($planningid, 'Deleted Group Name');
+
+        $course = $DB->get_record('course', ['shortname' => 'course 1']);
+        $this->setAdminUser();
+
+        // Backup.
+        $bc = new backup_controller(
+            backup::TYPE_1COURSE,
+            $course->id,
+            backup::FORMAT_MOODLE,
+            backup::INTERACTIVE_NO,
+            backup::MODE_SAMESITE,
+            2
+        );
+
+        // Execute backup.
+        $bc->execute_plan();
+        $backupid = $bc->get_backupid();
+        $backupbasepath = $bc->get_plan()->get_basepath();
+        $results = $bc->get_results();
+        $file = $results['backup_destination'];
+
+        $bc->destroy();
+
+        // Restore the backup immediately.
+
+        // Check if we need to unzip the file because the backup temp dir does not contains backup files.
+        if (!file_exists($backupbasepath . "/moodle_backup.xml")) {
+            $file->extract_to_pathname(get_file_packer('application/vnd.moodle.backup'), $backupbasepath);
+        }
+
+        $newcourseid = \restore_dbops::create_new_course(
+            $course->fullname . 'RESTORED',
+            $course->shortname . 'RESTORED',
+            $course->category
+        );
+
+        // Prepare for restore.
+        $rc = new \restore_controller(
+            $backupid,
+            $newcourseid,
+            \backup::INTERACTIVE_NO,
+            \backup::MODE_SAMESITE,
+            2,
+            \backup::TARGET_NEW_COURSE
+        );
+
+        // Execute restore.
+        $rc->execute_precheck();
+        $rc->execute_plan();
+        $rc->destroy();
+
+        // Verify restored planning has group history.
+        $restoredplannings = planning::get_records(['situationid' => $situation->get('id')]);
+        $this->assertNotEmpty($restoredplannings);
+
+        // The restored planning should have group history metadata preserved.
+        $restoredplanning = reset($restoredplannings);
+        $grouphistory = \mod_competvet\local\persistent\group_history::get_for_planning($restoredplanning->get('id'));
+        $this->assertNotNull($grouphistory, 'Group history should be restored with the planning');
+        $this->assertEquals('Deleted Group Name', $grouphistory->get('groupname'));
+    }
+
+    /**
+     * Add group history record for testing.
+     *
+     * @param int $planningid Planning ID.
+     * @param string $groupname Group name.
+     * @return void
+     */
+    private function add_group_history(int $planningid, string $groupname): void {
+        global $DB;
+        $DB->insert_record('competvet_group_history', (object) [
+            'planningid' => $planningid,
+            'groupname' => $groupname,
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ]);
+    }
 }

@@ -56,6 +56,8 @@ class delete_observation extends external_api {
         $planning = planning::get_record(['id' => $observation->get('planningid')]);
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         self::validate_context($competvet->get_context());
+        // Guard: reject writes to historical plannings.
+        \mod_competvet\local\api\plannings::check_write_allowed($observation->get('planningid'));
         // Check if we can delete.
         if ($observation->can_delete()) {
             $observation->delete();
