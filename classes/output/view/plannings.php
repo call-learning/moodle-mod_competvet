@@ -73,7 +73,6 @@ class plannings extends base {
      * @return array|array[]|stdClass
      */
     public function export_for_template(renderer_base $output) {
-        global $FULLME;
         $data = parent::export_for_template($output);
 
         $planningids = array_map(function ($planning) {
@@ -240,10 +239,12 @@ class plannings extends base {
             $context = $PAGE->context;
             $competvet = competvet::get_from_context($context);
             $situationname = $competvet->get_instance()->name;
+            $nofuture = !has_capability('mod/competvet:editplanning', $context);
             $currentplannings =
                 \mod_competvet\local\api\plannings::get_plannings_for_situation_id(
                     $competvet->get_situation()->get('id'),
-                    $USER->id
+                    $USER->id,
+                    $nofuture
                 );
             $planningids = array_map(function ($planning) {
                 return $planning['id'];
