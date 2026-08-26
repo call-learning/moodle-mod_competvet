@@ -34,7 +34,8 @@
 <div class="row" data-region="planitem" data-id="{{id}}">
     <div class="col-3 tcell {{#edit}}editable{{/edit}}">
         {{#edit}}
-            <input type="datetime-local" name="startdate" value="{{startdate}}" data-field="startdate" class="form-control {{#errorstartdate}}error{{/errorstartdate}}">
+            <input type="datetime-local" name="startdate" value="{{startdate}}" data-field="startdate"
+                   class="form-control {{#errorstartdate}}is-invalid{{/errorstartdate}} {{^errorstartdate}}is-valid{{/errorstartdate}}">
         {{/edit}}
         {{^edit}}
             {{#startdatets}}
@@ -44,7 +45,8 @@
     </div>
     <div class="col-3 tcell {{#edit}}editable{{/edit}}">
         {{#edit}}
-            <input type="datetime-local" name="enddate" value="{{enddate}}" data-field="enddate" class="form-control {{#errorenddate}}error{{/errorenddate}}">
+            <input type="datetime-local" name="enddate" value="{{enddate}}" data-field="enddate"
+                   class="form-control {{#errorenddate}}is-invalid{{/errorenddate}} {{^errorenddate}}is-valid{{/errorenddate}}">
         {{/edit}}
         {{^edit}}
             {{#enddatets}}
@@ -54,7 +56,7 @@
     </div>
     <div class="col-2 tcell {{#edit}}editable{{/edit}}">
         {{#edit}}
-            <select name="groupname" class="form-control {{#errorgroupid}}error{{/errorgroupid}}" data-field="groupid">
+            <select name="groupname" class="form-control {{#errorgroupid}}is-invalid{{/errorgroupid}} {{^errorgroupid}}is-valid{{/errorgroupid}}" data-field="groupid">
                 {{#groups}}
                     <option value="{{id}}" {{#selected}}selected{{/selected}}>{{name}}</option>
                 {{/groups}}
