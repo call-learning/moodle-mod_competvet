@@ -106,7 +106,9 @@
                 <label for="startdate">
                     <span class="visually-hidden">{{#str}}search:startdate, mod_competvet{{/str}}</span>
                 </label>
-                <input type="date" id="startdate" name="startdate" value="{{startdate}}" data-field="startdate" class="form-control {{#errorenddate}}error{{/errorenddate}}">
+                <input type="date" id="startdate" name="startdate" value="{{startdate}}" data-field="startdate"
+                       class="form-control {{#errorenddate}}is-invalid{{/errorenddate}} {{^errorenddate}}is-valid{{/errorenddate}}"
+                >
                 <button id="clearstartdate" class="btn btn-outline-secondary">
                     <i class="icon fa fa-times"></i>
                     <span class="visually-hidden">{{#str}}search:clearstartdate, mod_competvet{{/str}}</span>

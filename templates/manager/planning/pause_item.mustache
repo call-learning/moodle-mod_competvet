@@ -36,7 +36,9 @@
         </div>
         {{/editpause}}
         {{#editpause}}
-            <input type="datetime-local" name="startdate{{id}}" data-initial-value="{{startdate}}" value="{{startdate}}" data-field="startdate" class="form-control {{#errorstartdate}}error{{/errorstartdate}}">
+            <input type="datetime-local" name="startdate{{id}}" data-initial-value="{{startdate}}" value="{{startdate}}" data-field="startdate"
+                   class="form-control {{#errorstartdate}}is-invalid{{/errorstartdate}} {{^errorstartdate}}is-valid{{/errorstartdate}}"
+            >
         {{/editpause}}
         {{^editpause}}
             {{#startdatets}}
@@ -51,7 +53,8 @@
         </div>
         {{/editpause}}
         {{#editpause}}
-            <input type="datetime-local" name="enddate{{id}}" data-initial-value="{{enddate}}" value="{{enddate}}" data-field="enddate" class="form-control {{#errorenddate}}error{{/errorenddate}}">
+            <input type="datetime-local" name="enddate{{id}}" data-initial-value="{{enddate}}" value="{{enddate}}" data-field="enddate"
+                   class="form-control {{#errorenddate}}is-invalid{{/errorenddate}} {{^errorenddate}}is-valid{{/errorenddate}}">
         {{/editpause}}
         {{^editpause}}
             {{#enddatets}}
