@@ -53,7 +53,7 @@ class eval_observation_helper {
                 'max' => 100,
                 'step' => 10,
                 'value' => 0,
-                'class' => 'form-range criterion-level-slider flex-grow-1',
+                'class' => 'custom-range criterion-level-slider flex-grow-1',
                 'id' => $sliderid,
                 'data-criterion-id' => $criterion->id,
                 'data-linked-input-name' => $levelname,
