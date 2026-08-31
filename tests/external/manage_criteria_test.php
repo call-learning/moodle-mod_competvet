@@ -743,6 +743,96 @@ final class manage_criteria_test extends \advanced_testcase {
     }
 
     /**
+     * The grid a situation actually uses is returned by get even when it is a global grid.
+     *
+     * @runInSeparateProcess
+     */
+    public function test_get_includes_situation_inuse_global_grid(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $competvetgenerator = $this->getDataGenerator()->get_plugin_generator('mod_competvet');
+        $globalgrid = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Global in-use grid', 'idnumber' => 'GRID300',
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+        ]);
+        $globalgrid->create();
+        $competvet = $competvetgenerator->create_instance(['course' => $course->id, 'evalgrid' => $globalgrid->get('id')]);
+        $situation = \mod_competvet\local\persistent\situation::get_record(['competvetid' => $competvet->id]);
+        $this->assertEquals($globalgrid->get('id'), $situation->get('evalgrid'));
+
+        $this->setAdminUser();
+        $result = $this->manage_criteria_get(
+            \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+            0,
+            $situation->get('id')
+        );
+        // The situation has no grid of its own, but the global grid it uses must be returned.
+        $this->assertCount(1, $result['grids']);
+        $this->assertEquals($globalgrid->get('id'), $result['grids'][0]['gridid']);
+    }
+
+    /**
+     * The grid in use of a situation is not duplicated when it is already scoped to that situation.
+     *
+     * @runInSeparateProcess
+     */
+    public function test_get_inuse_grid_not_duplicated(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $competvetgenerator = $this->getDataGenerator()->get_plugin_generator('mod_competvet');
+        $competvet = $competvetgenerator->create_instance(['course' => $course->id]);
+        $situation = \mod_competvet\local\persistent\situation::get_record(['competvetid' => $competvet->id]);
+        $grid = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Situation grid', 'idnumber' => 'GRID301',
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+            'situationid' => $situation->get('id'),
+        ]);
+        $grid->create();
+        $situation->set('evalgrid', $grid->get('id'));
+        $situation->update();
+
+        $this->setAdminUser();
+        $result = $this->manage_criteria_get(
+            \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+            0,
+            $situation->get('id')
+        );
+        $this->assertCount(1, $result['grids']);
+        $this->assertEquals($grid->get('id'), $result['grids'][0]['gridid']);
+    }
+
+    /**
+     * Creating a new grid with a situation id through the webservice makes the situation use that grid.
+     *
+     * @runInSeparateProcess
+     */
+    public function test_update_new_grid_assigns_situation(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $competvetgenerator = $this->getDataGenerator()->get_plugin_generator('mod_competvet');
+        $competvet = $competvetgenerator->create_instance(['course' => $course->id]);
+        $situation = \mod_competvet\local\persistent\situation::get_record(['competvetid' => $competvet->id]);
+
+        $this->setAdminUser();
+        $result = $this->manage_criteria_update([
+            [
+                'gridid' => 0,
+                'gridname' => 'New situation grid',
+                'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+                'situationid' => $situation->get('id'),
+                'haschanged' => true,
+                'criteria' => [],
+            ],
+        ], \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION);
+        $this->assertTrue($result['result']);
+
+        $situation = \mod_competvet\local\persistent\situation::get_record(['competvetid' => $competvet->id]);
+        $newgrid = \mod_competvet\local\persistent\grid::get_record(['situationid' => $situation->get('id')]);
+        $this->assertNotNull($newgrid);
+        $this->assertEquals($newgrid->get('id'), $situation->get('evalgrid'));
+    }
+
+    /**
      * Helper for manage_criteria::update
      *
      * @param array $grids

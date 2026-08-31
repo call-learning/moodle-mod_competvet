@@ -660,6 +660,22 @@ class plannings {
     }
 
     /**
+     * Return true if any planning of the situation already has user data.
+     *
+     * @param int $situationid
+     * @return bool
+     */
+    public static function situation_has_user_data(int $situationid): bool {
+        $plannings = planning::get_records(['situationid' => $situationid]);
+        foreach ($plannings as $planning) {
+            if (static::has_user_data($planning->get('id'))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Get planning pauses for a given planning ID
      *
      * @param int $planningid The ID of the planning.
