@@ -80,6 +80,9 @@
             {{#candelete}}
                 <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-action="delete" data-id="{{gridid}}" data-type="grid">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
             {{/candelete}}
+            {{#canduplicate}}
+                <button class="btn btn-icon icon-no-margin mr-1 jsbutton" data-action="duplicate" data-id="{{gridid}}" data-type="grid">{{#pix}}i/duplicate, mod_competvet, {{#str}}duplicategrid, mod_competvet{{/str}}{{/pix}}</button>
+            {{/canduplicate}}
         </div>
     </div>
     <div class="collapse show" id="grid{{gridid}}">

@@ -59,6 +59,7 @@ final class manage_criteria_test extends \advanced_testcase {
         $this->assertArrayHasKey('grids', $result);
         $this->assertCount(1, $result['grids']);
         $this->assertEquals('Test Grid', $result['grids'][0]['gridname']);
+        $this->assertTrue($result['grids'][0]['canduplicate']);
         $this->assertCount(1, $result['grids'][0]['criteria']);
         $this->assertEquals('Test Criterion', $result['grids'][0]['criteria'][0]['label']);
     }
@@ -602,6 +603,146 @@ final class manage_criteria_test extends \advanced_testcase {
     }
 
     /**
+     * Duplicating a global grid returns the new grid id and copies the structure.
+     *
+     * @runInSeparateProcess
+     */
+    public function test_duplicate_grid_success(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $grid = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Source grid', 'idnumber' => 'GRID200',
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+        ]);
+        $grid->create();
+        $parent = new \mod_competvet\local\persistent\criterion(0, (object) [
+            'gridid' => $grid->get('id'), 'label' => 'Parent', 'idnumber' => 'CRIT200',
+            'parentid' => 0, 'sort' => 1,
+        ]);
+        $parent->create();
+        $option = new \mod_competvet\local\persistent\criterion(0, (object) [
+            'gridid' => $grid->get('id'), 'label' => 'Option', 'idnumber' => 'OPT200',
+            'parentid' => $parent->get('id'), 'sort' => 1,
+        ]);
+        $option->create();
+
+        $sourcecriterioncount = \mod_competvet\local\persistent\criterion::count_records(['gridid' => $grid->get('id')]);
+
+        $result = $this->manage_criteria_duplicate_grid($grid->get('id'));
+        $newgridid = $result['newgridid'];
+
+        $this->assertNotEquals($grid->get('id'), $newgridid);
+        $newgrid = \mod_competvet\local\persistent\grid::get_record(['id' => $newgridid]);
+        $this->assertNotNull($newgrid);
+        $this->assertEquals(
+            'Source grid' . get_string('copysuffix', 'mod_competvet'),
+            $newgrid->get('name')
+        );
+        // The copy keeps the scope, type and sortorder of the source.
+        $this->assertEquals($grid->get('situationid'), $newgrid->get('situationid'));
+        $this->assertEquals($grid->get('type'), $newgrid->get('type'));
+        $this->assertEquals($grid->get('sortorder'), $newgrid->get('sortorder'));
+        // All criteria are copied and the source is untouched.
+        $this->assertEquals(
+            $sourcecriterioncount,
+            \mod_competvet\local\persistent\criterion::count_records(['gridid' => $newgridid])
+        );
+        $this->assertEquals(
+            $sourcecriterioncount,
+            \mod_competvet\local\persistent\criterion::count_records(['gridid' => $grid->get('id')])
+        );
+        // The source grid name is unchanged.
+        $this->assertEquals(
+            'Source grid',
+            \mod_competvet\local\persistent\grid::get_record(['id' => $grid->get('id')])->get('name')
+        );
+    }
+
+    /**
+     * Duplicating a missing grid throws invaliddata.
+     *
+     * @runInSeparateProcess
+     */
+    public function test_duplicate_grid_missing_grid(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $this->expectException(\moodle_exception::class);
+        $this->expectExceptionMessage('Invalid data');
+        $this->manage_criteria_duplicate_grid(999999);
+    }
+
+    /**
+     * A user without the global scope capability cannot duplicate a global grid.
+     *
+     * @runInSeparateProcess
+     */
+    public function test_duplicate_grid_noaccess_global_grid(): void {
+        $this->resetAfterTest();
+
+        $grid = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Global grid', 'idnumber' => 'GRID201',
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+        ]);
+        $grid->create();
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+        $this->expectException(\moodle_exception::class);
+        $this->expectExceptionMessage('You don\'t have access');
+        $this->manage_criteria_duplicate_grid($grid->get('id'));
+    }
+
+    /**
+     * A user without the activity capability cannot duplicate a situation grid.
+     *
+     * @runInSeparateProcess
+     */
+    public function test_duplicate_grid_noaccess_situation_grid(): void {
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $competvetgenerator = $this->getDataGenerator()->get_plugin_generator('mod_competvet');
+        $competvet = $competvetgenerator->create_instance(['course' => $course->id]);
+        $situation = \mod_competvet\local\persistent\situation::get_record(['competvetid' => $competvet->id]);
+        $grid = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Situation grid', 'idnumber' => 'GRID202',
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+            'situationid' => $situation->get('id'),
+        ]);
+        $grid->create();
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+        $this->expectException(\moodle_exception::class);
+        $this->expectExceptionMessage('You don\'t have access');
+        $this->manage_criteria_duplicate_grid($grid->get('id'));
+    }
+
+    /**
+     * The duplicate_grid webservice is registered in the external_functions table.
+     *
+     * @runInSeparateProcess
+     */
+    public function test_duplicate_grid_webservice_is_registered(): void {
+        global $DB, $CFG;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        // Re-sync the external_functions table from db/services.php (the test database is only
+        // reinstalled from the plugin when the plugin is (re)installed, not on every test run).
+        require_once($CFG->libdir . '/upgradelib.php');
+        external_update_descriptions('mod_competvet');
+
+        $function = $DB->get_record('external_functions', ['name' => 'mod_competvet_duplicate_grid']);
+        $this->assertNotNull($function, 'mod_competvet_duplicate_grid should be registered.');
+        $this->assertEquals(\mod_competvet\external\manage_criteria::class, $function->classname);
+        $this->assertEquals('duplicate_grid', $function->methodname);
+        $this->assertEquals('mod_competvet', $function->component);
+    }
+
+    /**
      * Helper for manage_criteria::update
      *
      * @param array $grids
@@ -642,5 +783,23 @@ final class manage_criteria_test extends \advanced_testcase {
         $params = array_values($params);
         $returnvalue = manage_criteria::get(...$params);
         return \external_api::clean_returnvalue(manage_criteria::get_returns(), $returnvalue);
+    }
+
+    /**
+     * Helper for manage_criteria::duplicate_grid
+     *
+     * @param int $gridid
+     * @return array
+     */
+    protected function manage_criteria_duplicate_grid(int $gridid) {
+        $validate = [manage_criteria::class, 'validate_parameters'];
+        $params = call_user_func(
+            $validate,
+            manage_criteria::duplicate_grid_parameters(),
+            ['gridid' => $gridid]
+        );
+        $params = array_values($params);
+        $returnvalue = manage_criteria::duplicate_grid(...$params);
+        return \external_api::clean_returnvalue(manage_criteria::duplicate_grid_returns(), $returnvalue);
     }
 }

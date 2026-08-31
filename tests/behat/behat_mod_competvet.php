@@ -802,4 +802,189 @@ class behat_mod_competvet extends behat_base {
             return true;
         });
     }
+
+    /**
+     * Duplicates the grid with the given name by clicking its duplicate action and confirming the prompt.
+     *
+     * Example: When I duplicate the grid named "Activity certification grid"
+     *
+     * The grids container is populated by the JavaScript manager, so every part of this step
+     * waits (via spin) for the required DOM to be present before interacting with it.
+     *
+     * @Given /^I duplicate the grid named "(?P<grid_name>(?:[^"]|\\")*)"$/
+     * @param string $gridname The name of the grid to duplicate
+     * @throws Exception
+     */
+    public function i_duplicate_grid_named($gridname) {
+        // Wait for the source grid and its duplicate action button to be rendered.
+        $duplicatebutton = $this->spin(function () use ($gridname) {
+            $grid = $this->get_grid_by_name($gridname);
+            $button = $grid->find('css', 'button[data-action="duplicate"][data-type="grid"]');
+            if (!$button) {
+                throw new Exception('The duplicate button was not found in the grid named "' . $gridname . '" yet');
+            }
+            return $button;
+        }, [], behat_base::get_extended_timeout(),
+            new ExpectationException(
+                'The duplicate button was not found in the grid named "' . $gridname . '"',
+                $this->getSession()
+            ));
+
+        $duplicatebutton->click();
+
+        // Wait for the confirmation prompt to render, then confirm it.
+        $this->spin(function () {
+            $savebutton = $this->getSession()->getPage()->find('css', '.modal button[data-action="save"]');
+            if (!$savebutton) {
+                throw new Exception('The duplicate confirmation prompt has not been rendered yet');
+            }
+            $savebutton->click();
+            return true;
+        }, [], behat_base::get_extended_timeout(),
+            new ExpectationException('The duplicate confirmation prompt did not appear', $this->getSession()));
+
+        // Wait for the newly duplicated grid to be rendered.
+        $copyname = $gridname . get_string('copysuffix', 'mod_competvet');
+        $this->spin(function () use ($copyname) {
+            $this->get_grid_by_name($copyname);
+            return true;
+        }, [], behat_base::get_extended_timeout(),
+            new ExpectationException(
+                'The duplicated grid named "' . $copyname . '" was not rendered',
+                $this->getSession()
+            ));
+    }
+
+    /**
+     * Asserts that a grid action button is present in the grid with the given name.
+     *
+     * Example: Then I should see the "edit" action button in the grid named "Activity certification grid (copy)"
+     *
+     * @Given /^I should see the "(?P<action>[a-z]+)" action button in the grid named "(?P<grid_name>(?:[^"]|\\")*)"$/
+     * @param string $action The data-action attribute of the button to look for
+     * @param string $gridname The name of the grid
+     * @throws Exception
+     */
+    public function i_should_see_grid_action_button_named($action, $gridname) {
+        $this->spin(function () use ($action, $gridname) {
+            $grid = $this->get_grid_by_name($gridname);
+            $button = $grid->find('css', 'button[data-action="' . $action . '"][data-type="grid"]');
+            if (!$button) {
+                throw new Exception(
+                    'The "' . $action . '" action button is not present in the grid named "' . $gridname . '" yet'
+                );
+            }
+            return true;
+        }, [], behat_base::get_extended_timeout(),
+            new ExpectationException(
+                'The "' . $action . '" action button was not found in the grid named "' . $gridname . '"',
+                $this->getSession()
+            ));
+    }
+
+    /**
+     * Asserts that a grid action button is absent from the grid with the given name.
+     *
+     * Example: Then I should not see the "delete" action button in the grid named "Activity certification grid"
+     *
+     * The grid is first waited on so that absence is asserted once the grid has actually been
+     * rendered, rather than while the container is still empty.
+     *
+     * @Given /^I should not see the "(?P<action>[a-z]+)" action button in the grid named "(?P<grid_name>(?:[^"]|\\")*)"$/
+     * @param string $action The data-action attribute of the button that must be absent
+     * @param string $gridname The name of the grid
+     * @throws Exception
+     */
+    public function i_should_not_see_grid_action_button_named($action, $gridname) {
+        $this->spin(function () use ($gridname) {
+            return $this->get_grid_by_name($gridname);
+        }, [], behat_base::get_extended_timeout(),
+            new ExpectationException('Grid named "' . $gridname . '" was not rendered', $this->getSession()));
+
+        $grid = $this->get_grid_by_name($gridname);
+        $button = $grid->find('css', 'button[data-action="' . $action . '"][data-type="grid"]');
+        if ($button) {
+            throw new Exception('The "' . $action . '" action button was found in the grid named "' . $gridname . '"');
+        }
+    }
+
+    /**
+     * Changes the label of the given criterion within the grid with the given name.
+     *
+     * Example: And I change criterium row "1" in the grid named "Activity certification grid (copy)" to "Modifié"
+     *
+     * @Given /^I change criterium row "(?P<criterion_row>\d+)" in the grid named "(?P<grid_name>(?:[^"]|\\")*)" to "(?P<new_label>(?:[^"]|\\")*)"$/
+     * @param int $criterionrow The row number of the criterion to change
+     * @param string $gridname The name of the grid containing the criterion
+     * @param string $newlabel The new label to set for the criterion
+     * @throws Exception
+     */
+    public function i_change_criterion_label_in_grid_named($criterionrow, $gridname, $newlabel) {
+        // Map the grid name to its current row and reuse the proven row-based criterion editing step.
+        $gridrow = $this->locate_grid_row_by_name($gridname);
+        $this->i_change_criterion_label_in_grid($criterionrow, $gridrow, $newlabel);
+    }
+
+    /**
+     * Gets the grid element whose name matches the given name.
+     *
+     * The display order of the grids is not guaranteed to be stable (a duplicated grid keeps the
+     * source sort order), so grids are looked up by name instead of by row position.
+     *
+     * @param string $gridname The name of the grid to locate
+     * @return \Behat\Mink\Element\NodeElement The grid element
+     * @throws Exception
+     */
+    private function get_grid_by_name($gridname) {
+        foreach ($this->get_all_grids() as $grid) {
+            $nameelement = $grid->find('css', '.gridname');
+            if (!$nameelement) {
+                continue;
+            }
+            $name = trim($nameelement->getText());
+            // Fall back to the input value when the grid is being edited.
+            if ($name === '') {
+                $input = $nameelement->find('css', 'input[data-field="gridname"]');
+                if ($input) {
+                    $name = trim($input->getValue());
+                }
+            }
+            if ($name === $gridname) {
+                return $grid;
+            }
+        }
+        throw new Exception('Grid named "' . $gridname . '" not found');
+    }
+
+    /**
+     * Gets the 1-based row position of the grid whose name matches the given name.
+     *
+     * @param string $gridname The name of the grid to locate
+     * @return int The 1-based row position of the grid
+     * @throws Exception
+     */
+    private function locate_grid_row_by_name($gridname) {
+        $grids = $this->get_all_grids();
+        foreach ($grids as $index => $grid) {
+            $nameelement = $grid->find('css', '.gridname');
+            if ($nameelement && trim($nameelement->getText()) === $gridname) {
+                return $index + 1;
+            }
+        }
+        throw new Exception('Grid named "' . $gridname . '" not found');
+    }
+
+    /**
+     * Gets all the grid elements within the manage criteria grids container.
+     *
+     * @return \Behat\Mink\Element\NodeElement[]
+     * @throws Exception
+     */
+    private function get_all_grids() {
+        $container = $this->find('css', '#managecriteria > div.grids');
+        if (!$container) {
+            throw new Exception('Grids container not found');
+        }
+        return $container->findAll('css', 'div[data-region="grid"]');
+    }
 }
