@@ -25,7 +25,10 @@
 
 import CompetState from 'mod_competvet/local/competstate';
 import Repository from 'mod_competvet/local/new-repository';
-import {get_string as getString} from 'core/str';
+import {get_string as getString, get_strings as getStrings} from 'core/str';
+import Notification from 'core/notification';
+import ModalSaveCancel from 'core/modal_save_cancel';
+import ModalEvents from 'core/modal_events';
 import './grids';
 import './navigation';
 
@@ -98,7 +101,10 @@ class Manager {
     addEventListeners() {
         document.addEventListener('click', (e) => {
             let btn = e.target.closest('[data-action]');
-            if (btn) {
+            // Modal buttons (e.g. ModalSaveCancel) handle their own data-action clicks
+            // through the core modal events. Skip them here, otherwise the duplicate
+            // modal's save would also trigger a full-state save().
+            if (btn && !btn.closest('.modal')) {
                 e.preventDefault();
                 this.actions(btn);
             }
@@ -126,6 +132,9 @@ class Manager {
         }
         if (btn.dataset.action === 'delete') {
             this.delete(btn);
+        }
+        if (btn.dataset.action === 'duplicate') {
+            this.duplicate(btn);
         }
         if (btn.dataset.action === 'changedataset') {
             this.dataset = Number(btn.dataset.dataset);
@@ -234,6 +243,33 @@ class Manager {
         }
         CompetState.setValue('datatree', state);
         this.save();
+    }
+
+    /**
+     * Duplicate a grid and all of its criteria.
+     * Shows a confirmation prompt, calls the duplicate webservice, then refetches the state on success.
+     * Webservice errors are surfaced via the notification path.
+     * @param {object} btn The button that was clicked.
+     */
+    async duplicate(btn) {
+        const gridid = parseInt(btn.dataset.id);
+        const [title, confirm] = await getStrings([
+            {key: 'duplicategrid', component: 'mod_competvet'},
+            {key: 'duplicategridconfirm', component: 'mod_competvet'},
+        ]);
+        const modal = await ModalSaveCancel.create({
+            title,
+            body: confirm,
+        }).catch(Notification.exception);
+        modal.getRoot().on(ModalEvents.save, () => {
+            Repository.duplicateGrid(gridid)
+                .done(() => {
+                    modal.hide();
+                    this.getData();
+                })
+                .fail(Notification.exception);
+        });
+        modal.show();
     }
 
     /**

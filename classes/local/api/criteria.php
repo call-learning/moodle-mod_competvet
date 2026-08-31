@@ -100,6 +100,86 @@ class criteria {
     }
 
     /**
+     * Duplicate a grid together with all of its criteria and options.
+     *
+     * The copy is created in the same scope as the source grid (same situationid), with the same type
+     * and sort order, a new unique idnumber and a name derived from the source name. The criteria are
+     * copied keeping their labels, idnumbers, sort orders and grades, with the option parent references
+     * remapped to the copied parents. The source grid and its criteria are left untouched.
+     *
+     * @param int $gridid - The grid id
+     * @return int - The new grid id
+     */
+    public static function duplicate_grid(int $gridid): int {
+        global $DB;
+
+        $sourcegrid = grid::get_record(['id' => $gridid]);
+        if (!$sourcegrid) {
+            throw new \moodle_exception('invaliddata', 'competvet', '', 'grid');
+        }
+        if (!$sourcegrid->can_manage()) {
+            throw new \moodle_exception('noaccess', 'mod_competvet');
+        }
+
+        $transaction = $DB->start_delegated_transaction();
+
+        $newgrid = new grid(0);
+        $newgrid->set('name', $sourcegrid->get('name') . get_string('copysuffix', 'mod_competvet'));
+        $newgrid->set('idnumber', \core\di::get(\core\clock::class)->time());
+        $newgrid->set('situationid', $sourcegrid->get('situationid'));
+        $newgrid->set('type', $sourcegrid->get('type'));
+        $newgrid->set('sortorder', $sourcegrid->get('sortorder'));
+        $newgrid->create();
+
+        // Split the criteria so that the parents are copied before their options.
+        $parents = [];
+        $options = [];
+        foreach (criterion::get_records(['gridid' => $gridid], 'sort') as $oldcriterion) {
+            if ($oldcriterion->get('parentid') === 0) {
+                $parents[] = $oldcriterion;
+            } else {
+                $options[] = $oldcriterion;
+            }
+        }
+
+        $oldtonewids = [];
+        foreach (array_merge($parents, $options) as $oldcriterion) {
+            $newcriterion = self::duplicate_criterion($oldcriterion, $newgrid->get('id'), $oldtonewids);
+            if ($oldcriterion->get('parentid') === 0) {
+                $oldtonewids[$oldcriterion->get('id')] = $newcriterion->get('id');
+            }
+        }
+
+        $transaction->allow_commit();
+
+        return $newgrid->get('id');
+    }
+
+    /**
+     * Create a copy of a criterion in a grid.
+     *
+     * @param criterion $oldcriterion - The criterion to copy
+     * @param int $newgridid - The grid to copy the criterion to
+     * @param array $oldtonewids - Map of old parent criterion ids to new parent criterion ids
+     * @return criterion - The new criterion
+     */
+    private static function duplicate_criterion(criterion $oldcriterion, int $newgridid, array $oldtonewids): criterion {
+        $parentid = 0;
+        if ($oldcriterion->get('parentid') !== 0 && isset($oldtonewids[$oldcriterion->get('parentid')])) {
+            $parentid = $oldtonewids[$oldcriterion->get('parentid')];
+        }
+        $newcriterion = new criterion(0);
+        $newcriterion->set('label', $oldcriterion->get('label'));
+        $newcriterion->set('idnumber', $oldcriterion->get('idnumber'));
+        $newcriterion->set('parentid', $parentid);
+        $newcriterion->set('sort', $oldcriterion->get('sort'));
+        $newcriterion->set('gridid', $newgridid);
+        $newcriterion->set('grade', $oldcriterion->get('grade'));
+        $newcriterion->create();
+        return $newcriterion;
+    }
+
+    /**
      * Get the grid for this planning
      * @param int $planningid - The planning id
      * @param string $type - The type
