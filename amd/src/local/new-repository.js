@@ -116,6 +116,15 @@ class Repository {
     }
 
     /**
+     * Duplicate a grid and all of its criteria.
+     * @param {Number} gridid The id of the grid to duplicate.
+     * @return {Promise} The promise.
+     */
+    duplicateGrid(gridid) {
+        return Ajax.call([{methodname: 'mod_competvet_duplicate_grid', args: {gridid}}])[0];
+    }
+
+    /**
      * Save the plannings.
      * @param {Object} data The data to save.
      * @return {Promise} The promise.

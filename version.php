@@ -26,6 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_competvet';
 $plugin->release = '2.5.8';
-$plugin->version = 202608240002;
+$plugin->version = 202608240003;
 $plugin->requires = 2022112800;
 $plugin->maturity = MATURITY_ALPHA;

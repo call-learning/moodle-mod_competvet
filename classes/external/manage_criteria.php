@@ -108,7 +108,7 @@ class manage_criteria extends external_api {
         foreach ($grids as $grid) {
             $storedgrid = grid::get_record(['id' => $grid['gridid']]);
             if ($storedgrid && !$storedgrid->can_manage()) {
-                throw new \moodle_exception('noaccess', 'mod_competvet');
+                continue;
             }
             if (!$storedgrid && empty($grid['situationid'])) {
                 require_capability('mod/competvet:manageglobalcriteria', context_system::instance());
@@ -248,6 +248,45 @@ class manage_criteria extends external_api {
     }
 
     /**
+     * Returns description of method parameters.
+     *
+     * @return external_function_parameters
+     */
+    public static function duplicate_grid_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'gridid' => new external_value(PARAM_INT, 'The grid id', VALUE_REQUIRED),
+        ]);
+    }
+
+    /**
+     * Duplicate a grid and all of its criteria into a new grid of the same type and scope.
+     *
+     * @param int $gridid - The grid id
+     * @return array
+     */
+    public static function duplicate_grid(int $gridid): array {
+        $params = self::validate_parameters(self::duplicate_grid_parameters(), ['gridid' => $gridid]);
+        self::validate_context(context_system::instance());
+
+        $newgridid = criteria::duplicate_grid($params['gridid']);
+
+        return [
+            'newgridid' => $newgridid,
+        ];
+    }
+
+    /**
+     * Returns description of method return value.
+     *
+     * @return external_single_structure
+     */
+    public static function duplicate_grid_returns(): external_single_structure {
+        return new external_single_structure([
+            'newgridid' => new external_value(PARAM_INT, 'The new grid id'),
+        ]);
+    }
+
+    /**
      * Returns description of method parameters
      *
      * @return external_function_parameters
@@ -298,6 +337,7 @@ class manage_criteria extends external_api {
                 'timemodified' => $grid->get('timemodified'),
                 'canedit' => $grid->canedit(),
                 'candelete' => $grid->can_delete(),
+                'canduplicate' => $grid->can_manage(),
                 'criteria' => criteria::get_sorted_criteria($grid->get('id')),
             ];
             return $newgrid;
@@ -322,6 +362,7 @@ class manage_criteria extends external_api {
                     'timemodified' => new external_value(PARAM_INT, 'The time modified'),
                     'canedit' => new external_value(PARAM_BOOL, 'Can the grid be edited'),
                     'candelete' => new external_value(PARAM_BOOL, 'Can the grid be deleted'),
+                    'canduplicate' => new external_value(PARAM_BOOL, 'Can the grid be duplicated'),
                     'sortorder' => new external_value(PARAM_INT, 'The sort order of the grid'),
                     'criteria' => new external_multiple_structure(
                         new external_single_structure([

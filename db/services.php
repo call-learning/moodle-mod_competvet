@@ -114,6 +114,15 @@ $functions = [
         // The API selects the required capability from the grid scope.
         'capabilities' => '',
     ],
+    'mod_competvet_duplicate_grid' => [
+        'classname' => \mod_competvet\external\manage_criteria::class,
+        'methodname' => 'duplicate_grid',
+        'description' => 'Duplicate a grid and all of its criteria',
+        'type' => 'write',
+        'ajax' => true,
+        // The API selects the required capability from the grid scope.
+        'capabilities' => '',
+    ],
     'mod_competvet_manage_plannings' => [
         'classname' => \mod_competvet\external\manage_plannings::class,
         'methodname' => 'update',
