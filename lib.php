@@ -22,16 +22,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_competvet\local\api\plannings;
 use mod_competvet\local\grader;
-use mod_competvet\local\persistent\case_data;
-use mod_competvet\local\persistent\case_entry;
-use mod_competvet\local\persistent\cert_decl;
-use mod_competvet\local\persistent\cert_decl_asso;
-use mod_competvet\local\persistent\cert_valid;
-use mod_competvet\local\persistent\observation;
-use mod_competvet\local\persistent\observation_comment;
-use mod_competvet\local\persistent\observation_criterion_level;
-use mod_competvet\local\persistent\observation_criterion_comment;
+use mod_competvet\local\persistent\grid;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\utils;
@@ -112,6 +105,31 @@ function competvet_update_instance($moduleinstance, $mform = null) {
     // Get the relevant situation.
     $situationproperties->competvetid = $moduleinstance->instance;
     $situation = situation::get_record(['competvetid' => $moduleinstance->instance], MUST_EXIST);
+
+    // The criteria grid selectors are disabled in the form once the situation has user data, but a crafted
+    // request could still bypass that. Protect the mapping server-side.
+    $situationhasuserdata = plannings::situation_has_user_data($situation->get('id'));
+    foreach (grid::COMPETVET_GRID_TYPES as $griddatatype) {
+        $fieldname = $griddatatype . 'grid';
+        // A disabled select is not submitted, so only act on grid fields that are actually present.
+        if (!isset($situationproperties->{$fieldname})) {
+            continue;
+        }
+        $newgridid = (int) $situationproperties->{$fieldname};
+        if ($newgridid === (int) $situation->get($fieldname)) {
+            continue;
+        }
+        if ($situationhasuserdata) {
+            throw new \moodle_exception('gridsituationlocked', 'competvet');
+        }
+        // Releasing a situation-scoped grid turns it back into a global grid.
+        $oldgrid = grid::get_record(['id' => (int) $situation->get($fieldname), 'situationid' => $situation->get('id')]);
+        if ($oldgrid) {
+            $oldgrid->set('situationid', 0);
+            $oldgrid->update();
+        }
+    }
+
     $situation->from_record($situationproperties);
     $situation->update();
     return $DB->update_record('competvet', $moduleproperties);

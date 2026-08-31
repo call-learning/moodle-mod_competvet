@@ -47,6 +47,10 @@ class criteria {
         $grid = grid::get_record(['id' => $gridid]);
         $clock = \core\di::get(\core\clock::class);
         if (!$grid) {
+            // A situation that already contains user data must keep its current grid.
+            if (!empty($situationid) && plannings::situation_has_user_data($situationid)) {
+                throw new \moodle_exception('gridsituationlocked', 'competvet');
+            }
             $grid = new grid(0);
             $grid->set('name', $gridname);
             // Generate a unique idnumber.
@@ -56,6 +60,14 @@ class criteria {
             $grid->set('sortorder', $sortorder);
             $grid->set('type', $type);
             $grid->create();
+            // A new grid scoped to a situation becomes the grid in use for that situation.
+            if (!empty($situationid)) {
+                $situation = situation::get_record(['id' => $situationid]);
+                if ($situation) {
+                    $situation->set(grid::COMPETVET_GRID_TYPES[$type] . 'grid', $grid->get('id'));
+                    $situation->update();
+                }
+            }
         } else {
             if (!$grid->canedit()) {
                 throw new \moodle_exception('invaliddata', 'competvet', '', 'grid');

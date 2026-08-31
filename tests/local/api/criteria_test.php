@@ -21,6 +21,7 @@ use mod_competvet\local\persistent\criterion;
 use mod_competvet\local\persistent\grid;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\observation_criterion_level;
+use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\utils;
 
@@ -238,6 +239,72 @@ final class criteria_test extends advanced_testcase {
     }
 
     /**
+     * Test that creating a grid bound to a situation makes that situation use the new grid.
+     *
+     * @return void
+     */
+    public function test_update_grid_creation_assigns_new_grid_to_situation(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $competvet = $this->getDataGenerator()->get_plugin_generator('mod_competvet')
+            ->create_instance(['course' => $course->id]);
+        $situation = situation::get_record(['competvetid' => $competvet->id]);
+        $originalgridid = $situation->get('evalgrid');
+        $this->assertNotEquals(0, $originalgridid);
+
+        $newgridid = criteria::update_grid(0, 'New situation grid', 1, $situation->get('id'), grid::COMPETVET_CRITERIA_EVALUATION);
+
+        $newgrid = grid::get_record(['id' => $newgridid]);
+        $this->assertNotNull($newgrid);
+        $this->assertEquals($situation->get('id'), $newgrid->get('situationid'));
+        $situation = situation::get_record(['competvetid' => $competvet->id]);
+        $this->assertEquals($newgridid, $situation->get('evalgrid'));
+        $this->assertNotEquals($originalgridid, $newgridid);
+    }
+
+    /**
+     * Test that creating a global grid or editing an existing grid does not change the situation grid pointer.
+     *
+     * @return void
+     */
+    public function test_update_grid_global_creation_and_edit_keep_situation_grid(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $competvet = $this->getDataGenerator()->get_plugin_generator('mod_competvet')
+            ->create_instance(['course' => $course->id]);
+        $situation = situation::get_record(['competvetid' => $competvet->id]);
+        $originalgridid = $situation->get('evalgrid');
+
+        // Creating a global grid does not affect the situation grid pointer.
+        $globalgridid = criteria::update_grid(0, 'New global grid', 1, 0, grid::COMPETVET_CRITERIA_EVALUATION);
+        $situation = situation::get_record(['competvetid' => $competvet->id]);
+        $this->assertEquals($originalgridid, $situation->get('evalgrid'));
+
+        // Editing an existing grid does not change the situation grid pointer.
+        criteria::update_grid($globalgridid, 'Renamed grid', 1, 0, grid::COMPETVET_CRITERIA_EVALUATION);
+        $situation = situation::get_record(['competvetid' => $competvet->id]);
+        $this->assertEquals($originalgridid, $situation->get('evalgrid'));
+        $grid = grid::get_record(['id' => $globalgridid]);
+        $this->assertEquals('Renamed grid', $grid->get('name'));
+    }
+
+    /**
+     * Test that a new grid cannot be created for a situation that already contains user data.
+     *
+     * @return void
+     */
+    public function test_update_grid_creation_with_situation_user_data_throws(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $competvet = $this->getDataGenerator()->get_plugin_generator('mod_competvet')
+            ->create_instance(['course' => $course->id]);
+        $situation = situation::get_record(['competvetid' => $competvet->id]);
+        $this->add_user_data_to_situation($situation->get('id'));
+
+        $this->expectException('moodle_exception');
+        $this->expectExceptionMessage('This situation already contains evaluation data');
+
+        criteria::update_grid(0, 'Blocked grid', 1, $situation->get('id'), grid::COMPETVET_CRITERIA_EVALUATION);
+    }
+
+    /**
      * Create a grid with the given scope.
      *
      * @param int $situationid - The situation id the grid is bound to (0 for a global grid)
@@ -255,6 +322,32 @@ final class criteria_test extends advanced_testcase {
         ]);
         $grid->create();
         return $grid;
+    }
+
+    /**
+     * Add a planning with an observation to a situation so that it is considered to have user data.
+     *
+     * @param int $situationid - The situation id
+     * @return void
+     */
+    private function add_user_data_to_situation(int $situationid): void {
+        $planning = new planning(0, (object) [
+            'situationid' => $situationid,
+            'groupid' => 0,
+            'startdate' => time(),
+            'enddate' => time() + 86400,
+            'session' => '2026',
+        ]);
+        $planning->create();
+        $observation = new observation(0, (object) [
+            'situationid' => 0,
+            'observerid' => 0,
+            'observedid' => 0,
+            'planningid' => $planning->get('id'),
+            'studentid' => 0,
+            'timeobserved' => time(),
+        ]);
+        $observation->create();
     }
 
     /**

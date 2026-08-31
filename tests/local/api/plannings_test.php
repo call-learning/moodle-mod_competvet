@@ -18,6 +18,8 @@ namespace mod_competvet\local\api;
 use advanced_testcase;
 use core_user;
 use DateTime;
+use mod_competvet\local\persistent\observation;
+use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\tests\test_data_definition;
 use mod_competvet\tests\test_helpers;
@@ -110,5 +112,41 @@ final class plannings_test extends advanced_testcase {
         ksort($allplannings);
         ksort($expected);
         $this->assertSame($expected, $allplannings);
+    }
+
+    /**
+     * Test that situation_has_user_data reflects whether any planning of the situation contains user data.
+     *
+     * @return void
+     */
+    public function test_situation_has_user_data(): void {
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $competvet = $generator->get_plugin_generator('mod_competvet')->create_instance(['course' => $course->id]);
+        $situation = situation::get_record(['competvetid' => $competvet->id]);
+
+        // A fresh situation has no user data yet.
+        $this->assertFalse(plannings::situation_has_user_data($situation->get('id')));
+
+        // A planning with an observation makes it have user data.
+        $planning = new planning(0, (object) [
+            'situationid' => $situation->get('id'),
+            'groupid' => 0,
+            'startdate' => time(),
+            'enddate' => time() + 86400,
+            'session' => '2026',
+        ]);
+        $planning->create();
+        $observation = new observation(0, (object) [
+            'situationid' => 0,
+            'observerid' => 0,
+            'observedid' => 0,
+            'planningid' => $planning->get('id'),
+            'studentid' => 0,
+            'timeobserved' => time(),
+        ]);
+        $observation->create();
+
+        $this->assertTrue(plannings::situation_has_user_data($situation->get('id')));
     }
 }

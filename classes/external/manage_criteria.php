@@ -327,6 +327,22 @@ class manage_criteria extends external_api {
         }
         $grids = grid::get_records($queryparams);
 
+        // A situation also uses the grid referenced by its {type}grid field. That grid can be global
+        // (or scoped to another situation), so include it as well even when it does not match the
+        // situationid filter.
+        if (!empty($situationid) && !$gridid && isset(grid::COMPETVET_GRID_TYPES[$type])) {
+            $situation = situation::get_record(['id' => $situationid]);
+            if ($situation) {
+                $inusegridid = (int) $situation->get(grid::COMPETVET_GRID_TYPES[$type] . 'grid');
+                if ($inusegridid && !isset($grids[$inusegridid])) {
+                    $inusegrid = grid::get_record(['id' => $inusegridid, 'type' => $type]);
+                    if ($inusegrid) {
+                        $grids[$inusegridid] = $inusegrid;
+                    }
+                }
+            }
+        }
+
         $grids = array_map(function ($grid) {
             $newgrid = (object) [
                 'gridid' => $grid->get('id'),

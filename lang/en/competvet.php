@@ -336,6 +336,7 @@ $string['grid:idnumber'] = 'Evaluation grid idnumber';
 $string['grid:name'] = 'Evaluation grid name';
 $string['grid:selector'] = 'Evaluation grid selector';
 $string['gridnotfound'] = 'The grid with id {$a} was not found';
+$string['gridsituationlocked'] = 'This situation already contains evaluation data, so its criteria grid cannot be changed.';
 $string['group'] = 'Group';
 $string['groupnotfound'] = 'The group with name {$a} was not found';
 $string['historicalgroupunknown'] = 'Unknown group ({$a})';
