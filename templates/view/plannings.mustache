@@ -160,10 +160,24 @@
                         <div class="d-flex align-items-center position-relative">
                             <img src="{{userinfo.userpictureurl}}" alt="{{userinfo.fullname}}" class="userpicture">
                             <a class="stretched-link" href="{{{profileurl}}}" data-region="studentname" data-studentid="{{userinfo.id}}" data-firstname="{{userinfo.firstname}}" data-lastname="{{userinfo.lastname}}" data-email="{{userinfo.email}}">{{userinfo.fullname}}</a>
+                            {{#isorphan}}
+                                <span class="badge bg-warning ml-2">{{#str}}orphanuser, mod_competvet{{/str}}</span>
+                            {{/isorphan}}
                         </div>
                     </th>
                     <td class="t-grade stats">
                         <div class="d-flex flex-row align-items-baseline">
+                            {{#fix}}
+                                <button class="btn btn-danger btn-sm btn-fixorphan mr-2"
+                                        data-action="{{fix.action}}"
+                                        data-userid="{{fix.userid}}"
+                                        data-groupid="{{fix.groupid}}"
+                                        data-planningid="{{fix.planningid}}"
+                                        data-oldplanningid="{{fix.oldplanningid}}"
+                                        title="{{fix.fixstring}}">
+                                    {{#str}}orphanuserfix, mod_competvet{{/str}}
+                                </button>
+                            {{/fix}}
                             {{#planninginfo}}
                                 {{#stats.eval}}
                                     <div class="evaluations p-l-1">

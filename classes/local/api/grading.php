@@ -44,9 +44,10 @@ class grading {
      *
      * @param array $planningsids
      * @param int $userid
+     * @param bool $includeorphan Whether to include orphaned users (removed from the group but still enrolled in the course).
      * @return array
      */
-    public static function get_planning_infos_for_grading(array $planningsids, int $userid) {
+    public static function get_planning_infos_for_grading(array $planningsids, int $userid, bool $includeorphan = false) {
         global $DB;
         if (empty($planningsids)) {
             return [];
@@ -60,7 +61,7 @@ class grading {
                 continue;
             }
             $planningid = $planning->get('id');
-            $groupstats = self::get_group_infos_for_planning_with_students($planningid);
+            $groupstats = self::get_group_infos_for_planning_with_students($planningid, $includeorphan);
             $category = plannings::get_category_for_planning_id($planningid);
             $stats[] = [
                 'id' => $planning->get('id'),
@@ -76,13 +77,21 @@ class grading {
      * Retrieves the users which are students associated with all grades for a given planning ID.
      *
      * @param int $planningid The ID of the planning.
+     * @param bool $includeorphan Whether to include orphaned users (removed from the group but still enrolled in the course).
      * @return array An array of users.
      */
-    protected static function get_students_with_grade_info_for_planning_id(int $planningid): array {
+    protected static function get_students_with_grade_info_for_planning_id(int $planningid, bool $includeorphan = false): array {
         global $USER;
         $planning = planning::get_record(['id' => $planningid]);
         $competvet = competvet::get_from_situation_id($planning->get('situationid'));
         $students = plannings::get_students_for_planning_id($planningid);
+        $orphans = [];
+        if ($includeorphan) {
+            // Merge orphaned users (no longer in the group, or no longer a student) into the student list.
+            // Both sources are keyed by user id, so the union adds orphans without duplicating current members.
+            $orphans = plannings::get_orphaned_students_for_planning_id($planningid);
+            $students = $students + $orphans;
+        }
         $groupmembers = [];
         $canseeother = has_capability('mod/competvet:viewother', $competvet->get_context());
         foreach ($students as $student) {
@@ -116,6 +125,12 @@ class grading {
                 'course' => $competvet->get_course_id(),
             ];
             $groupmember->profileurl = (new moodle_url('/user/profile.php', $profileparams))->out();
+            if ($includeorphan && isset($orphans[$student->id])) {
+                // This student has records in the planning but is no longer a regular student of the group;
+                // flag them as an orphan. A fix is proposed only when the issue can be fixed.
+                $groupmember->isorphan = true;
+                $groupmember->fixinfo = plannings::find_orphan_fix($student->id, $planningid);
+            }
             $groupmembers[] = $groupmember;
         }
         return $groupmembers;
@@ -125,12 +140,13 @@ class grading {
      * Get all observations statistics for a given planning with student info
      *
      * @param int $planningid
+     * @param bool $includeorphan Whether to include orphaned users (removed from the group but still enrolled in the course).
      * @return array|null
      */
-    protected static function get_group_infos_for_planning_with_students(int $planningid): ?array {
+    protected static function get_group_infos_for_planning_with_students(int $planningid, bool $includeorphan = false): ?array {
         $planning = planning::get_record(['id' => $planningid]);
         $stats = ['groupid' => $planning->get('groupid')];
-        $students = self::get_students_with_grade_info_for_planning_id($planningid);
+        $students = self::get_students_with_grade_info_for_planning_id($planningid, $includeorphan);
         $stats['nbstudents'] = count($students);
         $stats['students'] = $students;
         return $stats;

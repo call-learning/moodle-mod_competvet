@@ -196,6 +196,11 @@ class plannings extends base {
                     $progressionreporturl->param('parameters[planningid]', $planningstat['id']);
                     $student->progressionreporturl = ($progressionreporturl)->out(false);
 
+                    // Orphaned students may offer a fix action, if the current user has the required capability.
+                    if (!empty($student->isorphan)) {
+                        $student->fix = $this->get_orphan_fix_for_student($student, $competvet->get_context());
+                    }
+
                     $studentswithreporturl[] = $student;
                 }
                 $planningresult->students = $studentswithreporturl;
@@ -249,7 +254,8 @@ class plannings extends base {
             $planningids = array_map(function ($planning) {
                 return $planning['id'];
             }, $currentplannings);
-            $planningstats = grading_api::get_planning_infos_for_grading($planningids, $USER->id);
+            // Include orphaned users (removed from the group but still enrolled) so they can be displayed and fixed.
+            $planningstats = grading_api::get_planning_infos_for_grading($planningids, $USER->id, true);
             $viewplanning =
                 new moodle_url($this->baseurl, ['pagetype' => 'planning', 'id' => $competvet->get_course_module_id()]);
             $isgrader = has_capability('mod/competvet:cangrade', $context);
@@ -280,5 +286,41 @@ class plannings extends base {
             get_string('mytodos', 'mod_competvet'),
         );
         return $buttons;
+    }
+
+    /**
+     * Build the orphan fix object for a student, if the current user has the required capability.
+     *
+     * The fix action determines which capability is required:
+     * - orphanfix:move requires mod/competvet:cangrade.
+     * - orphanfix:add requires moodle/course:managegroups.
+     *
+     * @param object $student The student object (carries isorphan and fixinfo when it is an orphan).
+     * @param \context $context The situation context.
+     * @return object|null The fix object, or null when the student is not an orphan or has no permission.
+     */
+    private function get_orphan_fix_for_student(object $student, \context $context): ?object {
+        if (empty($student->isorphan) || empty($student->fixinfo['action'])) {
+            return null;
+        }
+        $action = $student->fixinfo['action'];
+        if ($action == 'orphanfix:move') {
+            $allowed = has_capability('mod/competvet:cangrade', $context);
+        } else if ($action == 'orphanfix:add') {
+            $allowed = has_capability('moodle/course:managegroups', $context);
+        } else {
+            $allowed = false;
+        }
+        if (!$allowed) {
+            return null;
+        }
+        return (object) [
+            'action' => $student->fixinfo['action'],
+            'userid' => $student->fixinfo['userid'],
+            'groupid' => $student->fixinfo['groupid'],
+            'planningid' => $student->fixinfo['planningid'],
+            'oldplanningid' => $student->fixinfo['oldplanningid'],
+            'fixstring' => $student->fixinfo['fixstring'],
+        ];
     }
 }

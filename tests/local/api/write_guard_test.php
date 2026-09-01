@@ -148,11 +148,17 @@ final class write_guard_test extends advanced_testcase {
         $planningid = $planning->get('id');
         $groupid = $planning->get('groupid');
 
+        // Use a real member of the planning's group so the observation can be created.
+        $members = groups_get_members($groupid);
+        $member = reset($members);
+        $this->assertNotFalse($member, 'The planning group must contain a member.');
+        $studentid = $member->id;
+
         // Create an observation first (before group deletion).
         $obsid = observations::create_observation(
             observation::CATEGORY_EVAL_OBSERVATION,
             $planningid,
-            1,
+            $studentid,
             1,
             'Original context'
         );
@@ -228,11 +234,17 @@ final class write_guard_test extends advanced_testcase {
         $planningid = $planning->get('id');
         $groupid = $planning->get('groupid');
 
+        // Use a real member of the planning's group so the observation can be created.
+        $members = groups_get_members($groupid);
+        $member = reset($members);
+        $this->assertNotFalse($member, 'The planning group must contain a member.');
+        $studentid = $member->id;
+
         // Create an observation before group deletion.
         $obsid = observations::create_observation(
             observation::CATEGORY_EVAL_OBSERVATION,
             $planningid,
-            1,
+            $studentid,
             1,
             'Original context'
         );
@@ -242,12 +254,12 @@ final class write_guard_test extends advanced_testcase {
         $group = groups_get_group($groupid);
         groups_delete_group($group);
 
-        // Try to create another observation (should fail).
+        // Try to create another observation (should fail: the group was deleted).
         $this->expectException(\moodle_exception::class);
         observations::create_observation(
             observation::CATEGORY_EVAL_OBSERVATION,
             $planningid,
-            1,
+            $studentid,
             1,
             'Should not be created'
         );

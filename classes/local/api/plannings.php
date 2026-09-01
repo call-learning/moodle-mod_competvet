@@ -20,6 +20,7 @@ use core_date;
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\case_entry;
 use mod_competvet\local\persistent\cert_decl;
+use mod_competvet\local\persistent\grade;
 use mod_competvet\local\persistent\group_history;
 use mod_competvet\local\persistent\observation;
 use mod_competvet\local\persistent\planning;
@@ -312,6 +313,233 @@ class plannings {
               ORDER BY u.lastname, u.firstname";
 
         return $DB->get_records_sql($sql, $inparams);
+    }
+
+    /**
+     * Get orphaned students for a given planning ID.
+     *
+     * An orphaned student is a user who has data attached to a planning
+     * (observations, certifications, cases or grades) but who is not a regular
+     * student of the planning's group: either they are no longer a member of the
+     * planning's group (their group assignment changed) or they no longer have
+     * the student role in the course (their role was changed).
+     *
+     * @param int $planningid The ID of the planning.
+     * @return array An array of orphaned user objects, keyed by user ID.
+     */
+    public static function get_orphaned_students_for_planning_id(int $planningid): array {
+        $planning = planning::get_record(['id' => $planningid]);
+        if (!$planning) {
+            return [];
+        }
+
+        // Historical plannings already derive their students from the records, so there are no orphans.
+        $metadata = self::resolve_planning_metadata($planningid);
+        if ($metadata['historical']) {
+            return [];
+        }
+
+        global $DB;
+        $groupid = $planning->get('groupid');
+        $competvet = competvet::get_from_situation_id($planning->get('situationid'));
+        $contextid = $competvet->get_context()->id;
+
+        // Collect distinct student IDs from all planning-scoped CompetVet records.
+        $sql = "SELECT DISTINCT o.studentid
+                  FROM {competvet_observation} o
+                 WHERE o.planningid = :planningid
+                UNION
+                SELECT DISTINCT cd.studentid
+                  FROM {competvet_cert_decl} cd
+                 WHERE cd.planningid = :planningid2
+                UNION
+                SELECT DISTINCT ce.studentid
+                  FROM {competvet_case_entry} ce
+                 WHERE ce.planningid = :planningid3
+                UNION
+                 SELECT DISTINCT g.studentid
+                   FROM {competvet_grades} g
+                  WHERE g.planningid = :planningid4";
+
+        $params = [
+            'planningid' => $planningid,
+            'planningid2' => $planningid,
+            'planningid3' => $planningid,
+            'planningid4' => $planningid,
+        ];
+
+        $studentids = $DB->get_fieldset_sql($sql, $params);
+        if (empty($studentids)) {
+            return [];
+        }
+
+        // Orphaned users are users with records on the planning who are no longer a regular
+        // student of the planning group: either they left the group (group assignment changed)
+        // or they lost the student role (role changed).
+        $orphanids = array_filter($studentids, fn($studentid) =>
+            !groups_is_member($groupid, $studentid) || !utils::is_student($studentid, $contextid));
+        if (empty($orphanids)) {
+            return [];
+        }
+
+        [$insql, $inparams] = $DB->get_in_or_equal($orphanids, SQL_PARAMS_NAMED, 'sid');
+        $sql = "SELECT u.*
+                  FROM {user} u
+                 WHERE u.id $insql
+                   AND u.deleted = 0
+               ORDER BY u.lastname, u.firstname";
+
+        return $DB->get_records_sql($sql, $inparams);
+    }
+
+    /**
+     * Find a fix proposal for an orphaned user.
+     *
+     * If the user is a member of another group whose planning covers the same
+     * week in the same situation, propose to move the orphaned records to that
+     * planning. Otherwise, propose to add the user back to the original
+     * planning group.
+     *
+     * If the user is still a member of the planning's own group (their role was
+     * changed rather than their group), the issue cannot be fixed and an empty
+     * array is returned.
+     *
+     * @param int $userid The orphaned user ID.
+     * @param int $planningid The planning ID holding the orphaned records.
+     * @return array The fix proposal, or an empty array when the issue cannot be fixed.
+     */
+    public static function find_orphan_fix(int $userid, int $planningid): array {
+        $planning = planning::get_record(['id' => $planningid]);
+        $plannings = planning::get_records(['situationid' => $planning->get('situationid')], 'startdate');
+        foreach ($plannings as $otherplanning) {
+            if ($otherplanning->get('id') == $planningid) {
+                continue;
+            }
+            // Only consider plannings covering the same week as the orphaned planning.
+            if (
+                $otherplanning->get('startdate') != $planning->get('startdate') ||
+                    $otherplanning->get('enddate') != $planning->get('enddate')
+            ) {
+                continue;
+            }
+            if (groups_is_member($otherplanning->get('groupid'), $userid)) {
+                $groupid = $otherplanning->get('groupid');
+                $groupname = groups_get_group_name($groupid);
+                return [
+                    'action' => 'orphanfix:move',
+                    'fixstring' => get_string('orphanfix:move', 'competvet', $groupname),
+                    'userid' => $userid,
+                    'groupid' => $groupid,
+                    'groupname' => $groupname,
+                    'oldplanningid' => $planningid,
+                    'planningid' => $otherplanning->get('id'),
+                ];
+            }
+        }
+
+        $groupid = $planning->get('groupid');
+        // If the user is still a member of the planning's own group, they were not removed from
+        // the group (their role was changed instead): there is nothing we can fix, so no fix action.
+        if (groups_is_member($groupid, $userid)) {
+            return [];
+        }
+        $groupname = groups_get_group_name($groupid);
+        return [
+            'action' => 'orphanfix:add',
+            'fixstring' => get_string('orphanfix:add', 'competvet', $groupname),
+            'userid' => $userid,
+            'groupid' => $groupid,
+            'groupname' => $groupname,
+            'oldplanningid' => $planningid,
+            'planningid' => $planningid,
+        ];
+    }
+
+    /**
+     * Fix an orphaned user in a planning.
+     *
+     * Supported actions:
+     * - orphanfix:add: re-add the user to the original planning group.
+     * - orphanfix:move: move all orphaned records to the planning of the user's
+     *   current group covering the same week in the same situation.
+     *
+     * @param int $userid The orphaned user ID.
+     * @param int $groupid The target group ID.
+     * @param int $planningid The target planning ID.
+     * @param int $oldplanningid The planning ID holding the orphaned records.
+     * @param string $action The fix action.
+     * @return string A human readable result message.
+     * @throws \moodle_exception If the fix is not valid.
+     */
+    public static function fix_orphan_user(int $userid, int $groupid, int $planningid, int $oldplanningid, string $action): string {
+        if ($action == 'orphanfix:move') {
+            $oldplanning = planning::get_record(['id' => $oldplanningid]);
+            $targetplanning = planning::get_record(['id' => $planningid]);
+            if (!$oldplanning || !$targetplanning || $targetplanning->get('id') == $oldplanningid) {
+                throw new \moodle_exception('invaliddata', 'competvet', '', 'planningid');
+            }
+            // Validate the target planning: same situation, same week.
+            if (
+                $targetplanning->get('situationid') != $oldplanning->get('situationid') ||
+                    $targetplanning->get('startdate') != $oldplanning->get('startdate') ||
+                    $targetplanning->get('enddate') != $oldplanning->get('enddate')
+            ) {
+                throw new \moodle_exception('invaliddata', 'competvet', '', 'planningid');
+            }
+            // The user must be a member of the target planning group.
+            if (!$groupid || $targetplanning->get('groupid') != $groupid || !groups_is_member($groupid, $userid)) {
+                throw new \moodle_exception('invaliddata', 'competvet', '', 'groupid');
+            }
+            self::move_orphan_records($oldplanningid, $planningid, $userid);
+            $groupname = groups_get_group_name($groupid);
+            return get_string('orphanfixed:move', 'competvet', $groupname);
+        }
+
+        if ($action == 'orphanfix:add') {
+            $planning = planning::get_record(['id' => $oldplanningid]);
+            if (!$planning || !$groupid || $planning->get('groupid') != $groupid) {
+                throw new \moodle_exception('invaliddata', 'competvet', '', 'groupid');
+            }
+            groups_add_member($groupid, $userid);
+            $groupname = groups_get_group_name($groupid);
+            return get_string('orphanfixed:add', 'competvet', $groupname);
+        }
+
+        throw new \moodle_exception('invaliddata', 'competvet', '', 'action');
+    }
+
+    /**
+     * Move the orphaned records of a user from one planning to another.
+     *
+     * Only the planning-scoped records attached to the student are moved:
+     * observations, certifications, case entries and grades.
+     *
+     * @param int $oldplanningid The planning ID holding the orphaned records.
+     * @param int $newplanningid The target planning ID.
+     * @param int $userid The user ID.
+     * @return void
+     */
+    protected static function move_orphan_records(int $oldplanningid, int $newplanningid, int $userid): void {
+        $observations = observation::get_records(['planningid' => $oldplanningid, 'studentid' => $userid]);
+        foreach ($observations as $observation) {
+            $observation->set('planningid', $newplanningid);
+            $observation->save();
+        }
+        $grades = grade::get_records(['planningid' => $oldplanningid, 'studentid' => $userid]);
+        foreach ($grades as $grade) {
+            $grade->set('planningid', $newplanningid);
+            $grade->save();
+        }
+        $certdecl = cert_decl::get_records(['planningid' => $oldplanningid, 'studentid' => $userid]);
+        foreach ($certdecl as $cert) {
+            $cert->set('planningid', $newplanningid);
+            $cert->save();
+        }
+        $cases = case_entry::get_records(['planningid' => $oldplanningid, 'studentid' => $userid]);
+        foreach ($cases as $case) {
+            $case->set('planningid', $newplanningid);
+            $case->save();
+        }
     }
 
     /**
