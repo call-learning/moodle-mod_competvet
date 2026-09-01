@@ -259,4 +259,12 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'moodle/role:assign',
     ],
+    'mod_competvet_fix_orphan_user' => [
+        'classname' => \mod_competvet\external\fix_orphan_user::class,
+        'methodname' => 'execute',
+        'description' => 'Fix an orphaned user in a planning',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'mod/competvet:viewother',
+    ],
 ];

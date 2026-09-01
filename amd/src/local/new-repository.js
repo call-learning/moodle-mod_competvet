@@ -254,6 +254,15 @@ class Repository {
     async getRoles(args) {
         return Ajax.call([{methodname: 'mod_competvet_get_roles', args: args}])[0];
     }
+
+    /**
+     * Fix an orphaned user in a planning.
+     * @param {Object} args The arguments containing the fix action and identifiers.
+     * @return {Promise} The promise.
+     */
+    async fixOrphanUser(args) {
+        return Ajax.call([{methodname: 'mod_competvet_fix_orphan_user', args: args}])[0];
+    }
 }
 
 const RepositoryInstance = new Repository();

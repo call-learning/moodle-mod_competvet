@@ -23,6 +23,7 @@ use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
 use mod_competvet\local\api\plannings;
+use mod_competvet\utils;
 
 /**
  * Class get_student_list
@@ -69,7 +70,10 @@ class get_student_list extends external_api {
      */
     public static function execute(int $planningid) {
         self::validate_context(context_system::instance());
-        $users  = plannings::get_students_info_for_planning_id($planningid);
+        $users = plannings::get_students_info_for_planning_id($planningid);
+        foreach (plannings::get_orphaned_students_for_planning_id($planningid) as $user) {
+            $users[] = utils::get_user_info($user->id);
+        }
         return [
             'users' => $users,
         ];

@@ -21,6 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import Ajax from 'core/ajax';
+import Notification from 'core/notification';
 import {get_strings as getStrings} from 'core/str';
 import XLSX from 'mod_competvet/local/xlsx';
 
@@ -82,6 +84,14 @@ export const init = (situationname) => {
     exportButton.addEventListener('click', (e) => {
         exportToCsv(situationname);
         e.preventDefault();
+    });
+
+    // Orphan fix buttons (only rendered for orphaned students with permission).
+    document.querySelectorAll('.btn-fixorphan').forEach((fixButton) => {
+        fixButton.addEventListener('click', (e) => {
+            fixOrphanUser(fixButton);
+            e.preventDefault();
+        });
     });
 
 };
@@ -276,4 +286,49 @@ const exportToCsv = async(situationname) => {
     const filename = `${situationname}-${new Date().toISOString().slice(0, 10)}-export.xlsx`;
     XLSX.utils.book_append_sheet(wb, ws, 'Plannings');
     XLSX.writeFile(wb, filename);
+};
+
+/**
+ * Fix an orphaned user.
+ *
+ * Asks for confirmation, then calls the web service. Once the orphan has been fixed,
+ * the plannings page is reloaded so the updated student list is shown.
+ *
+ * @param {HTMLElement} button The fix button that was clicked.
+ * @return {Promise<void>} A promise that resolves when the flow has started.
+ */
+const fixOrphanUser = async(button) => {
+    const [orphanuser, yes, no] = await getStrings([
+        {key: 'orphanuser', component: 'mod_competvet'},
+        {key: 'yes', component: 'core'},
+        {key: 'no', component: 'core'},
+    ]);
+    const args = {
+        action: button.dataset.action,
+        userid: parseInt(button.dataset.userid, 10),
+        groupid: parseInt(button.dataset.groupid, 10),
+        planningid: parseInt(button.dataset.planningid, 10),
+        oldplanningid: parseInt(button.dataset.oldplanningid, 10),
+    };
+    Notification.confirm(
+        orphanuser,
+        button.title,
+        yes,
+        no,
+        () => {
+            const request = {
+                methodname: 'mod_competvet_fix_orphan_user',
+                args: args,
+            };
+            Ajax.call([request])[0]
+                .then((response) => {
+                    Notification.success(response.result);
+                    // Give the user a moment to read the confirmation before reloading the changed list.
+                    setTimeout(() => window.location.reload(), 1500);
+                    return;
+                })
+                .catch(Notification.exception);
+            return true;
+        },
+    );
 };

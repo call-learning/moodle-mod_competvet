@@ -688,6 +688,9 @@
   height: 3rem;
   border-radius: 100%;
 }
+.path-mod-competvet .competvet-grade-table .btn-fixorphan {
+  white-space: nowrap;
+}
 
 .competvet-view-todos .userpicture {
   width: 3rem;
