@@ -90,6 +90,11 @@ class manage_plannings extends external_api {
                 $result = false;
                 break;
             }
+            // Historical plannings are read-only: skip them (and their pauses) so a batch
+            // operation does not abort and read-only plannings are preserved.
+            if (plannings::resolve_planning_metadata($planning['id'])['readonly']) {
+                continue;
+            }
             if (isset($planning['deleted']) && $planning['deleted']) {
                 plannings::delete_planning($planning['id']);
                 continue;

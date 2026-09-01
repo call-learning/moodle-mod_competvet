@@ -47,6 +47,11 @@ class planning extends base {
     protected string $currentgroupname;
 
     /**
+     * @var bool $readonly Whether the planning is read-only because its group has been deleted.
+     */
+    protected bool $readonly = false;
+
+    /**
      * Export this data so it can be used in a mustache template.
      *
      * @param renderer_base $output
@@ -101,6 +106,10 @@ class planning extends base {
             }
         }
         $data['usersbytype'] = array_values($results);
+        $data['isreadonly'] = $this->readonly;
+        if ($this->readonly) {
+            $data['readonlymessage'] = get_string('historicalplanningreadonly', 'mod_competvet');
+        }
         return $data;
     }
 
@@ -136,7 +145,11 @@ class planning extends base {
                     ['pagetype' => $pagetype, 'id' => $competvet->get_course_module_id(), 'planningid' => $planningid]
                 );
             $planning = plannings_entity::get_record(['id' => $planningid]);
-            $currentgroupname = groups_get_group_name($planning->get('groupid'));
+            // Use the metadata resolver so that plannings whose group has been deleted show the
+            // preserved group name (or the fallback string) instead of an empty name.
+            $planningmetadata = plannings_api::resolve_planning_metadata($planningid);
+            $currentgroupname = $planningmetadata['groupname'];
+            $this->readonly = $planningmetadata['readonly'];
             $data = [$userswithinfo, $currentgroupname, $viewstudenturl];
             $this->backurl =
                 new moodle_url($this->baseurl, ['pagetype' => 'plannings', 'id' => $competvet->get_course_module_id()]);

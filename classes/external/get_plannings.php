@@ -74,7 +74,8 @@ class get_plannings extends external_api {
             $competvet->get_situation()->get('id'),
             $USER->id,
             false,
-            $viewall
+            $viewall,
+            true
         );
         $timezone = core_date::get_user_timezone_object();
         // Covert the startdate and enddate to a human readable format using yyyy-MM-dd.
@@ -122,6 +123,8 @@ class get_plannings extends external_api {
                 'enddatets' => new external_value(PARAM_INT, 'End date timestamp', VALUE_OPTIONAL),
                 'groupname' => new external_value(PARAM_TEXT, 'Group name', VALUE_REQUIRED),
                 'session' => new external_value(PARAM_TEXT, 'Session name', VALUE_REQUIRED),
+                'historical' => new external_value(PARAM_BOOL, 'Whether the planning group no longer exists', VALUE_REQUIRED),
+                'readonly' => new external_value(PARAM_BOOL, 'Whether the planning is read-only', VALUE_REQUIRED),
                 'hasuserdata' => new external_value(PARAM_BOOL, 'Has user data attached to planning?', VALUE_REQUIRED),
                 'groups' => new external_multiple_structure(new external_single_structure([
                     'id' => new external_value(PARAM_INT, 'Id', VALUE_REQUIRED),

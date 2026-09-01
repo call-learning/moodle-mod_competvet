@@ -107,13 +107,17 @@ class plannings {
      * @param bool $nofuture do not show future situation
      * @param bool $viewall if true, return plannings for all groups even when the user is a student
      *                      (used by the management/editor view where the user may also hold a student role)
+     * @param bool $includehistorical if true, students who belong to no group are also returned their historical
+     *                      plannings (whose Moodle group no longer exists). Defaults to false so callers such as
+     *                      local_competvet keep the pre-historical behaviour; only the mod_competvet UI opts in.
      * @return array array of plannings
      */
     public static function get_plannings_for_situation_id(
         int $situationid,
         int $userid,
         bool $nofuture = true,
-        bool $viewall = false
+        bool $viewall = false,
+        bool $includehistorical = false
     ): array {
         // Check if user has access to this situation, else throw an error.
         $competvet = competvet::get_from_situation_id($situationid);
@@ -135,8 +139,14 @@ class plannings {
             $allusergroups = groups_get_all_groups($situationcontext->get_course_context()->instanceid, $userid);
             $allusergroupsid = array_keys($allusergroups);
             if (empty($allusergroupsid)) {
-                // No groups - only return historical plannings (where group doesn't exist).
-                // We'll filter these out later after fetching all plannings.
+                if (!$includehistorical) {
+                    // The student belongs to no group and historical plannings are not requested, so there is
+                    // nothing to return. This preserves the pre-historical behaviour for callers that do not opt
+                    // into historical plannings (e.g. local_competvet).
+                    return [];
+                }
+                // No groups but historical plannings are requested - fetch all plannings and keep only the
+                // historical ones (where the group no longer exists) in the loop below.
                 $planninngsql .= ' AND 1=1';
             } else {
                 [$sql, $params] = $DB->get_in_or_equal($allusergroupsid, SQL_PARAMS_NAMED, 'allusergroupsid');

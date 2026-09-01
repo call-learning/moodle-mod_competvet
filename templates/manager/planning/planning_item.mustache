@@ -67,6 +67,7 @@
         {{#edit}}<input type="text" class="form-control" value="{{{session}}}" placeholder="{{{placeholder}}}" data-field="session">{{/edit}}{{^edit}}{{{session}}}{{/edit}}
     </div>
     <div class="col-2 tcell">
+        {{^readonly}}
         {{^edit}}
         <button class="btn btn-icon icon-no-margin me-1 jsbutton" data-id="{{id}}" data-action="edit" data-type="planning">{{#pix}}i/edit, core, {{#str}}edit{{/str}}{{/pix}}</button>
         {{/edit}}
@@ -78,6 +79,7 @@
         {{/edit}}
         <button class="btn btn-icon icon-no-margin me-1 jsbutton {{#hasuserdata}}btn-warning{{/hasuserdata}}" data-id="{{id}}" data-action="delete" data-type="planning">{{#pix}}i/delete, core, {{#str}}delete{{/str}}{{/pix}}</button>
         <button class="btn btn-icon icon-no-margin me-1 ms-auto jsbutton" data-id="{{id}}" data-action="add" data-type="pause">{{#pix}}e/insert, core, {{#str}}pauseplanningadd, mod_competvet{{/str}}{{/pix}}</button>
+        {{/readonly}}
     </div>
 </div>
 {{#pauses}}
