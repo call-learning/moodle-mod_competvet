@@ -249,7 +249,9 @@ class plannings extends base {
                 \mod_competvet\local\api\plannings::get_plannings_for_situation_id(
                     $competvet->get_situation()->get('id'),
                     $USER->id,
-                    $nofuture
+                    $nofuture,
+                    false,
+                    true
                 );
             $planningids = array_map(function ($planning) {
                 return $planning['id'];

@@ -55,6 +55,9 @@
     }
 }}
 <div class="competvet-view-planning">
+    {{#isreadonly}}
+        <div class="alert alert-warning">{{readonlymessage}}</div>
+    {{/isreadonly}}
     <div class="accordion" id="users-accordion">
         {{#usersbytype}}
             <div class="card">

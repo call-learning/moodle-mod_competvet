@@ -69,7 +69,17 @@ class get_plannings extends external_api {
             ];
         }, $coursegroups);
 
-        $plannings = plannings_api::get_plannings_for_situation_id($competvet->get_situation()->get('id'), $USER->id, false);
+        // Users who can edit plannings manage the full list, so they must see plannings for every group
+        // even if they also hold a student role in this situation (which would otherwise filter the list
+        // down to their own groups).
+        $viewall = has_capability('mod/competvet:editplanning', $context);
+        $plannings = plannings_api::get_plannings_for_situation_id(
+            $competvet->get_situation()->get('id'),
+            $USER->id,
+            false,
+            $viewall,
+            true
+        );
         $timezone = core_date::get_user_timezone_object();
         // Covert the startdate and enddate to a human readable format using yyyy-MM-dd.
         foreach ($plannings as $key => $planning) {
@@ -116,6 +126,8 @@ class get_plannings extends external_api {
                 'enddatets' => new external_value(PARAM_INT, 'End date timestamp', VALUE_OPTIONAL),
                 'groupname' => new external_value(PARAM_TEXT, 'Group name', VALUE_REQUIRED),
                 'session' => new external_value(PARAM_TEXT, 'Session name', VALUE_REQUIRED),
+                'historical' => new external_value(PARAM_BOOL, 'Whether the planning group no longer exists', VALUE_REQUIRED),
+                'readonly' => new external_value(PARAM_BOOL, 'Whether the planning is read-only', VALUE_REQUIRED),
                 'hasuserdata' => new external_value(PARAM_BOOL, 'Has user data attached to planning?', VALUE_REQUIRED),
                 'groups' => new external_multiple_structure(new external_single_structure([
                     'id' => new external_value(PARAM_INT, 'Id', VALUE_REQUIRED),

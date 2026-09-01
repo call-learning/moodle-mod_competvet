@@ -159,8 +159,8 @@ final class historical_access_test extends advanced_testcase {
         $student = core_user::get_user_by_username('student1');
         $this->setUser($student);
 
-        // Student should see the historical planning.
-        $result = plannings::get_plannings_for_situation_id($situation->get('id'), $student->id, true, false);
+        // Student should see the historical planning (the mod_competvet UI opts into historical plannings).
+        $result = plannings::get_plannings_for_situation_id($situation->get('id'), $student->id, true, false, true);
         $found = false;
         foreach ($result as $p) {
             if ((int)$p['id'] === (int)$planning->get('id')) {

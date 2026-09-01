@@ -195,7 +195,10 @@ class Manager {
     async deleteAll() {
         const pendingDeleteAllReady = new Pending(`moc_competvet/planning:deleteall`);
         const state = CompetState.getData();
-        if (state.plannings.length === 0) {
+        // Read-only (historical) plannings cannot be deleted.
+        const deletableplannings = state.plannings.filter((planning) => !planning.readonly);
+        if (deletableplannings.length === 0) {
+            pendingDeleteAllReady.resolve();
             return;
         }
         const confirmationStrings = await getStrings([
@@ -219,7 +222,7 @@ class Manager {
         Notification.confirm(
             ...confirmationStrings,
             () => {
-                state.plannings.forEach((planning) => {
+                deletableplannings.forEach((planning) => {
                     planning.deleted = true;
                 });
                 CompetState.setData(state);
@@ -251,7 +254,10 @@ class Manager {
         });
         if (btn.dataset.type === 'planning') {
             let planning = state.plannings.find((element) => element.id === parseInt(btn.dataset.id));
-            planning.edit = true;
+            // Read-only plannings (deleted group) cannot be edited.
+            if (planning && !planning.readonly) {
+                planning.edit = true;
+            }
         }
         if (btn.dataset.type === 'pause') {
             const pause = this.getPause(parseInt(btn.dataset.id));
@@ -310,7 +316,10 @@ class Manager {
                 element.enddate = this.getValue('planitem', 'enddate', element.id);
                 element.groupid = this.getValue('planitem', 'groupid', element.id);
                 if (element.groupid !== '') {
-                    element.groupname = element.groups.find((group) => group.id === parseInt(element.groupid)).name;
+                    const selectedgroup = element.groups.find((group) => group.id === parseInt(element.groupid));
+                    if (selectedgroup) {
+                        element.groupname = selectedgroup.name;
+                    }
                 }
                 element.session = this.getValue('planitem', 'session', element.id);
                 element.error = false;
