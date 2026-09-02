@@ -102,5 +102,13 @@
 
     .field.textarea {
         margin-bottom: 1rem;
+
+        .field-value {
+            white-space: pre-line;
+        }
     }
+}
+
+.path-mod-competvet .reportbuilder-table .case-entry-textarea {
+    white-space: pre-line;
 }

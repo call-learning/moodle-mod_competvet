@@ -112,9 +112,12 @@ class caselog_schema_importer {
             $versionids = [];
             $versionnames = [];
             foreach ($schema['versions'] as $versiondata) {
-                $existingversions = case_version::get_records(['name' => $versiondata['name']]);
-                $existing = $existingversions ? reset($existingversions) : null;
+                $existing = self::find_version($versiondata['key'], $versiondata['name']);
                 if ($existing) {
+                    $metadata = $existing->read_metadata();
+                    $metadata['schemaid'] = $versiondata['key'];
+                    $existing->set('metadata', json_encode($metadata, JSON_UNESCAPED_UNICODE));
+                    $existing->set('name', $versiondata['name']);
                     if ($verbose) {
                         $log[] = "Version '{$versiondata['name']}' already exists (id: {$existing->get('id')}).";
                     }
@@ -123,12 +126,11 @@ class caselog_schema_importer {
                     continue;
                 }
 
-                $metadata = isset($versiondata['metadata'])
-                    ? json_encode($versiondata['metadata'], JSON_UNESCAPED_UNICODE)
-                    : null;
+                $metadata = $versiondata['metadata'] ?? [];
+                $metadata['schemaid'] = $versiondata['key'];
                 $version = new case_version(0, (object) [
                     'name'     => $versiondata['name'],
-                    'metadata' => $metadata,
+                    'metadata' => json_encode($metadata, JSON_UNESCAPED_UNICODE),
                 ]);
                 $version->create();
                 $versionids[$versiondata['key']] = $version->get('id');
@@ -152,7 +154,8 @@ class caselog_schema_importer {
                 $versionid = $versionids[$schemaversionkey];
                 $versionname = $versionnames[$schemaversionkey];
 
-                $cachekey = $categorydata['name'] . '|' . $versionid;
+                $categorykey = $categorydata['idnumber'] ?? 'category' . substr(md5($categorydata['name']), 0, 12);
+                $cachekey = $categorykey . '|' . $versionid;
                 if (!isset($categorycache[$cachekey])) {
                     // Try to reuse a pre-versioned category for the legacy version.
                     $reusedid = self::try_reuse_legacy_category(
@@ -165,33 +168,44 @@ class caselog_schema_importer {
                     );
                     if ($reusedid !== null) {
                         $categorycache[$cachekey] = $reusedid;
-                        // Skip creating fields — the old fields are already there.
-                        continue;
-                    }
-
-                    $category = case_cat::get_record([
-                        'name' => $categorydata['name'],
-                        'versionid' => $versionid,
-                    ]);
-                    if ($category) {
-                        if ($verbose) {
-                            $msg = "Category '{$categorydata['name']}' exists in '{$versionname}' (id: {$category->get('id')}).";
-                            $log[] = $msg;
-                        }
-                        $categorycache[$cachekey] = $category->get('id');
                     } else {
-                        $category = new case_cat(0, (object) [
-                            'name'        => $categorydata['name'],
-                            'idnumber'    => 'c' . case_cat::count_records(),
-                            'sortorder'   => case_cat::count_records() + 1,
-                            'description' => '',
-                            'versionid'   => $versionid,
+                        $category = case_cat::get_record([
+                        'idnumber' => $categorykey,
+                        'versionid' => $versionid,
                         ]);
-                        $category->create();
-                        $categorycache[$cachekey] = $category->get('id');
-                        if ($verbose) {
-                            $msg = "Created category '{$categorydata['name']}' in '{$versionname}' (id: {$category->get('id')}).";
-                            $log[] = $msg;
+                        if (!$category) {
+                            $category = case_cat::get_record([
+                                'name' => $categorydata['name'],
+                                'versionid' => $versionid,
+                            ]);
+                        }
+                        if ($category) {
+                            $category->set('idnumber', $categorykey);
+                            $category->set('name', $categorydata['name']);
+                            $category->set('description', $categorydata['description'] ?? '');
+                            $category->set('sortorder', $categorydata['sortorder'] ?? $category->get('sortorder'));
+                            $category->update();
+                            if ($verbose) {
+                                $msg = "Category '{$categorydata['name']}' exists in '{$versionname}' "
+                                    . "(id: {$category->get('id')}).";
+                                $log[] = $msg;
+                            }
+                            $categorycache[$cachekey] = $category->get('id');
+                        } else {
+                            $category = new case_cat(0, (object) [
+                            'name'        => $categorydata['name'],
+                            'idnumber'    => $categorykey,
+                            'sortorder'   => case_cat::count_records() + 1,
+                            'description' => $categorydata['description'] ?? '',
+                            'versionid'   => $versionid,
+                            ]);
+                            $category->create();
+                            $categorycache[$cachekey] = $category->get('id');
+                            if ($verbose) {
+                                $msg = "Created category '{$categorydata['name']}' in '{$versionname}' "
+                                    . "(id: {$category->get('id')}).";
+                                $log[] = $msg;
+                            }
                         }
                     }
                 }
@@ -206,6 +220,21 @@ class caselog_schema_importer {
                             'categoryid' => $categoryid,
                         ]);
                         if ($existingfield) {
+                            if (
+                                $existingfield->get('type') !== $fielddata['type']
+                                    && $DB->record_exists('competvet_case_data', ['fieldid' => $existingfield->get('id')])
+                            ) {
+                                throw new \moodle_exception(
+                                    'Cannot change type of field with existing data: ' . $fielddata['idnumber']
+                                );
+                            }
+                            $existingfield->set('name', $fielddata['name']);
+                            $existingfield->set('type', $fielddata['type']);
+                            $existingfield->set('description', $fielddata['description'] ?? '');
+                            $existingfield->set('sortorder', $fielddata['sortorder'] ?? 0);
+                            // Update configuration in place so flags such as removed can evolve safely.
+                            $existingfield->set('configdata', $fielddata['configdata'] ?? null);
+                            $existingfield->update();
                             if ($verbose) {
                                 $msg = "Field '{$fielddata['idnumber']}' exists in '{$categorydata['name']}'.";
                                 $log[] = $msg;
@@ -231,6 +260,7 @@ class caselog_schema_importer {
             }
 
             $transaction->allow_commit();
+            \cache::make('mod_competvet', 'casestructures')->purge();
             if ($verbose) {
                 $log[] = "Import completed successfully.";
             }
@@ -240,6 +270,22 @@ class caselog_schema_importer {
         }
 
         return $log;
+    }
+
+    /**
+     * Find a version by its schema identity, falling back to its current name.
+     *
+     * @param string $schemaid Stable schema identifier.
+     * @param string $name Display name.
+     * @return case_version|null
+     */
+    private static function find_version(string $schemaid, string $name): ?case_version {
+        foreach (case_version::get_records([]) as $version) {
+            if (($version->read_metadata()['schemaid'] ?? null) === $schemaid || $version->get('name') === $name) {
+                return $version;
+            }
+        }
+        return null;
     }
 
     /**

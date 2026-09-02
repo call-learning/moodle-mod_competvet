@@ -18,6 +18,7 @@ namespace mod_competvet\form;
 
 use context;
 use moodle_url;
+use html_writer;
 use core_form\dynamic_form;
 use mod_competvet\competvet;
 use mod_competvet\local\api\cases;
@@ -53,13 +54,20 @@ class case_form_edit extends dynamic_form {
         foreach ($cases as $category) {
             $mform->addElement('header', 'category_' . $category->id, $category->name);
             foreach ($category->fields as $field) {
+                $config = json_decode(stripslashes((string)$field->configdata), true) ?: [];
                 if ($field->type == 'text') {
-                    $mform->addElement('text', 'field_' . $field->id, $field->name);
+                    $attributes = [];
+                    if (!empty($config['placeholder'])) {
+                        $attributes['placeholder'] = $config['placeholder'];
+                    }
+                    $mform->addElement('text', 'field_' . $field->id, $field->name, $attributes);
                     $mform->setType('field_' . $field->id, PARAM_TEXT);
                 }
                 if ($field->type == 'textarea') {
-                    $config = json_decode(stripslashes((string)$field->configdata), true) ?: [];
                     $attributes = ['rows' => $config['rows'] ?? 2];
+                    if (!empty($config['placeholder'])) {
+                        $attributes['placeholder'] = $config['placeholder'];
+                    }
                     if (!empty($config['maxlength'])) {
                         $attributes['maxlength'] = $config['maxlength'];
                     }
@@ -68,16 +76,24 @@ class case_form_edit extends dynamic_form {
                 }
                 if ($field->type == 'select') {
                     $options = [];
-                    if (isset($field->configdata)) {
-                        $config = json_decode(stripslashes((string)$field->configdata), true) ?: [];
-                        $options = (array)($config['options'] ?? []);
-                    }
+                    $options = (array)($config['options'] ?? []);
                     $mform->addElement('select', 'field_' . $field->id, $field->name, $options);
                     $mform->setType('field_' . $field->id, PARAM_INT);
                 }
                 if ($field->type == 'date') {
-                    $mform->addElement('date_selector', 'field_' . $field->id, $field->name);
+                    $mform->addElement('date_selector', 'field_' . $field->id, $field->name, ['optional' => true]);
                     $mform->setType('field_' . $field->id, PARAM_INT);
+                }
+                if (!empty($field->description)) {
+                    $mform->addElement(
+                        'static',
+                        'field_description_' . $field->id,
+                        '',
+                        html_writer::div(s($field->description), 'form-field-description')
+                    );
+                }
+                if (!empty($config['mandatory'])) {
+                    $mform->addRule('field_' . $field->id, get_string('required'), 'required', null, 'client');
                 }
             }
         }
