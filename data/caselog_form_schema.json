@@ -20,6 +20,7 @@
     "categories": [
         {
             "name": "L'animal",
+            "idnumber": "animal",
             "versionkey": "legacy",
             "fields": [
                 { "idnumber": "nom_animal", "name": "Nom de l'animal", "sortorder": 1, "type": "text", "description": "", "configdata": "{}" },
@@ -32,6 +33,7 @@
         },
         {
             "name": "Cas clinique",
+            "idnumber": "clinical-case",
             "versionkey": "legacy",
             "fields": [
                 { "idnumber": "date_cas", "name": "Date", "sortorder": 7, "type": "date", "description": "", "configdata": "{\"placeholder\": \"[date_du_jour]\"}" },
@@ -44,6 +46,7 @@
         },
         {
             "name": "Prise en charge",
+            "idnumber": "care",
             "versionkey": "legacy",
             "fields": [
                 { "idnumber": "role_charge", "name": "Rôle dans la prise en charge", "sortorder": 13, "type": "select", "description": "", "configdata": "{\"options\":{\"1\":\"Observateur\",\"2\":\"Principal acteur (responsable du cas)\",\"3\":\"En assistance d'un autre étudiant responsable\",\"4\":\"En groupe sans responsable attitré\"}}" },
@@ -53,15 +56,16 @@
         },
         {
             "name": "Cas clinique",
+            "idnumber": "clinical-case",
             "versionkey": "clinical-transmission",
             "fields": [
-                { "idnumber": "nom_animal", "name": "Nom de l'animal", "sortorder": 1, "type": "text", "description": "", "configdata": "{}" },
-                { "idnumber": "espece", "name": "Espèce", "sortorder": 2, "type": "text", "description": "", "configdata": "{}" },
-                { "idnumber": "num_dossier", "name": "Numéro de dossier", "sortorder": 3, "type": "text", "description": "", "configdata": "{}" },
-                { "idnumber": "date_cas", "name": "Date de la prise en charge concernée", "sortorder": 4, "type": "date", "description": "", "configdata": "{\"placeholder\": \"[date_du_jour]\"}" },
-                { "idnumber": "role_charge", "name": "Mon rôle dans la prise en charge", "sortorder": 5, "type": "select", "description": "", "configdata": "{\"options\":{\"1\":\"Observateur\",\"2\":\"Principal acteur (responsable du cas)\",\"3\":\"En assistance d'un autre étudiant responsable\",\"4\":\"En groupe sans responsable attitré\"}}" },
-                { "idnumber": "transmission_clinique", "name": "Transmission clinique", "sortorder": 6, "type": "textarea", "description": "L'objectif n'est pas de rédiger un dossier complet mais de vous exercer à synthétiser les informations essentielles. Listez ici, de façon hiérarchisée, uniquement les éléments décisifs pour la compréhension du cas et son suivi. Omettez les éléments anecdotiques.", "configdata": "{\"rows\": 8, \"maxlength\": 1200}" },
-                { "idnumber": "reflexions_enseignements", "name": "Réflexions et enseignements issus du cas", "sortorder": 7, "type": "textarea", "description": "Listez ici - Ce que vous avez mieux compris, - Ce qui vous a mis en difficulté et que vous referiez différemment avec le recul, - Les points que vous devez consolider.", "configdata": "{\"rows\": 6, \"maxlength\": 800}" }
+                { "idnumber": "nom_animal", "name": "Nom de l'animal", "sortorder": 1, "type": "text", "description": "Indiquez le nom usuel de l'animal concerné.", "configdata": "{\"placeholder\": \"Exemple : Médor\", \"mandatory\": true}" },
+                { "idnumber": "espece", "name": "Espèce", "sortorder": 2, "type": "text", "description": "Indiquez l'espèce de l'animal.", "configdata": "{\"placeholder\": \"Exemple : Chien\", \"mandatory\": true}" },
+                { "idnumber": "num_dossier", "name": "Numéro de dossier", "sortorder": 3, "type": "text", "description": "Indiquez le numéro du dossier ou de la prise en charge.", "configdata": "{\"placeholder\": \"Exemple : 2025-01234\", \"mandatory\": true}" },
+                { "idnumber": "date_cas", "name": "Date de la prise en charge concernée", "sortorder": 4, "type": "date", "description": "Indiquez la date de la prise en charge concernée. Laissez le champ désactivé si la date est inconnue.", "configdata": "{}" },
+                { "idnumber": "role_charge", "name": "Mon rôle dans la prise en charge", "sortorder": 5, "type": "select", "description": "Sélectionnez le rôle que vous avez joué dans la prise en charge.", "configdata": "{\"options\":{\"1\":\"Observateur\",\"2\":\"Principal acteur (responsable du cas)\",\"3\":\"En assistance d'un autre étudiant responsable\",\"4\":\"En groupe sans responsable attitré\"},\"mandatory\": true}" },
+                { "idnumber": "transmission_clinique", "name": "Transmission clinique", "sortorder": 6, "type": "textarea", "description": "Synthétisez les informations essentielles au suivi du cas : contexte, problème principal, éléments cliniques utiles, prise en charge réalisée, suites prévues et points de vigilance. Ne rédigez pas un dossier complet et omettez les éléments anecdotiques.", "configdata": "{\"placeholder\": \"Exemple : signes cliniques, éléments déterminants, prise en charge réalisée et suites prévues\", \"rows\": 8, \"maxlength\": 1200}" },
+                { "idnumber": "reflexions_enseignements", "name": "Réflexions et enseignements issus du cas", "sortorder": 7, "type": "textarea", "description": "Décrivez ce que vous avez appris, les difficultés rencontrées, ce que vous referiez différemment et les points que vous devez encore consolider.", "configdata": "{\"placeholder\": \"Exemple : ce que j'ai appris, mes difficultés et mes axes d'amélioration\", \"rows\": 6, \"maxlength\": 800}" }
             ]
         }
     ]

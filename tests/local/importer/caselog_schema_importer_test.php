@@ -20,6 +20,7 @@ use advanced_testcase;
 use mod_competvet\local\persistent\case_cat;
 use mod_competvet\local\persistent\case_field;
 use mod_competvet\local\persistent\case_version;
+use mod_competvet\local\api\cases;
 
 /**
  * Caselog schema importer tests.
@@ -113,6 +114,46 @@ final class caselog_schema_importer_test extends advanced_testcase {
         $this->assertEquals($firstversioncount, case_version::count_records([]));
         $this->assertEquals($firstcatcount, case_cat::count_records([]));
         $this->assertEquals($firstfieldcount, case_field::count_records([]));
+
+        unlink($filepath);
+    }
+
+    /**
+     * Test field configuration is updated without replacing the field record.
+     */
+    public function test_field_configuration_update_preserves_field(): void {
+        $this->resetAfterTest();
+
+        $schema = [
+            'versions' => [['key' => 'v1', 'name' => 'Version 1']],
+            'categories' => [[
+                'name' => 'Test Category',
+                'versionkey' => 'v1',
+                'fields' => [[
+                    'idnumber' => 'f1',
+                    'name' => 'Field 1',
+                    'type' => 'text',
+                    'configdata' => '{"removed":false}',
+                ]],
+            ]],
+        ];
+        $filepath = $this->create_temp_schema_file($schema);
+        caselog_schema_importer::import($filepath);
+        $category = case_cat::get_record(['name' => 'Test Category']);
+        $field = case_field::get_record(['idnumber' => 'f1', 'categoryid' => $category->get('id')]);
+        $fieldid = $field->get('id');
+
+        $schema['categories'][0]['fields'][0]['configdata'] = '{"removed":true}';
+        $schema['categories'][0]['fields'][0]['name'] = 'Updated Field';
+        file_put_contents($filepath, json_encode($schema));
+        caselog_schema_importer::import($filepath);
+
+        $updatedfield = case_field::get_record(['idnumber' => 'f1', 'categoryid' => $category->get('id')]);
+        $this->assertSame($fieldid, $updatedfield->get('id'));
+        $this->assertSame('Updated Field', $updatedfield->get('name'));
+        $this->assertSame('{"removed":true}', $updatedfield->get('configdata'));
+        $version = case_version::get_record(['name' => 'Version 1']);
+        $this->assertCount(0, cases::get_case_structure($version->get('id'))[0]->fields);
 
         unlink($filepath);
     }

@@ -36,8 +36,10 @@ Feature: Caselog modal form
     And I should see "Transmission clinique"
     And I should see "Réflexions et enseignements issus du cas"
     And I set the following fields to these values:
-      | Nom de l'animal       | Rex Chien    |
-      | Espèce                | Chien        |
-      | Transmission clinique | Test message |
+      | Nom de l'animal                  | Rex Chien    |
+      | Espèce                           | Chien        |
+      | Numéro de dossier                | 2025-01234   |
+      | Mon rôle dans la prise en charge | Observateur  |
+      | Transmission clinique            | Test message |
     And I press "Save"
     And I should see "Rex Chien"

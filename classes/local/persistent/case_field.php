@@ -120,6 +120,9 @@ class case_field extends persistent {
             case 'textarea':
                 return $value;
             case 'date':
+                if (empty($value)) {
+                    return '';
+                }
                 return userdate($value, get_string('strftimedate', 'core_langconfig'));
             case 'select':
                 $configdata = json_decode(stripslashes($this->get('configdata')), true);

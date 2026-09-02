@@ -59,8 +59,14 @@ class case_entries extends datasource {
      */
     public static function get_additional_columns_from_case_def(): array {
         $fields = case_field::get_records([], 'categoryid,sortorder');
+        $columns = [];
+        $seenidnumbers = [];
         foreach ($fields as $field) {
             $fieldrecord = $field->to_record();
+            if (isset($seenidnumbers[$fieldrecord->idnumber])) {
+                continue;
+            }
+            $seenidnumbers[$fieldrecord->idnumber] = true;
             $columns[] = "case_entry:field_{$fieldrecord->idnumber}";
         }
 

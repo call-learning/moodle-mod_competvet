@@ -81,6 +81,13 @@
 .path-mod-competvet .case .field.textarea {
     margin-bottom: 1rem;
 }
+.path-mod-competvet .case .field.textarea .field-value {
+  white-space: pre-line;
+}
+
+.path-mod-competvet .reportbuilder-table .case-entry-textarea {
+  white-space: pre-line;
+}
 
 .gradingapp {
     display: flex;

@@ -65,9 +65,16 @@ class case_entry extends base {
     protected function get_all_columns(): array {
         $caseentryalias = $this->get_table_alias('competvet_case_entry');
         $fields = case_field::get_records([], 'categoryid,sortorder');
+        $seenidnumbers = [];
         foreach ($fields as $field) {
             $fieldrecord = $field->to_record();
-            $columns[] = (new column(
+            // Field idnumbers are scoped to a Caselog version/category, while
+            // report column identifiers are scoped to this entity.
+            if (isset($seenidnumbers[$fieldrecord->idnumber])) {
+                continue;
+            }
+            $seenidnumbers[$fieldrecord->idnumber] = true;
+            $column = (new column(
                 "field_{$fieldrecord->idnumber}",
                 new lang_string('caseentry:field', 'mod_competvet', $fieldrecord->name),
                 $this->get_entity_name()
@@ -77,6 +84,10 @@ class case_entry extends base {
                 ->add_fields("{$caseentryalias}.id as entryid")
                 ->set_is_sortable(true)
                 ->add_callback([case_entry_format::class, 'format_field'], $fieldrecord);
+            if ($fieldrecord->type === 'textarea') {
+                $column->add_attributes(['class' => 'case-entry-textarea']);
+            }
+            $columns[] = $column;
         }
         $columns[] = (new column(
             'timecreated',

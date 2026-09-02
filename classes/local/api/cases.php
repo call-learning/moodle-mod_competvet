@@ -44,22 +44,23 @@ class cases {
         if (empty($caseentry)) {
             throw new \moodle_exception('case_not_found', 'competvet', '', $caseid);
         }
-        return self::do_get_entry_content(self::get_case_structure($caseentry->get('versionid')), $caseentry);
+        return self::do_get_entry_content(self::get_case_structure($caseentry->get('versionid'), true), $caseentry);
     }
 
     /**
      * Get the case form structure.
      *
      * @param int|null $versionid The version id
+     * @param bool $includeremoved Whether to include removed fields
      * @return array
      */
-    public static function get_case_structure(?int $versionid = null): array {
+    public static function get_case_structure(?int $versionid = null, bool $includeremoved = false): array {
         if ($versionid === null) {
             $version = case_version::get_current();
             $versionid = $version ? $version->get('id') : 0;
         }
         $casestructure = cache::make('mod_competvet', 'casestructures');
-        $cachekey = 'casestructure_' . $versionid;
+        $cachekey = 'casestructure_' . $versionid . ($includeremoved ? '_all' : '');
         if ($casestructure->get($cachekey)) {
             return $casestructure->get($cachekey);
         }
@@ -73,6 +74,10 @@ class cases {
             ];
             $fields = case_field::get_records(['categoryid' => $category->get('id')], 'sortorder');
             foreach ($fields as $field) {
+                $configdata = json_decode(stripslashes((string)$field->get('configdata')), true) ?: [];
+                if (!$includeremoved && !empty($configdata['removed'])) {
+                    continue;
+                }
                 $data[$category->get('id')]->fields[] = (object) [
                     'id' => $field->get('id'),
                     'idnumber' => $field->get('idnumber'),

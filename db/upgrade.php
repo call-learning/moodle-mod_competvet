@@ -25,7 +25,7 @@
  * @return bool
  */
 function xmldb_competvet_upgrade($oldversion) {
-    global $DB;
+    global $CFG, $DB;
 
     $dbman = $DB->get_manager();
     if ($oldversion < 2024060701) {
@@ -449,5 +449,29 @@ function xmldb_competvet_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 202608240002, 'competvet');
     }
 
+    if ($oldversion < 202609020001) {
+        // Load the bundled Caselog form definition and reconcile it in place.
+        // Deduplicate definitions first so the importer can safely use unique lookups.
+        \mod_competvet\local\upgrade\caselog_schema_deduplicator::execute();
+        \mod_competvet\setup::ensure_case_versions();
+        upgrade_mod_savepoint(true, 202609020001, 'competvet');
+    }
+
+    if ($oldversion < 202609020002) {
+        \mod_competvet\local\upgrade\caselog_schema_deduplicator::execute();
+        upgrade_mod_savepoint(true, 202609020002, 'competvet');
+    }
+
+    if ($oldversion < 202609020003) {
+        \mod_competvet\local\upgrade\caselog_schema_deduplicator::reconcile_schema_fields(
+            $CFG->dirroot . '/mod/competvet/data/caselog_form_schema.json'
+        );
+        upgrade_mod_savepoint(true, 202609020003, 'competvet');
+    }
+
+    if ($oldversion < 202609020004) {
+        // Report column identifiers must remain unique when fields are shared by versions.
+        upgrade_mod_savepoint(true, 202609020004, 'competvet');
+    }
     return true;
 }
