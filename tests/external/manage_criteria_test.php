@@ -778,6 +778,95 @@ final class manage_criteria_test extends \advanced_testcase {
     }
 
     /**
+     * get returns the situations using a grid in the assignedsituations field.
+     */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    public function test_get_returns_assigned_situations(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $competvetgenerator = $this->getDataGenerator()->get_plugin_generator('mod_competvet');
+        $grid = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Shared grid', 'idnumber' => 'GRID302',
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+        ]);
+        $grid->create();
+        $situationa = $competvetgenerator->create_instance(
+            ['course' => $course->id, 'name' => 'Situation AAA', 'evalgrid' => $grid->get('id')]
+        );
+        $competvetgenerator->create_instance(
+            ['course' => $course->id, 'name' => 'Situation BBB', 'evalgrid' => $grid->get('id')]
+        );
+
+        $this->setAdminUser();
+        $result = $this->manage_criteria_get(
+            \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+            $grid->get('id')
+        );
+        $this->assertCount(1, $result['grids']);
+        $assigned = $result['grids'][0]['assignedsituations'];
+        $this->assertCount(2, $assigned);
+        $this->assertSame(['Situation AAA', 'Situation BBB'], array_column($assigned, 'name'));
+        $this->assertStringContainsString('/mod/competvet/view.php', $assigned[0]['url']);
+
+        // The url must point to the course module id, not the situation or instance id.
+        $cmid = get_coursemodule_from_instance('competvet', $situationa->id)->id;
+        $this->assertStringContainsString(
+            'view.php?id=' . $cmid,
+            $assigned[0]['url']
+        );
+
+        // A global grid is not scoped.
+        $this->assertFalse($result['grids'][0]['scoped']);
+    }
+
+    /**
+     * get flags a grid assigned to a single situation with the scoped field.
+     */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    public function test_get_returns_scoped_grid_flag(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $competvetgenerator = $this->getDataGenerator()->get_plugin_generator('mod_competvet');
+        $competvet = $competvetgenerator->create_instance(['course' => $course->id]);
+        $situation = \mod_competvet\local\persistent\situation::get_record(['competvetid' => $competvet->id]);
+        $grid = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Scoped grid', 'idnumber' => 'GRID304',
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+            'situationid' => $situation->get('id'),
+        ]);
+        $grid->create();
+
+        $this->setAdminUser();
+        $result = $this->manage_criteria_get(
+            \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+            $grid->get('id')
+        );
+        $this->assertCount(1, $result['grids']);
+        $this->assertTrue($result['grids'][0]['scoped']);
+    }
+
+    /**
+     * get returns an empty assignedsituations list for a grid used by no situation.
+     */
+    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    public function test_get_returns_empty_assigned_situations(): void {
+        $this->resetAfterTest();
+        $grid = new \mod_competvet\local\persistent\grid(0, (object) [
+            'name' => 'Unused grid', 'idnumber' => 'GRID303',
+            'type' => \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+        ]);
+        $grid->create();
+
+        $this->setAdminUser();
+        $result = $this->manage_criteria_get(
+            \mod_competvet\local\persistent\grid::COMPETVET_CRITERIA_EVALUATION,
+            $grid->get('id')
+        );
+        $this->assertCount(1, $result['grids']);
+        $this->assertSame([], $result['grids'][0]['assignedsituations']);
+    }
+
+    /**
      * Creating a new grid with a situation id through the webservice makes the situation use that grid.
      */
     #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
