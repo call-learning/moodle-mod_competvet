@@ -470,11 +470,14 @@ final class manage_criteria_test extends \advanced_testcase {
         $this->assertTrue($result['result']);
         $this->assertNotEmpty($result['warnings']);
 
-        // Test with non-admin user.
+        // A user who cannot manage the grid gets the grid skipped: the call succeeds,
+        // nothing is modified and the admin warning about the failed deletion is absent.
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
-        $this->expectException(\moodle_exception::class);
-        $this->manage_criteria_update($deleteparams, $grid->get('type'));
+        $result = $this->manage_criteria_update($deleteparams, $grid->get('type'));
+        $this->assertTrue($result['result']);
+        $this->assertEmpty($result['warnings']);
+        $this->assertNotNull(\mod_competvet\local\persistent\grid::get_record(['id' => $grid->get('id')]));
     }
 
     /**
