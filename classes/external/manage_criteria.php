@@ -107,7 +107,7 @@ class manage_criteria extends external_api {
         foreach ($grids as $grid) {
             $storedgrid = grid::get_record(['id' => $grid['gridid']]);
             if ($storedgrid && !$storedgrid->can_manage()) {
-                throw new \moodle_exception('noaccess', 'mod_competvet');
+                continue;
             }
             if (!$storedgrid && empty($grid['situationid'])) {
                 require_capability('mod/competvet:manageglobalcriteria', context_system::instance());
