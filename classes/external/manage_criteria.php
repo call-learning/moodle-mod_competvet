@@ -108,6 +108,8 @@ class manage_criteria extends external_api {
         foreach ($grids as $grid) {
             $storedgrid = grid::get_record(['id' => $grid['gridid']]);
             if ($storedgrid && !$storedgrid->can_manage()) {
+                // The manager submits all the grids, including grids the user cannot manage.
+                // Those are skipped so they do not block the update of the other grids.
                 continue;
             }
             if (!$storedgrid && empty($grid['situationid'])) {
