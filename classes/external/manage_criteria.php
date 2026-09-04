@@ -24,6 +24,7 @@ use core_external\external_value;
 use core_external\external_single_structure;
 use core_external\external_multiple_structure;
 use core_external\external_warnings;
+use mod_competvet\competvet;
 use mod_competvet\local\api\criteria;
 use mod_competvet\local\persistent\grid;
 use mod_competvet\local\persistent\situation;
@@ -316,6 +317,8 @@ class manage_criteria extends external_api {
                 'canedit' => $grid->canedit(),
                 'candelete' => $grid->can_delete(),
                 'canduplicate' => $grid->can_manage(),
+                'scoped' => !empty($grid->get('situationid')),
+                'assignedsituations' => self::get_assigned_situations($grid),
                 'criteria' => criteria::get_sorted_criteria($grid->get('id')),
             ];
             return $newgrid;
@@ -323,6 +326,48 @@ class manage_criteria extends external_api {
         return [
             'grids' => array_values($grids),
         ];
+    }
+
+    /**
+     * Get the situations that use a grid as the grid in use for the grid type.
+     *
+     * @param grid $grid The grid
+     * @return array[] The list of situations using the grid, each with a name and a url
+     */
+    private static function get_assigned_situations(grid $grid): array {
+        global $DB;
+
+        $gridid = $grid->get('id');
+        $fieldname = grid::COMPETVET_GRID_TYPES[$grid->get('type')] . 'grid';
+        $usingsituations = situation::get_records([$fieldname => $gridid]);
+        if (empty($usingsituations)) {
+            return [];
+        }
+
+        $instanceids = [];
+        foreach ($usingsituations as $usingsituation) {
+            $instanceids[] = (int) $usingsituation->get('competvetid');
+        }
+        [$insql, $inparams] = $DB->get_in_or_equal($instanceids);
+        $competvetrecords = $DB->get_records_select('competvet', "id $insql", $inparams, 'id, name');
+
+        // Note: no format_string() here, this webservice is called via ajax/service.php
+        // where $PAGE->context is not set. The name is plain text and escaped by the template.
+        $assignedsituations = [];
+        foreach ($usingsituations as $usingsituation) {
+            $instanceid = (int) $usingsituation->get('competvetid');
+            if (!isset($competvetrecords[$instanceid])) {
+                continue;
+            }
+            // The url uses the course module id, not the situation or instance id.
+            $cmid = competvet::get_from_instance_id($instanceid)->get_course_module_id();
+            $assignedsituations[] = [
+                'name' => $competvetrecords[$instanceid]->name,
+                'url' => (new \moodle_url('/mod/competvet/view.php', ['id' => $cmid]))->out(),
+            ];
+        }
+        usort($assignedsituations, static fn(array $a, array $b) => strnatcasecmp($a['name'], $b['name']));
+        return $assignedsituations;
     }
 
     /**
@@ -341,6 +386,14 @@ class manage_criteria extends external_api {
                     'canedit' => new external_value(PARAM_BOOL, 'Can the grid be edited'),
                     'candelete' => new external_value(PARAM_BOOL, 'Can the grid be deleted'),
                     'canduplicate' => new external_value(PARAM_BOOL, 'Can the grid be duplicated'),
+                    'scoped' => new external_value(PARAM_BOOL, 'The grid is assigned to a single situation'),
+                    'assignedsituations' => new external_multiple_structure(
+                        new external_single_structure([
+                            'name' => new external_value(PARAM_TEXT, 'The name of the situation using the grid'),
+                            'url' => new external_value(PARAM_URL, 'The url of the situation using the grid'),
+                        ]),
+                        'The situations using this grid'
+                    ),
                     'sortorder' => new external_value(PARAM_INT, 'The sort order of the grid'),
                     'criteria' => new external_multiple_structure(
                         new external_single_structure([
