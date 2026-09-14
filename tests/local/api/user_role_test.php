@@ -16,8 +16,10 @@
 
 namespace mod_competvet\local\api;
 use advanced_testcase;
+use cache;
 use context_course;
 use context_module;
+use context_system;
 use core_user;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\tests\test_data_definition;
@@ -265,5 +267,63 @@ final class user_role_test extends advanced_testcase {
         $situation = situation::get_record(['competvetid' => $instance->id], MUST_EXIST);
         $this->assertSame(['observer'], user_role::get_all($user->id, $situation->get('id')));
         $this->assertSame('observer', user_role::get_top($user->id, $situation->get('id')));
+    }
+
+    /**
+     * A hidden situation must not count towards the aggregated user role for a user who cannot
+     * view hidden activities, but it must count for a user who can (uservisible).
+     *
+     * The user is a student on the hidden situation A and an observer on the visible situation B.
+     * For the normal user the hidden (student) situation is ignored, so the aggregated role is
+     * "observer" and no conflict is raised. For the user who can view hidden activities both
+     * situations are seen, the student and observer roles conflict, and the role is therefore
+     * unknown (surfaced by the app as such).
+     *
+     * @return void
+     */
+    public function test_get_top_for_all_situations_excludes_hidden_situations(): void {
+        $generator = $this->getDataGenerator();
+        $coursea = $generator->create_course(['fullname' => 'Hidden Role Course A', 'shortname' => 'HRA']);
+        $courseb = $generator->create_course(['fullname' => 'Hidden Role Course B', 'shortname' => 'HRB']);
+        $modulea = $generator->create_module('competvet', ['course' => $coursea->id, 'name' => 'Sit A']);
+        $moduleb = $generator->create_module('competvet', ['course' => $courseb->id, 'name' => 'Sit B']);
+        $sita = situation::get_record(['competvetid' => $modulea->id], MUST_EXIST);
+        $sitb = situation::get_record(['competvetid' => $moduleb->id], MUST_EXIST);
+
+        // Hide the situation where the users are students.
+        set_coursemodule_visible($modulea->cmid, 0);
+
+        // A normal user: student on the hidden situation A, observer on the visible situation B.
+        $normaluser = $generator->create_user(['username' => 'hidrolenormal']);
+        $generator->enrol_user($normaluser->id, $coursea->id, 'student');
+        $generator->enrol_user($normaluser->id, $courseb->id, 'observer');
+
+        // The student role exists on the hidden situation (visibility is independent of the role).
+        $this->assertSame('student', user_role::get_top($normaluser->id, $sita->get('id')));
+        // The hidden situation is excluded from the list; the visible one is kept.
+        cache::make('mod_competvet', 'usersituations')->delete($normaluser->id);
+        $this->assertNotContains($sita->get('id'), situation::get_all_situations_id_for($normaluser->id));
+        $this->assertContains($sitb->get('id'), situation::get_all_situations_id_for($normaluser->id));
+        // So the aggregated role is observer: the hidden student is ignored and no conflict is raised.
+        $this->assertSame('observer', user_role::get_top_for_all_situations($normaluser->id));
+
+        // A privileged user (same enrolments, plus viewhiddenactivities) sees both situations.
+        $privilegeduser = $generator->create_user(['username' => 'hidrolepriv']);
+        $generator->enrol_user($privilegeduser->id, $coursea->id, 'student');
+        $generator->enrol_user($privilegeduser->id, $courseb->id, 'observer');
+        $systemcontext = context_system::instance();
+        $roleid = create_role('Dummy view hidden role', 'dummyviewhiddenrole', 'Allows viewing hidden activities');
+        assign_capability('moodle/course:viewhiddenactivities', CAP_ALLOW, $roleid, $systemcontext->id);
+        role_assign($roleid, $privilegeduser->id, $systemcontext->id);
+        accesslib_clear_all_caches_for_unit_testing();
+        cache::make('mod_competvet', 'usersituations')->delete($privilegeduser->id);
+
+        // Both situations are visible, so the student and observer roles conflict.
+        try {
+            user_role::get_top_for_all_situations($privilegeduser->id);
+            $this->fail('Expected a conflictroles moodle_exception to be thrown.');
+        } catch (\moodle_exception $e) {
+            $this->assertSame('conflictroles', $e->errorcode);
+        }
     }
 }

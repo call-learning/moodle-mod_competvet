@@ -16,7 +16,9 @@
 
 namespace mod_competvet\local\api;
 use advanced_testcase;
+use context_course;
 use core_user;
+use mod_competvet\competvet;
 use mod_competvet\event\observation_requested;
 use mod_competvet\local\persistent\planning;
 use mod_competvet\local\persistent\situation;
@@ -90,5 +92,38 @@ final class todo_test extends advanced_testcase {
         foreach ($todos as $todo) {
             $this->assertEquals($student->id, $todo['targetuser']['id'], 'Todo target user id does not match.');
         }
+    }
+
+    /**
+     * Todos on a hidden situation must not be returned, even for users able to view hidden activities.
+     *
+     * @return void
+     */
+    public function test_get_todos_for_user_excludes_hidden(): void {
+        global $DB;
+        $student = core_user::get_user_by_username('student1');
+        $observer = core_user::get_user_by_username('observer1');
+        $situation = situation::get_record(['shortname' => 'SIT1']);
+        $competvet = competvet::get_from_situation_id($situation->get('id'));
+        $plannings = plannings::get_plannings_for_situation_id($situation->get('id'), $student->id);
+        $planninginfo = array_shift($plannings);
+        $planning = planning::get_record(['id' => $planninginfo['id']]);
+        $event = observation_requested::create_from_planning($planning, 'A context for observation', $observer->id, $student->id);
+        $event->trigger();
+
+        // While visible, the todo is returned.
+        $todos = todos::get_todos_for_user($observer->id);
+        $this->assertNotEmpty($todos, 'Todo list for user is empty.');
+
+        // Grant the capability to view hidden activities (to the observer role) and hide the situation.
+        $context = context_course::instance($competvet->get_course_module()->course);
+        $observerrole = $DB->get_record('role', ['shortname' => 'observer'], '*', MUST_EXIST);
+        assign_capability('moodle/course:viewhiddenactivities', CAP_ALLOW, $observerrole->id, $context->id);
+        accesslib_clear_all_caches_for_unit_testing();
+        set_coursemodule_visible($competvet->get_course_module_id(), 0);
+
+        // The todo on the hidden situation is no longer returned.
+        $todos = todos::get_todos_for_user($observer->id);
+        $this->assertEmpty($todos, 'Todos on a hidden situation should not be returned.');
     }
 }

@@ -16,6 +16,7 @@
 
 namespace mod_competvet\local\api;
 
+use mod_competvet\competvet;
 use mod_competvet\local\persistent\cert_decl;
 use mod_competvet\local\persistent\cert_decl_asso;
 use mod_competvet\local\persistent\observation;
@@ -207,6 +208,12 @@ class todos {
                 utils::user_exists($todo->get('targetuserid')) === false ||
                 utils::user_exists($todo->get('userid')) === false
             ) {
+                continue;
+            }
+            // Hidden activities must not surface their todos in the app, whatever the viewer's capabilities.
+            $planning = planning::get_record(['id' => $todo->get('planningid')]);
+            $competvet = competvet::get_from_situation_id($planning->get('situationid'));
+            if (!$competvet->has_strict_view_access($userid)) {
                 continue;
             }
             $todorecord = [];
