@@ -78,7 +78,7 @@ final class historical_access_test extends advanced_testcase {
         $this->setUser($manager);
 
         // Manager should be able to get plannings including the historical one.
-        $result = plannings::get_plannings_for_situation_id($situation->get('id'), $manager->id, true, true);
+        $result = plannings::get_plannings_for_situation_id($situation->get('id'), $manager->id, true, true, true);
         $this->assertNotEmpty($result);
 
         // Find the historical planning in the result.
@@ -92,6 +92,11 @@ final class historical_access_test extends advanced_testcase {
         $this->assertNotNull($historical, 'Historical planning should be in the result');
         $this->assertTrue($historical['historical']);
         $this->assertTrue($historical['readonly']);
+
+        // Manager should be able to get plannings including the historical one.
+        $result = plannings::get_plannings_for_situation_id($situation->get('id'), $manager->id, true, true);
+        // Now it should be empty as we should not have any historical planning.
+        $this->assertEmpty($result);
     }
 
     /**

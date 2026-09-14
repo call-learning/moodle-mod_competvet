@@ -166,6 +166,9 @@ class plannings {
         foreach ($allplannings as $planning) {
             $newplanning = (array) $planning->to_record();
             $metadata = self::resolve_planning_metadata($planning->get('id'));
+            if (!$includehistorical && $metadata['historical']) {
+                continue;
+            }
             $newplanning['groupname'] = $metadata['groupname'];
             $newplanning['historical'] = $metadata['historical'];
             $newplanning['readonly'] = $metadata['readonly'];
