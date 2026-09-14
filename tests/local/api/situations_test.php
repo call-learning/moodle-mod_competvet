@@ -16,8 +16,11 @@
 
 namespace mod_competvet\local\api;
 use advanced_testcase;
+use cache;
+use context_course;
 use core_user;
 use DateTime;
+use mod_competvet\competvet;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\tests\test_data_definition;
 use mod_competvet\tests\test_helpers;
@@ -140,5 +143,41 @@ final class situations_test extends advanced_testcase {
             'parentidnumber' => 'Q001',
             'grade' => null,
         ], $criteria[8]);
+    }
+
+    /**
+     * The app read path must not expose a hidden situation, even for users able to view hidden
+     * activities, while the web (capability-based) read path still does.
+     *
+     * @return void
+     */
+    public function test_get_all_situations_with_planning_for_excludes_hidden(): void {
+        global $DB;
+        $situation = situation::get_record(['shortname' => 'SIT1']);
+        $competvet = competvet::get_from_situation_id($situation->get('id'));
+        $observer = core_user::get_user_by_username('observer1');
+        $courseid = $competvet->get_course_module()->course;
+
+        // Clear any cached situation list so the assertions are computed from scratch.
+        cache::make('mod_competvet', 'usersituations')->delete($observer->id);
+
+        // While visible, the app path includes the situation.
+        $situations = situations::get_all_situations_with_planning_for($observer->id);
+        $this->assertContains('SIT1', array_column($situations, 'shortname'));
+
+        // Grant the capability to view hidden activities (to the observer role) and hide the activity.
+        $context = context_course::instance($courseid);
+        $observerrole = $DB->get_record('role', ['shortname' => 'observer'], '*', MUST_EXIST);
+        assign_capability('moodle/course:viewhiddenactivities', CAP_ALLOW, $observerrole->id, $context->id);
+        accesslib_clear_all_caches_for_unit_testing();
+        set_coursemodule_visible($competvet->get_course_module_id(), 0);
+
+        // The web (capability-based) read path still includes the hidden situation.
+        $websituations = situation::get_all_situations_in_course_id_for($observer->id, $courseid);
+        $this->assertContains($situation->get('id'), $websituations);
+
+        // The app (strict) read path excludes the hidden situation.
+        $appsituations = situations::get_all_situations_with_planning_for($observer->id);
+        $this->assertNotContains('SIT1', array_column($appsituations, 'shortname'));
     }
 }

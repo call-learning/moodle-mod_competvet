@@ -52,6 +52,10 @@ class situations {
         foreach ($allsituations as $situation) {
             $situationid = $situation->get('id');
             $competvet = competvet::get_from_situation_id($situationid);
+            // The app must not expose hidden activities, whatever the viewer's capabilities.
+            if (!$competvet->has_strict_view_access($userid)) {
+                continue;
+            }
             $allplannings = plannings::get_plannings_for_situation_id($situationid, $userid, $nofuture);
             if (empty($allplannings)) {
                 continue; // Do not add situations with empty plannings as user is not involved.

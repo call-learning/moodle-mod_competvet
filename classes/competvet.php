@@ -248,6 +248,26 @@ class competvet {
     }
 
     /**
+     * Has the given user access to this competvet, ignoring the ability to view hidden activities?
+     *
+     * This is a strict variant of {@see self::has_view_access()} used by the app (local_competvet) API.
+     * A hidden activity (visible = 0) is denied to everyone, including users holding
+     * moodle/course:viewhiddenactivities and siteadmins. Availability and group restrictions
+     * are still respected, as they are part of uservisible.
+     *
+     * @param int $userid The id of the user to check.
+     * @return bool
+     */
+    public function has_strict_view_access(int $userid): bool {
+        $cminfo = get_fast_modinfo($this->cminfo->course, $userid);
+        $cm = $cminfo->get_cm($this->cminfo->id);
+
+        // Requiring the raw visible flag removes the viewhiddenactivities / siteadmin
+        // bypasses that uservisible would otherwise grant for hidden activities.
+        return (bool) ($cm->uservisible && $cm->visible);
+    }
+
+    /**
      * Get the competVet instance from the context (module)
      *
      * @param situation $situation
