@@ -56,6 +56,7 @@ class validate_certification extends external_api {
      * @return array
      */
     public static function execute($validid, $declid, $level, $comment, $commentformat, $status): array {
+        global $USER;
         ['validid' => $validid, 'declid' => $declid, 'level' => $level, 'comment' => $comment, 'commentformat' => $commentformat,
             'status' => $status] =
             self::validate_parameters(
@@ -75,7 +76,7 @@ class validate_certification extends external_api {
                 return ['success' => true];
             }
         } else {
-            if (certifications::validate_cert_declaration($validid, $declid, $level, $comment, $commentformat)) {
+            if (certifications::validate_cert_declaration($declid, $USER->id, $status, $comment, $commentformat)) {
                 return ['success' => true];
             }
         }
