@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\local\api;
+
 use mod_competvet\local\persistent\form;
 
 /**

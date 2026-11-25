@@ -25,6 +25,7 @@
 use mod_competvet\competvet;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\reportbuilder\local\systemreports\situations;
+
 require(__DIR__ . '/../../config.php');
 global $PAGE, $DB, $OUTPUT, $USER;
 

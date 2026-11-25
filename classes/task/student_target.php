@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\task;
+
 use mod_competvet\notifications;
 use mod_competvet\competvet;
 use mod_competvet\local\api\grading as grading_api;

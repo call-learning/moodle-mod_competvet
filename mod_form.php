@@ -21,6 +21,7 @@
  * @copyright 2023 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 use mod_competvet\local\persistent\grid;
 use mod_competvet\local\persistent\situation;
 use mod_competvet\local\api\plannings as plannings_api;

@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\local\observers;
+
 use mod_competvet\event\observation_completed;
 use mod_competvet\event\observation_requested;
 use mod_competvet\local\api\todos;

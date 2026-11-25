@@ -24,6 +24,7 @@
  * @copyright  2026 CALL Learning <contact@call-learning.fr>
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_competvet\task;
 
 use mod_competvet\local\persistent\criterion;

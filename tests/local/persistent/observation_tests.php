@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\local\persistent;
+
 use advanced_testcase;
 use core_user;
 use mod_competvet\tests\test_data_definition;

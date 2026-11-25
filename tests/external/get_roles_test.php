@@ -119,9 +119,6 @@ final class get_roles_test extends \advanced_testcase {
      *
      * @param string $currentuser Current user key.
      * @param array $expected Expected result payload.
-     * @param string $currentuser
-     * @param array $expected
-     *
      */
     #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     #[\PHPUnit\Framework\Attributes\DataProvider('get_role_data')]

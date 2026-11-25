@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\local\tasks;
+
 use advanced_testcase;
 use DateTime;
 use mod_competvet\task\student_target;

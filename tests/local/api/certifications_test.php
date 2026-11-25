@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_competvet\local\api;
+
 use advanced_testcase;
 use core_user;
 use mod_competvet\local\persistent\cert_decl;

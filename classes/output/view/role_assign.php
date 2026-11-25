@@ -19,6 +19,7 @@ namespace mod_competvet\output\view;
 use renderable;
 use templatable;
 use renderer_base;
+
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/admin/roles/lib.php');
